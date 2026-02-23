@@ -15,6 +15,10 @@ export type AuthUser = {
             return this._user() !== null;
         }
 
+        init(): void {
+            
+        }
+
         loginMock(): void {
             this._user.set({ id: 'u1', email:'sascha@example.com'});
         }
