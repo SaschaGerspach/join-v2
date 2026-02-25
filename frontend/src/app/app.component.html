@@ -1,1 +1,7 @@
 <router-outlet></router-outlet>
+
+@if (!auth.authChecked()) {
+  <div class="app-loading-overlay">
+    <p>Session wird geprüft…</p>
+  </div>
+}
