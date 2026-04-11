@@ -4,6 +4,7 @@ import { RegisterPageComponent } from './features/auth/pages/register-page/regis
 import { BoardsPageComponent } from './features/boards/pages/boards-page/boards-page.component';
 import { BoardDetailPageComponent } from './features/boards/pages/board-detail-page/board-detail-page.component';
 import { ContactsPageComponent } from './features/contacts/pages/contacts-page/contacts-page.component';
+import { SummaryPageComponent } from './features/summary/pages/summary-page/summary-page.component';
 import { ShellComponent } from './layout/shell/shell.component';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -16,7 +17,8 @@ export const routes: Routes = [
         component: ShellComponent,
         canActivate: [authGuard],
         children: [
-                {path: '', pathMatch: 'full', redirectTo: 'boards'},
+                {path: '', pathMatch: 'full', redirectTo: 'summary'},
+                {path: 'summary', component: SummaryPageComponent},
                 {path: 'boards', component: BoardsPageComponent},
                 {path: 'boards/:id', component: BoardDetailPageComponent},
                 {path: 'contacts', component: ContactsPageComponent},

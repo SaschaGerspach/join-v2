@@ -1,0 +1,53 @@
+<div class="summary-page">
+
+  <div class="greeting-section">
+    <h1 class="greeting">{{ greeting() }}, <span class="greeting-name">{{ userName() }}</span>!</h1>
+  </div>
+
+  <div class="stats-grid">
+
+    <div class="stat-card accent" (click)="goToBoards()">
+      <div class="stat-icon">&#9776;</div>
+      <div class="stat-body">
+        <span class="stat-number">{{ boards().length }}</span>
+        <span class="stat-label">Boards</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">&#9776;</div>
+      <div class="stat-body">
+        <span class="stat-number">{{ totalTasks() }}</span>
+        <span class="stat-label">Tasks in total</span>
+      </div>
+    </div>
+
+    <div class="stat-card urgent">
+      <div class="stat-icon">&#9888;</div>
+      <div class="stat-body">
+        <span class="stat-number">{{ urgentTasks() }}</span>
+        <span class="stat-label">Urgent</span>
+      </div>
+    </div>
+
+    <div class="stat-card high">
+      <div class="stat-icon">&#8679;</div>
+      <div class="stat-body">
+        <span class="stat-number">{{ highTasks() }}</span>
+        <span class="stat-label">High priority</span>
+      </div>
+    </div>
+
+    @if (nextDeadline()) {
+      <div class="stat-card deadline">
+        <div class="stat-icon">&#128197;</div>
+        <div class="stat-body">
+          <span class="stat-number deadline-date">{{ nextDeadline() | slice:0:10 }}</span>
+          <span class="stat-label">Next deadline</span>
+        </div>
+      </div>
+    }
+
+  </div>
+
+</div>

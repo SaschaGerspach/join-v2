@@ -6,6 +6,10 @@
     </div>
 
     <nav class="sidebar-nav">
+      <a routerLink="/summary" routerLinkActive="active">
+        <span class="nav-icon">&#9632;</span>
+        Summary
+      </a>
       <a routerLink="/boards" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">
         <span class="nav-icon">&#9776;</span>
         Boards
@@ -44,6 +48,10 @@
   </div>
 
   <footer class="mobile-footer">
+    <a routerLink="/summary" routerLinkActive="active">
+      <span>&#9632;</span>
+      <span>Summary</span>
+    </a>
     <a routerLink="/boards" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">
       <span>&#9776;</span>
       <span>Boards</span>
