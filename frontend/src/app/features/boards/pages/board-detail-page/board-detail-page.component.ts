@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { TasksApiService, Task, CreateTaskPayload } from '../../../../core/tasks/tasks-api.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
@@ -8,7 +9,7 @@ import { BoardsApiService, Board } from '../../../../core/boards/boards-api.serv
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DragDropModule],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
 })
@@ -22,6 +23,8 @@ export class BoardDetailPageComponent implements OnInit {
   board = signal<Board | null>(null);
   columns = signal<Column[]>([]);
   tasks = signal<Task[]>([]);
+
+  columnListIds = computed(() => this.columns().map(c => `col-${c.id}`));
 
   newColumnTitle = '';
   showColumnForm = signal(false);
@@ -84,6 +87,23 @@ export class BoardDetailPageComponent implements OnInit {
     this.tasksApi.delete(id).subscribe(() => {
       this.tasks.update(t => t.filter(task => task.id !== id));
     });
+  }
+
+  drop(event: CdkDragDrop<Task[]>, targetColumnId: number): void {
+    const task: Task = event.item.data;
+
+    if (event.previousContainer === event.container) {
+      // reorder within same column — no API call needed for now
+      return;
+    }
+
+    // Optimistic update: change the task's column in local state
+    this.tasks.update(tasks =>
+      tasks.map(t => t.id === task.id ? { ...t, column: targetColumnId } : t)
+    );
+
+    // Persist to backend
+    this.tasksApi.patch(task.id, { column: targetColumnId }).subscribe();
   }
 
   priorityClass(priority: string): string {

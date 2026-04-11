@@ -286,6 +286,31 @@ $priority-urgent: #ff3d00;
   }
 }
 
+// ─── Drag & Drop ─────────────────────────────────────────────────────────────
+
+.cdk-drag-preview {
+  border-radius: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  opacity: 0.95;
+}
+
+.cdk-drag-placeholder {
+  background: rgba($color-primary, 0.08);
+  border: 2px dashed $color-primary;
+  border-radius: 24px;
+  min-height: 60px;
+
+  * { visibility: hidden; }
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .task-card:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
 // ─── Empty State ─────────────────────────────────────────────────────────────
 
 .board-empty {

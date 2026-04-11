@@ -30,9 +30,16 @@
           <button class="btn-icon" (click)="deleteColumn(column.id)" title="Delete column">&#10005;</button>
         </div>
 
-        <div class="task-list">
+        <div
+          class="task-list"
+          cdkDropList
+          [id]="'col-' + column.id"
+          [cdkDropListData]="tasksForColumn(column.id)"
+          [cdkDropListConnectedTo]="columnListIds()"
+          (cdkDropListDropped)="drop($event, column.id)"
+        >
           @for (task of tasksForColumn(column.id); track task.id) {
-            <div class="task-card">
+            <div class="task-card" cdkDrag [cdkDragData]="task">
               <div class="task-card-top">
                 <span class="task-priority" [class]="priorityClass(task.priority)">
                   {{ task.priority }}
