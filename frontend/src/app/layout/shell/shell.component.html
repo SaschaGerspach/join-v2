@@ -9,7 +9,8 @@
 
   <main class="content">
     <header class="topbar">
-      <span>App Bereich</span>
+      <span>{{ auth.user()?.email }}</span>
+      <button type="button" (click)="logout()">Logout</button>
     </header>
 
     <section class="page">
