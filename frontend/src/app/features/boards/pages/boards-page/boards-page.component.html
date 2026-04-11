@@ -1,8 +1,42 @@
-<h1>Boards</h1>
-<p>Wenn du hier bist, hat der Guard dich durchgelassen.</p>
+<div class="boards-page">
+  <div class="boards-header">
+    <h1>My Boards</h1>
+    <button class="btn-add" (click)="showForm.set(true)">+ New Board</button>
+  </div>
 
-<button type="button" (click)="logout()">Logout</button>
+  @if (showForm()) {
+    <div class="board-form">
+      <input
+        class="form-input"
+        type="text"
+        [(ngModel)]="newTitle"
+        placeholder="Board title"
+        (keyup.enter)="createBoard()"
+        autofocus
+      />
+      <div class="board-form-actions">
+        <button class="btn-secondary" (click)="showForm.set(false)">Cancel</button>
+        <button class="btn-primary" (click)="createBoard()">Create</button>
+      </div>
+    </div>
+  }
 
-<p style="margin-top: 16px">
-  <a routerLink="/login">>Zu Login</a>
-</p>
+  @if (boards().length === 0) {
+    <div class="boards-empty">
+      <p>No boards yet. Create your first board!</p>
+    </div>
+  } @else {
+    <div class="boards-grid">
+      @for (board of boards(); track board.id) {
+        <div class="board-card">
+          <div class="board-card-body">
+            <h2>{{ board.title }}</h2>
+          </div>
+          <div class="board-card-actions">
+            <button class="btn-delete" (click)="deleteBoard(board.id)" title="Delete board">&#10005;</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

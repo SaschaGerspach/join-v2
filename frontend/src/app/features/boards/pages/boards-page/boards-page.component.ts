@@ -1,20 +1,43 @@
-import { Component, inject } from '@angular/core';
-import { RouterModule, Router } from "@angular/router";
-import { AuthService } from '../../../../core/auth/auth.service';
+import { Component, inject, signal, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 
 @Component({
   selector: 'app-boards-page',
   standalone: true,
-  imports: [RouterModule],
+  imports: [FormsModule],
   templateUrl: './boards-page.component.html',
   styleUrl: './boards-page.component.scss'
 })
-export class BoardsPageComponent {
-  private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
+export class BoardsPageComponent implements OnInit {
+  private readonly api = inject(BoardsApiService);
 
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['login']);
+  boards = signal<Board[]>([]);
+  newTitle = '';
+  showForm = signal(false);
+
+  ngOnInit(): void {
+    this.loadBoards();
+  }
+
+  loadBoards(): void {
+    this.api.getAll().subscribe(boards => this.boards.set(boards));
+  }
+
+  createBoard(): void {
+    const title = this.newTitle.trim();
+    if (!title) return;
+
+    this.api.create(title).subscribe(board => {
+      this.boards.update(b => [...b, board]);
+      this.newTitle = '';
+      this.showForm.set(false);
+    });
+  }
+
+  deleteBoard(id: number): void {
+    this.api.delete(id).subscribe(() => {
+      this.boards.update(b => b.filter(board => board.id !== id));
+    });
   }
 }
