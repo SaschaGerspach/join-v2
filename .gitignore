@@ -1,2 +1,6 @@
 __pycache__/
 *.pyc
+backend/staticfiles/
+frontend/dist/
+frontend/node_modules/
+.env
