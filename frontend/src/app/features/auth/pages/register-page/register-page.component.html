@@ -1,15 +1,65 @@
-<h1>Register</h1>
+<div class="auth-page">
+  <div class="auth-logo">
+    <span>Join</span>
+  </div>
 
-<form (ngSubmit)="register()">
-  <input type="text" [(ngModel)]="firstName" name="firstName" placeholder="First name" required />
-  <input type="text" [(ngModel)]="lastName" name="lastName" placeholder="Last name" required />
-  <input type="email" [(ngModel)]="email" name="email" placeholder="Email" required />
-  <input type="password" [(ngModel)]="password" name="password" placeholder="Password" required />
-  <button type="submit">Register</button>
-</form>
+  <div class="auth-card">
+    <h1>Sign up</h1>
+    <div class="auth-divider"></div>
 
-@if (error()) {
-  <p>{{ error() }}</p>
-}
+    <form (ngSubmit)="register()">
+      <div class="form-group">
+        <input
+          class="form-input"
+          type="text"
+          [(ngModel)]="firstName"
+          name="firstName"
+          placeholder="First name"
+          required
+        />
+      </div>
 
-<a routerLink="/login">Already have an account? Login</a>
+      <div class="form-group">
+        <input
+          class="form-input"
+          type="text"
+          [(ngModel)]="lastName"
+          name="lastName"
+          placeholder="Last name"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <input
+          class="form-input"
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="Email"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <input
+          class="form-input"
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+      </div>
+
+      @if (error()) {
+        <p class="error-message">{{ error() }}</p>
+      }
+
+      <div class="auth-actions">
+        <a routerLink="/login" class="btn-secondary">Back to login</a>
+        <button type="submit" class="btn-primary">Sign up</button>
+      </div>
+    </form>
+  </div>
+</div>

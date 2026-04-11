@@ -9,6 +9,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
   standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './register-page.component.html',
+  styleUrl: './register-page.component.scss',
 })
 export class RegisterPageComponent {
   private readonly api = inject(AuthApiService);
