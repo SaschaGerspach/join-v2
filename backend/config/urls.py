@@ -22,4 +22,5 @@ urlpatterns = [
     path("auth/", include("auth_api.urls")),
     path("users/", include("users_api.urls")),
     path("boards/", include("boards_api.urls")),
+    path("columns/", include("columns_api.urls")),
 ]

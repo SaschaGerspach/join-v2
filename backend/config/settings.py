@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'auth_api',
     'users_api',
     'boards_api',
+    'columns_api',
 ]
 
 MIDDLEWARE = [
