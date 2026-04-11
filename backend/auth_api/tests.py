@@ -71,3 +71,22 @@ class LoginViewTests(APITestCase):
     def test_login_missing_fields(self):
         response = self.client.post(self.url, {})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutViewTests(APITestCase):
+    url = "/auth/logout"
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="securepass123",
+        )
+
+    def test_logout_success(self):
+        self.client.login(username="test@example.com", password="securepass123")
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_logout_unauthenticated(self):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
