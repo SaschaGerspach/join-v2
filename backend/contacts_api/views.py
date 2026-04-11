@@ -1,3 +1,54 @@
-from django.shortcuts import render
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-# Create your views here.
+from .models import Contact
+
+
+def serialize_contact(contact):
+    return {
+        "id": contact.pk,
+        "first_name": contact.first_name,
+        "last_name": contact.last_name,
+        "email": contact.email,
+        "phone": contact.phone,
+    }
+
+
+@api_view(["GET", "POST"])
+def contact_list(request):
+    if request.method == "GET":
+        contacts = request.user.contacts.all().order_by("last_name", "first_name")
+        return Response([serialize_contact(c) for c in contacts])
+
+    required = ["first_name", "last_name", "email"]
+    for field in required:
+        if not request.data.get(field, "").strip():
+            return Response({"detail": f"{field} is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    contact = Contact.objects.create(
+        owner=request.user,
+        first_name=request.data["first_name"].strip(),
+        last_name=request.data["last_name"].strip(),
+        email=request.data["email"].strip(),
+        phone=request.data.get("phone", "").strip(),
+    )
+    return Response(serialize_contact(contact), status=status.HTTP_201_CREATED)
+
+
+@api_view(["PATCH", "DELETE"])
+def contact_detail(request, pk):
+    try:
+        contact = Contact.objects.get(pk=pk, owner=request.user)
+    except Contact.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "PATCH":
+        for field in ["first_name", "last_name", "email", "phone"]:
+            if field in request.data:
+                setattr(contact, field, request.data[field].strip())
+        contact.save()
+        return Response(serialize_contact(contact))
+
+    contact.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
