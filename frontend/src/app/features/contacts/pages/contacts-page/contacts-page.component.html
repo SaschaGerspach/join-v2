@@ -6,7 +6,14 @@
       <button class="btn-add-contact" (click)="openCreate()">+ New Contact</button>
     </div>
 
+    @if (error()) {
+      <p class="error-banner">{{ error() }}</p>
+    }
+
     <div class="contact-list">
+      @if (loading()) {
+        <app-loading-spinner />
+      }
       @for (contact of contacts(); track contact.id) {
         <div
           class="contact-list-item"

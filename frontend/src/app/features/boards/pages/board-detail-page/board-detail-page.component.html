@@ -1,5 +1,13 @@
 <div class="board-detail">
 
+  @if (error()) {
+    <p class="error-banner">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <app-loading-spinner />
+  }
+
   <div class="board-detail-header">
     <h1>{{ board()?.title ?? 'Board' }}</h1>
     <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>

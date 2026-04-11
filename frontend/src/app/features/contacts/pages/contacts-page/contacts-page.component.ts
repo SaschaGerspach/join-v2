@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
 type ContactForm = {
   first_name: string;
@@ -12,7 +13,7 @@ type ContactForm = {
 @Component({
   selector: 'app-contacts-page',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, LoadingSpinnerComponent],
   templateUrl: './contacts-page.component.html',
   styleUrl: './contacts-page.component.scss',
 })
@@ -23,11 +24,16 @@ export class ContactsPageComponent implements OnInit {
   selectedContact = signal<Contact | null>(null);
   showForm = signal(false);
   editMode = signal(false);
+  loading = signal(true);
+  error = signal('');
 
   form: ContactForm = { first_name: '', last_name: '', email: '', phone: '' };
 
   ngOnInit(): void {
-    this.api.getAll().subscribe(contacts => this.contacts.set(contacts));
+    this.api.getAll().subscribe({
+      next: contacts => { this.contacts.set(contacts); this.loading.set(false); },
+      error: () => { this.error.set('Failed to load contacts.'); this.loading.set(false); },
+    });
   }
 
   openCreate(): void {

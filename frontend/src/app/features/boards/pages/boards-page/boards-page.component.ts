@@ -2,11 +2,12 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-boards-page',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, LoadingSpinnerComponent],
   templateUrl: './boards-page.component.html',
   styleUrl: './boards-page.component.scss'
 })
@@ -17,13 +18,20 @@ export class BoardsPageComponent implements OnInit {
   boards = signal<Board[]>([]);
   newTitle = '';
   showForm = signal(false);
+  loading = signal(true);
+  error = signal('');
 
   ngOnInit(): void {
     this.loadBoards();
   }
 
   loadBoards(): void {
-    this.api.getAll().subscribe(boards => this.boards.set(boards));
+    this.loading.set(true);
+    this.error.set('');
+    this.api.getAll().subscribe({
+      next: boards => { this.boards.set(boards); this.loading.set(false); },
+      error: () => { this.error.set('Failed to load boards.'); this.loading.set(false); },
+    });
   }
 
   createBoard(): void {

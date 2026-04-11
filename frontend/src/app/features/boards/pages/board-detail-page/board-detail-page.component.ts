@@ -8,11 +8,12 @@ import { TasksApiService, Task, CreateTaskPayload } from '../../../../core/tasks
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 import { ContactsApiService, Contact } from '../../../../core/contacts/contacts-api.service';
 import { TaskDetailModalComponent } from '../../components/task-detail-modal/task-detail-modal.component';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule, DragDropModule, SlicePipe, TaskDetailModalComponent],
+  imports: [FormsModule, DragDropModule, SlicePipe, TaskDetailModalComponent, LoadingSpinnerComponent],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
 })
@@ -38,6 +39,8 @@ export class BoardDetailPageComponent implements OnInit {
   newTaskTitle = '';
 
   selectedTask = signal<Task | null>(null);
+  loading = signal(true);
+  error = signal('');
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -46,9 +49,17 @@ export class BoardDetailPageComponent implements OnInit {
   }
 
   loadData(boardId: number): void {
-    this.boardsApi.getById(boardId).subscribe(board => this.board.set(board));
+    this.loading.set(true);
+    this.error.set('');
+    this.boardsApi.getById(boardId).subscribe({
+      next: board => this.board.set(board),
+      error: () => { this.error.set('Failed to load board.'); this.loading.set(false); },
+    });
     this.columnsApi.getByBoard(boardId).subscribe(cols => this.columns.set(cols));
-    this.tasksApi.getByBoard(boardId).subscribe(tasks => this.tasks.set(tasks));
+    this.tasksApi.getByBoard(boardId).subscribe(tasks => {
+      this.tasks.set(tasks);
+      this.loading.set(false);
+    });
     this.contactsApi.getAll().subscribe(contacts => this.contacts.set(contacts));
   }
 
