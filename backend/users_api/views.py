@@ -37,6 +37,11 @@ def user_detail(request, pk):
         for field in ["first_name", "last_name", "email"]:
             if field in request.data:
                 setattr(user, field, request.data[field])
+        if "password" in request.data:
+            new_password = request.data["password"].strip()
+            if len(new_password) < 8:
+                return Response({"detail": "Password must be at least 8 characters."}, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(new_password)
         user.save()
         return Response(serialize_user(user))
 
