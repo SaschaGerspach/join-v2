@@ -35,3 +35,39 @@ class RegisterViewTests(APITestCase):
             "password": "otherpass123",
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class LoginViewTests(APITestCase):
+    url = "/auth/login"
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="securepass123",
+        )
+
+    def test_login_success(self):
+        response = self.client.post(self.url, {
+            "email": "test@example.com",
+            "password": "securepass123",
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["email"], "test@example.com")
+
+    def test_login_wrong_password(self):
+        response = self.client.post(self.url, {
+            "email": "test@example.com",
+            "password": "wrongpassword",
+        })
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_login_unknown_email(self):
+        response = self.client.post(self.url, {
+            "email": "unknown@example.com",
+            "password": "securepass123",
+        })
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_login_missing_fields(self):
+        response = self.client.post(self.url, {})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
