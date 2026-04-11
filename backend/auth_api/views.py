@@ -68,3 +68,9 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET"])
+def me(request):
+    user = request.user
+    return Response({"id": user.pk, "email": user.email})

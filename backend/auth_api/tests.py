@@ -90,3 +90,24 @@ class LogoutViewTests(APITestCase):
     def test_logout_unauthenticated(self):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class MeViewTests(APITestCase):
+    url = "/auth/me"
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="securepass123",
+        )
+
+    def test_me_authenticated(self):
+        self.client.login(username="test@example.com", password="securepass123")
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["email"], "test@example.com")
+        self.assertEqual(response.data["id"], self.user.pk)
+
+    def test_me_unauthenticated(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
