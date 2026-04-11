@@ -50,6 +50,12 @@
               @if (task.description) {
                 <p class="task-description">{{ task.description }}</p>
               }
+              @if (task.assigned_to) {
+                <div class="task-assignee">
+                  <span class="assignee-avatar">{{ contactInitials(task.assigned_to) }}</span>
+                  <span class="assignee-name">{{ contactName(task.assigned_to) }}</span>
+                </div>
+              }
               @if (task.subtask_count > 0) {
                 <div class="subtask-progress">
                   <div class="subtask-progress-bar">

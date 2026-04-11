@@ -51,17 +51,33 @@
         </div>
       </div>
 
-      <div class="field-group">
-        <label class="field-label">Column</label>
-        <select
-          class="field-select"
-          [ngModel]="columnId()"
-          (ngModelChange)="columnId.set($event)"
-        >
-          @for (col of columns(); track col.id) {
-            <option [ngValue]="col.id">{{ col.title }}</option>
-          }
-        </select>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Column</label>
+          <select
+            class="field-select"
+            [ngModel]="columnId()"
+            (ngModelChange)="columnId.set($event)"
+          >
+            @for (col of columns(); track col.id) {
+              <option [ngValue]="col.id">{{ col.title }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Assigned to</label>
+          <select
+            class="field-select"
+            [ngModel]="assignedTo()"
+            (ngModelChange)="assignedTo.set($event === 'null' ? null : +$event)"
+          >
+            <option [ngValue]="null">— Unassigned —</option>
+            @for (contact of contacts(); track contact.id) {
+              <option [ngValue]="contact.id">{{ contact.first_name }} {{ contact.last_name }}</option>
+            }
+          </select>
+        </div>
       </div>
 
       <div class="field-group">

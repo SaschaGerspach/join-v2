@@ -5,6 +5,7 @@ import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from 
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { TasksApiService, Task, CreateTaskPayload } from '../../../../core/tasks/tasks-api.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
+import { ContactsApiService, Contact } from '../../../../core/contacts/contacts-api.service';
 import { TaskDetailModalComponent } from '../../components/task-detail-modal/task-detail-modal.component';
 
 @Component({
@@ -19,11 +20,13 @@ export class BoardDetailPageComponent implements OnInit {
   private readonly boardsApi = inject(BoardsApiService);
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly tasksApi = inject(TasksApiService);
+  private readonly contactsApi = inject(ContactsApiService);
 
   boardId = signal<number>(0);
   board = signal<Board | null>(null);
   columns = signal<Column[]>([]);
   tasks = signal<Task[]>([]);
+  contacts = signal<Contact[]>([]);
 
   columnListIds = computed(() => this.columns().map(c => `col-${c.id}`));
 
@@ -45,6 +48,19 @@ export class BoardDetailPageComponent implements OnInit {
     this.boardsApi.getById(boardId).subscribe(board => this.board.set(board));
     this.columnsApi.getByBoard(boardId).subscribe(cols => this.columns.set(cols));
     this.tasksApi.getByBoard(boardId).subscribe(tasks => this.tasks.set(tasks));
+    this.contactsApi.getAll().subscribe(contacts => this.contacts.set(contacts));
+  }
+
+  contactName(id: number | null): string {
+    if (!id) return '';
+    const c = this.contacts().find(x => x.id === id);
+    return c ? `${c.first_name} ${c.last_name}` : '';
+  }
+
+  contactInitials(id: number | null): string {
+    if (!id) return '';
+    const c = this.contacts().find(x => x.id === id);
+    return c ? (c.first_name[0] ?? '') + (c.last_name[0] ?? '') : '';
   }
 
   tasksForColumn(columnId: number): Task[] {

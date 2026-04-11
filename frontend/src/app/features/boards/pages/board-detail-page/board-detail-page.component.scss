@@ -180,6 +180,37 @@ $priority-urgent: #ff3d00;
   text-overflow: ellipsis;
 }
 
+// ─── Assignee ────────────────────────────────────────────────────────────────
+
+.task-assignee {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.assignee-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: $color-dark;
+  color: $color-white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.assignee-name {
+  font-size: 0.8rem;
+  color: $color-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 // ─── Subtask Progress ────────────────────────────────────────────────────────
 
 .subtask-progress {

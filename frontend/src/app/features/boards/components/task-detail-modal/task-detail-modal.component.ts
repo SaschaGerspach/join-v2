@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Task, TasksApiService } from '../../../../core/tasks/tasks-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api.service';
+import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
 
 @Component({
   selector: 'app-task-detail-modal',
@@ -14,9 +15,12 @@ import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api
 export class TaskDetailModalComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly subtasksApi = inject(SubtasksApiService);
+  private readonly contactsApi = inject(ContactsApiService);
 
   task = input.required<Task>();
   columns = input.required<Column[]>();
+
+  contacts = signal<Contact[]>([]);
 
   closed = output<void>();
   taskUpdated = output<Task>();
@@ -30,6 +34,7 @@ export class TaskDetailModalComponent implements OnInit {
 
   subtasks = signal<Subtask[]>([]);
   newSubtaskTitle = signal('');
+  assignedTo = signal<number | null>(null);
 
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
 
@@ -40,8 +45,10 @@ export class TaskDetailModalComponent implements OnInit {
     this.priority.set(t.priority);
     this.dueDate.set(t.due_date ?? '');
     this.columnId.set(t.column);
+    this.assignedTo.set(t.assigned_to);
 
     this.subtasksApi.getByTask(t.id).subscribe(subs => this.subtasks.set(subs));
+    this.contactsApi.getAll().subscribe(contacts => this.contacts.set(contacts));
   }
 
   save(): void {
@@ -51,6 +58,7 @@ export class TaskDetailModalComponent implements OnInit {
       priority: this.priority(),
       due_date: this.dueDate() || null,
       column: this.columnId(),
+      assigned_to: this.assignedTo(),
     };
 
     this.tasksApi.patch(this.task().id, payload).subscribe(updated => {
