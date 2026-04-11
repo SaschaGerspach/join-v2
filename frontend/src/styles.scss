@@ -1,1 +1,157 @@
-/* You can add global styles to this file, and also import other style files */
+// ─── Font ────────────────────────────────────────────────────────────────────
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./assets/fonts/Inter-VariableFont.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+// ─── Variables ───────────────────────────────────────────────────────────────
+
+// Colors
+$color-primary:     #29abe2;
+$color-dark:        #2a3647;
+$color-dark-hover:  #2a3d59;
+$color-dark-active: #091931;
+$color-error:       #ff8190;
+$color-bg:          #f6f7f8;
+$color-white:       #ffffff;
+$color-border:      #d1d1d1;
+$color-text-muted:  #a8a8a8;
+$color-link:        #007cee;
+
+// Priority
+$priority-high:   #ff3d00;
+$priority-medium: #ffa800;
+$priority-low:    #7ae229;
+
+// Task category colors
+$category-colors: (
+  '#FF7A00', '#FF5EB3', '#6E52FF', '#FF745E',
+  '#00BEE8', '#9327FF', '#1FD7C1', '#FFA35E',
+  '#FC71FF', '#FFC701', '#0038FF', '#FF4646',
+  '#FFBB2B', '#462f8a'
+);
+
+// Typography
+$font-family: 'Inter', Verdana, Geneva, Tahoma, sans-serif;
+$font-size-base: 16px;
+
+// Layout
+$sidebar-width:        248px;
+$header-height:        6rem;
+$mobile-footer-height: 80px;
+
+// Border radius
+$radius-xl:    30px;
+$radius-card:  24px;
+$radius-input: 10px;
+$radius-badge: 8px;
+
+// Breakpoints
+$bp-mobile:  800px;
+$bp-tablet:  1080px;
+$bp-desktop: 1410px;
+
+// ─── Reset & Base ────────────────────────────────────────────────────────────
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: $font-family;
+  font-size: $font-size-base;
+  background-color: $color-bg;
+  color: $color-dark;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: $color-link;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+button {
+  font-family: $font-family;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input, textarea, select {
+  font-family: $font-family;
+  font-size: $font-size-base;
+  outline: none;
+}
+
+// ─── Utility Classes ─────────────────────────────────────────────────────────
+
+.btn-primary {
+  background-color: $color-dark;
+  color: $color-white;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 1rem 2rem;
+  border-radius: $radius-input;
+  height: 56px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: $color-primary;
+  }
+}
+
+.btn-secondary {
+  background-color: $color-white;
+  color: $color-dark;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 1rem 2rem;
+  border-radius: $radius-input;
+  height: 56px;
+  border: 2px solid $color-dark;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    background-color: $color-primary;
+    color: $color-white;
+    border-color: $color-primary;
+  }
+}
+
+.form-input {
+  width: 100%;
+  border: 1px solid $color-border;
+  border-radius: $radius-input;
+  padding: 0.8rem 1.5rem;
+  font-size: $font-size-base;
+  background: $color-white;
+  transition: border-color 0.2s ease;
+
+  &::placeholder {
+    color: $color-border;
+  }
+
+  &:focus {
+    border-color: $color-primary;
+  }
+
+  &.error {
+    border-color: $color-error;
+  }
+}
+
+.error-message {
+  font-size: 12px;
+  color: $color-error;
+  margin-top: 4px;
+}
