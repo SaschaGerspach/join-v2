@@ -1,0 +1,107 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <input
+        class="modal-title-input"
+        type="text"
+        [ngModel]="title()"
+        (ngModelChange)="title.set($event)"
+        placeholder="Task title"
+      />
+      <button class="btn-close" (click)="close()">&#10005;</button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="field-group">
+        <label class="field-label">Description</label>
+        <textarea
+          class="field-textarea"
+          rows="3"
+          [ngModel]="description()"
+          (ngModelChange)="description.set($event)"
+          placeholder="Add a description..."
+        ></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Priority</label>
+          <div class="priority-options">
+            @for (p of priorities; track p) {
+              <button
+                class="priority-btn"
+                [class]="'priority-' + p"
+                [class.active]="priority() === p"
+                (click)="priority.set(p)"
+              >{{ p }}</button>
+            }
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Due date</label>
+          <input
+            class="field-input"
+            type="date"
+            [ngModel]="dueDate()"
+            (ngModelChange)="dueDate.set($event)"
+          />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Column</label>
+        <select
+          class="field-select"
+          [ngModel]="columnId()"
+          (ngModelChange)="columnId.set($event)"
+        >
+          @for (col of columns(); track col.id) {
+            <option [ngValue]="col.id">{{ col.title }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Subtasks</label>
+        <div class="subtask-list">
+          @for (sub of subtasks(); track sub.id) {
+            <div class="subtask-item">
+              <input
+                type="checkbox"
+                [id]="'sub-' + sub.id"
+                [checked]="sub.done"
+                (change)="toggleSubtask(sub)"
+              />
+              <label [for]="'sub-' + sub.id" [class.done]="sub.done">{{ sub.title }}</label>
+              <button class="btn-remove-sub" (click)="deleteSubtask(sub)">&#10005;</button>
+            </div>
+          }
+        </div>
+        <div class="subtask-add">
+          <input
+            class="field-input"
+            type="text"
+            [ngModel]="newSubtaskTitle()"
+            (ngModelChange)="newSubtaskTitle.set($event)"
+            placeholder="Add subtask..."
+            (keyup.enter)="addSubtask()"
+          />
+          <button class="btn-add-sub" (click)="addSubtask()">+</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-danger" (click)="deleteTask()">Delete</button>
+      <div class="footer-right">
+        <button class="btn-cancel" (click)="close()">Cancel</button>
+        <button class="btn-save" (click)="save()">Save</button>
+      </div>
+    </div>
+
+  </div>
+</div>

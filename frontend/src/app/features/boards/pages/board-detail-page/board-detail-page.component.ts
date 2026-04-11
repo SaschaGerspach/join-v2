@@ -5,11 +5,12 @@ import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from 
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { TasksApiService, Task, CreateTaskPayload } from '../../../../core/tasks/tasks-api.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
+import { TaskDetailModalComponent } from '../../components/task-detail-modal/task-detail-modal.component';
 
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule, DragDropModule],
+  imports: [FormsModule, DragDropModule, TaskDetailModalComponent],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
 })
@@ -31,6 +32,8 @@ export class BoardDetailPageComponent implements OnInit {
 
   addingTaskForColumn = signal<number | null>(null);
   newTaskTitle = '';
+
+  selectedTask = signal<Task | null>(null);
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -81,6 +84,18 @@ export class BoardDetailPageComponent implements OnInit {
       this.addingTaskForColumn.set(null);
       this.newTaskTitle = '';
     });
+  }
+
+  openTask(task: Task): void {
+    this.selectedTask.set(task);
+  }
+
+  onTaskUpdated(updated: Task): void {
+    this.tasks.update(t => t.map(task => task.id === updated.id ? updated : task));
+  }
+
+  onTaskDeleted(id: number): void {
+    this.tasks.update(t => t.filter(task => task.id !== id));
   }
 
   deleteTask(id: number): void {

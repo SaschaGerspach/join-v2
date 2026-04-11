@@ -39,12 +39,12 @@
           (cdkDropListDropped)="drop($event, column.id)"
         >
           @for (task of tasksForColumn(column.id); track task.id) {
-            <div class="task-card" cdkDrag [cdkDragData]="task">
+            <div class="task-card" cdkDrag [cdkDragData]="task" (click)="openTask(task)">
               <div class="task-card-top">
                 <span class="task-priority" [class]="priorityClass(task.priority)">
                   {{ task.priority }}
                 </span>
-                <button class="btn-icon small" (click)="deleteTask(task.id)">&#10005;</button>
+                <button class="btn-icon small" (click)="$event.stopPropagation(); deleteTask(task.id)">&#10005;</button>
               </div>
               <p class="task-title">{{ task.title }}</p>
               @if (task.description) {
@@ -83,3 +83,13 @@
   </div>
 
 </div>
+
+@if (selectedTask()) {
+  <app-task-detail-modal
+    [task]="selectedTask()!"
+    [columns]="columns()"
+    (closed)="selectedTask.set(null)"
+    (taskUpdated)="onTaskUpdated($event)"
+    (taskDeleted)="onTaskDeleted($event)"
+  />
+}
