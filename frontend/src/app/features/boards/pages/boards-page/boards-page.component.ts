@@ -1,4 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 
@@ -11,6 +12,7 @@ import { BoardsApiService, Board } from '../../../../core/boards/boards-api.serv
 })
 export class BoardsPageComponent implements OnInit {
   private readonly api = inject(BoardsApiService);
+  private readonly router = inject(Router);
 
   boards = signal<Board[]>([]);
   newTitle = '';
@@ -33,6 +35,10 @@ export class BoardsPageComponent implements OnInit {
       this.newTitle = '';
       this.showForm.set(false);
     });
+  }
+
+  openBoard(id: number): void {
+    this.router.navigate(['/boards', id]);
   }
 
   deleteBoard(id: number): void {

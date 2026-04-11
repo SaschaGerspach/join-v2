@@ -18,6 +18,10 @@ export class BoardsApiService {
     return this.http.get<Board[]>(`${this.baseUrl}/boards/`, { withCredentials: true });
   }
 
+  getById(id: number): Observable<Board> {
+    return this.http.get<Board>(`${this.baseUrl}/boards/${id}/`, { withCredentials: true });
+  }
+
   create(title: string): Observable<Board> {
     return this.http.post<Board>(`${this.baseUrl}/boards/`, { title }, { withCredentials: true });
   }

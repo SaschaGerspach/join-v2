@@ -1,0 +1,298 @@
+$color-dark:    #2a3647;
+$color-primary: #29abe2;
+$color-white:   #ffffff;
+$color-bg:      #f6f7f8;
+$color-border:  #d1d1d1;
+$color-muted:   #a8a8a8;
+$color-error:   #ff8190;
+
+$priority-high:   #ff3d00;
+$priority-medium: #ffa800;
+$priority-low:    #7ae229;
+$priority-urgent: #ff3d00;
+
+// ─── Page Header ─────────────────────────────────────────────────────────────
+
+.board-detail {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.board-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $color-dark;
+  }
+}
+
+.btn-add-column {
+  background-color: $color-dark;
+  color: $color-white;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: $color-primary;
+  }
+}
+
+// ─── Column Form ─────────────────────────────────────────────────────────────
+
+.column-form {
+  background: $color-white;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-shrink: 0;
+
+  .form-input {
+    flex: 1;
+    border: 1px solid $color-border;
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+
+    &:focus {
+      border-color: $color-primary;
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $color-border;
+    }
+  }
+}
+
+.column-form-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+// ─── Kanban Board ─────────────────────────────────────────────────────────────
+
+.kanban-board {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  flex: 1;
+  padding-bottom: 1rem;
+  align-items: flex-start;
+}
+
+// ─── Column ──────────────────────────────────────────────────────────────────
+
+.kanban-column {
+  min-width: 272px;
+  width: 272px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.25rem;
+
+  .column-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: $color-dark;
+  }
+}
+
+// ─── Task List ────────────────────────────────────────────────────────────────
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+// ─── Task Card ────────────────────────────────────────────────────────────────
+
+.task-card {
+  background: $color-white;
+  border-radius: 24px;
+  padding: 1rem;
+  box-shadow: -1px 1px 10px 3px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+    transform: translateY(-2px);
+  }
+}
+
+.task-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-priority {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 8px;
+  color: $color-white;
+
+  &.priority-low    { background-color: $priority-low; color: $color-dark; }
+  &.priority-medium { background-color: $priority-medium; }
+  &.priority-high   { background-color: $priority-high; }
+  &.priority-urgent { background-color: $priority-urgent; }
+}
+
+.task-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: $color-dark;
+}
+
+.task-description {
+  font-size: 0.85rem;
+  color: $color-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ─── Task Input ───────────────────────────────────────────────────────────────
+
+.task-input-card {
+  background: $color-white;
+  border-radius: 16px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .form-input {
+    width: 100%;
+    border: 1px solid $color-border;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+
+    &:focus {
+      border-color: $color-primary;
+      outline: none;
+    }
+  }
+}
+
+.task-input-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.btn-add-task {
+  background: none;
+  border: 1px dashed $color-muted;
+  border-radius: 12px;
+  color: $color-muted;
+  font-size: 0.9rem;
+  padding: 0.6rem;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+}
+
+// ─── Shared Buttons ──────────────────────────────────────────────────────────
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: $color-muted;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 50%;
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    color: $color-error;
+    background-color: rgba(255, 129, 144, 0.1);
+  }
+
+  &.small {
+    font-size: 0.75rem;
+    padding: 2px 5px;
+  }
+}
+
+.btn-cancel {
+  background: $color-white;
+  color: $color-dark;
+  border: 2px solid $color-dark;
+  border-radius: 8px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background-color: $color-primary;
+    color: $color-white;
+    border-color: $color-primary;
+  }
+}
+
+.btn-confirm {
+  background: $color-dark;
+  color: $color-white;
+  border: 2px solid $color-dark;
+  border-radius: 8px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: $color-primary;
+    border-color: $color-primary;
+  }
+}
+
+// ─── Empty State ─────────────────────────────────────────────────────────────
+
+.board-empty {
+  border: 1px dashed $color-muted;
+  border-radius: 16px;
+  padding: 3rem;
+  text-align: center;
+  color: $color-muted;
+  min-width: 272px;
+}

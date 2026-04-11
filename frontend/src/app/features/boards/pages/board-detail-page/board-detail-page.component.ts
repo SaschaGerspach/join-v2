@@ -1,0 +1,92 @@
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
+import { TasksApiService, Task, CreateTaskPayload } from '../../../../core/tasks/tasks-api.service';
+import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
+
+@Component({
+  selector: 'app-board-detail-page',
+  standalone: true,
+  imports: [FormsModule],
+  templateUrl: './board-detail-page.component.html',
+  styleUrl: './board-detail-page.component.scss',
+})
+export class BoardDetailPageComponent implements OnInit {
+  private readonly route = inject(ActivatedRoute);
+  private readonly boardsApi = inject(BoardsApiService);
+  private readonly columnsApi = inject(ColumnsApiService);
+  private readonly tasksApi = inject(TasksApiService);
+
+  boardId = signal<number>(0);
+  board = signal<Board | null>(null);
+  columns = signal<Column[]>([]);
+  tasks = signal<Task[]>([]);
+
+  newColumnTitle = '';
+  showColumnForm = signal(false);
+
+  addingTaskForColumn = signal<number | null>(null);
+  newTaskTitle = '';
+
+  ngOnInit(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.boardId.set(id);
+    this.loadData(id);
+  }
+
+  loadData(boardId: number): void {
+    this.boardsApi.getById(boardId).subscribe(board => this.board.set(board));
+    this.columnsApi.getByBoard(boardId).subscribe(cols => this.columns.set(cols));
+    this.tasksApi.getByBoard(boardId).subscribe(tasks => this.tasks.set(tasks));
+  }
+
+  tasksForColumn(columnId: number): Task[] {
+    return this.tasks().filter(t => t.column === columnId);
+  }
+
+  createColumn(): void {
+    const title = this.newColumnTitle.trim();
+    if (!title) return;
+
+    this.columnsApi.create(this.boardId(), title).subscribe(col => {
+      this.columns.update(c => [...c, col]);
+      this.newColumnTitle = '';
+      this.showColumnForm.set(false);
+    });
+  }
+
+  deleteColumn(id: number): void {
+    this.columnsApi.delete(id).subscribe(() => {
+      this.columns.update(c => c.filter(col => col.id !== id));
+      this.tasks.update(t => t.filter(task => task.column !== id));
+    });
+  }
+
+  startAddTask(columnId: number): void {
+    this.addingTaskForColumn.set(columnId);
+    this.newTaskTitle = '';
+  }
+
+  createTask(columnId: number): void {
+    const title = this.newTaskTitle.trim();
+    if (!title) return;
+
+    const payload: CreateTaskPayload = { title, column: columnId };
+    this.tasksApi.create(this.boardId(), payload).subscribe(task => {
+      this.tasks.update(t => [...t, task]);
+      this.addingTaskForColumn.set(null);
+      this.newTaskTitle = '';
+    });
+  }
+
+  deleteTask(id: number): void {
+    this.tasksApi.delete(id).subscribe(() => {
+      this.tasks.update(t => t.filter(task => task.id !== id));
+    });
+  }
+
+  priorityClass(priority: string): string {
+    return `priority-${priority}`;
+  }
+}

@@ -1,0 +1,78 @@
+<div class="board-detail">
+
+  <div class="board-detail-header">
+    <h1>{{ board()?.title ?? 'Board' }}</h1>
+    <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>
+  </div>
+
+  @if (showColumnForm()) {
+    <div class="column-form">
+      <input
+        class="form-input"
+        type="text"
+        [(ngModel)]="newColumnTitle"
+        placeholder="Column title"
+        (keyup.enter)="createColumn()"
+      />
+      <div class="column-form-actions">
+        <button class="btn-cancel" (click)="showColumnForm.set(false)">Cancel</button>
+        <button class="btn-confirm" (click)="createColumn()">Add</button>
+      </div>
+    </div>
+  }
+
+  <div class="kanban-board">
+    @for (column of columns(); track column.id) {
+      <div class="kanban-column">
+
+        <div class="column-header">
+          <span class="column-title">{{ column.title }}</span>
+          <button class="btn-icon" (click)="deleteColumn(column.id)" title="Delete column">&#10005;</button>
+        </div>
+
+        <div class="task-list">
+          @for (task of tasksForColumn(column.id); track task.id) {
+            <div class="task-card">
+              <div class="task-card-top">
+                <span class="task-priority" [class]="priorityClass(task.priority)">
+                  {{ task.priority }}
+                </span>
+                <button class="btn-icon small" (click)="deleteTask(task.id)">&#10005;</button>
+              </div>
+              <p class="task-title">{{ task.title }}</p>
+              @if (task.description) {
+                <p class="task-description">{{ task.description }}</p>
+              }
+            </div>
+          }
+
+          @if (addingTaskForColumn() === column.id) {
+            <div class="task-input-card">
+              <input
+                class="form-input"
+                type="text"
+                [(ngModel)]="newTaskTitle"
+                placeholder="Task title"
+                (keyup.enter)="createTask(column.id)"
+              />
+              <div class="task-input-actions">
+                <button class="btn-cancel" (click)="addingTaskForColumn.set(null)">Cancel</button>
+                <button class="btn-confirm" (click)="createTask(column.id)">Add</button>
+              </div>
+            </div>
+          } @else {
+            <button class="btn-add-task" (click)="startAddTask(column.id)">+ Add Task</button>
+          }
+        </div>
+
+      </div>
+    }
+
+    @if (columns().length === 0) {
+      <div class="board-empty">
+        <p>No columns yet. Add your first column!</p>
+      </div>
+    }
+  </div>
+
+</div>
