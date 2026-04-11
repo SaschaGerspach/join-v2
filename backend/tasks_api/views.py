@@ -7,6 +7,7 @@ from .models import Task, Subtask
 
 
 def serialize_task(task):
+    subtasks = task.subtasks.all()
     return {
         "id": task.pk,
         "board": task.board_id,
@@ -17,6 +18,8 @@ def serialize_task(task):
         "assigned_to": task.assigned_to_id,
         "due_date": task.due_date,
         "created_at": task.created_at,
+        "subtask_count": subtasks.count(),
+        "subtask_done_count": subtasks.filter(done=True).count(),
     }
 
 
