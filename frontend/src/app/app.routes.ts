@@ -5,6 +5,7 @@ import { BoardsPageComponent } from './features/boards/pages/boards-page/boards-
 import { BoardDetailPageComponent } from './features/boards/pages/board-detail-page/board-detail-page.component';
 import { ContactsPageComponent } from './features/contacts/pages/contacts-page/contacts-page.component';
 import { SummaryPageComponent } from './features/summary/pages/summary-page/summary-page.component';
+import { ProfilePageComponent } from './features/profile/pages/profile-page/profile-page.component';
 import { ShellComponent } from './layout/shell/shell.component';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -22,6 +23,7 @@ export const routes: Routes = [
                 {path: 'boards', component: BoardsPageComponent},
                 {path: 'boards/:id', component: BoardDetailPageComponent},
                 {path: 'contacts', component: ContactsPageComponent},
+                {path: 'profile', component: ProfilePageComponent},
         ],
     },
 ];

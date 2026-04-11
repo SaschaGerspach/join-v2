@@ -1,0 +1,61 @@
+<div class="profile-page">
+
+  <h1 class="page-title">My Profile</h1>
+
+  <div class="profile-card">
+
+    <div class="profile-avatar-section">
+      <div class="profile-avatar">{{ initials() }}</div>
+      <div class="profile-name">
+        <span class="profile-full-name">{{ firstName() }} {{ lastName() }}</span>
+        <span class="profile-email-display">{{ email() }}</span>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Personal Information</h2>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>First name</label>
+          <input class="field-input" type="text" [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" />
+        </div>
+        <div class="form-field">
+          <label>Last name</label>
+          <input class="field-input" type="text" [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" />
+        </div>
+        <div class="form-field full-width">
+          <label>Email</label>
+          <input class="field-input" type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Change Password</h2>
+      <div class="form-grid">
+        <div class="form-field full-width">
+          <label>New password</label>
+          <input class="field-input" type="password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" placeholder="Leave blank to keep current" />
+        </div>
+        <div class="form-field full-width">
+          <label>Confirm new password</label>
+          <input class="field-input" type="password" [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" placeholder="Repeat new password" />
+        </div>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="msg msg-error">{{ errorMessage() }}</p>
+    }
+    @if (successMessage()) {
+      <p class="msg msg-success">{{ successMessage() }}</p>
+    }
+
+    <div class="form-actions">
+      <button class="btn-save" [disabled]="saving()" (click)="save()">
+        {{ saving() ? 'Saving…' : 'Save changes' }}
+      </button>
+    </div>
+
+  </div>
+</div>
