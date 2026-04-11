@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'boards_api',
     'columns_api',
     'tasks_api',
+    'contacts_api',
 ]
 
 MIDDLEWARE = [
