@@ -16,11 +16,10 @@ export const routes: Routes = [
         component: ShellComponent,
         canActivate: [authGuard],
         children: [
+                {path: '', pathMatch: 'full', redirectTo: 'boards'},
                 {path: 'boards', component: BoardsPageComponent},
                 {path: 'boards/:id', component: BoardDetailPageComponent},
                 {path: 'contacts', component: ContactsPageComponent},
         ],
     },
-
-    {path: '', pathMatch: 'full', redirectTo: 'boards'},
 ];
