@@ -3,6 +3,7 @@ import { LoginPageComponent } from './features/auth/pages/login-page/login-page.
 import { RegisterPageComponent } from './features/auth/pages/register-page/register-page.component';
 import { BoardsPageComponent } from './features/boards/pages/boards-page/boards-page.component';
 import { BoardDetailPageComponent } from './features/boards/pages/board-detail-page/board-detail-page.component';
+import { ContactsPageComponent } from './features/contacts/pages/contacts-page/contacts-page.component';
 import { ShellComponent } from './layout/shell/shell.component';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -17,6 +18,7 @@ export const routes: Routes = [
         children: [
                 {path: 'boards', component: BoardsPageComponent},
                 {path: 'boards/:id', component: BoardDetailPageComponent},
+                {path: 'contacts', component: ContactsPageComponent},
         ],
     },
 

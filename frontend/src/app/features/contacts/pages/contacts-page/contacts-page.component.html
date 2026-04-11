@@ -1,0 +1,92 @@
+<div class="contacts-page">
+
+  <div class="contacts-sidebar">
+    <div class="sidebar-header">
+      <h1>Contacts</h1>
+      <button class="btn-add-contact" (click)="openCreate()">+ New Contact</button>
+    </div>
+
+    <div class="contact-list">
+      @for (contact of contacts(); track contact.id) {
+        <div
+          class="contact-list-item"
+          [class.active]="selectedContact()?.id === contact.id"
+          (click)="selectContact(contact)"
+        >
+          <div class="contact-avatar">{{ initials(contact) }}</div>
+          <div class="contact-list-info">
+            <span class="contact-list-name">{{ fullName(contact) }}</span>
+            <span class="contact-list-email">{{ contact.email }}</span>
+          </div>
+        </div>
+      }
+
+      @if (contacts().length === 0) {
+        <p class="contacts-empty">No contacts yet.</p>
+      }
+    </div>
+  </div>
+
+  <div class="contacts-main">
+
+    @if (showForm()) {
+      <div class="contact-form-card">
+        <h2>{{ editMode() ? 'Edit Contact' : 'New Contact' }}</h2>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>First name</label>
+            <input class="field-input" type="text" [(ngModel)]="form.first_name" placeholder="First name" />
+          </div>
+          <div class="form-field">
+            <label>Last name</label>
+            <input class="field-input" type="text" [(ngModel)]="form.last_name" placeholder="Last name" />
+          </div>
+          <div class="form-field full-width">
+            <label>Email</label>
+            <input class="field-input" type="email" [(ngModel)]="form.email" placeholder="Email address" />
+          </div>
+          <div class="form-field full-width">
+            <label>Phone</label>
+            <input class="field-input" type="tel" [(ngModel)]="form.phone" placeholder="Phone number (optional)" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-cancel" (click)="showForm.set(false)">Cancel</button>
+          <button class="btn-save" (click)="save()">{{ editMode() ? 'Save' : 'Create' }}</button>
+        </div>
+      </div>
+    } @else if (selectedContact()) {
+      <div class="contact-detail-card">
+        <div class="detail-header">
+          <div class="detail-avatar">{{ initials(selectedContact()!) }}</div>
+          <div class="detail-name-block">
+            <h2>{{ fullName(selectedContact()!) }}</h2>
+          </div>
+        </div>
+
+        <div class="detail-fields">
+          <div class="detail-field">
+            <span class="detail-label">Email</span>
+            <a class="detail-value link" [href]="'mailto:' + selectedContact()!.email">{{ selectedContact()!.email }}</a>
+          </div>
+          @if (selectedContact()!.phone) {
+            <div class="detail-field">
+              <span class="detail-label">Phone</span>
+              <span class="detail-value">{{ selectedContact()!.phone }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="detail-actions">
+          <button class="btn-edit" (click)="openEdit(selectedContact()!)">Edit</button>
+          <button class="btn-danger" (click)="deleteContact(selectedContact()!.id)">Delete</button>
+        </div>
+      </div>
+    } @else {
+      <div class="contacts-placeholder">
+        <p>Select a contact or create a new one.</p>
+      </div>
+    }
+
+  </div>
+</div>
