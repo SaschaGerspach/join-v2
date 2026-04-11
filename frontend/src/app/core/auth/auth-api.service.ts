@@ -1,19 +1,31 @@
-import { Injectable, inject } from "@angular/core"; 
+import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import type { AuthUser } from "./auth.service";
 
-type Loginrequest = {
+type LoginRequest = {
     email: string;
     password: string;
+};
+
+type RegisterRequest = {
+    email: string;
+    password: string;
+    first_name: string;
+    last_name: string;
 };
 
 @Injectable({providedIn: 'root'})
 export class AuthApiService {
     private readonly http = inject(HttpClient);
 
-      // Später ziehst du das in environment.ts, erstmal hart als Platzhalter
     private readonly baseUrl = 'http://localhost:8000';
+
+    register(payload: RegisterRequest): Observable<AuthUser> {
+        return this.http.post<AuthUser>(`${this.baseUrl}/auth/register`, payload, {
+            withCredentials: true,
+        });
+    }
 
     me(): Observable<AuthUser> {
         return this.http.get<AuthUser>(`${this.baseUrl}/auth/me`, {
@@ -21,14 +33,14 @@ export class AuthApiService {
         });
     }
 
-    login(payload: Loginrequest): Observable<void> {
-        return this.http.post<void>(`{this.baseUrl}/auth/login`, payload, {
+    login(payload: LoginRequest): Observable<AuthUser> {
+        return this.http.post<AuthUser>(`${this.baseUrl}/auth/login`, payload, {
             withCredentials: true,
         });
     }
 
     logout(): Observable<void> {
-        return this.http.post<void>(`{this.baseUrl}/auth/logouz`, null, {
+        return this.http.post<void>(`${this.baseUrl}/auth/logout`, null, {
             withCredentials: true,
         });
     }
