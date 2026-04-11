@@ -180,6 +180,20 @@ $priority-urgent: #ff3d00;
   text-overflow: ellipsis;
 }
 
+// ─── Due Date ────────────────────────────────────────────────────────────────
+
+.task-due-date {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: $color-muted;
+}
+
+.due-icon {
+  font-size: 0.75rem;
+}
+
 // ─── Assignee ────────────────────────────────────────────────────────────────
 
 .task-assignee {

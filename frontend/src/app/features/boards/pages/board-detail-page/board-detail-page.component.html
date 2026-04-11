@@ -50,6 +50,12 @@
               @if (task.description) {
                 <p class="task-description">{{ task.description }}</p>
               }
+              @if (task.due_date) {
+                <div class="task-due-date">
+                  <span class="due-icon">&#128197;</span>
+                  <span>{{ task.due_date | slice:0:10 }}</span>
+                </div>
+              }
               @if (task.assigned_to) {
                 <div class="task-assignee">
                   <span class="assignee-avatar">{{ contactInitials(task.assigned_to) }}</span>

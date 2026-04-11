@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { SlicePipe } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { TasksApiService, Task, CreateTaskPayload } from '../../../../core/tasks/tasks-api.service';
@@ -11,7 +12,7 @@ import { TaskDetailModalComponent } from '../../components/task-detail-modal/tas
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule, DragDropModule, TaskDetailModalComponent],
+  imports: [FormsModule, DragDropModule, SlicePipe, TaskDetailModalComponent],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
 })
