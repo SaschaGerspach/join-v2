@@ -1,20 +1,49 @@
 <div class="app-layout">
-  <aside class="sidebar">
-    <h3>Join</h3>
 
-    <nav>
-      <a routerLink="/boards">Boards</a>
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-text">Join</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/boards" routerLinkActive="active">
+        <span class="nav-icon">&#9776;</span>
+        Boards
+      </a>
     </nav>
+
+    <div class="sidebar-footer">
+      <a routerLink="/privacy">Privacy Policy</a>
+      <a routerLink="/legal">Legal Notice</a>
+    </div>
   </aside>
 
-  <main class="content">
+  <div class="main-wrapper">
     <header class="topbar">
-      <span>{{ auth.user()?.email }}</span>
-      <button type="button" (click)="logout()">Logout</button>
+      <span class="topbar-title">Kanban Project Management Tool</span>
+      <div class="topbar-user">
+        <div class="user-badge" (click)="toggleMenu()">
+          {{ userInitials() }}
+        </div>
+        @if (menuOpen()) {
+          <div class="user-menu">
+            <a routerLink="/profile">My Profile</a>
+            <button type="button" (click)="logout()">Log out</button>
+          </div>
+        }
+      </div>
     </header>
 
     <section class="page">
       <router-outlet></router-outlet>
     </section>
-  </main>
+  </div>
+
+  <footer class="mobile-footer">
+    <a routerLink="/boards" routerLinkActive="active">
+      <span>&#9776;</span>
+      <span>Boards</span>
+    </a>
+  </footer>
+
 </div>

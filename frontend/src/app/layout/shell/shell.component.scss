@@ -1,0 +1,234 @@
+// Variables (mirrored from global — component-scoped for clarity)
+$color-dark:        #2a3647;
+$color-dark-hover:  #2a3d59;
+$color-dark-active: #091931;
+$color-primary:     #29abe2;
+$color-white:       #ffffff;
+$color-bg:          #f6f7f8;
+$color-text-muted:  #cdcdcd;
+$sidebar-width:     248px;
+$header-height:     6rem;
+$mobile-footer:     80px;
+$bp-mobile:         800px;
+
+// ─── Layout ──────────────────────────────────────────────────────────────────
+
+.app-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+// ─── Sidebar ─────────────────────────────────────────────────────────────────
+
+.sidebar {
+  width: $sidebar-width;
+  min-width: $sidebar-width;
+  background-color: $color-dark;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+
+  @media (max-width: $bp-mobile) {
+    display: none;
+  }
+}
+
+.sidebar-logo {
+  padding: 4rem 2rem 2rem;
+
+  .logo-text {
+    color: $color-white;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding-top: 1rem;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 0 0.9rem 25%;
+    color: $color-text-muted;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 400;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: $color-dark-hover;
+      text-decoration: none;
+    }
+
+    &.active {
+      background-color: $color-dark-active;
+      color: $color-white;
+      font-weight: 700;
+    }
+
+    .nav-icon {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.sidebar-footer {
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  a {
+    color: $color-text-muted;
+    font-size: 0.875rem;
+    text-decoration: none;
+
+    &:hover {
+      color: $color-primary;
+      font-weight: 700;
+    }
+  }
+}
+
+// ─── Main Wrapper ─────────────────────────────────────────────────────────────
+
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @media (max-width: $bp-mobile) {
+    padding-bottom: $mobile-footer;
+  }
+}
+
+// ─── Topbar ──────────────────────────────────────────────────────────────────
+
+.topbar {
+  height: $header-height;
+  background-color: $color-white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+}
+
+.topbar-title {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: $color-dark;
+
+  @media (max-width: $bp-mobile) {
+    display: none;
+  }
+}
+
+.topbar-user {
+  position: relative;
+}
+
+.user-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: $color-primary;
+  border: 2px solid $color-dark;
+  color: $color-white;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: $color-dark;
+  }
+}
+
+.user-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background-color: $color-dark;
+  border-radius: 10px;
+  padding: 0.5rem 0;
+  min-width: 140px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 200;
+
+  a, button {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 1.2rem;
+    color: $color-white;
+    font-size: 0.9rem;
+    text-align: left;
+    background: none;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: $color-dark-hover;
+    }
+  }
+}
+
+// ─── Page Content ─────────────────────────────────────────────────────────────
+
+.page {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+}
+
+// ─── Mobile Footer ────────────────────────────────────────────────────────────
+
+.mobile-footer {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: $mobile-footer;
+  background-color: $color-dark;
+  z-index: 100;
+
+  @media (max-width: $bp-mobile) {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: $color-text-muted;
+    text-decoration: none;
+    font-size: 0.75rem;
+
+    &.active {
+      color: $color-white;
+    }
+  }
+}
