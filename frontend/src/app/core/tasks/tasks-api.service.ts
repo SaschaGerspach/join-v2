@@ -12,6 +12,8 @@ export type Task = {
   assigned_to: number | null;
   due_date: string | null;
   created_at: string;
+  subtask_count: number;
+  subtask_done_count: number;
 };
 
 export type CreateTaskPayload = {

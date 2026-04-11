@@ -73,18 +73,30 @@ export class TaskDetailModalComponent implements OnInit {
     this.subtasksApi.create(this.task().id, title).subscribe(sub => {
       this.subtasks.update(s => [...s, sub]);
       this.newSubtaskTitle.set('');
+      this.emitSubtaskCounts();
     });
   }
 
   toggleSubtask(sub: Subtask): void {
     this.subtasksApi.patch(this.task().id, sub.id, { done: !sub.done }).subscribe(updated => {
       this.subtasks.update(s => s.map(x => x.id === updated.id ? updated : x));
+      this.emitSubtaskCounts();
     });
   }
 
   deleteSubtask(sub: Subtask): void {
     this.subtasksApi.delete(this.task().id, sub.id).subscribe(() => {
       this.subtasks.update(s => s.filter(x => x.id !== sub.id));
+      this.emitSubtaskCounts();
+    });
+  }
+
+  private emitSubtaskCounts(): void {
+    const subs = this.subtasks();
+    this.taskUpdated.emit({
+      ...this.task(),
+      subtask_count: subs.length,
+      subtask_done_count: subs.filter(s => s.done).length,
     });
   }
 

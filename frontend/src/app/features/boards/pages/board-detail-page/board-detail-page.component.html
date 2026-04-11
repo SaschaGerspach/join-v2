@@ -50,6 +50,17 @@
               @if (task.description) {
                 <p class="task-description">{{ task.description }}</p>
               }
+              @if (task.subtask_count > 0) {
+                <div class="subtask-progress">
+                  <div class="subtask-progress-bar">
+                    <div
+                      class="subtask-progress-fill"
+                      [style.width.%]="(task.subtask_done_count / task.subtask_count) * 100"
+                    ></div>
+                  </div>
+                  <span class="subtask-progress-label">{{ task.subtask_done_count }}/{{ task.subtask_count }}</span>
+                </div>
+              }
             </div>
           }
 
