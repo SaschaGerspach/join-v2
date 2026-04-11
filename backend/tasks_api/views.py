@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.models import Board
-from .models import Task
+from .models import Task, Subtask
 
 
 def serialize_task(task):
@@ -75,4 +75,53 @@ def task_detail(request, pk):
         return Response(serialize_task(task))
 
     task.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def serialize_subtask(subtask):
+    return {
+        "id": subtask.pk,
+        "task": subtask.task_id,
+        "title": subtask.title,
+        "done": subtask.done,
+    }
+
+
+@api_view(["GET", "POST"])
+def subtask_list(request, task_pk):
+    try:
+        task = Task.objects.get(pk=task_pk)
+    except Task.DoesNotExist:
+        return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        return Response([serialize_subtask(s) for s in task.subtasks.all()])
+
+    title = request.data.get("title", "").strip()
+    if not title:
+        return Response({"detail": "Title is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    subtask = Subtask.objects.create(task=task, title=title)
+    return Response(serialize_subtask(subtask), status=status.HTTP_201_CREATED)
+
+
+@api_view(["PATCH", "DELETE"])
+def subtask_detail(request, task_pk, pk):
+    try:
+        subtask = Subtask.objects.get(pk=pk, task_id=task_pk)
+    except Subtask.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if subtask.task.board.created_by != request.user:
+        return Response({"detail": "Only the board creator can modify subtasks."}, status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == "PATCH":
+        if "title" in request.data:
+            subtask.title = request.data["title"].strip()
+        if "done" in request.data:
+            subtask.done = request.data["done"]
+        subtask.save()
+        return Response(serialize_subtask(subtask))
+
+    subtask.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
