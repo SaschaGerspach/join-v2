@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, input, output, signal, OnInit } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, HostListener, inject, input, output, signal, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Task, TasksApiService } from '../../../../core/tasks/tasks-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
@@ -13,7 +13,8 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
   templateUrl: './task-detail-modal.component.html',
   styleUrl: './task-detail-modal.component.scss',
 })
-export class TaskDetailModalComponent implements OnInit {
+export class TaskDetailModalComponent implements OnInit, AfterViewInit {
+  @ViewChild('titleInput') titleInput!: ElementRef<HTMLInputElement>;
   private readonly tasksApi = inject(TasksApiService);
   private readonly subtasksApi = inject(SubtasksApiService);
   private readonly contactsApi = inject(ContactsApiService);
@@ -39,6 +40,10 @@ export class TaskDetailModalComponent implements OnInit {
   showDeleteConfirm = signal(false);
 
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
+
+  ngAfterViewInit(): void {
+    this.titleInput?.nativeElement.focus();
+  }
 
   ngOnInit(): void {
     const t = this.task();

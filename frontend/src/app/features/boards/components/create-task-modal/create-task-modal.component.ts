@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, input, output, OnInit, signal } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, HostListener, inject, input, output, OnInit, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
@@ -11,7 +11,8 @@ import { CreateTaskPayload } from '../../../../core/tasks/tasks-api.service';
   templateUrl: './create-task-modal.component.html',
   styleUrl: './create-task-modal.component.scss',
 })
-export class CreateTaskModalComponent implements OnInit {
+export class CreateTaskModalComponent implements OnInit, AfterViewInit {
+  @ViewChild('titleInput') titleInput!: ElementRef<HTMLInputElement>;
   private readonly contactsApi = inject(ContactsApiService);
 
   columnId = input.required<number>();
@@ -32,6 +33,10 @@ export class CreateTaskModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedColumnId = this.columnId();
+  }
+
+  ngAfterViewInit(): void {
+    this.titleInput?.nativeElement.focus();
   }
 
   @HostListener('document:keydown.escape')
