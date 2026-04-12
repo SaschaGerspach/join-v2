@@ -28,8 +28,8 @@
         </div>
       }
 
-      @if (contacts().length === 0) {
-        <p class="contacts-empty">No contacts yet.</p>
+      @if (!loading() && contacts().length === 0) {
+        <p class="contacts-empty">No contacts yet. Add your first contact!</p>
       }
     </div>
   </div>
