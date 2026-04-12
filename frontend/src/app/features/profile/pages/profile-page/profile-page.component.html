@@ -47,11 +47,8 @@
     @if (errorMessage()) {
       <p class="msg msg-error">{{ errorMessage() }}</p>
     }
-    @if (successMessage()) {
-      <p class="msg msg-success">{{ successMessage() }}</p>
-    }
 
-    <div class="form-actions">
+<div class="form-actions">
       <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">Delete account</button>
       <button class="btn-save" [disabled]="saving()" (click)="save()">
         {{ saving() ? 'Saving…' : 'Save changes' }}

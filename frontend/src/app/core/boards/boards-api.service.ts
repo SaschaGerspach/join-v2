@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export type Board = {
@@ -16,7 +17,9 @@ export class BoardsApiService {
   private readonly baseUrl = environment.apiUrl;
 
   getAll(): Observable<Board[]> {
-    return this.http.get<Board[]>(`${this.baseUrl}/boards/`, { withCredentials: true });
+    return this.http.get<{ results: Board[] }>(`${this.baseUrl}/boards/`, { withCredentials: true }).pipe(
+      map(r => r.results)
+    );
   }
 
   getById(id: number): Observable<Board> {

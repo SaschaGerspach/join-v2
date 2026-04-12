@@ -1,8 +1,15 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from .models import Board
+
+
+class _BoardPagination(PageNumberPagination):
+    page_size = 50
+    page_size_query_param = "page_size"
+    max_page_size = 200
 
 
 def serialize_board(board):
@@ -18,7 +25,9 @@ def serialize_board(board):
 def board_list(request):
     if request.method == "GET":
         boards = Board.objects.filter(created_by=request.user).order_by("-created_at")
-        return Response([serialize_board(b) for b in boards])
+        paginator = _BoardPagination()
+        page = paginator.paginate_queryset(boards, request)
+        return paginator.get_paginated_response([serialize_board(b) for b in page])
 
     title = request.data.get("title", "").strip()
     if not title:

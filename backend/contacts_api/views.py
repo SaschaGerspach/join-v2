@@ -1,8 +1,15 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from .models import Contact
+
+
+class _ContactPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = "page_size"
+    max_page_size = 500
 
 
 def serialize_contact(contact):
@@ -19,7 +26,9 @@ def serialize_contact(contact):
 def contact_list(request):
     if request.method == "GET":
         contacts = request.user.contacts.all().order_by("last_name", "first_name")
-        return Response([serialize_contact(c) for c in contacts])
+        paginator = _ContactPagination()
+        page = paginator.paginate_queryset(contacts, request)
+        return paginator.get_paginated_response([serialize_contact(c) for c in page])
 
     required = ["first_name", "last_name", "email"]
     for field in required:

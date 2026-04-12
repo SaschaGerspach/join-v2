@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export type Contact = {
@@ -17,7 +18,9 @@ export class ContactsApiService {
   private readonly baseUrl = environment.apiUrl;
 
   getAll(): Observable<Contact[]> {
-    return this.http.get<Contact[]>(`${this.baseUrl}/contacts/`, { withCredentials: true });
+    return this.http.get<{ results: Contact[] }>(`${this.baseUrl}/contacts/`, { withCredentials: true }).pipe(
+      map(r => r.results)
+    );
   }
 
   create(payload: Omit<Contact, 'id'>): Observable<Contact> {
