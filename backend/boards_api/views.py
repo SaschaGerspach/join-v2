@@ -35,11 +35,11 @@ def board_detail(request, pk):
     except Board.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    if board.created_by != request.user:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
     if request.method == "GET":
         return Response(serialize_board(board))
-
-    if board.created_by != request.user:
-        return Response({"detail": "Only the creator can modify this board."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":
         if "title" in request.data:

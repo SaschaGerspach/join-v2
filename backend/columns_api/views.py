@@ -23,7 +23,7 @@ def column_list(request):
         return Response({"detail": "board query parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        board = Board.objects.get(pk=board_id)
+        board = Board.objects.get(pk=board_id, created_by=request.user)
     except Board.DoesNotExist:
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 

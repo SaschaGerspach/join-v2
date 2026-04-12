@@ -32,7 +32,7 @@ def task_list(request):
         return Response({"detail": "board query parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        board = Board.objects.get(pk=board_id)
+        board = Board.objects.get(pk=board_id, created_by=request.user)
     except Board.DoesNotExist:
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -63,11 +63,11 @@ def task_detail(request, pk):
     except Task.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    if task.board.created_by != request.user:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
     if request.method == "GET":
         return Response(serialize_task(task))
-
-    if task.board.created_by != request.user:
-        return Response({"detail": "Only the board creator can modify tasks."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":
         for field in ["title", "description", "priority", "column", "assigned_to", "due_date", "order"]:
@@ -93,7 +93,7 @@ def serialize_subtask(subtask):
 @api_view(["GET", "POST"])
 def subtask_list(request, task_pk):
     try:
-        task = Task.objects.get(pk=task_pk)
+        task = Task.objects.get(pk=task_pk, board__created_by=request.user)
     except Task.DoesNotExist:
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -137,7 +137,7 @@ def task_reorder(request):
         return Response({"detail": "Expected a list."}, status=status.HTTP_400_BAD_REQUEST)
 
     task_ids = [item["id"] for item in items if "id" in item]
-    tasks = {t.pk: t for t in Task.objects.filter(pk__in=task_ids)}
+    tasks = {t.pk: t for t in Task.objects.filter(pk__in=task_ids, board__created_by=request.user)}
 
     for item in items:
         task = tasks.get(item.get("id"))
