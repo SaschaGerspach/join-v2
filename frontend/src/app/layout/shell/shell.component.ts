@@ -1,11 +1,12 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { Router, RouterModule } from "@angular/router";
 import { AuthService } from '../../core/auth/auth.service';
+import { ToastComponent } from '../../shared/components/toast/toast.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, ToastComponent],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss'
 })

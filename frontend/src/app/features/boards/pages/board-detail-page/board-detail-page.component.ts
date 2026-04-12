@@ -11,6 +11,7 @@ import { TaskDetailModalComponent } from '../../components/task-detail-modal/tas
 import { CreateTaskModalComponent } from '../../components/create-task-modal/create-task-modal.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-board-detail-page',
@@ -25,6 +26,7 @@ export class BoardDetailPageComponent implements OnInit {
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly tasksApi = inject(TasksApiService);
   private readonly contactsApi = inject(ContactsApiService);
+  private readonly toast = inject(ToastService);
 
   boardId = signal<number>(0);
   board = signal<Board | null>(null);
@@ -139,6 +141,7 @@ export class BoardDetailPageComponent implements OnInit {
       this.columns.update(c => c.filter(col => col.id !== id));
       this.tasks.update(t => t.filter(task => task.column !== id));
       this.pendingDeleteColumnId.set(null);
+      this.toast.show('Column deleted');
     });
   }
 
@@ -150,6 +153,7 @@ export class BoardDetailPageComponent implements OnInit {
     this.tasksApi.create(this.boardId(), payload).subscribe(task => {
       this.tasks.update(t => [...t, task]);
       this.addingTaskForColumn.set(null);
+      this.toast.show('Task created');
     });
   }
 
@@ -175,6 +179,7 @@ export class BoardDetailPageComponent implements OnInit {
     this.tasksApi.delete(id).subscribe(() => {
       this.tasks.update(t => t.filter(task => task.id !== id));
       this.pendingDeleteTaskId.set(null);
+      this.toast.show('Task deleted');
     });
   }
 

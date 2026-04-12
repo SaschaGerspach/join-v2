@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-boards-page',
@@ -15,6 +16,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
 export class BoardsPageComponent implements OnInit {
   private readonly api = inject(BoardsApiService);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
 
   boards = signal<Board[]>([]);
   newTitle = '';
@@ -44,6 +46,7 @@ export class BoardsPageComponent implements OnInit {
       this.boards.update(b => [...b, board]);
       this.newTitle = '';
       this.showForm.set(false);
+      this.toast.show('Board created');
     });
   }
 
@@ -62,6 +65,7 @@ export class BoardsPageComponent implements OnInit {
     this.api.delete(id).subscribe(() => {
       this.boards.update(b => b.filter(board => board.id !== id));
       this.pendingDeleteId.set(null);
+      this.toast.show('Board deleted');
     });
   }
 }

@@ -5,6 +5,7 @@ import { Column } from '../../../../core/columns/columns-api.service';
 import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api.service';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-detail-modal',
@@ -18,6 +19,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly subtasksApi = inject(SubtasksApiService);
   private readonly contactsApi = inject(ContactsApiService);
+  private readonly toast = inject(ToastService);
 
   task = input.required<Task>();
   columns = input.required<Column[]>();
@@ -71,6 +73,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.tasksApi.patch(this.task().id, payload).subscribe(updated => {
       this.taskUpdated.emit(updated);
       this.closed.emit();
+      this.toast.show('Task saved');
     });
   }
 
