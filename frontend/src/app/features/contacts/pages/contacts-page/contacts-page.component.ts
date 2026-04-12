@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 type ContactForm = {
   first_name: string;
@@ -13,7 +14,7 @@ type ContactForm = {
 @Component({
   selector: 'app-contacts-page',
   standalone: true,
-  imports: [FormsModule, LoadingSpinnerComponent],
+  imports: [FormsModule, LoadingSpinnerComponent, ConfirmDialogComponent],
   templateUrl: './contacts-page.component.html',
   styleUrl: './contacts-page.component.scss',
 })
@@ -26,6 +27,7 @@ export class ContactsPageComponent implements OnInit {
   editMode = signal(false);
   loading = signal(true);
   error = signal('');
+  pendingDeleteId = signal<number | null>(null);
 
   form: ContactForm = { first_name: '', last_name: '', email: '', phone: '' };
 
@@ -73,12 +75,19 @@ export class ContactsPageComponent implements OnInit {
   }
 
   deleteContact(id: number): void {
+    this.pendingDeleteId.set(id);
+  }
+
+  confirmDeleteContact(): void {
+    const id = this.pendingDeleteId();
+    if (id === null) return;
     this.api.delete(id).subscribe(() => {
       this.contacts.update(c => c.filter(x => x.id !== id));
       if (this.selectedContact()?.id === id) {
         this.selectedContact.set(null);
         this.showForm.set(false);
       }
+      this.pendingDeleteId.set(null);
     });
   }
 

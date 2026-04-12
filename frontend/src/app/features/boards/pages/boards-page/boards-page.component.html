@@ -39,10 +39,18 @@
             <h2>{{ board.title }}</h2>
           </div>
           <div class="board-card-actions">
-            <button class="btn-delete" (click)="deleteBoard(board.id)" title="Delete board">&#10005;</button>
+            <button class="btn-delete" (click)="deleteBoard(board.id, $event)" title="Delete board">&#10005;</button>
           </div>
         </div>
       }
     </div>
   }
 </div>
+
+@if (pendingDeleteId() !== null) {
+  <app-confirm-dialog
+    message="Delete this board? All columns and tasks will be lost."
+    (confirmed)="confirmDelete()"
+    (cancelled)="pendingDeleteId.set(null)"
+  />
+}

@@ -121,3 +121,11 @@
 
   </div>
 </div>
+
+@if (showDeleteConfirm()) {
+  <app-confirm-dialog
+    message="Delete this task? This cannot be undone."
+    (confirmed)="confirmDeleteTask()"
+    (cancelled)="showDeleteConfirm.set(false)"
+  />
+}

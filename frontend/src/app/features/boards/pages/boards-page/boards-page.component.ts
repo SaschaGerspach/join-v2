@@ -3,11 +3,12 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-boards-page',
   standalone: true,
-  imports: [FormsModule, LoadingSpinnerComponent],
+  imports: [FormsModule, LoadingSpinnerComponent, ConfirmDialogComponent],
   templateUrl: './boards-page.component.html',
   styleUrl: './boards-page.component.scss'
 })
@@ -20,6 +21,7 @@ export class BoardsPageComponent implements OnInit {
   showForm = signal(false);
   loading = signal(true);
   error = signal('');
+  pendingDeleteId = signal<number | null>(null);
 
   ngOnInit(): void {
     this.loadBoards();
@@ -49,9 +51,17 @@ export class BoardsPageComponent implements OnInit {
     this.router.navigate(['/boards', id]);
   }
 
-  deleteBoard(id: number): void {
+  deleteBoard(id: number, event: Event): void {
+    event.stopPropagation();
+    this.pendingDeleteId.set(id);
+  }
+
+  confirmDelete(): void {
+    const id = this.pendingDeleteId();
+    if (id === null) return;
     this.api.delete(id).subscribe(() => {
       this.boards.update(b => b.filter(board => board.id !== id));
+      this.pendingDeleteId.set(null);
     });
   }
 }

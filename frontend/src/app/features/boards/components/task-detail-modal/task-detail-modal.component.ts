@@ -4,11 +4,12 @@ import { Task, TasksApiService } from '../../../../core/tasks/tasks-api.service'
 import { Column } from '../../../../core/columns/columns-api.service';
 import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api.service';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-task-detail-modal',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ConfirmDialogComponent],
   templateUrl: './task-detail-modal.component.html',
   styleUrl: './task-detail-modal.component.scss',
 })
@@ -35,6 +36,7 @@ export class TaskDetailModalComponent implements OnInit {
   subtasks = signal<Subtask[]>([]);
   newSubtaskTitle = signal('');
   assignedTo = signal<number | null>(null);
+  showDeleteConfirm = signal(false);
 
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
 
@@ -68,6 +70,10 @@ export class TaskDetailModalComponent implements OnInit {
   }
 
   deleteTask(): void {
+    this.showDeleteConfirm.set(true);
+  }
+
+  confirmDeleteTask(): void {
     this.tasksApi.delete(this.task().id).subscribe(() => {
       this.taskDeleted.emit(this.task().id);
       this.closed.emit();

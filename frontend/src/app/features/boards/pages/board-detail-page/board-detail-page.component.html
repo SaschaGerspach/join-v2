@@ -135,3 +135,19 @@
     (taskDeleted)="onTaskDeleted($event)"
   />
 }
+
+@if (pendingDeleteColumnId() !== null) {
+  <app-confirm-dialog
+    message="Delete this column? All tasks inside will be removed."
+    (confirmed)="confirmDeleteColumn()"
+    (cancelled)="pendingDeleteColumnId.set(null)"
+  />
+}
+
+@if (pendingDeleteTaskId() !== null) {
+  <app-confirm-dialog
+    message="Delete this task?"
+    (confirmed)="confirmDeleteTask()"
+    (cancelled)="pendingDeleteTaskId.set(null)"
+  />
+}

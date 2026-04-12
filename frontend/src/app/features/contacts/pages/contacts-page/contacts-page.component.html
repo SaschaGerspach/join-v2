@@ -97,3 +97,11 @@
 
   </div>
 </div>
+
+@if (pendingDeleteId() !== null) {
+  <app-confirm-dialog
+    message="Delete this contact?"
+    (confirmed)="confirmDeleteContact()"
+    (cancelled)="pendingDeleteId.set(null)"
+  />
+}

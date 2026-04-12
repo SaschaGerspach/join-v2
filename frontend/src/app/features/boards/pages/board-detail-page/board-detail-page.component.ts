@@ -9,11 +9,12 @@ import { BoardsApiService, Board } from '../../../../core/boards/boards-api.serv
 import { ContactsApiService, Contact } from '../../../../core/contacts/contacts-api.service';
 import { TaskDetailModalComponent } from '../../components/task-detail-modal/task-detail-modal.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule, DragDropModule, SlicePipe, TaskDetailModalComponent, LoadingSpinnerComponent],
+  imports: [FormsModule, DragDropModule, SlicePipe, TaskDetailModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
 })
@@ -44,6 +45,9 @@ export class BoardDetailPageComponent implements OnInit {
   selectedTask = signal<Task | null>(null);
   loading = signal(true);
   error = signal('');
+
+  pendingDeleteColumnId = signal<number | null>(null);
+  pendingDeleteTaskId = signal<number | null>(null);
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -108,9 +112,16 @@ export class BoardDetailPageComponent implements OnInit {
   }
 
   deleteColumn(id: number): void {
+    this.pendingDeleteColumnId.set(id);
+  }
+
+  confirmDeleteColumn(): void {
+    const id = this.pendingDeleteColumnId();
+    if (id === null) return;
     this.columnsApi.delete(id).subscribe(() => {
       this.columns.update(c => c.filter(col => col.id !== id));
       this.tasks.update(t => t.filter(task => task.column !== id));
+      this.pendingDeleteColumnId.set(null);
     });
   }
 
@@ -144,8 +155,15 @@ export class BoardDetailPageComponent implements OnInit {
   }
 
   deleteTask(id: number): void {
+    this.pendingDeleteTaskId.set(id);
+  }
+
+  confirmDeleteTask(): void {
+    const id = this.pendingDeleteTaskId();
+    if (id === null) return;
     this.tasksApi.delete(id).subscribe(() => {
       this.tasks.update(t => t.filter(task => task.id !== id));
+      this.pendingDeleteTaskId.set(null);
     });
   }
 
