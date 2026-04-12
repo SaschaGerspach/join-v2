@@ -281,6 +281,11 @@ $priority-urgent: #ff3d00;
     color: $color-error;
     font-weight: 700;
   }
+
+  &.due-soon {
+    color: #e6a817;
+    font-weight: 600;
+  }
 }
 
 .due-icon {

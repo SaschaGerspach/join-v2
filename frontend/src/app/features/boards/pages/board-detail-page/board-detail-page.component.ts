@@ -268,4 +268,12 @@ export class BoardDetailPageComponent implements OnInit {
     if (!dueDate) return false;
     return new Date(dueDate) < new Date(new Date().toDateString());
   }
+
+  isSoon(dueDate: string | null): boolean {
+    if (!dueDate) return false;
+    const today = new Date(new Date().toDateString());
+    const due = new Date(dueDate);
+    const diff = (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+    return diff >= 0 && diff <= 3;
+  }
 }
