@@ -11,8 +11,8 @@ import { authGuard } from './core/guards/auth.guard';
 import { NotFoundPageComponent } from './features/not-found/not-found-page.component';
 
 export const routes: Routes = [
-    {path: 'login', component: LoginPageComponent},
-    {path: 'register', component: RegisterPageComponent},
+    {path: 'login', title: 'Log in | Join', component: LoginPageComponent},
+    {path: 'register', title: 'Sign up | Join', component: RegisterPageComponent},
 
     {
         path: '',
@@ -20,13 +20,13 @@ export const routes: Routes = [
         canActivate: [authGuard],
         children: [
                 {path: '', pathMatch: 'full', redirectTo: 'summary'},
-                {path: 'summary', component: SummaryPageComponent},
-                {path: 'boards', component: BoardsPageComponent},
-                {path: 'boards/:id', component: BoardDetailPageComponent},
-                {path: 'contacts', component: ContactsPageComponent},
-                {path: 'profile', component: ProfilePageComponent},
+                {path: 'summary', title: 'Summary | Join', component: SummaryPageComponent},
+                {path: 'boards', title: 'Boards | Join', component: BoardsPageComponent},
+                {path: 'boards/:id', title: 'Board | Join', component: BoardDetailPageComponent},
+                {path: 'contacts', title: 'Contacts | Join', component: ContactsPageComponent},
+                {path: 'profile', title: 'Profile | Join', component: ProfilePageComponent},
         ],
     },
 
-    {path: '**', component: NotFoundPageComponent},
+    {path: '**', title: 'Not Found | Join', component: NotFoundPageComponent},
 ];
