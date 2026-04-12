@@ -43,6 +43,10 @@ export class AuthService {
         );
     }
 
+    clearUser(): void {
+        this._user.set(null);
+    }
+
     logout(): void {
         this.api.logout().subscribe();
         this._user.set(null);
