@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SlicePipe } from '@angular/common';
-import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { TasksApiService, Task, CreateTaskPayload } from '../../../../core/tasks/tasks-api.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
@@ -176,6 +176,16 @@ export class BoardDetailPageComponent implements OnInit {
       this.tasks.update(t => t.filter(task => task.id !== id));
       this.pendingDeleteTaskId.set(null);
     });
+  }
+
+  dropColumn(event: CdkDragDrop<Column[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+    const reordered = [...this.columns()];
+    const [moved] = reordered.splice(event.previousIndex, 1);
+    reordered.splice(event.currentIndex, 0, moved);
+    const updated = reordered.map((c, i) => ({ ...c, order: i }));
+    this.columns.set(updated);
+    updated.forEach(col => this.columnsApi.patch(col.id, { order: col.order }).subscribe());
   }
 
   drop(event: CdkDragDrop<Task[]>, targetColumnId: number): void {

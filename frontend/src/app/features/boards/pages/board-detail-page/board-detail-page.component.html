@@ -40,11 +40,17 @@
     </div>
   }
 
-  <div class="kanban-board">
+  <div
+    class="kanban-board"
+    cdkDropList
+    cdkDropListOrientation="horizontal"
+    [cdkDropListData]="columns()"
+    (cdkDropListDropped)="dropColumn($event)"
+  >
     @for (column of columns(); track column.id) {
-      <div class="kanban-column">
+      <div class="kanban-column" cdkDrag [cdkDragData]="column">
 
-        <div class="column-header">
+        <div class="column-header" cdkDragHandle>
           @if (editingColumnId() === column.id) {
             <input
               class="column-title-input"
