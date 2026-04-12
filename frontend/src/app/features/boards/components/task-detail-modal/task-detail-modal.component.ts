@@ -40,6 +40,8 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   newSubtaskTitle = signal('');
   assignedTo = signal<number | null>(null);
   showDeleteConfirm = signal(false);
+  editingSubtaskId = signal<number | null>(null);
+  editingSubtaskTitle = '';
 
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
 
@@ -122,6 +124,21 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
         this.emitSubtaskCounts();
       },
       error: () => this.toast.show('Failed to delete subtask.', 'error'),
+    });
+  }
+
+  startEditSubtask(sub: Subtask): void {
+    this.editingSubtaskId.set(sub.id);
+    this.editingSubtaskTitle = sub.title;
+  }
+
+  confirmEditSubtask(sub: Subtask): void {
+    const title = this.editingSubtaskTitle.trim();
+    this.editingSubtaskId.set(null);
+    if (!title || title === sub.title) return;
+    this.subtasksApi.patch(this.task().id, sub.id, { title }).subscribe({
+      next: updated => this.subtasks.update(s => s.map(x => x.id === updated.id ? updated : x)),
+      error: () => this.toast.show('Failed to rename subtask.', 'error'),
     });
   }
 

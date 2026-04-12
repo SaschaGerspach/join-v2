@@ -205,6 +205,17 @@ $priority-urgent: #ff3d00;
       color: $color-muted;
     }
   }
+
+  .subtask-edit-input {
+    flex: 1;
+    font-size: 0.9rem;
+    border: none;
+    border-bottom: 1px solid $color-primary;
+    outline: none;
+    padding: 0;
+    background: transparent;
+    color: $color-dark;
+  }
 }
 
 .btn-remove-sub {
