@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { UsersApiService } from '../../../../core/users/users-api.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -15,6 +16,7 @@ export class ProfilePageComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly usersApi = inject(UsersApiService);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
 
   firstName = signal('');
   lastName = signal('');
@@ -69,10 +71,11 @@ export class ProfilePageComponent implements OnInit {
     this.saving.set(true);
     this.usersApi.patch(this.userId, payload).subscribe({
       next: () => {
-        this.successMessage.set('Profile updated successfully.');
+        this.successMessage.set('');
         this.newPassword.set('');
         this.confirmPassword.set('');
         this.saving.set(false);
+        this.toast.show('Profile updated successfully.');
       },
       error: (err) => {
         this.errorMessage.set(err?.error?.detail ?? 'Something went wrong.');
