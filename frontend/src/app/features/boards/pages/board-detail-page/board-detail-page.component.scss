@@ -65,6 +65,41 @@ $priority-urgent: #ff3d00;
     }
   }
 
+  .filter-select {
+    flex: 0 0 auto;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid $color-border;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: $color-dark;
+    background: $color-white;
+    cursor: pointer;
+    outline: none;
+
+    &:focus { border-color: $color-primary; }
+
+    @media (max-width: $bp-mobile) {
+      flex: 1 1 calc(50% - 0.5rem);
+    }
+  }
+
+  .btn-clear-filter {
+    padding: 0.4rem 0.75rem;
+    border: 1px solid $color-error;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $color-error;
+    background: transparent;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+      background: $color-error;
+      color: $color-white;
+    }
+  }
+
   h1 {
     font-size: 2rem;
     font-weight: 700;

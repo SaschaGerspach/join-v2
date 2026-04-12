@@ -28,6 +28,27 @@
       [value]="searchQuery()"
       (input)="searchQuery.set($any($event.target).value)"
     />
+    <select class="filter-select" [ngModel]="filterPriority()" (ngModelChange)="filterPriority.set($event)">
+      <option value="">All priorities</option>
+      <option value="urgent">Urgent</option>
+      <option value="high">High</option>
+      <option value="medium">Medium</option>
+      <option value="low">Low</option>
+    </select>
+    <select class="filter-select" [ngModel]="filterAssignee()" (ngModelChange)="filterAssignee.set($event === '' ? '' : +$event)">
+      <option value="">All assignees</option>
+      @for (c of contacts(); track c.id) {
+        <option [value]="c.id">{{ c.first_name }} {{ c.last_name }}</option>
+      }
+    </select>
+    <select class="filter-select" [ngModel]="filterDue()" (ngModelChange)="filterDue.set($event)">
+      <option value="">Any due date</option>
+      <option value="overdue">Overdue</option>
+      <option value="soon">Due soon</option>
+    </select>
+    @if (hasActiveFilter()) {
+      <button class="btn-clear-filter" (click)="clearFilters()">&#10005; Clear</button>
+    }
     <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>
   </div>
 
@@ -52,7 +73,7 @@
     cdkDropList
     cdkDropListOrientation="horizontal"
     [cdkDropListData]="columns()"
-    [cdkDropListDisabled]="!!searchQuery()"
+    [cdkDropListDisabled]="hasActiveFilter()"
     (cdkDropListDropped)="dropColumn($event)"
   >
     @for (column of columns(); track column.id) {
@@ -80,7 +101,7 @@
           [id]="'col-' + column.id"
           [cdkDropListData]="tasksForColumn(column.id)"
           [cdkDropListConnectedTo]="columnListIds()"
-          [cdkDropListDisabled]="!!searchQuery()"
+          [cdkDropListDisabled]="hasActiveFilter()"
           (cdkDropListDropped)="drop($event, column.id)"
         >
           @for (task of tasksForColumn(column.id); track task.id) {

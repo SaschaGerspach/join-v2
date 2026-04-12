@@ -39,12 +39,36 @@ export class BoardDetailPageComponent implements OnInit {
   columnListIds = computed(() => this.columns().map(c => `col-${c.id}`));
 
   searchQuery = signal('');
+  filterPriority = signal<string>('');
+  filterAssignee = signal<number | ''>('');
+  filterDue = signal<'overdue' | 'soon' | ''>('');
 
   filteredTasks = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();
-    if (!q) return this.tasks();
-    return this.tasks().filter(t => t.title.toLowerCase().includes(q));
+    const priority = this.filterPriority();
+    const assignee = this.filterAssignee();
+    const due = this.filterDue();
+
+    return this.tasks().filter(t => {
+      if (q && !t.title.toLowerCase().includes(q)) return false;
+      if (priority && t.priority !== priority) return false;
+      if (assignee !== '' && t.assigned_to !== assignee) return false;
+      if (due === 'overdue' && !this.isOverdue(t.due_date)) return false;
+      if (due === 'soon' && !(this.isSoon(t.due_date) && !this.isOverdue(t.due_date))) return false;
+      return true;
+    });
   });
+
+  hasActiveFilter = computed(() =>
+    !!this.searchQuery() || !!this.filterPriority() || this.filterAssignee() !== '' || !!this.filterDue()
+  );
+
+  clearFilters(): void {
+    this.searchQuery.set('');
+    this.filterPriority.set('');
+    this.filterAssignee.set('');
+    this.filterDue.set('');
+  }
 
   newColumnTitle = '';
   showColumnForm = signal(false);
