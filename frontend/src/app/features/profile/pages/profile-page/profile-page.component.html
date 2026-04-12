@@ -52,6 +52,7 @@
     }
 
     <div class="form-actions">
+      <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">Delete account</button>
       <button class="btn-save" [disabled]="saving()" (click)="save()">
         {{ saving() ? 'Saving…' : 'Save changes' }}
       </button>
@@ -59,3 +60,11 @@
 
   </div>
 </div>
+
+@if (showDeleteConfirm()) {
+  <app-confirm-dialog
+    message="Delete your account? This cannot be undone."
+    (confirmed)="confirmDeleteAccount()"
+    (cancelled)="showDeleteConfirm.set(false)"
+  />
+}

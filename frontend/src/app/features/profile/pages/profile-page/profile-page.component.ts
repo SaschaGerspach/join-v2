@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { UsersApiService } from '../../../../core/users/users-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ConfirmDialogComponent],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss',
 })
@@ -25,8 +26,8 @@ export class ProfilePageComponent implements OnInit {
   confirmPassword = signal('');
 
   saving = signal(false);
-  successMessage = signal('');
   errorMessage = signal('');
+  showDeleteConfirm = signal(false);
 
   initials = computed(() => {
     const f = this.firstName()[0] ?? '';
@@ -49,7 +50,6 @@ export class ProfilePageComponent implements OnInit {
   }
 
   save(): void {
-    this.successMessage.set('');
     this.errorMessage.set('');
 
     const pw = this.newPassword().trim();
@@ -71,7 +71,6 @@ export class ProfilePageComponent implements OnInit {
     this.saving.set(true);
     this.usersApi.patch(this.userId, payload).subscribe({
       next: () => {
-        this.successMessage.set('');
         this.newPassword.set('');
         this.confirmPassword.set('');
         this.saving.set(false);
@@ -81,6 +80,16 @@ export class ProfilePageComponent implements OnInit {
         this.errorMessage.set(err?.error?.detail ?? 'Something went wrong.');
         this.saving.set(false);
       },
+    });
+  }
+
+  confirmDeleteAccount(): void {
+    this.usersApi.delete(this.userId).subscribe({
+      next: () => {
+        this.auth.clearUser();
+        this.router.navigate(['/login']);
+      },
+      error: () => this.toast.show('Failed to delete account.', 'error'),
     });
   }
 }

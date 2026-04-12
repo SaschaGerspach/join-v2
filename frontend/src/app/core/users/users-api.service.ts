@@ -22,4 +22,8 @@ export class UsersApiService {
   patch(id: number, payload: Partial<UserProfile & { password: string }>): Observable<UserProfile> {
     return this.http.patch<UserProfile>(`${this.baseUrl}/users/${id}/`, payload, { withCredentials: true });
   }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/users/${id}/`, { withCredentials: true });
+  }
 }
