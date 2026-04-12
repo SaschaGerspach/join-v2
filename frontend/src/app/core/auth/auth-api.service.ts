@@ -45,4 +45,16 @@ export class AuthApiService {
             withCredentials: true,
         });
     }
+
+    passwordResetRequest(email: string): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/auth/password-reset`, { email }, {
+            withCredentials: true,
+        });
+    }
+
+    passwordResetConfirm(uid: string, token: string, password: string): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/auth/password-reset/confirm`, { uid, token, password }, {
+            withCredentials: true,
+        });
+    }
 }

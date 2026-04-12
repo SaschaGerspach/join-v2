@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { LoginPageComponent } from './features/auth/pages/login-page/login-page.component';
 import { RegisterPageComponent } from './features/auth/pages/register-page/register-page.component';
+import { ForgotPasswordPageComponent } from './features/auth/pages/forgot-password-page/forgot-password-page.component';
+import { ResetPasswordPageComponent } from './features/auth/pages/reset-password-page/reset-password-page.component';
 import { BoardsPageComponent } from './features/boards/pages/boards-page/boards-page.component';
 import { BoardDetailPageComponent } from './features/boards/pages/board-detail-page/board-detail-page.component';
 import { ContactsPageComponent } from './features/contacts/pages/contacts-page/contacts-page.component';
@@ -13,6 +15,8 @@ import { NotFoundPageComponent } from './features/not-found/not-found-page.compo
 export const routes: Routes = [
     {path: 'login', title: 'Log in | Join', component: LoginPageComponent},
     {path: 'register', title: 'Sign up | Join', component: RegisterPageComponent},
+    {path: 'forgot-password', title: 'Reset Password | Join', component: ForgotPasswordPageComponent},
+    {path: 'reset-password/:uid/:token', title: 'Set New Password | Join', component: ResetPasswordPageComponent},
 
     {
         path: '',

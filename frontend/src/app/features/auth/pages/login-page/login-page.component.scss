@@ -115,6 +115,28 @@ $color-error:   #ff8190;
   margin-bottom: 0.75rem;
 }
 
+.info-message {
+  font-size: 0.9rem;
+  color: $color-dark;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.auth-links {
+  margin-top: 0.75rem;
+  text-align: right;
+}
+
+.link-subtle {
+  font-size: 0.85rem;
+  color: $color-primary;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .auth-actions {
   display: flex;
   gap: 1rem;

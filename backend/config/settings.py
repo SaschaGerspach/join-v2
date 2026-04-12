@@ -147,6 +147,17 @@ CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors_origins.split(',')]
 _csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:4200,http://localhost')
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins.split(',')]
 
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '25'))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'false').lower() == 'true'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@join.app')
+PASSWORD_RESET_TIMEOUT = 3600
+
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:4200')
+
 CORS_ALLOW_CREDENTIALS = True
 
 SESSION_COOKIE_SAMESITE = "Lax"
