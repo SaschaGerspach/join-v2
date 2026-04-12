@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export type Board = {
   id: number;
@@ -12,7 +13,7 @@ export type Board = {
 @Injectable({ providedIn: 'root' })
 export class BoardsApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8000';
+  private readonly baseUrl = environment.apiUrl;
 
   getAll(): Observable<Board[]> {
     return this.http.get<Board[]>(`${this.baseUrl}/boards/`, { withCredentials: true });

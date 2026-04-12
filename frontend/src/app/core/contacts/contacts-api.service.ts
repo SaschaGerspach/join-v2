@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export type Contact = {
   id: number;
@@ -13,7 +14,7 @@ export type Contact = {
 @Injectable({ providedIn: 'root' })
 export class ContactsApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8000';
+  private readonly baseUrl = environment.apiUrl;
 
   getAll(): Observable<Contact[]> {
     return this.http.get<Contact[]>(`${this.baseUrl}/contacts/`, { withCredentials: true });

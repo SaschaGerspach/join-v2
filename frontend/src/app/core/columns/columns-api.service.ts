@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export type Column = {
   id: number;
@@ -12,7 +13,7 @@ export type Column = {
 @Injectable({ providedIn: 'root' })
 export class ColumnsApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8000';
+  private readonly baseUrl = environment.apiUrl;
 
   getByBoard(boardId: number): Observable<Column[]> {
     return this.http.get<Column[]>(`${this.baseUrl}/columns/`, {

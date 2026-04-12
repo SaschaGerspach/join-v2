@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export type UserProfile = {
   id: number;
@@ -12,7 +13,7 @@ export type UserProfile = {
 @Injectable({ providedIn: 'root' })
 export class UsersApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8000';
+  private readonly baseUrl = environment.apiUrl;
 
   get(id: number): Observable<UserProfile> {
     return this.http.get<UserProfile>(`${this.baseUrl}/users/${id}/`, { withCredentials: true });

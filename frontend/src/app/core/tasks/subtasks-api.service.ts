@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export type Subtask = {
   id: number;
@@ -12,7 +13,7 @@ export type Subtask = {
 @Injectable({ providedIn: 'root' })
 export class SubtasksApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8000';
+  private readonly baseUrl = environment.apiUrl;
 
   getByTask(taskId: number): Observable<Subtask[]> {
     return this.http.get<Subtask[]>(`${this.baseUrl}/tasks/${taskId}/subtasks/`, { withCredentials: true });

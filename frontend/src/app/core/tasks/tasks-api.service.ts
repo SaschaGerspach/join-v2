@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export type Task = {
   id: number;
@@ -27,7 +28,7 @@ export type CreateTaskPayload = {
 @Injectable({ providedIn: 'root' })
 export class TasksApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8000';
+  private readonly baseUrl = environment.apiUrl;
 
   getByBoard(boardId: number): Observable<Task[]> {
     return this.http.get<Task[]>(`${this.baseUrl}/tasks/`, {

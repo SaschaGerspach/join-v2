@@ -2,6 +2,7 @@ import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import type { AuthUser } from "./auth.service";
+import { environment } from "../../../environments/environment";
 
 type LoginRequest = {
     email: string;
@@ -19,7 +20,7 @@ type RegisterRequest = {
 export class AuthApiService {
     private readonly http = inject(HttpClient);
 
-    private readonly baseUrl = 'http://localhost:8000';
+    private readonly baseUrl = environment.apiUrl;
 
     register(payload: RegisterRequest): Observable<AuthUser> {
         return this.http.post<AuthUser>(`${this.baseUrl}/auth/register`, payload, {
