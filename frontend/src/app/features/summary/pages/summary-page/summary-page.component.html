@@ -38,6 +38,16 @@
       </div>
     </div>
 
+    @if (overdueTasks() > 0) {
+      <div class="stat-card overdue">
+        <div class="stat-icon">&#9888;</div>
+        <div class="stat-body">
+          <span class="stat-number">{{ overdueTasks() }}</span>
+          <span class="stat-label">Overdue</span>
+        </div>
+      </div>
+    }
+
     @if (nextDeadline()) {
       <div class="stat-card deadline">
         <div class="stat-icon">&#128197;</div>

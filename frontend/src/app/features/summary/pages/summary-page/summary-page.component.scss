@@ -63,8 +63,9 @@ $color-high:    #ffa800;
     .stat-icon, .stat-number, .stat-label { color: $color-white; }
   }
 
-  &.urgent .stat-number { color: $color-urgent; }
-  &.high   .stat-number { color: $color-high; }
+  &.urgent  .stat-number { color: $color-urgent; }
+  &.high    .stat-number { color: $color-high; }
+  &.overdue .stat-number { color: $color-urgent; }
   &.deadline .stat-number { font-size: 1.1rem; }
 }
 

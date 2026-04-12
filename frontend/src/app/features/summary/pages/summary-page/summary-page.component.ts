@@ -32,6 +32,11 @@ export class SummaryPageComponent implements OnInit {
   urgentTasks = computed(() => this.tasks().filter(t => t.priority === 'urgent').length);
   highTasks = computed(() => this.tasks().filter(t => t.priority === 'high').length);
 
+  overdueTasks = computed(() => {
+    const today = new Date(new Date().toDateString());
+    return this.tasks().filter(t => t.due_date && new Date(t.due_date) < today).length;
+  });
+
   nextDeadline = computed(() => {
     const upcoming = this.tasks()
       .filter(t => t.due_date)
