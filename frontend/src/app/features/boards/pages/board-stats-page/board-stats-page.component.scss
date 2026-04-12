@@ -1,0 +1,89 @@
+$color-primary: #29abe2;
+$color-dark: #2a3647;
+$color-muted: #a8a8a8;
+$color-error: #ff8190;
+
+.stats-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.stats-header {
+  margin-bottom: 1.5rem;
+
+  .back-link {
+    font-size: 0.85rem;
+    color: $color-primary;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text, $color-dark);
+    margin-top: 0.5rem;
+  }
+}
+
+.loading-hint {
+  text-align: center;
+  color: $color-muted;
+  padding: 3rem 0;
+}
+
+.stats-summary {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  flex: 1;
+  background: var(--color-surface, #fff);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  .stat-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: $color-primary;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $color-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &.overdue .stat-value { color: $color-error; }
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  background: var(--color-surface, #fff);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text, $color-dark);
+    margin-bottom: 1rem;
+  }
+}

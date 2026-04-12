@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { SlicePipe } from '@angular/common';
@@ -19,7 +19,7 @@ import { BoardWsService } from '../../../../core/websocket/board-ws.service';
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule, DragDropModule, SlicePipe, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent],
+  imports: [FormsModule, DragDropModule, SlicePipe, RouterModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
 })

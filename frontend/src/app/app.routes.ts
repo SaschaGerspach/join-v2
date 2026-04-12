@@ -20,6 +20,7 @@ export const routes: Routes = [
                 {path: 'summary', title: 'Summary | Join', loadComponent: () => import('./features/summary/pages/summary-page/summary-page.component').then(m => m.SummaryPageComponent)},
                 {path: 'boards', title: 'Boards | Join', loadComponent: () => import('./features/boards/pages/boards-page/boards-page.component').then(m => m.BoardsPageComponent)},
                 {path: 'boards/:id', title: 'Board | Join', loadComponent: () => import('./features/boards/pages/board-detail-page/board-detail-page.component').then(m => m.BoardDetailPageComponent)},
+                {path: 'boards/:id/stats', title: 'Board Stats | Join', loadComponent: () => import('./features/boards/pages/board-stats-page/board-stats-page.component').then(m => m.BoardStatsPageComponent)},
                 {path: 'contacts', title: 'Contacts | Join', loadComponent: () => import('./features/contacts/pages/contacts-page/contacts-page.component').then(m => m.ContactsPageComponent)},
                 {path: 'profile', title: 'Profile | Join', loadComponent: () => import('./features/profile/pages/profile-page/profile-page.component').then(m => m.ProfilePageComponent)},
                 {path: 'calendar', title: 'Calendar | Join', loadComponent: () => import('./features/calendar/pages/calendar-page/calendar-page.component').then(m => m.CalendarPageComponent)},

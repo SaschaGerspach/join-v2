@@ -127,6 +127,23 @@ $priority-urgent: #ff3d00;
   }
 }
 
+.btn-stats {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid $color-primary;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $color-primary;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    background: $color-primary;
+    color: $color-white;
+    text-decoration: none;
+  }
+}
+
 .btn-add-column {
   margin-left: auto;
   background-color: $color-dark;

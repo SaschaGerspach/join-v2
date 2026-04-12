@@ -49,6 +49,7 @@
     @if (hasActiveFilter()) {
       <button class="btn-clear-filter" (click)="clearFilters()">&#10005; Clear</button>
     }
+    <a class="btn-stats" [routerLink]="['/boards', boardId(), 'stats']">Stats</a>
     <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>
   </div>
 

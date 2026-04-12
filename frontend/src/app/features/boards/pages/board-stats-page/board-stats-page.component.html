@@ -1,0 +1,32 @@
+<div class="stats-page">
+  <div class="stats-header">
+    <a [routerLink]="['/boards', boardId]" class="back-link">&larr; Back to board</a>
+    <h1>{{ boardTitle() }} — Statistics</h1>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-hint">Loading…</p>
+  } @else {
+    <div class="stats-summary">
+      <div class="stat-card">
+        <span class="stat-value">{{ totalTasks() }}</span>
+        <span class="stat-label">Total Tasks</span>
+      </div>
+      <div class="stat-card overdue">
+        <span class="stat-value">{{ overdueTasks() }}</span>
+        <span class="stat-label">Overdue</span>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>Tasks per Column</h3>
+        <canvas baseChart [data]="columnChartData()" type="bar" [options]="barOptions"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Tasks by Priority</h3>
+        <canvas baseChart [data]="priorityChartData()" type="doughnut" [options]="doughnutOptions"></canvas>
+      </div>
+    </div>
+  }
+</div>
