@@ -1,0 +1,87 @@
+<div class="modal-backdrop" (click)="cancelled.emit()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2>New Task</h2>
+      <button class="btn-close" (click)="cancelled.emit()">&#10005;</button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="field-group">
+        <label class="field-label">Title *</label>
+        <input
+          class="field-input"
+          type="text"
+          [(ngModel)]="title"
+          placeholder="Task title"
+          (keyup.enter)="submit()"
+        />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Description</label>
+        <textarea
+          class="field-textarea"
+          rows="2"
+          [(ngModel)]="description"
+          placeholder="Optional description..."
+        ></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Priority</label>
+          <div class="priority-options">
+            @for (p of priorities; track p) {
+              <button
+                type="button"
+                class="priority-btn"
+                [class]="'priority-' + p"
+                [class.active]="priority === p"
+                (click)="priority = p"
+              >{{ p }}</button>
+            }
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Due date</label>
+          <input
+            class="field-input"
+            type="date"
+            [(ngModel)]="dueDate"
+          />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Column</label>
+          <select class="field-select" [(ngModel)]="selectedColumnId">
+            @for (col of columns(); track col.id) {
+              <option [ngValue]="col.id">{{ col.title }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Assign to</label>
+          <select class="field-select" [(ngModel)]="assignedTo">
+            <option [ngValue]="null">— Unassigned —</option>
+            @for (c of contacts(); track c.id) {
+              <option [ngValue]="c.id">{{ c.first_name }} {{ c.last_name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelled.emit()">Cancel</button>
+      <button class="btn-save" (click)="submit()">Create Task</button>
+    </div>
+
+  </div>
+</div>

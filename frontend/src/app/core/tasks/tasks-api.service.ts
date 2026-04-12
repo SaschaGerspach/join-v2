@@ -24,6 +24,7 @@ export type CreateTaskPayload = {
   priority?: string;
   column?: number | null;
   due_date?: string | null;
+  assigned_to?: number | null;
 };
 
 @Injectable({ providedIn: 'root' })

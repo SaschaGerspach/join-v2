@@ -8,13 +8,14 @@ import { TasksApiService, Task, CreateTaskPayload } from '../../../../core/tasks
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 import { ContactsApiService, Contact } from '../../../../core/contacts/contacts-api.service';
 import { TaskDetailModalComponent } from '../../components/task-detail-modal/task-detail-modal.component';
+import { CreateTaskModalComponent } from '../../components/create-task-modal/create-task-modal.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule, DragDropModule, SlicePipe, TaskDetailModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent],
+  imports: [FormsModule, DragDropModule, SlicePipe, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
 })
@@ -37,7 +38,6 @@ export class BoardDetailPageComponent implements OnInit {
   showColumnForm = signal(false);
 
   addingTaskForColumn = signal<number | null>(null);
-  newTaskTitle = '';
 
   editingColumnId = signal<number | null>(null);
   editingColumnTitle = '';
@@ -144,18 +144,12 @@ export class BoardDetailPageComponent implements OnInit {
 
   startAddTask(columnId: number): void {
     this.addingTaskForColumn.set(columnId);
-    this.newTaskTitle = '';
   }
 
-  createTask(columnId: number): void {
-    const title = this.newTaskTitle.trim();
-    if (!title) return;
-
-    const payload: CreateTaskPayload = { title, column: columnId };
+  createTask(payload: CreateTaskPayload): void {
     this.tasksApi.create(this.boardId(), payload).subscribe(task => {
       this.tasks.update(t => [...t, task]);
       this.addingTaskForColumn.set(null);
-      this.newTaskTitle = '';
     });
   }
 

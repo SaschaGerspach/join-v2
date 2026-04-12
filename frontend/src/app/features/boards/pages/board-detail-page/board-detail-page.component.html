@@ -106,23 +106,7 @@
             </div>
           }
 
-          @if (addingTaskForColumn() === column.id) {
-            <div class="task-input-card">
-              <input
-                class="form-input"
-                type="text"
-                [(ngModel)]="newTaskTitle"
-                placeholder="Task title"
-                (keyup.enter)="createTask(column.id)"
-              />
-              <div class="task-input-actions">
-                <button class="btn-cancel" (click)="addingTaskForColumn.set(null)">Cancel</button>
-                <button class="btn-confirm" (click)="createTask(column.id)">Add</button>
-              </div>
-            </div>
-          } @else {
-            <button class="btn-add-task" (click)="startAddTask(column.id)">+ Add Task</button>
-          }
+          <button class="btn-add-task" (click)="startAddTask(column.id)">+ Add Task</button>
         </div>
 
       </div>
@@ -136,6 +120,16 @@
   </div>
 
 </div>
+
+@if (addingTaskForColumn() !== null) {
+  <app-create-task-modal
+    [columnId]="addingTaskForColumn()!"
+    [columns]="columns()"
+    [contacts]="contacts()"
+    (confirmed)="createTask($event)"
+    (cancelled)="addingTaskForColumn.set(null)"
+  />
+}
 
 @if (selectedTask()) {
   <app-task-detail-modal
