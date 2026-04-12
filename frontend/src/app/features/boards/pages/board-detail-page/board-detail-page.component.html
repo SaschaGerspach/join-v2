@@ -81,7 +81,7 @@
                 <p class="task-description">{{ task.description }}</p>
               }
               @if (task.due_date) {
-                <div class="task-due-date">
+                <div class="task-due-date" [class.overdue]="isOverdue(task.due_date)">
                   <span class="due-icon">&#128197;</span>
                   <span>{{ task.due_date | slice:0:10 }}</span>
                 </div>

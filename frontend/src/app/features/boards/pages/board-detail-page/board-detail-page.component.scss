@@ -246,6 +246,11 @@ $priority-urgent: #ff3d00;
   gap: 0.3rem;
   font-size: 0.78rem;
   color: $color-muted;
+
+  &.overdue {
+    color: $color-error;
+    font-weight: 700;
+  }
 }
 
 .due-icon {

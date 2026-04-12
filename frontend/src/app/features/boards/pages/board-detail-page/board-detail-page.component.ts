@@ -223,4 +223,9 @@ export class BoardDetailPageComponent implements OnInit {
   priorityClass(priority: string): string {
     return `priority-${priority}`;
   }
+
+  isOverdue(dueDate: string | null): boolean {
+    if (!dueDate) return false;
+    return new Date(dueDate) < new Date(new Date().toDateString());
+  }
 }
