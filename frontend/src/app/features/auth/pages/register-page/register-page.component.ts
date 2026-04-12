@@ -24,6 +24,18 @@ export class RegisterPageComponent {
   showPassword = signal(false);
   submitting = signal(false);
 
+  passwordStrength = signal<'weak' | 'medium' | 'strong' | null>(null);
+
+  onPasswordChange(value: string): void {
+    this.password = value;
+    if (!value) { this.passwordStrength.set(null); return; }
+    const hasUpper = /[A-Z]/.test(value);
+    const hasDigit = /\d/.test(value);
+    const hasSpecial = /[^A-Za-z0-9]/.test(value);
+    const score = (value.length >= 12 ? 1 : 0) + (hasUpper ? 1 : 0) + (hasDigit ? 1 : 0) + (hasSpecial ? 1 : 0);
+    this.passwordStrength.set(score >= 3 ? 'strong' : score >= 2 ? 'medium' : 'weak');
+  }
+
   register(form: NgForm): void {
     if (form.invalid) return;
     this.error.set(null);

@@ -65,7 +65,8 @@
           <input
             class="form-input"
             [type]="showPassword() ? 'text' : 'password'"
-            [(ngModel)]="password"
+            [ngModel]="password"
+            (ngModelChange)="onPasswordChange($event)"
             name="password"
             placeholder="Password (min. 8 characters)"
             required
@@ -77,6 +78,16 @@
             {{ showPassword() ? '🙈' : '👁' }}
           </button>
         </div>
+        @if (passwordStrength()) {
+          <div class="password-strength">
+            <div class="strength-bars">
+              <div class="bar filled" [class]="passwordStrength()!"></div>
+              <div class="bar" [class.filled]="passwordStrength() === 'medium' || passwordStrength() === 'strong'" [class]="passwordStrength() === 'medium' || passwordStrength() === 'strong' ? passwordStrength()! : ''"></div>
+              <div class="bar" [class.filled]="passwordStrength() === 'strong'" [class]="passwordStrength() === 'strong' ? 'strong' : ''"></div>
+            </div>
+            <span class="strength-label strength-{{ passwordStrength() }}">{{ passwordStrength() }}</span>
+          </div>
+        }
         @if (passwordField.invalid && (passwordField.touched || f.submitted)) {
           <span class="field-error">
             @if (passwordField.errors?.['required']) { Password is required. }
