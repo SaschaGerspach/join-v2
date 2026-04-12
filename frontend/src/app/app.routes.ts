@@ -8,6 +8,7 @@ import { SummaryPageComponent } from './features/summary/pages/summary-page/summ
 import { ProfilePageComponent } from './features/profile/pages/profile-page/profile-page.component';
 import { ShellComponent } from './layout/shell/shell.component';
 import { authGuard } from './core/guards/auth.guard';
+import { NotFoundPageComponent } from './features/not-found/not-found-page.component';
 
 export const routes: Routes = [
     {path: 'login', component: LoginPageComponent},
@@ -26,4 +27,6 @@ export const routes: Routes = [
                 {path: 'profile', component: ProfilePageComponent},
         ],
     },
+
+    {path: '**', component: NotFoundPageComponent},
 ];
