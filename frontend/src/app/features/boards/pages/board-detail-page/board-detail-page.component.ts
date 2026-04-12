@@ -42,6 +42,9 @@ export class BoardDetailPageComponent implements OnInit {
   editingColumnId = signal<number | null>(null);
   editingColumnTitle = '';
 
+  editingBoardTitle = signal(false);
+  boardTitleInput = '';
+
   selectedTask = signal<Task | null>(null);
   loading = signal(true);
   error = signal('');
@@ -94,6 +97,20 @@ export class BoardDetailPageComponent implements OnInit {
       this.columns.update(c => [...c, col]);
       this.newColumnTitle = '';
       this.showColumnForm.set(false);
+    });
+  }
+
+  startRenameBoardTitle(): void {
+    this.boardTitleInput = this.board()?.title ?? '';
+    this.editingBoardTitle.set(true);
+  }
+
+  confirmRenameBoardTitle(): void {
+    const title = this.boardTitleInput.trim();
+    if (!title) { this.editingBoardTitle.set(false); return; }
+    this.boardsApi.patch(this.boardId(), { title }).subscribe(updated => {
+      this.board.set(updated);
+      this.editingBoardTitle.set(false);
     });
   }
 

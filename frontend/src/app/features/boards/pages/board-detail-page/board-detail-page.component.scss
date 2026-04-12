@@ -43,6 +43,20 @@ $priority-urgent: #ff3d00;
     font-size: 2rem;
     font-weight: 700;
     color: $color-dark;
+    cursor: text;
+  }
+
+  .board-title-input {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $color-dark;
+    border: none;
+    border-bottom: 3px solid $color-primary;
+    outline: none;
+    background: transparent;
+    padding: 0;
+    width: 100%;
+    max-width: 400px;
   }
 
   @media (max-width: $bp-mobile) {

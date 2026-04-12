@@ -27,6 +27,10 @@ export class BoardsApiService {
     return this.http.post<Board>(`${this.baseUrl}/boards/`, { title }, { withCredentials: true });
   }
 
+  patch(id: number, payload: Partial<{ title: string }>): Observable<Board> {
+    return this.http.patch<Board>(`${this.baseUrl}/boards/${id}/`, payload, { withCredentials: true });
+  }
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/boards/${id}/`, { withCredentials: true });
   }

@@ -9,7 +9,18 @@
   }
 
   <div class="board-detail-header">
-    <h1>{{ board()?.title ?? 'Board' }}</h1>
+    @if (editingBoardTitle()) {
+      <input
+        class="board-title-input"
+        type="text"
+        [(ngModel)]="boardTitleInput"
+        (keyup.enter)="confirmRenameBoardTitle()"
+        (keyup.escape)="editingBoardTitle.set(false)"
+        (blur)="confirmRenameBoardTitle()"
+      />
+    } @else {
+      <h1 (dblclick)="startRenameBoardTitle()">{{ board()?.title ?? 'Board' }}</h1>
+    }
     <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>
   </div>
 
