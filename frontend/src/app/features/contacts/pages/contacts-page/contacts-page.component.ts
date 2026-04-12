@@ -108,4 +108,18 @@ export class ContactsPageComponent implements OnInit {
   fullName(contact: Contact): string {
     return `${contact.first_name} ${contact.last_name}`;
   }
+
+  avatarColor(contact: Contact): string {
+    const colors = [
+      '#6e40c9', '#29abe2', '#e44a76', '#2d8a4e',
+      '#d97c0e', '#4a90d9', '#c94040', '#3a7d44',
+      '#8b4fc4', '#1a7f8f',
+    ];
+    const name = contact.first_name + contact.last_name;
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+    }
+    return colors[hash % colors.length];
+  }
 }

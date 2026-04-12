@@ -22,7 +22,7 @@
             [class.active]="selectedContact()?.id === contact.id"
             (click)="selectContact(contact)"
           >
-            <div class="contact-avatar">{{ initials(contact) }}</div>
+            <div class="contact-avatar" [style.background]="avatarColor(contact)">{{ initials(contact) }}</div>
             <div class="contact-list-info">
               <span class="contact-list-name">{{ fullName(contact) }}</span>
               <span class="contact-list-email">{{ contact.email }}</span>
@@ -68,7 +68,7 @@
     } @else if (selectedContact()) {
       <div class="contact-detail-card">
         <div class="detail-header">
-          <div class="detail-avatar">{{ initials(selectedContact()!) }}</div>
+          <div class="detail-avatar" [style.background]="avatarColor(selectedContact()!)">{{ initials(selectedContact()!) }}</div>
           <div class="detail-name-block">
             <h2>{{ fullName(selectedContact()!) }}</h2>
           </div>
