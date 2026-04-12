@@ -10,7 +10,9 @@ import { SummaryPageComponent } from './features/summary/pages/summary-page/summ
 import { ProfilePageComponent } from './features/profile/pages/profile-page/profile-page.component';
 import { ShellComponent } from './layout/shell/shell.component';
 import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 import { NotFoundPageComponent } from './features/not-found/not-found-page.component';
+import { AdminPageComponent } from './features/admin/pages/admin-page/admin-page.component';
 
 export const routes: Routes = [
     {path: 'login', title: 'Log in | Join', component: LoginPageComponent},
@@ -29,6 +31,7 @@ export const routes: Routes = [
                 {path: 'boards/:id', title: 'Board | Join', component: BoardDetailPageComponent},
                 {path: 'contacts', title: 'Contacts | Join', component: ContactsPageComponent},
                 {path: 'profile', title: 'Profile | Join', component: ProfilePageComponent},
+                {path: 'admin', title: 'Admin | Join', component: AdminPageComponent, canActivate: [adminGuard]},
         ],
     },
 

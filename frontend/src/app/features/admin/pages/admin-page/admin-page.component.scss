@@ -1,0 +1,77 @@
+$color-dark: #2a3647;
+$color-primary: #29abe2;
+$color-white: #ffffff;
+$color-bg: #f6f7f8;
+$color-error: #ff8190;
+
+.admin-page {
+  padding: 2rem;
+  max-width: 900px;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $color-dark;
+  }
+}
+
+.btn-django-admin {
+  padding: 0.6rem 1.25rem;
+  background: $color-dark;
+  color: $color-white;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+
+  &:hover {
+    background: $color-primary;
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.25rem;
+}
+
+.stat-card {
+  background: $color-white;
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: $color-dark;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #6b7a8d;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.error-banner {
+  color: $color-error;
+  font-size: 0.9rem;
+}
