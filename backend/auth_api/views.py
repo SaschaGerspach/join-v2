@@ -1,15 +1,23 @@
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
+
+
+class AuthRateThrottle(AnonRateThrottle):
+    rate = "10/minute"
+    scope = "auth_attempts"
+
 
 User = get_user_model()
 
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([AuthRateThrottle])
 def register(request):
     email = request.data.get("email", "").strip().lower()
     password = request.data.get("password", "")
@@ -49,6 +57,7 @@ def register(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([AuthRateThrottle])
 def login_view(request):
     email = request.data.get("email", "").strip().lower()
     password = request.data.get("password", "")
