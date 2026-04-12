@@ -34,7 +34,7 @@
   } @else if (!loading()) {
     <div class="boards-grid">
       @for (board of boards(); track board.id) {
-        <div class="board-card" (click)="openBoard(board.id)">
+        <div class="board-card" [style.border-left]="'4px solid ' + board.color" (click)="openBoard(board.id)">
           <div class="board-card-body">
             <h2>{{ board.title }}</h2>
             @if (!board.is_owner) {
@@ -43,6 +43,14 @@
           </div>
           <div class="board-card-actions">
             @if (board.is_owner) {
+              <input
+                class="color-picker"
+                type="color"
+                [value]="board.color"
+                (click)="$event.stopPropagation()"
+                (change)="changeColor(board, $any($event.target).value)"
+                title="Board color"
+              />
               <button class="btn-members" (click)="openMembers(board, $event)" title="Manage members">&#128101;</button>
               <button class="btn-delete" (click)="deleteBoard(board.id, $event)" title="Delete board">&#10005;</button>
             }

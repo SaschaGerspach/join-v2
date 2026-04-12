@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 export type Board = {
   id: number;
   title: string;
+  color: string;
   created_by: number;
   created_at: string;
   is_owner: boolean;
@@ -38,7 +39,7 @@ export class BoardsApiService {
     return this.http.post<Board>(`${this.baseUrl}/boards/`, { title }, { withCredentials: true });
   }
 
-  patch(id: number, payload: Partial<{ title: string }>): Observable<Board> {
+  patch(id: number, payload: Partial<{ title: string; color: string }>): Observable<Board> {
     return this.http.patch<Board>(`${this.baseUrl}/boards/${id}/`, payload, { withCredentials: true });
   }
 

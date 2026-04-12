@@ -101,6 +101,13 @@ export class BoardsPageComponent implements OnInit {
     });
   }
 
+  changeColor(board: Board, color: string): void {
+    this.api.patch(board.id, { color }).subscribe({
+      next: updated => this.boards.update(list => list.map(b => b.id === updated.id ? updated : b)),
+      error: () => this.toast.show('Failed to change color.', 'error'),
+    });
+  }
+
   removeMember(userId: number): void {
     const board = this.managingBoard();
     if (!board) return;

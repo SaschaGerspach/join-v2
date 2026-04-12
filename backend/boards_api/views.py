@@ -25,6 +25,7 @@ def serialize_board(board):
     return {
         "id": board.pk,
         "title": board.title,
+        "color": board.color,
         "created_by": board.created_by_id,
         "created_at": board.created_at,
         "is_owner": True,
@@ -35,6 +36,7 @@ def serialize_shared_board(board, user):
     return {
         "id": board.pk,
         "title": board.title,
+        "color": board.color,
         "created_by": board.created_by_id,
         "created_at": board.created_at,
         "is_owner": board.created_by == user,
@@ -78,7 +80,11 @@ def board_detail(request, pk):
     if request.method == "PATCH":
         if "title" in request.data:
             board.title = request.data["title"].strip()
-            board.save()
+        if "color" in request.data:
+            color = request.data["color"].strip()
+            if len(color) == 7 and color.startswith("#"):
+                board.color = color
+        board.save()
         return Response(serialize_shared_board(board, request.user))
 
     board.delete()

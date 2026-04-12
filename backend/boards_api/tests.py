@@ -20,8 +20,8 @@ class BoardListTests(APITestCase):
         Board.objects.create(title="Other Board", created_by=self.other)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["title"], "My Board")
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["title"], "My Board")
 
     def test_create_board(self):
         response = self.client.post(self.url, {"title": "New Board"}, format="json")

@@ -4,6 +4,7 @@ from django.db import models
 
 class Board(models.Model):
     title = models.CharField(max_length=255)
+    color = models.CharField(max_length=7, default='#29abe2')
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
