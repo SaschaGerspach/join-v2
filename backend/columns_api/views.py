@@ -28,7 +28,7 @@ def column_list(request):
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
-        columns = board.columns.all()
+        columns = board.columns.all().order_by("order")
         return Response([serialize_column(c) for c in columns])
 
     title = request.data.get("title", "").strip()
