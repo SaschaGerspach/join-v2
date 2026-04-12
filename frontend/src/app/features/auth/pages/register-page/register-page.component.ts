@@ -21,6 +21,7 @@ export class RegisterPageComponent {
   email = '';
   password = '';
   error = signal<string | null>(null);
+  showPassword = signal(false);
 
   register(form: NgForm): void {
     if (form.invalid) return;

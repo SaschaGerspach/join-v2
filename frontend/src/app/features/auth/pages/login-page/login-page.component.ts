@@ -17,6 +17,7 @@ export class LoginPageComponent {
   email = '';
   password = '';
   error = signal<string | null>(null);
+  showPassword = signal(false);
 
   login(form: NgForm): void {
     if (form.invalid) return;
