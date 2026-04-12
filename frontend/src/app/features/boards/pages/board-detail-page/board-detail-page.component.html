@@ -52,6 +52,7 @@
     cdkDropList
     cdkDropListOrientation="horizontal"
     [cdkDropListData]="columns()"
+    [cdkDropListDisabled]="!!searchQuery()"
     (cdkDropListDropped)="dropColumn($event)"
   >
     @for (column of columns(); track column.id) {
@@ -79,6 +80,7 @@
           [id]="'col-' + column.id"
           [cdkDropListData]="tasksForColumn(column.id)"
           [cdkDropListConnectedTo]="columnListIds()"
+          [cdkDropListDisabled]="!!searchQuery()"
           (cdkDropListDropped)="drop($event, column.id)"
         >
           @for (task of tasksForColumn(column.id); track task.id) {
