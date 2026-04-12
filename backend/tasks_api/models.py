@@ -25,6 +25,7 @@ class Task(models.Model):
         related_name="assigned_tasks",
     )
     due_date = models.DateField(null=True, blank=True)
+    order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -12,6 +12,7 @@ export type Task = {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   assigned_to: number | null;
   due_date: string | null;
+  order: number;
   created_at: string;
   subtask_count: number;
   subtask_done_count: number;
@@ -51,5 +52,9 @@ export class TasksApiService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/tasks/${id}/`, { withCredentials: true });
+  }
+
+  reorder(items: { id: number; order: number; column: number | null }[]): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/tasks/reorder/`, items, { withCredentials: true });
   }
 }

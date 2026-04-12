@@ -134,19 +134,38 @@ export class BoardDetailPageComponent implements OnInit {
 
   drop(event: CdkDragDrop<Task[]>, targetColumnId: number): void {
     const task: Task = event.item.data;
+    const isSameColumn = event.previousContainer === event.container;
 
-    if (event.previousContainer === event.container) {
-      // reorder within same column — no API call needed for now
-      return;
+    if (isSameColumn) {
+      const colTasks = this.tasksForColumn(targetColumnId);
+      const reordered = [...colTasks];
+      const [moved] = reordered.splice(event.previousIndex, 1);
+      reordered.splice(event.currentIndex, 0, moved);
+      const updated = reordered.map((t, i) => ({ ...t, order: i }));
+      this.tasks.update(tasks =>
+        tasks.map(t => updated.find(u => u.id === t.id) ?? t)
+      );
+      this.tasksApi.reorder(updated.map(t => ({ id: t.id, order: t.order, column: t.column }))).subscribe();
+    } else {
+      const prevTasks = this.tasksForColumn(task.column!).filter(t => t.id !== task.id)
+        .map((t, i) => ({ ...t, order: i }));
+      const targetTasks = [...this.tasksForColumn(targetColumnId)];
+      targetTasks.splice(event.currentIndex, 0, { ...task, column: targetColumnId });
+      const updatedTarget = targetTasks.map((t, i) => ({ ...t, order: i, column: targetColumnId }));
+
+      this.tasks.update(tasks =>
+        tasks.map(t => {
+          const inPrev = prevTasks.find(u => u.id === t.id);
+          const inTarget = updatedTarget.find(u => u.id === t.id);
+          return inTarget ?? inPrev ?? t;
+        })
+      );
+
+      this.tasksApi.reorder([
+        ...prevTasks.map(t => ({ id: t.id, order: t.order, column: t.column })),
+        ...updatedTarget.map(t => ({ id: t.id, order: t.order, column: t.column })),
+      ]).subscribe();
     }
-
-    // Optimistic update: change the task's column in local state
-    this.tasks.update(tasks =>
-      tasks.map(t => t.id === task.id ? { ...t, column: targetColumnId } : t)
-    );
-
-    // Persist to backend
-    this.tasksApi.patch(task.id, { column: targetColumnId }).subscribe();
   }
 
   priorityClass(priority: string): string {

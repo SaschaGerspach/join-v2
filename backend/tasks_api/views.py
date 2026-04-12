@@ -18,6 +18,7 @@ def serialize_task(task):
         "assigned_to": task.assigned_to_id,
         "due_date": task.due_date,
         "created_at": task.created_at,
+        "order": task.order,
         "subtask_count": subtasks.count(),
         "subtask_done_count": subtasks.filter(done=True).count(),
     }
@@ -36,7 +37,7 @@ def task_list(request):
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
-        tasks = board.tasks.all().order_by("created_at")
+        tasks = board.tasks.all().order_by("order", "created_at")
         return Response([serialize_task(t) for t in tasks])
 
     title = request.data.get("title", "").strip()
@@ -69,11 +70,10 @@ def task_detail(request, pk):
         return Response({"detail": "Only the board creator can modify tasks."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":
-        for field in ["title", "description", "priority", "column", "assigned_to", "due_date"]:
+        for field in ["title", "description", "priority", "column", "assigned_to", "due_date", "order"]:
             key = field if field not in ["column", "assigned_to"] else f"{field}_id"
-            data_key = field
-            if data_key in request.data:
-                setattr(task, key, request.data[data_key])
+            if field in request.data:
+                setattr(task, key, request.data[field])
         task.save()
         return Response(serialize_task(task))
 
@@ -127,4 +127,26 @@ def subtask_detail(request, task_pk, pk):
         return Response(serialize_subtask(subtask))
 
     subtask.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["POST"])
+def task_reorder(request):
+    items = request.data
+    if not isinstance(items, list):
+        return Response({"detail": "Expected a list."}, status=status.HTTP_400_BAD_REQUEST)
+
+    task_ids = [item["id"] for item in items if "id" in item]
+    tasks = {t.pk: t for t in Task.objects.filter(pk__in=task_ids)}
+
+    for item in items:
+        task = tasks.get(item.get("id"))
+        if not task:
+            continue
+        if "order" in item:
+            task.order = item["order"]
+        if "column" in item:
+            task.column_id = item["column"]
+
+    Task.objects.bulk_update(list(tasks.values()), ["order", "column_id"])
     return Response(status=status.HTTP_204_NO_CONTENT)
