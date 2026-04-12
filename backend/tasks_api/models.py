@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 
 from boards_api.models import Board
@@ -18,7 +17,7 @@ class Task(models.Model):
     description = models.TextField(blank=True)
     priority = models.CharField(max_length=10, choices=Priority.choices, default=Priority.MEDIUM)
     assigned_to = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        "contacts_api.Contact",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
