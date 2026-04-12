@@ -52,6 +52,21 @@
     <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>
   </div>
 
+  @if (bulkMode()) {
+    <div class="bulk-toolbar">
+      <span class="bulk-count">{{ selectedTaskIds().size }} selected</span>
+      <select class="filter-select" [ngModel]="bulkMoveTarget()" (ngModelChange)="bulkMoveTarget.set($event === '' ? null : +$event)">
+        <option value="">Move to…</option>
+        @for (col of columns(); track col.id) {
+          <option [value]="col.id">{{ col.title }}</option>
+        }
+      </select>
+      <button class="btn-bulk-move" [disabled]="bulkMoveTarget() === null" (click)="bulkMove()">Move</button>
+      <button class="btn-bulk-delete" (click)="bulkDelete()">Delete</button>
+      <button class="btn-clear-filter" (click)="clearSelection()">&#10005; Cancel</button>
+    </div>
+  }
+
   @if (showColumnForm()) {
     <div class="column-form">
       <input
@@ -105,8 +120,14 @@
           (cdkDropListDropped)="drop($event, column.id)"
         >
           @for (task of tasksForColumn(column.id); track task.id) {
-            <div class="task-card" cdkDrag [cdkDragData]="task" (click)="openTask(task)">
+            <div class="task-card" [class.selected]="isTaskSelected(task.id)" cdkDrag [cdkDragData]="task" (click)="openTask(task)">
               <div class="task-card-top">
+                <input
+                  type="checkbox"
+                  class="task-select-checkbox"
+                  [checked]="isTaskSelected(task.id)"
+                  (click)="toggleTaskSelection(task.id, $event)"
+                />
                 <span class="task-priority" [class]="priorityClass(task.priority)">
                   {{ task.priority }}
                 </span>
@@ -196,5 +217,13 @@
     message="Delete this task?"
     (confirmed)="confirmDeleteTask()"
     (cancelled)="pendingDeleteTaskId.set(null)"
+  />
+}
+
+@if (pendingBulkDelete()) {
+  <app-confirm-dialog
+    [message]="'Delete ' + selectedTaskIds().size + ' selected task(s)?'"
+    (confirmed)="confirmBulkDelete()"
+    (cancelled)="pendingBulkDelete.set(false)"
   />
 }

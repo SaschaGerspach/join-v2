@@ -88,6 +88,11 @@ export class BoardDetailPageComponent implements OnInit {
   pendingDeleteColumnId = signal<number | null>(null);
   pendingDeleteTaskId = signal<number | null>(null);
 
+  selectedTaskIds = signal<Set<number>>(new Set());
+  bulkMode = computed(() => this.selectedTaskIds().size > 0);
+  bulkMoveTarget = signal<number | null>(null);
+  pendingBulkDelete = signal(false);
+
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.boardId.set(id);
@@ -282,6 +287,64 @@ export class BoardDetailPageComponent implements OnInit {
         ...updatedTarget.map(t => ({ id: t.id, order: t.order, column: t.column })),
       ]).subscribe();
     }
+  }
+
+  toggleTaskSelection(taskId: number, event: Event): void {
+    event.stopPropagation();
+    this.selectedTaskIds.update(set => {
+      const next = new Set(set);
+      if (next.has(taskId)) next.delete(taskId);
+      else next.add(taskId);
+      return next;
+    });
+  }
+
+  isTaskSelected(taskId: number): boolean {
+    return this.selectedTaskIds().has(taskId);
+  }
+
+  clearSelection(): void {
+    this.selectedTaskIds.set(new Set());
+  }
+
+  bulkMove(): void {
+    const targetCol = this.bulkMoveTarget();
+    if (targetCol === null) return;
+    const ids = [...this.selectedTaskIds()];
+    const items = ids.map((id, i) => ({ id, order: i, column: targetCol }));
+    this.tasksApi.reorder(items).subscribe({
+      next: () => {
+        this.tasks.update(tasks =>
+          tasks.map(t => ids.includes(t.id) ? { ...t, column: targetCol } : t)
+        );
+        this.clearSelection();
+        this.toast.show(`Moved ${ids.length} task(s)`);
+      },
+      error: () => this.toast.show('Failed to move tasks.', 'error'),
+    });
+  }
+
+  bulkDelete(): void {
+    this.pendingBulkDelete.set(true);
+  }
+
+  confirmBulkDelete(): void {
+    const ids = [...this.selectedTaskIds()];
+    this.pendingBulkDelete.set(false);
+    let done = 0;
+    ids.forEach(id => {
+      this.tasksApi.delete(id).subscribe({
+        next: () => {
+          this.tasks.update(t => t.filter(task => task.id !== id));
+          done++;
+          if (done === ids.length) {
+            this.clearSelection();
+            this.toast.show(`Deleted ${ids.length} task(s)`);
+          }
+        },
+        error: () => this.toast.show('Failed to delete some tasks.', 'error'),
+      });
+    });
   }
 
   priorityClass(priority: string): string {
