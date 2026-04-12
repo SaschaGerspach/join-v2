@@ -168,7 +168,11 @@ $color-error:   #ff8190;
 }
 
 .board-card-actions {
-  .btn-delete {
+  display: flex;
+  gap: 0.25rem;
+
+  .btn-delete,
+  .btn-members {
     background: none;
     border: none;
     color: $color-muted;
@@ -178,10 +182,123 @@ $color-error:   #ff8190;
     border-radius: 50%;
     line-height: 1;
     transition: color 0.15s ease, background-color 0.15s ease;
-
-    &:hover {
-      color: $color-error;
-      background-color: rgba(255, 129, 144, 0.1);
-    }
   }
+
+  .btn-delete:hover {
+    color: $color-error;
+    background-color: rgba(255, 129, 144, 0.1);
+  }
+
+  .btn-members:hover {
+    color: $color-primary;
+    background-color: rgba(41, 171, 226, 0.1);
+  }
+}
+
+.shared-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: $color-primary;
+  background: rgba(41, 171, 226, 0.12);
+  border-radius: 6px;
+  padding: 2px 7px;
+  margin-top: 0.25rem;
+  display: inline-block;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.members-modal {
+  background: $color-white;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+}
+
+.members-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: $color-dark;
+  }
+}
+
+.invite-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.invite-input {
+  flex: 1;
+  border: 1px solid $color-border;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+  }
+}
+
+.btn-invite {
+  background: $color-dark;
+  color: $color-white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover { background: $color-primary; }
+}
+
+.invite-error {
+  font-size: 0.8rem;
+  color: $color-error;
+  margin-bottom: 0.5rem;
+}
+
+.members-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: $color-bg;
+  border-radius: 10px;
+
+  .member-name { font-weight: 600; color: $color-dark; flex: 0 0 auto; }
+  .member-email { font-size: 0.82rem; color: $color-muted; flex: 1; }
+}
+
+.member-empty {
+  font-size: 0.85rem;
+  color: $color-muted;
+  font-style: italic;
+  padding: 0.5rem 0;
 }

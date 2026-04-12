@@ -37,9 +37,15 @@
         <div class="board-card" (click)="openBoard(board.id)">
           <div class="board-card-body">
             <h2>{{ board.title }}</h2>
+            @if (!board.is_owner) {
+              <span class="shared-badge">Shared</span>
+            }
           </div>
           <div class="board-card-actions">
-            <button class="btn-delete" (click)="deleteBoard(board.id, $event)" title="Delete board">&#10005;</button>
+            @if (board.is_owner) {
+              <button class="btn-members" (click)="openMembers(board, $event)" title="Manage members">&#128101;</button>
+              <button class="btn-delete" (click)="deleteBoard(board.id, $event)" title="Delete board">&#10005;</button>
+            }
           </div>
         </div>
       }
@@ -53,4 +59,42 @@
     (confirmed)="confirmDelete()"
     (cancelled)="pendingDeleteId.set(null)"
   />
+}
+
+@if (managingBoard()) {
+  <div class="modal-overlay" (click)="managingBoard.set(null)">
+    <div class="members-modal" (click)="$event.stopPropagation()">
+      <div class="members-modal-header">
+        <h2>Members — {{ managingBoard()!.title }}</h2>
+        <button class="btn-icon" (click)="managingBoard.set(null)">&#10005;</button>
+      </div>
+
+      <div class="invite-row">
+        <input
+          class="invite-input"
+          type="email"
+          [(ngModel)]="inviteEmail"
+          placeholder="Invite by email"
+          (keyup.enter)="invite()"
+        />
+        <button class="btn-invite" (click)="invite()">Invite</button>
+      </div>
+      @if (inviteError()) {
+        <p class="invite-error">{{ inviteError() }}</p>
+      }
+
+      <ul class="members-list">
+        @for (m of members(); track m.user_id) {
+          <li class="member-item">
+            <span class="member-name">{{ m.first_name }} {{ m.last_name }}</span>
+            <span class="member-email">{{ m.email }}</span>
+            <button class="btn-icon small" (click)="removeMember(m.user_id)" title="Remove">&#10005;</button>
+          </li>
+        }
+        @if (members().length === 0) {
+          <li class="member-empty">No members yet. Invite someone!</li>
+        }
+      </ul>
+    </div>
+  </div>
 }

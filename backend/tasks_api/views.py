@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.models import Board
+from boards_api.views import _can_access
 from .models import Task, Subtask
 
 
@@ -32,8 +33,11 @@ def task_list(request):
         return Response({"detail": "board query parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        board = Board.objects.get(pk=board_id, created_by=request.user)
+        board = Board.objects.get(pk=board_id)
     except Board.DoesNotExist:
+        return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not _can_access(board, request.user):
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -63,7 +67,7 @@ def task_detail(request, pk):
     except Task.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if task.board.created_by != request.user:
+    if not _can_access(task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -93,8 +97,11 @@ def serialize_subtask(subtask):
 @api_view(["GET", "POST"])
 def subtask_list(request, task_pk):
     try:
-        task = Task.objects.get(pk=task_pk, board__created_by=request.user)
+        task = Task.objects.get(pk=task_pk)
     except Task.DoesNotExist:
+        return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not _can_access(task.board, request.user):
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -115,8 +122,8 @@ def subtask_detail(request, task_pk, pk):
     except Subtask.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if subtask.task.board.created_by != request.user:
-        return Response({"detail": "Only the board creator can modify subtasks."}, status=status.HTTP_403_FORBIDDEN)
+    if not _can_access(subtask.task.board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PATCH":
         if "title" in request.data:
@@ -137,7 +144,10 @@ def task_reorder(request):
         return Response({"detail": "Expected a list."}, status=status.HTTP_400_BAD_REQUEST)
 
     task_ids = [item["id"] for item in items if "id" in item]
-    tasks = {t.pk: t for t in Task.objects.filter(pk__in=task_ids, board__created_by=request.user)}
+    tasks = {
+        t.pk: t for t in Task.objects.filter(pk__in=task_ids)
+        if _can_access(t.board, request.user)
+    }
 
     for item in items:
         task = tasks.get(item.get("id"))

@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.models import Board
+from boards_api.views import _can_access
 from .models import Column
 
 
@@ -23,8 +24,11 @@ def column_list(request):
         return Response({"detail": "board query parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        board = Board.objects.get(pk=board_id, created_by=request.user)
+        board = Board.objects.get(pk=board_id)
     except Board.DoesNotExist:
+        return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not _can_access(board, request.user):
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -47,8 +51,8 @@ def column_detail(request, pk):
     except Column.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if column.board.created_by != request.user:
-        return Response({"detail": "Only the board creator can modify columns."}, status=status.HTTP_403_FORBIDDEN)
+    if not _can_access(column.board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PATCH":
         if "title" in request.data:

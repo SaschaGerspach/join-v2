@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
+import { BoardsApiService, Board, BoardMember } from '../../../../core/boards/boards-api.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -24,6 +24,11 @@ export class BoardsPageComponent implements OnInit {
   loading = signal(true);
   error = signal('');
   pendingDeleteId = signal<number | null>(null);
+
+  managingBoard = signal<Board | null>(null);
+  members = signal<BoardMember[]>([]);
+  inviteEmail = '';
+  inviteError = signal('');
 
   ngOnInit(): void {
     this.loadBoards();
@@ -72,6 +77,36 @@ export class BoardsPageComponent implements OnInit {
         this.toast.show('Board deleted');
       },
       error: () => this.toast.show('Failed to delete board.', 'error'),
+    });
+  }
+
+  openMembers(board: Board, event: Event): void {
+    event.stopPropagation();
+    this.managingBoard.set(board);
+    this.inviteEmail = '';
+    this.inviteError.set('');
+    this.api.getMembers(board.id).subscribe({
+      next: m => this.members.set(m),
+      error: () => this.members.set([]),
+    });
+  }
+
+  invite(): void {
+    const board = this.managingBoard();
+    if (!board || !this.inviteEmail.trim()) return;
+    this.inviteError.set('');
+    this.api.inviteMember(board.id, this.inviteEmail.trim()).subscribe({
+      next: m => { this.members.update(list => [...list, m]); this.inviteEmail = ''; this.toast.show('Invitation sent'); },
+      error: (err) => this.inviteError.set(err?.error?.detail ?? 'Failed to invite.'),
+    });
+  }
+
+  removeMember(userId: number): void {
+    const board = this.managingBoard();
+    if (!board) return;
+    this.api.removeMember(board.id, userId).subscribe({
+      next: () => this.members.update(list => list.filter(m => m.user_id !== userId)),
+      error: () => this.toast.show('Failed to remove member.', 'error'),
     });
   }
 }

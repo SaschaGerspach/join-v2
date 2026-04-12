@@ -9,6 +9,14 @@ export type Board = {
   title: string;
   created_by: number;
   created_at: string;
+  is_owner: boolean;
+};
+
+export type BoardMember = {
+  user_id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -36,5 +44,17 @@ export class BoardsApiService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/boards/${id}/`, { withCredentials: true });
+  }
+
+  getMembers(boardId: number): Observable<BoardMember[]> {
+    return this.http.get<BoardMember[]>(`${this.baseUrl}/boards/${boardId}/members/`, { withCredentials: true });
+  }
+
+  inviteMember(boardId: number, email: string): Observable<BoardMember> {
+    return this.http.post<BoardMember>(`${this.baseUrl}/boards/${boardId}/members/`, { email }, { withCredentials: true });
+  }
+
+  removeMember(boardId: number, userId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/boards/${boardId}/members/${userId}/`, { withCredentials: true });
   }
 }
