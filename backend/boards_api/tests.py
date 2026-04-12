@@ -63,19 +63,19 @@ class BoardDetailTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["title"], "Updated")
 
-    def test_patch_other_board_forbidden(self):
+    def test_patch_other_board_returns_404(self):
         self.client.logout()
         self.client.login(username="b@example.com", password="pass")
         response = self.client.patch(self.url(self.board.pk), {"title": "Hacked"}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_own_board(self):
         response = self.client.delete(self.url(self.board.pk))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Board.objects.count(), 0)
 
-    def test_delete_other_board_forbidden(self):
+    def test_delete_other_board_returns_404(self):
         self.client.logout()
         self.client.login(username="b@example.com", password="pass")
         response = self.client.delete(self.url(self.board.pk))
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

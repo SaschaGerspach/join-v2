@@ -64,22 +64,22 @@ class TaskDetailTests(APITestCase):
         self.assertEqual(response.data["title"], "Updated")
         self.assertEqual(response.data["priority"], "high")
 
-    def test_patch_task_forbidden(self):
+    def test_patch_task_returns_404_for_other_user(self):
         self.client.logout()
         self.client.login(username="b@example.com", password="pass")
         response = self.client.patch(self.url(self.task.pk), {"title": "Hacked"}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_task(self):
         response = self.client.delete(self.url(self.task.pk))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Task.objects.count(), 0)
 
-    def test_delete_task_forbidden(self):
+    def test_delete_task_returns_404_for_other_user(self):
         self.client.logout()
         self.client.login(username="b@example.com", password="pass")
         response = self.client.delete(self.url(self.task.pk))
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class SubtaskTests(APITestCase):
