@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Task, Subtask
+from .models import Task, Subtask, Comment
 
 
 class SubtaskInline(admin.TabularInline):
@@ -23,3 +23,10 @@ class SubtaskAdmin(admin.ModelAdmin):
     list_display = ('title', 'task', 'done')
     list_filter = ('done',)
     search_fields = ('title', 'task__title')
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('task', 'author', 'created_at')
+    search_fields = ('text', 'author__email', 'task__title')
+    raw_id_fields = ('task', 'author')

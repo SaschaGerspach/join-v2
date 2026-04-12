@@ -124,6 +124,44 @@
 
     </div>
 
+    <div class="comments-section">
+      <h3 class="section-label">Comments</h3>
+
+      <div class="comment-list">
+        @for (c of comments(); track c.id) {
+          <div class="comment-item">
+            <div class="comment-header">
+              <span class="comment-author">{{ c.author_name }}</span>
+              <span class="comment-date">{{ c.created_at | slice:0:10 }}</span>
+              @if (c.author_id === +auth.user()!.id) {
+                <button class="btn-comment-action" (click)="startEditComment(c)">Edit</button>
+                <button class="btn-comment-action danger" (click)="deleteComment(c.id)">Delete</button>
+              }
+            </div>
+            @if (editingCommentId() === c.id) {
+              <textarea class="comment-textarea" [(ngModel)]="editingCommentText" rows="2" (blur)="confirmEditComment(c)"></textarea>
+            } @else {
+              <p class="comment-text">{{ c.text }}</p>
+            }
+          </div>
+        }
+        @if (comments().length === 0) {
+          <p class="comments-empty">No comments yet.</p>
+        }
+      </div>
+
+      <div class="comment-input-row">
+        <textarea
+          class="comment-textarea new"
+          [ngModel]="newCommentText()"
+          (ngModelChange)="newCommentText.set($event)"
+          placeholder="Add a comment…"
+          rows="2"
+        ></textarea>
+        <button class="btn-add-comment" (click)="addComment()">Post</button>
+      </div>
+    </div>
+
     <div class="modal-footer">
       <button class="btn-danger" (click)="deleteTask()">Delete</button>
       <div class="footer-right">

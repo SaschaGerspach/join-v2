@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from boards_api.models import Board
 from boards_api.views import _can_access
-from .models import Task, Subtask
+from .models import Task, Subtask, Comment
 
 
 def serialize_task(task):
@@ -159,4 +159,59 @@ def task_reorder(request):
             task.column_id = item["column"]
 
     Task.objects.bulk_update(list(tasks.values()), ["order", "column_id"])
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def serialize_comment(comment):
+    return {
+        "id": comment.pk,
+        "task": comment.task_id,
+        "author_id": comment.author_id,
+        "author_name": f"{comment.author.first_name} {comment.author.last_name}".strip() or comment.author.email,
+        "text": comment.text,
+        "created_at": comment.created_at,
+        "updated_at": comment.updated_at,
+    }
+
+
+@api_view(["GET", "POST"])
+def comment_list(request, task_pk):
+    try:
+        task = Task.objects.get(pk=task_pk)
+    except Task.DoesNotExist:
+        return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not _can_access(task.board, request.user):
+        return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        return Response([serialize_comment(c) for c in task.comments.select_related("author").all()])
+
+    text = request.data.get("text", "").strip()
+    if not text:
+        return Response({"detail": "Text is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    comment = Comment.objects.create(task=task, author=request.user, text=text)
+    return Response(serialize_comment(comment), status=status.HTTP_201_CREATED)
+
+
+@api_view(["PATCH", "DELETE"])
+def comment_detail(request, task_pk, pk):
+    try:
+        comment = Comment.objects.select_related("author").get(pk=pk, task_id=task_pk)
+    except Comment.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if comment.author != request.user:
+        return Response({"detail": "You can only edit your own comments."}, status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == "PATCH":
+        text = request.data.get("text", "").strip()
+        if not text:
+            return Response({"detail": "Text is required."}, status=status.HTTP_400_BAD_REQUEST)
+        comment.text = text
+        comment.save(update_fields=["text", "updated_at"])
+        return Response(serialize_comment(comment))
+
+    comment.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

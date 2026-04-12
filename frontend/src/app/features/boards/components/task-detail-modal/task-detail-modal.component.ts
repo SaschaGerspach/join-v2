@@ -1,16 +1,19 @@
 import { Component, AfterViewInit, ElementRef, HostListener, inject, input, output, signal, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SlicePipe } from '@angular/common';
 import { Task, TasksApiService } from '../../../../core/tasks/tasks-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api.service';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
+import { Comment, CommentsApiService } from '../../../../core/tasks/comments-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-task-detail-modal',
   standalone: true,
-  imports: [FormsModule, ConfirmDialogComponent],
+  imports: [FormsModule, SlicePipe, ConfirmDialogComponent],
   templateUrl: './task-detail-modal.component.html',
   styleUrl: './task-detail-modal.component.scss',
 })
@@ -19,7 +22,9 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly subtasksApi = inject(SubtasksApiService);
   private readonly contactsApi = inject(ContactsApiService);
+  private readonly commentsApi = inject(CommentsApiService);
   private readonly toast = inject(ToastService);
+  readonly auth = inject(AuthService);
 
   task = input.required<Task>();
   columns = input.required<Column[]>();
@@ -43,6 +48,11 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   editingSubtaskId = signal<number | null>(null);
   editingSubtaskTitle = '';
 
+  comments = signal<Comment[]>([]);
+  newCommentText = signal('');
+  editingCommentId = signal<number | null>(null);
+  editingCommentText = '';
+
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
 
   ngAfterViewInit(): void {
@@ -60,6 +70,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
 
     this.subtasksApi.getByTask(t.id).subscribe(subs => this.subtasks.set(subs));
     this.contactsApi.getAll().subscribe(contacts => this.contacts.set(contacts));
+    this.commentsApi.getAll(t.id).subscribe(comments => this.comments.set(comments));
   }
 
   save(): void {
@@ -148,6 +159,37 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       ...this.task(),
       subtask_count: subs.length,
       subtask_done_count: subs.filter(s => s.done).length,
+    });
+  }
+
+  addComment(): void {
+    const text = this.newCommentText().trim();
+    if (!text) return;
+    this.commentsApi.create(this.task().id, text).subscribe({
+      next: c => { this.comments.update(list => [...list, c]); this.newCommentText.set(''); },
+      error: () => this.toast.show('Failed to add comment.', 'error'),
+    });
+  }
+
+  startEditComment(c: Comment): void {
+    this.editingCommentId.set(c.id);
+    this.editingCommentText = c.text;
+  }
+
+  confirmEditComment(c: Comment): void {
+    const text = this.editingCommentText.trim();
+    this.editingCommentId.set(null);
+    if (!text || text === c.text) return;
+    this.commentsApi.patch(this.task().id, c.id, text).subscribe({
+      next: updated => this.comments.update(list => list.map(x => x.id === updated.id ? updated : x)),
+      error: () => this.toast.show('Failed to edit comment.', 'error'),
+    });
+  }
+
+  deleteComment(id: number): void {
+    this.commentsApi.delete(this.task().id, id).subscribe({
+      next: () => this.comments.update(list => list.filter(c => c.id !== id)),
+      error: () => this.toast.show('Failed to delete comment.', 'error'),
     });
   }
 
