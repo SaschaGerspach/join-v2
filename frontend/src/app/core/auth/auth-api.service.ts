@@ -46,6 +46,18 @@ export class AuthApiService {
         });
     }
 
+    verifyEmail(uid: string, token: string): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/auth/verify-email`, { uid, token }, {
+            withCredentials: true,
+        });
+    }
+
+    resendVerification(email: string): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/auth/resend-verification`, { email }, {
+            withCredentials: true,
+        });
+    }
+
     passwordResetRequest(email: string): Observable<void> {
         return this.http.post<void>(`${this.baseUrl}/auth/password-reset`, { email }, {
             withCredentials: true,

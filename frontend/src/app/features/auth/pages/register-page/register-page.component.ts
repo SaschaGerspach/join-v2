@@ -47,10 +47,7 @@ export class RegisterPageComponent {
       last_name: this.lastName,
     }).subscribe({
       next: () => {
-        this.auth.login(this.email, this.password).subscribe({
-          next: () => this.router.navigate(['/boards']),
-          error: () => this.router.navigate(['/login']),
-        });
+        this.router.navigate(['/verify-email-sent'], { queryParams: { email: this.email } });
       },
       error: (err) => {
         this.error.set(err?.error?.detail ?? 'Registration failed. Email may already be in use.');

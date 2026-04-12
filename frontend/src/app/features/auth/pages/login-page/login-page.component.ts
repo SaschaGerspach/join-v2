@@ -20,14 +20,21 @@ export class LoginPageComponent {
   showPassword = signal(false);
   submitting = signal(false);
 
+  unverifiedEmail = signal<string | null>(null);
+
   login(form: NgForm): void {
     if (form.invalid) return;
     this.error.set(null);
+    this.unverifiedEmail.set(null);
     this.submitting.set(true);
     this.auth.login(this.email, this.password).subscribe({
       next: () => this.router.navigate(['/boards']),
-      error: () => {
-        this.error.set('Invalid email or password.');
+      error: (err) => {
+        if (err?.error?.code === 'email_not_verified') {
+          this.unverifiedEmail.set(this.email);
+        } else {
+          this.error.set('Invalid email or password.');
+        }
         this.submitting.set(false);
       },
     });

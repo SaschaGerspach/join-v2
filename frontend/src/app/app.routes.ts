@@ -3,6 +3,8 @@ import { LoginPageComponent } from './features/auth/pages/login-page/login-page.
 import { RegisterPageComponent } from './features/auth/pages/register-page/register-page.component';
 import { ForgotPasswordPageComponent } from './features/auth/pages/forgot-password-page/forgot-password-page.component';
 import { ResetPasswordPageComponent } from './features/auth/pages/reset-password-page/reset-password-page.component';
+import { VerifyEmailSentPageComponent } from './features/auth/pages/verify-email-sent-page/verify-email-sent-page.component';
+import { VerifyEmailPageComponent } from './features/auth/pages/verify-email-page/verify-email-page.component';
 import { BoardsPageComponent } from './features/boards/pages/boards-page/boards-page.component';
 import { BoardDetailPageComponent } from './features/boards/pages/board-detail-page/board-detail-page.component';
 import { ContactsPageComponent } from './features/contacts/pages/contacts-page/contacts-page.component';
@@ -19,6 +21,8 @@ export const routes: Routes = [
     {path: 'register', title: 'Sign up | Join', component: RegisterPageComponent},
     {path: 'forgot-password', title: 'Reset Password | Join', component: ForgotPasswordPageComponent},
     {path: 'reset-password/:uid/:token', title: 'Set New Password | Join', component: ResetPasswordPageComponent},
+    {path: 'verify-email-sent', title: 'Verify Email | Join', component: VerifyEmailSentPageComponent},
+    {path: 'verify-email/:uid/:token', title: 'Verify Email | Join', component: VerifyEmailPageComponent},
 
     {
         path: '',

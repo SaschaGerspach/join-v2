@@ -5,8 +5,8 @@ from .models import User
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'is_active')
-    list_filter = ('is_staff', 'is_active')
+    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'is_active', 'is_verified')
+    list_filter = ('is_staff', 'is_active', 'is_verified')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
     fieldsets = (

@@ -55,6 +55,8 @@ def register(request):
         last_name=last_name,
     )
 
+    _send_verification_email(user)
+
     return Response(
         {"id": user.pk, "email": user.email},
         status=status.HTTP_201_CREATED,
@@ -82,6 +84,12 @@ def login_view(request):
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
+    if not user.is_verified:
+        return Response(
+            {"detail": "Please verify your email address before logging in.", "code": "email_not_verified"},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
     login(request, user)
     return Response({
         "id": user.pk,
@@ -94,6 +102,61 @@ def login_view(request):
 @api_view(["POST"])
 def logout_view(request):
     logout(request)
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def _send_verification_email(user):
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    verify_url = f"{settings.FRONTEND_URL}/verify-email/{uid}/{token}"
+    send_mail(
+        subject="Verify your email — Join",
+        message=f"Welcome to Join! Please verify your email:\n\n{verify_url}\n\nThis link expires in 1 hour.",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[user.email],
+        fail_silently=False,
+    )
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def verify_email(request):
+    uid = request.data.get("uid", "")
+    token = request.data.get("token", "")
+
+    if not uid or not token:
+        return Response({"detail": "uid and token are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        pk = force_str(urlsafe_base64_decode(uid))
+        user = User.objects.get(pk=pk)
+    except (User.DoesNotExist, ValueError, TypeError):
+        return Response({"detail": "Invalid link."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if not default_token_generator.check_token(user, token):
+        return Response({"detail": "Link expired or already used."}, status=status.HTTP_400_BAD_REQUEST)
+
+    user.is_verified = True
+    user.save(update_fields=["is_verified"])
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+@throttle_classes([AuthRateThrottle])
+def resend_verification(request):
+    email = request.data.get("email", "").strip().lower()
+    if not email:
+        return Response({"detail": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    if not user.is_verified:
+        _send_verification_email(user)
+
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
