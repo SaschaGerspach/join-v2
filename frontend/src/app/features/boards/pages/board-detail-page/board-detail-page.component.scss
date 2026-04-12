@@ -36,8 +36,23 @@ $priority-urgent: #ff3d00;
 .board-detail-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 1rem;
   flex-shrink: 0;
+
+  h1, .board-title-input { flex: 1; }
+
+  .search-input {
+    flex: 0 0 220px;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid $color-border;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    color: $color-dark;
+    background: $color-white;
+
+    &:focus { border-color: $color-primary; }
+  }
 
   h1 {
     font-size: 2rem;
@@ -67,6 +82,7 @@ $priority-urgent: #ff3d00;
 }
 
 .btn-add-column {
+  margin-left: auto;
   background-color: $color-dark;
   color: $color-white;
   font-weight: 700;

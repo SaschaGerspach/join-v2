@@ -36,6 +36,14 @@ export class BoardDetailPageComponent implements OnInit {
 
   columnListIds = computed(() => this.columns().map(c => `col-${c.id}`));
 
+  searchQuery = signal('');
+
+  filteredTasks = computed(() => {
+    const q = this.searchQuery().trim().toLowerCase();
+    if (!q) return this.tasks();
+    return this.tasks().filter(t => t.title.toLowerCase().includes(q));
+  });
+
   newColumnTitle = '';
   showColumnForm = signal(false);
 
@@ -88,7 +96,7 @@ export class BoardDetailPageComponent implements OnInit {
   }
 
   tasksForColumn(columnId: number): Task[] {
-    return this.tasks().filter(t => t.column === columnId);
+    return this.filteredTasks().filter(t => t.column === columnId);
   }
 
   createColumn(): void {

@@ -21,6 +21,13 @@
     } @else {
       <h1 (dblclick)="startRenameBoardTitle()">{{ board()?.title ?? 'Board' }}</h1>
     }
+    <input
+      class="search-input"
+      type="search"
+      placeholder="Search tasks…"
+      [value]="searchQuery()"
+      (input)="searchQuery.set($any($event.target).value)"
+    />
     <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>
   </div>
 
