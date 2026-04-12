@@ -493,3 +493,11 @@ $priority-urgent: #ff3d00;
   color: $color-muted;
   min-width: 272px;
 }
+
+.column-empty {
+  font-size: 0.82rem;
+  color: $color-muted;
+  text-align: center;
+  padding: 1rem 0.5rem;
+  font-style: italic;
+}

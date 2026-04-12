@@ -123,6 +123,10 @@
             </div>
           }
 
+          @if (tasksForColumn(column.id).length === 0) {
+            <p class="column-empty">No tasks yet</p>
+          }
+
           <button class="btn-add-task" (click)="startAddTask(column.id)">+ Add Task</button>
         </div>
 
