@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal, OnInit } from '@angular/core';
+import { Component, HostListener, inject, input, output, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Task, TasksApiService } from '../../../../core/tasks/tasks-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
@@ -112,6 +112,13 @@ export class TaskDetailModalComponent implements OnInit {
       subtask_count: subs.length,
       subtask_done_count: subs.filter(s => s.done).length,
     });
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (!this.showDeleteConfirm()) {
+      this.closed.emit();
+    }
   }
 
   close(): void {

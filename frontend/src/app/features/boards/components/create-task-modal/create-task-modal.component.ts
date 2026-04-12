@@ -1,4 +1,4 @@
-import { Component, inject, input, output, OnInit, signal } from '@angular/core';
+import { Component, HostListener, inject, input, output, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
@@ -32,6 +32,11 @@ export class CreateTaskModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedColumnId = this.columnId();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.cancelled.emit();
   }
 
   submit(): void {
