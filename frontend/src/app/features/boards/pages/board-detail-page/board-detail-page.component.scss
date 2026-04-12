@@ -353,6 +353,22 @@ $priority-urgent: #ff3d00;
   color: $color-dark;
 }
 
+.task-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.label-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
 .task-description {
   font-size: 0.85rem;
   color: $color-muted;

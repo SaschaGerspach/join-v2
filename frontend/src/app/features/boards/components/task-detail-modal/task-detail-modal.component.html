@@ -82,6 +82,31 @@
       </div>
 
       <div class="field-group">
+        <label class="field-label">Labels</label>
+        <div class="label-options">
+          @for (label of boardLabels(); track label.id) {
+            <button
+              class="label-toggle"
+              [style.background]="label.color"
+              [class.active]="selectedLabelIds().has(label.id)"
+              (click)="toggleLabel(label.id)"
+            >{{ label.name }}</button>
+          }
+        </div>
+        <div class="subtask-add">
+          <input
+            class="field-input"
+            type="text"
+            [(ngModel)]="newLabelName"
+            placeholder="New label…"
+            (keyup.enter)="createLabel()"
+          />
+          <input type="color" [(ngModel)]="newLabelColor" class="label-color-input" />
+          <button class="btn-add-sub" (click)="createLabel()">+</button>
+        </div>
+      </div>
+
+      <div class="field-group">
         <label class="field-label">Subtasks</label>
         <div class="subtask-list">
           @for (sub of subtasks(); track sub.id) {

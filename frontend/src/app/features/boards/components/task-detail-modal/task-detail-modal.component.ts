@@ -6,6 +6,7 @@ import { Column } from '../../../../core/columns/columns-api.service';
 import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api.service';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
 import { Comment, CommentsApiService } from '../../../../core/tasks/comments-api.service';
+import { Label, LabelsApiService } from '../../../../core/tasks/labels-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -23,6 +24,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   private readonly subtasksApi = inject(SubtasksApiService);
   private readonly contactsApi = inject(ContactsApiService);
   private readonly commentsApi = inject(CommentsApiService);
+  private readonly labelsApi = inject(LabelsApiService);
   private readonly toast = inject(ToastService);
   readonly auth = inject(AuthService);
 
@@ -53,6 +55,11 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   editingCommentId = signal<number | null>(null);
   editingCommentText = '';
 
+  boardLabels = signal<Label[]>([]);
+  selectedLabelIds = signal<Set<number>>(new Set());
+  newLabelName = '';
+  newLabelColor = '#29abe2';
+
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
 
   ngAfterViewInit(): void {
@@ -71,16 +78,19 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.subtasksApi.getByTask(t.id).subscribe(subs => this.subtasks.set(subs));
     this.contactsApi.getAll().subscribe(contacts => this.contacts.set(contacts));
     this.commentsApi.getAll(t.id).subscribe(comments => this.comments.set(comments));
+    this.labelsApi.getByBoard(t.board).subscribe(labels => this.boardLabels.set(labels));
+    this.selectedLabelIds.set(new Set(t.labels?.map(l => l.id) ?? []));
   }
 
   save(): void {
-    const payload = {
+    const payload: any = {
       title: this.title().trim(),
       description: this.description().trim(),
       priority: this.priority(),
       due_date: this.dueDate() || null,
       column: this.columnId(),
       assigned_to: this.assignedTo(),
+      label_ids: [...this.selectedLabelIds()],
     };
 
     this.tasksApi.patch(this.task().id, payload).subscribe({
@@ -159,6 +169,28 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       ...this.task(),
       subtask_count: subs.length,
       subtask_done_count: subs.filter(s => s.done).length,
+    });
+  }
+
+  toggleLabel(labelId: number): void {
+    this.selectedLabelIds.update(set => {
+      const next = new Set(set);
+      if (next.has(labelId)) next.delete(labelId);
+      else next.add(labelId);
+      return next;
+    });
+  }
+
+  createLabel(): void {
+    const name = this.newLabelName.trim();
+    if (!name) return;
+    this.labelsApi.create(this.task().board, name, this.newLabelColor).subscribe({
+      next: label => {
+        this.boardLabels.update(l => [...l, label]);
+        this.selectedLabelIds.update(s => { const n = new Set(s); n.add(label.id); return n; });
+        this.newLabelName = '';
+      },
+      error: () => this.toast.show('Failed to create label.', 'error'),
     });
   }
 

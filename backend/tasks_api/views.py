@@ -5,7 +5,11 @@ from rest_framework.response import Response
 from boards_api.models import Board
 from boards_api.views import _can_access
 from boards_api.ws_events import send_board_event
-from .models import Task, Subtask, Comment
+from .models import Task, Subtask, Comment, Label
+
+
+def serialize_label(label):
+    return {"id": label.pk, "name": label.name, "color": label.color}
 
 
 def serialize_task(task):
@@ -23,6 +27,7 @@ def serialize_task(task):
         "order": task.order,
         "subtask_count": subtasks.count(),
         "subtask_done_count": subtasks.filter(done=True).count(),
+        "labels": [serialize_label(l) for l in task.labels.all()],
     }
 
 
@@ -82,6 +87,8 @@ def task_detail(request, pk):
             if field in request.data:
                 setattr(task, key, request.data[field])
         task.save()
+        if "label_ids" in request.data:
+            task.labels.set(Label.objects.filter(pk__in=request.data["label_ids"], board=task.board))
         data = serialize_task(task)
         send_board_event(task.board_id, "task_updated", data)
         return Response(data)
@@ -228,4 +235,50 @@ def comment_detail(request, task_pk, pk):
         return Response(serialize_comment(comment))
 
     comment.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET", "POST"])
+def label_list(request, board_pk):
+    try:
+        board = Board.objects.get(pk=board_pk)
+    except Board.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not _can_access(board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        return Response([serialize_label(l) for l in board.labels.all()])
+
+    name = request.data.get("name", "").strip()
+    color = request.data.get("color", "#29abe2").strip()
+    if not name:
+        return Response({"detail": "Name is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    label, created = Label.objects.get_or_create(board=board, name=name, defaults={"color": color})
+    if not created:
+        return Response({"detail": "Label already exists."}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serialize_label(label), status=status.HTTP_201_CREATED)
+
+
+@api_view(["PATCH", "DELETE"])
+def label_detail(request, board_pk, pk):
+    try:
+        label = Label.objects.get(pk=pk, board_id=board_pk)
+    except Label.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not _can_access(label.board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "PATCH":
+        if "name" in request.data:
+            label.name = request.data["name"].strip()
+        if "color" in request.data:
+            label.color = request.data["color"].strip()
+        label.save()
+        return Response(serialize_label(label))
+
+    label.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

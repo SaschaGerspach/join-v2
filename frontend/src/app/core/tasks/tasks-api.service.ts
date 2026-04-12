@@ -16,6 +16,7 @@ export type Task = {
   created_at: string;
   subtask_count: number;
   subtask_done_count: number;
+  labels: { id: number; name: string; color: string }[];
 };
 
 export type CreateTaskPayload = {

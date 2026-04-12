@@ -134,6 +134,13 @@
                 <button class="btn-icon small" (click)="$event.stopPropagation(); deleteTask(task.id)">&#10005;</button>
               </div>
               <p class="task-title">{{ task.title }}</p>
+              @if (task.labels && task.labels.length > 0) {
+                <div class="task-labels">
+                  @for (label of task.labels; track label.id) {
+                    <span class="label-chip" [style.background]="label.color">{{ label.name }}</span>
+                  }
+                </div>
+              }
               @if (task.description) {
                 <p class="task-description">{{ task.description }}</p>
               }

@@ -172,6 +172,44 @@ $priority-urgent: #ff3d00;
   &.priority-low    { background: $priority-low; color: $color-dark; }
 }
 
+// ─── Labels ─────────────────────────────────────────────────────────────────
+
+.label-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.label-toggle {
+  border: 2px solid transparent;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+
+  &.active {
+    opacity: 1;
+    border-color: $color-dark;
+  }
+
+  &:hover { opacity: 0.75; }
+}
+
+.label-color-input {
+  width: 32px;
+  height: 32px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
 // ─── Subtasks ────────────────────────────────────────────────────────────────
 
 .subtask-list {
