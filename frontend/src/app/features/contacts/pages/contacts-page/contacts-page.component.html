@@ -14,18 +14,21 @@
       @if (loading()) {
         <app-loading-spinner />
       }
-      @for (contact of contacts(); track contact.id) {
-        <div
-          class="contact-list-item"
-          [class.active]="selectedContact()?.id === contact.id"
-          (click)="selectContact(contact)"
-        >
-          <div class="contact-avatar">{{ initials(contact) }}</div>
-          <div class="contact-list-info">
-            <span class="contact-list-name">{{ fullName(contact) }}</span>
-            <span class="contact-list-email">{{ contact.email }}</span>
+      @for (group of groupedContacts(); track group[0]) {
+        <div class="contact-group-header">{{ group[0] }}</div>
+        @for (contact of group[1]; track contact.id) {
+          <div
+            class="contact-list-item"
+            [class.active]="selectedContact()?.id === contact.id"
+            (click)="selectContact(contact)"
+          >
+            <div class="contact-avatar">{{ initials(contact) }}</div>
+            <div class="contact-list-info">
+              <span class="contact-list-name">{{ fullName(contact) }}</span>
+              <span class="contact-list-email">{{ contact.email }}</span>
+            </div>
           </div>
-        </div>
+        }
       }
 
       @if (!loading() && contacts().length === 0) {

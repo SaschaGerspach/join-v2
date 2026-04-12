@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
@@ -30,6 +30,16 @@ export class ContactsPageComponent implements OnInit {
   pendingDeleteId = signal<number | null>(null);
 
   form: ContactForm = { first_name: '', last_name: '', email: '', phone: '' };
+
+  groupedContacts = computed(() => {
+    const groups = new Map<string, Contact[]>();
+    for (const c of this.contacts()) {
+      const letter = (c.last_name[0] ?? c.first_name[0] ?? '#').toUpperCase();
+      if (!groups.has(letter)) groups.set(letter, []);
+      groups.get(letter)!.push(c);
+    }
+    return Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b));
+  });
 
   ngOnInit(): void {
     this.api.getAll().subscribe({
