@@ -34,7 +34,18 @@
       <div class="kanban-column">
 
         <div class="column-header">
-          <span class="column-title">{{ column.title }}</span>
+          @if (editingColumnId() === column.id) {
+            <input
+              class="column-title-input"
+              type="text"
+              [(ngModel)]="editingColumnTitle"
+              (keyup.enter)="confirmRenameColumn(column.id)"
+              (keyup.escape)="editingColumnId.set(null)"
+              (blur)="confirmRenameColumn(column.id)"
+            />
+          } @else {
+            <span class="column-title" (dblclick)="startRenameColumn(column)">{{ column.title }}</span>
+          }
           <button class="btn-icon" (click)="deleteColumn(column.id)" title="Delete column">&#10005;</button>
         </div>
 

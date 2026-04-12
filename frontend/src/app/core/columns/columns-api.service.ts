@@ -30,6 +30,10 @@ export class ColumnsApiService {
     );
   }
 
+  patch(id: number, payload: Partial<{ title: string; order: number }>): Observable<Column> {
+    return this.http.patch<Column>(`${this.baseUrl}/columns/${id}/`, payload, { withCredentials: true });
+  }
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/columns/${id}/`, { withCredentials: true });
   }

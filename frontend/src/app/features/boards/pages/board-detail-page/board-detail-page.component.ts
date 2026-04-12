@@ -38,6 +38,9 @@ export class BoardDetailPageComponent implements OnInit {
   addingTaskForColumn = signal<number | null>(null);
   newTaskTitle = '';
 
+  editingColumnId = signal<number | null>(null);
+  editingColumnTitle = '';
+
   selectedTask = signal<Task | null>(null);
   loading = signal(true);
   error = signal('');
@@ -87,6 +90,20 @@ export class BoardDetailPageComponent implements OnInit {
       this.columns.update(c => [...c, col]);
       this.newColumnTitle = '';
       this.showColumnForm.set(false);
+    });
+  }
+
+  startRenameColumn(col: Column): void {
+    this.editingColumnId.set(col.id);
+    this.editingColumnTitle = col.title;
+  }
+
+  confirmRenameColumn(id: number): void {
+    const title = this.editingColumnTitle.trim();
+    if (!title) { this.editingColumnId.set(null); return; }
+    this.columnsApi.patch(id, { title }).subscribe(updated => {
+      this.columns.update(cols => cols.map(c => c.id === id ? updated : c));
+      this.editingColumnId.set(null);
     });
   }
 

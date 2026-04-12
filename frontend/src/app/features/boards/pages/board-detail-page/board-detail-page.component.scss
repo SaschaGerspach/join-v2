@@ -127,6 +127,20 @@ $priority-urgent: #ff3d00;
     font-weight: 700;
     font-size: 1rem;
     color: $color-dark;
+    cursor: text;
+    flex: 1;
+  }
+
+  .column-title-input {
+    flex: 1;
+    font-weight: 700;
+    font-size: 1rem;
+    color: $color-dark;
+    border: none;
+    border-bottom: 2px solid $color-primary;
+    outline: none;
+    background: transparent;
+    padding: 0;
   }
 }
 
