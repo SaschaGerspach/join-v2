@@ -38,7 +38,7 @@ export class RegisterPageComponent {
           error: () => this.router.navigate(['/login']),
         });
       },
-      error: () => this.error.set('Registration failed. Email may already be in use.'),
+      error: (err) => this.error.set(err?.error?.detail ?? 'Registration failed. Email may already be in use.'),
     });
   }
 }

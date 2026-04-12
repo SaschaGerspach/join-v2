@@ -22,6 +22,12 @@ def register(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+    if len(password) < 8:
+        return Response(
+            {"detail": "Password must be at least 8 characters."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
     if User.objects.filter(email=email).exists():
         return Response(
             {"detail": "A user with this email already exists."},
