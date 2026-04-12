@@ -7,6 +7,7 @@ import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
 import { Comment, CommentsApiService } from '../../../../core/tasks/comments-api.service';
 import { Label, LabelsApiService } from '../../../../core/tasks/labels-api.service';
+import { Attachment, AttachmentsApiService } from '../../../../core/tasks/attachments-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -25,6 +26,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   private readonly contactsApi = inject(ContactsApiService);
   private readonly commentsApi = inject(CommentsApiService);
   private readonly labelsApi = inject(LabelsApiService);
+  private readonly attachmentsApi = inject(AttachmentsApiService);
   private readonly toast = inject(ToastService);
   readonly auth = inject(AuthService);
 
@@ -60,6 +62,8 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   newLabelName = '';
   newLabelColor = '#29abe2';
 
+  attachments = signal<Attachment[]>([]);
+
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
 
   ngAfterViewInit(): void {
@@ -80,6 +84,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.commentsApi.getAll(t.id).subscribe(comments => this.comments.set(comments));
     this.labelsApi.getByBoard(t.board).subscribe(labels => this.boardLabels.set(labels));
     this.selectedLabelIds.set(new Set(t.labels?.map(l => l.id) ?? []));
+    this.attachmentsApi.getByTask(t.id).subscribe(atts => this.attachments.set(atts));
   }
 
   save(): void {
@@ -169,6 +174,28 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       ...this.task(),
       subtask_count: subs.length,
       subtask_done_count: subs.filter(s => s.done).length,
+    });
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      this.toast.show('File too large (max 5MB).', 'error');
+      return;
+    }
+    this.attachmentsApi.upload(this.task().id, file).subscribe({
+      next: att => this.attachments.update(list => [...list, att]),
+      error: () => this.toast.show('Failed to upload file.', 'error'),
+    });
+    input.value = '';
+  }
+
+  deleteAttachment(att: Attachment): void {
+    this.attachmentsApi.delete(this.task().id, att.id).subscribe({
+      next: () => this.attachments.update(list => list.filter(a => a.id !== att.id)),
+      error: () => this.toast.show('Failed to delete file.', 'error'),
     });
   }
 

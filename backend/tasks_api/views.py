@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from boards_api.models import Board
 from boards_api.views import _can_access
 from boards_api.ws_events import send_board_event
-from .models import Task, Subtask, Comment, Label
+from .models import Task, Subtask, Comment, Label, Attachment
 
 
 def serialize_label(label):
@@ -281,4 +281,51 @@ def label_detail(request, board_pk, pk):
         return Response(serialize_label(label))
 
     label.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def serialize_attachment(att, request):
+    return {
+        "id": att.pk,
+        "filename": att.filename,
+        "url": request.build_absolute_uri(att.file.url),
+        "uploaded_at": att.uploaded_at,
+    }
+
+
+@api_view(["GET", "POST"])
+def attachment_list(request, task_pk):
+    try:
+        task = Task.objects.get(pk=task_pk)
+    except Task.DoesNotExist:
+        return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not _can_access(task.board, request.user):
+        return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        return Response([serialize_attachment(a, request) for a in task.attachments.all()])
+
+    file = request.FILES.get("file")
+    if not file:
+        return Response({"detail": "File is required."}, status=status.HTTP_400_BAD_REQUEST)
+    if file.size > 5 * 1024 * 1024:
+        return Response({"detail": "File too large (max 5MB)."}, status=status.HTTP_400_BAD_REQUEST)
+
+    att = Attachment.objects.create(task=task, file=file, filename=file.name)
+    return Response(serialize_attachment(att, request), status=status.HTTP_201_CREATED)
+
+
+@api_view(["DELETE"])
+def attachment_detail(request, task_pk, pk):
+    try:
+        att = Attachment.objects.get(pk=pk, task_id=task_pk)
+    except Attachment.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not _can_access(att.task.board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    att.file.delete()
+    att.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

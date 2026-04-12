@@ -210,6 +210,38 @@ $priority-urgent: #ff3d00;
   flex-shrink: 0;
 }
 
+// ─── Attachments ────────────────────────────────────────────────────────────
+
+.attachment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.attachment-link {
+  flex: 1;
+  font-size: 0.85rem;
+  color: $color-primary;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; }
+}
+
+.file-input {
+  font-size: 0.85rem;
+  color: $color-dark;
+}
+
 // ─── Subtasks ────────────────────────────────────────────────────────────────
 
 .subtask-list {
