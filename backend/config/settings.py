@@ -131,7 +131,7 @@ AUTH_USER_MODEL = 'auth_api.User'
 _cors_origins = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:4200')
 CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors_origins.split(',')]
 
-_csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:4200')
+_csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:4200,http://localhost')
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins.split(',')]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -141,6 +141,7 @@ SESSION_COOKIE_SECURE = False
 
 CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
