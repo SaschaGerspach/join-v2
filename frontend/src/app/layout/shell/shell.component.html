@@ -36,6 +36,9 @@
     <header class="topbar">
       <span class="topbar-title">Kanban Project Management Tool</span>
       <div class="topbar-user">
+        <button class="btn-theme-toggle" (click)="theme.toggle()" [title]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
+          {{ theme.isDark() ? '☀' : '☾' }}
+        </button>
         <div class="user-badge" (click)="toggleMenu()">
           {{ userInitials() }}
         </div>

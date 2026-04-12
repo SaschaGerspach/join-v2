@@ -2,6 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { Router, RouterModule } from "@angular/router";
 import { AuthService } from '../../core/auth/auth.service';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
+import { ThemeService } from '../../shared/services/theme.service';
 
 @Component({
   selector: 'app-shell',
@@ -12,6 +13,7 @@ import { ToastComponent } from '../../shared/components/toast/toast.component';
 })
 export class ShellComponent {
   readonly auth = inject(AuthService);
+  readonly theme = inject(ThemeService);
   private readonly router = inject(Router);
 
   menuOpen = signal(false);

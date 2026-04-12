@@ -54,6 +54,34 @@ $bp-mobile:  800px;
 $bp-tablet:  1080px;
 $bp-desktop: 1410px;
 
+// ─── CSS Custom Properties (theme tokens) ────────────────────────────────────
+
+:root {
+  --color-bg:      #f6f7f8;
+  --color-surface: #ffffff;
+  --color-dark:    #2a3647;
+  --color-border:  #d1d1d1;
+  --color-muted:   #a8a8a8;
+  --color-text:    #2a3647;
+  --color-primary: #29abe2;
+  --color-sidebar-bg: #2a3647;
+  --color-sidebar-text: #ffffff;
+  --shadow-card:   0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+  --color-bg:      #1a1f2b;
+  --color-surface: #252c3b;
+  --color-dark:    #e8eaf0;
+  --color-border:  #3a4255;
+  --color-muted:   #7a8099;
+  --color-text:    #e8eaf0;
+  --color-primary: #29abe2;
+  --color-sidebar-bg: #151a24;
+  --color-sidebar-text: #e8eaf0;
+  --shadow-card:   0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
 // ─── Reset & Base ────────────────────────────────────────────────────────────
 
 *, *::before, *::after {
@@ -66,9 +94,10 @@ html, body {
   height: 100%;
   font-family: $font-family;
   font-size: $font-size-base;
-  background-color: $color-bg;
-  color: $color-dark;
+  background-color: var(--color-bg);
+  color: var(--color-text);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 a {
