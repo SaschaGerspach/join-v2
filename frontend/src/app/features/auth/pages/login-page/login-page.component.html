@@ -7,7 +7,7 @@
     <h1>Log in</h1>
     <div class="auth-divider"></div>
 
-    <form (ngSubmit)="login()">
+    <form #f="ngForm" (ngSubmit)="login(f)">
       <div class="form-group">
         <input
           class="form-input"
@@ -16,7 +16,16 @@
           name="email"
           placeholder="Email"
           required
+          email
+          #emailField="ngModel"
+          [class.input-error]="emailField.invalid && (emailField.touched || f.submitted)"
         />
+        @if (emailField.invalid && (emailField.touched || f.submitted)) {
+          <span class="field-error">
+            @if (emailField.errors?.['required']) { Email is required. }
+            @else { Enter a valid email address. }
+          </span>
+        }
       </div>
 
       <div class="form-group">
@@ -27,7 +36,12 @@
           name="password"
           placeholder="Password"
           required
+          #passwordField="ngModel"
+          [class.input-error]="passwordField.invalid && (passwordField.touched || f.submitted)"
         />
+        @if (passwordField.invalid && (passwordField.touched || f.submitted)) {
+          <span class="field-error">Password is required.</span>
+        }
       </div>
 
       @if (error()) {

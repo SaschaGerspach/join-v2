@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 
@@ -22,7 +22,8 @@ export class RegisterPageComponent {
   password = '';
   error = signal<string | null>(null);
 
-  register(): void {
+  register(form: NgForm): void {
+    if (form.invalid) return;
     this.error.set(null);
     this.api.register({
       email: this.email,

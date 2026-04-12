@@ -7,7 +7,7 @@
     <h1>Sign up</h1>
     <div class="auth-divider"></div>
 
-    <form (ngSubmit)="register()">
+    <form #f="ngForm" (ngSubmit)="register(f)">
       <div class="form-group">
         <input
           class="form-input"
@@ -16,7 +16,12 @@
           name="firstName"
           placeholder="First name"
           required
+          #firstNameField="ngModel"
+          [class.input-error]="firstNameField.invalid && (firstNameField.touched || f.submitted)"
         />
+        @if (firstNameField.invalid && (firstNameField.touched || f.submitted)) {
+          <span class="field-error">First name is required.</span>
+        }
       </div>
 
       <div class="form-group">
@@ -27,7 +32,12 @@
           name="lastName"
           placeholder="Last name"
           required
+          #lastNameField="ngModel"
+          [class.input-error]="lastNameField.invalid && (lastNameField.touched || f.submitted)"
         />
+        @if (lastNameField.invalid && (lastNameField.touched || f.submitted)) {
+          <span class="field-error">Last name is required.</span>
+        }
       </div>
 
       <div class="form-group">
@@ -38,7 +48,16 @@
           name="email"
           placeholder="Email"
           required
+          email
+          #emailField="ngModel"
+          [class.input-error]="emailField.invalid && (emailField.touched || f.submitted)"
         />
+        @if (emailField.invalid && (emailField.touched || f.submitted)) {
+          <span class="field-error">
+            @if (emailField.errors?.['required']) { Email is required. }
+            @else { Enter a valid email address. }
+          </span>
+        }
       </div>
 
       <div class="form-group">
@@ -47,9 +66,18 @@
           type="password"
           [(ngModel)]="password"
           name="password"
-          placeholder="Password"
+          placeholder="Password (min. 8 characters)"
           required
+          minlength="8"
+          #passwordField="ngModel"
+          [class.input-error]="passwordField.invalid && (passwordField.touched || f.submitted)"
         />
+        @if (passwordField.invalid && (passwordField.touched || f.submitted)) {
+          <span class="field-error">
+            @if (passwordField.errors?.['required']) { Password is required. }
+            @else { Password must be at least 8 characters. }
+          </span>
+        }
       </div>
 
       @if (error()) {

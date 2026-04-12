@@ -49,6 +49,9 @@ $color-error:   #ff8190;
 
 .form-group {
   margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 
   .form-input {
     width: 100%;
@@ -65,8 +68,19 @@ $color-error:   #ff8190;
 
     &:focus {
       border-color: $color-primary;
+      outline: none;
+    }
+
+    &.input-error {
+      border-color: $color-error;
     }
   }
+}
+
+.field-error {
+  font-size: 0.78rem;
+  color: $color-error;
+  padding-left: 0.25rem;
 }
 
 .error-message {

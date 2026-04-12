@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
@@ -18,7 +18,8 @@ export class LoginPageComponent {
   password = '';
   error = signal<string | null>(null);
 
-  login(): void {
+  login(form: NgForm): void {
+    if (form.invalid) return;
     this.error.set(null);
     this.auth.login(this.email, this.password).subscribe({
       next: () => this.router.navigate(['/boards']),
