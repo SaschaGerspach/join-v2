@@ -78,3 +78,7 @@
 </div>
 
 <app-toast />
+
+@if (showShortcuts()) {
+  <app-keyboard-shortcuts-modal (closed)="showShortcuts.set(false)" />
+}

@@ -1,13 +1,14 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, HostListener } from '@angular/core';
 import { Router, RouterModule } from "@angular/router";
 import { AuthService } from '../../core/auth/auth.service';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
 import { ThemeService } from '../../shared/services/theme.service';
+import { KeyboardShortcutsModalComponent } from '../../shared/components/keyboard-shortcuts-modal/keyboard-shortcuts-modal.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterModule, ToastComponent],
+  imports: [RouterModule, ToastComponent, KeyboardShortcutsModalComponent],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss'
 })
@@ -17,6 +18,16 @@ export class ShellComponent {
   private readonly router = inject(Router);
 
   menuOpen = signal(false);
+  showShortcuts = signal(false);
+
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(event: KeyboardEvent): void {
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) return;
+    if (event.key === '?') {
+      event.preventDefault();
+      this.showShortcuts.update(v => !v);
+    }
+  }
 
   userInitials = computed(() => {
     const user = this.auth.user();
