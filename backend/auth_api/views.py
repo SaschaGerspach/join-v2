@@ -68,7 +68,12 @@ def login_view(request):
         )
 
     login(request, user)
-    return Response({"id": user.pk, "email": user.email})
+    return Response({
+        "id": user.pk,
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+    })
 
 
 @api_view(["POST"])
@@ -81,4 +86,9 @@ def logout_view(request):
 @api_view(["GET"])
 def me(request):
     user = request.user
-    return Response({"id": user.pk, "email": user.email})
+    return Response({
+        "id": user.pk,
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+    })

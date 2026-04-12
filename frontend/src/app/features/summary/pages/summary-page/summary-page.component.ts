@@ -25,8 +25,7 @@ export class SummaryPageComponent implements OnInit {
   userName = computed(() => {
     const user = this.auth.user();
     if (!user) return '';
-    const namePart = user.email.split('@')[0];
-    return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    return user.first_name || user.email.split('@')[0];
   });
 
   totalTasks = computed(() => this.tasks().length);
