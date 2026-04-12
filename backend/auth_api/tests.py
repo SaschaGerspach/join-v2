@@ -45,6 +45,8 @@ class LoginViewTests(APITestCase):
             email="test@example.com",
             password="securepass123",
         )
+        self.user.is_verified = True
+        self.user.save()
 
     def test_login_success(self):
         response = self.client.post(self.url, {

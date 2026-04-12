@@ -120,7 +120,7 @@ class SubtaskTests(APITestCase):
         self.client.logout()
         self.client.login(username="b@example.com", password="pass")
         response = self.client.patch(self.detail_url(subtask.pk), {"done": True}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_subtask(self):
         subtask = Subtask.objects.create(task=self.task, title="Sub")

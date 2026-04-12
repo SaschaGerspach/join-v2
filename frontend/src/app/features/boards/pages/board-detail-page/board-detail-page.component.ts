@@ -1,4 +1,5 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -13,6 +14,7 @@ import { CreateTaskModalComponent } from '../../components/create-task-modal/cre
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { BoardWsService } from '../../../../core/websocket/board-ws.service';
 
 @Component({
   selector: 'app-board-detail-page',
@@ -21,7 +23,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
 })
-export class BoardDetailPageComponent implements OnInit {
+export class BoardDetailPageComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly titleService = inject(Title);
   private readonly boardsApi = inject(BoardsApiService);
@@ -29,6 +31,8 @@ export class BoardDetailPageComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly contactsApi = inject(ContactsApiService);
   private readonly toast = inject(ToastService);
+  private readonly boardWs = inject(BoardWsService);
+  private wsSub?: Subscription;
 
   boardId = signal<number>(0);
   board = signal<Board | null>(null);
@@ -97,6 +101,47 @@ export class BoardDetailPageComponent implements OnInit {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.boardId.set(id);
     this.loadData(id);
+    this.connectWebSocket(id);
+  }
+
+  ngOnDestroy(): void {
+    this.wsSub?.unsubscribe();
+    this.boardWs.disconnect();
+  }
+
+  private connectWebSocket(boardId: number): void {
+    this.boardWs.connect(boardId);
+    this.wsSub = this.boardWs.events$.subscribe(evt => {
+      switch (evt.event) {
+        case 'task_created':
+          this.tasks.update(t => t.some(x => x.id === evt.data.id) ? t : [...t, evt.data]);
+          break;
+        case 'task_updated':
+          this.tasks.update(t => t.map(x => x.id === evt.data.id ? evt.data : x));
+          break;
+        case 'task_deleted':
+          this.tasks.update(t => t.filter(x => x.id !== evt.data.id));
+          break;
+        case 'tasks_reordered':
+          this.tasks.update(tasks => {
+            const updated = evt.data as any[];
+            return tasks.map(t => {
+              const u = updated.find((x: any) => x.id === t.id);
+              return u ?? t;
+            });
+          });
+          break;
+        case 'column_created':
+          this.columns.update(c => c.some(x => x.id === evt.data.id) ? c : [...c, evt.data]);
+          break;
+        case 'column_updated':
+          this.columns.update(c => c.map(x => x.id === evt.data.id ? evt.data : x));
+          break;
+        case 'column_deleted':
+          this.columns.update(c => c.filter(x => x.id !== evt.data.id));
+          break;
+      }
+    });
   }
 
   loadData(boardId: number): void {

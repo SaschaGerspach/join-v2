@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from boards_api.models import Board
 from boards_api.views import _can_access
+from boards_api.ws_events import send_board_event
 from .models import Task, Subtask, Comment
 
 
@@ -57,7 +58,9 @@ def task_list(request):
         assigned_to_id=request.data.get("assigned_to"),
         due_date=request.data.get("due_date"),
     )
-    return Response(serialize_task(task), status=status.HTTP_201_CREATED)
+    data = serialize_task(task)
+    send_board_event(board.pk, "task_created", data)
+    return Response(data, status=status.HTTP_201_CREATED)
 
 
 @api_view(["GET", "PATCH", "DELETE"])
@@ -79,9 +82,14 @@ def task_detail(request, pk):
             if field in request.data:
                 setattr(task, key, request.data[field])
         task.save()
-        return Response(serialize_task(task))
+        data = serialize_task(task)
+        send_board_event(task.board_id, "task_updated", data)
+        return Response(data)
 
+    board_id = task.board_id
+    task_id = task.pk
     task.delete()
+    send_board_event(board_id, "task_deleted", {"id": task_id})
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -159,6 +167,12 @@ def task_reorder(request):
             task.column_id = item["column"]
 
     Task.objects.bulk_update(list(tasks.values()), ["order", "column_id"])
+
+    board_ids = {t.board_id for t in tasks.values()}
+    for bid in board_ids:
+        board_tasks = [serialize_task(t) for t in tasks.values() if t.board_id == bid]
+        send_board_event(bid, "tasks_reordered", board_tasks)
+
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 

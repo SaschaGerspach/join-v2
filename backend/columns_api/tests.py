@@ -62,7 +62,7 @@ class ColumnDetailTests(APITestCase):
         self.client.logout()
         self.client.login(username="b@example.com", password="pass")
         response = self.client.patch(self.url(self.column.pk), {"title": "Hacked"}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_column(self):
         response = self.client.delete(self.url(self.column.pk))
@@ -73,4 +73,4 @@ class ColumnDetailTests(APITestCase):
         self.client.logout()
         self.client.login(username="b@example.com", password="pass")
         response = self.client.delete(self.url(self.column.pk))
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

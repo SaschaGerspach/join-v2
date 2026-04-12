@@ -20,7 +20,7 @@ class ContactListTests(APITestCase):
         Contact.objects.create(owner=self.other, first_name="Bob", last_name="B", email="bob@example.com")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_create_contact(self):
         response = self.client.post(self.url, {

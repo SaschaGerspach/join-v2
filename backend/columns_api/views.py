@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from boards_api.models import Board
 from boards_api.views import _can_access
+from boards_api.ws_events import send_board_event
 from .models import Column
 
 
@@ -41,7 +42,9 @@ def column_list(request):
 
     order = board.columns.count()
     column = Column.objects.create(board=board, title=title, order=order)
-    return Response(serialize_column(column), status=status.HTTP_201_CREATED)
+    data = serialize_column(column)
+    send_board_event(board.pk, "column_created", data)
+    return Response(data, status=status.HTTP_201_CREATED)
 
 
 @api_view(["PATCH", "DELETE"])
@@ -60,7 +63,12 @@ def column_detail(request, pk):
         if "order" in request.data:
             column.order = request.data["order"]
         column.save()
-        return Response(serialize_column(column))
+        data = serialize_column(column)
+        send_board_event(column.board_id, "column_updated", data)
+        return Response(data)
 
+    board_id = column.board_id
+    col_id = column.pk
     column.delete()
+    send_board_event(board_id, "column_deleted", {"id": col_id})
     return Response(status=status.HTTP_204_NO_CONTENT)
