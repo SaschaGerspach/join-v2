@@ -54,7 +54,9 @@
       }
 
       <div class="auth-actions">
-        <button type="submit" class="btn-primary">Log in</button>
+        <button type="submit" class="btn-primary" [disabled]="submitting()">
+          {{ submitting() ? 'Logging in…' : 'Log in' }}
+        </button>
         <a routerLink="/register" class="btn-secondary">Sign up</a>
       </div>
     </form>

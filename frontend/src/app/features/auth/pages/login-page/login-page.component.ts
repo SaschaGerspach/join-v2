@@ -18,13 +18,18 @@ export class LoginPageComponent {
   password = '';
   error = signal<string | null>(null);
   showPassword = signal(false);
+  submitting = signal(false);
 
   login(form: NgForm): void {
     if (form.invalid) return;
     this.error.set(null);
+    this.submitting.set(true);
     this.auth.login(this.email, this.password).subscribe({
       next: () => this.router.navigate(['/boards']),
-      error: () => this.error.set('Invalid email or password.'),
+      error: () => {
+        this.error.set('Invalid email or password.');
+        this.submitting.set(false);
+      },
     });
   }
 }

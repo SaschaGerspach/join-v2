@@ -91,7 +91,9 @@
 
       <div class="auth-actions">
         <a routerLink="/login" class="btn-secondary">Back to login</a>
-        <button type="submit" class="btn-primary">Sign up</button>
+        <button type="submit" class="btn-primary" [disabled]="submitting()">
+          {{ submitting() ? 'Signing up…' : 'Sign up' }}
+        </button>
       </div>
     </form>
   </div>

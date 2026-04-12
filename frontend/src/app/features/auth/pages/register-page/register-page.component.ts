@@ -22,23 +22,28 @@ export class RegisterPageComponent {
   password = '';
   error = signal<string | null>(null);
   showPassword = signal(false);
+  submitting = signal(false);
 
   register(form: NgForm): void {
     if (form.invalid) return;
     this.error.set(null);
+    this.submitting.set(true);
     this.api.register({
       email: this.email,
       password: this.password,
       first_name: this.firstName,
       last_name: this.lastName,
     }).subscribe({
-      next: (user) => {
+      next: () => {
         this.auth.login(this.email, this.password).subscribe({
           next: () => this.router.navigate(['/boards']),
           error: () => this.router.navigate(['/login']),
         });
       },
-      error: (err) => this.error.set(err?.error?.detail ?? 'Registration failed. Email may already be in use.'),
+      error: (err) => {
+        this.error.set(err?.error?.detail ?? 'Registration failed. Email may already be in use.');
+        this.submitting.set(false);
+      },
     });
   }
 }
