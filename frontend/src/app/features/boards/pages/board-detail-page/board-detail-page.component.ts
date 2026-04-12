@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { SlicePipe } from '@angular/common';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
@@ -22,6 +23,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 })
 export class BoardDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly titleService = inject(Title);
   private readonly boardsApi = inject(BoardsApiService);
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly tasksApi = inject(TasksApiService);
@@ -72,7 +74,10 @@ export class BoardDetailPageComponent implements OnInit {
     this.loading.set(true);
     this.error.set('');
     this.boardsApi.getById(boardId).subscribe({
-      next: board => this.board.set(board),
+      next: board => {
+        this.board.set(board);
+        this.titleService.setTitle(`${board.title} | Join`);
+      },
       error: () => { this.error.set('Failed to load board.'); this.loading.set(false); },
     });
     this.columnsApi.getByBoard(boardId).subscribe(cols => this.columns.set(cols));
