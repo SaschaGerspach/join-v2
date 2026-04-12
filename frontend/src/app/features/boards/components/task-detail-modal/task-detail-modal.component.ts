@@ -70,10 +70,13 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       assigned_to: this.assignedTo(),
     };
 
-    this.tasksApi.patch(this.task().id, payload).subscribe(updated => {
-      this.taskUpdated.emit(updated);
-      this.closed.emit();
-      this.toast.show('Task saved');
+    this.tasksApi.patch(this.task().id, payload).subscribe({
+      next: updated => {
+        this.taskUpdated.emit(updated);
+        this.closed.emit();
+        this.toast.show('Task saved');
+      },
+      error: () => this.toast.show('Failed to save task.', 'error'),
     });
   }
 
@@ -82,9 +85,12 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   }
 
   confirmDeleteTask(): void {
-    this.tasksApi.delete(this.task().id).subscribe(() => {
-      this.taskDeleted.emit(this.task().id);
-      this.closed.emit();
+    this.tasksApi.delete(this.task().id).subscribe({
+      next: () => {
+        this.taskDeleted.emit(this.task().id);
+        this.closed.emit();
+      },
+      error: () => this.toast.show('Failed to delete task.', 'error'),
     });
   }
 
@@ -92,10 +98,13 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     const title = this.newSubtaskTitle().trim();
     if (!title) return;
 
-    this.subtasksApi.create(this.task().id, title).subscribe(sub => {
-      this.subtasks.update(s => [...s, sub]);
-      this.newSubtaskTitle.set('');
-      this.emitSubtaskCounts();
+    this.subtasksApi.create(this.task().id, title).subscribe({
+      next: sub => {
+        this.subtasks.update(s => [...s, sub]);
+        this.newSubtaskTitle.set('');
+        this.emitSubtaskCounts();
+      },
+      error: () => this.toast.show('Failed to add subtask.', 'error'),
     });
   }
 
@@ -107,9 +116,12 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   }
 
   deleteSubtask(sub: Subtask): void {
-    this.subtasksApi.delete(this.task().id, sub.id).subscribe(() => {
-      this.subtasks.update(s => s.filter(x => x.id !== sub.id));
-      this.emitSubtaskCounts();
+    this.subtasksApi.delete(this.task().id, sub.id).subscribe({
+      next: () => {
+        this.subtasks.update(s => s.filter(x => x.id !== sub.id));
+        this.emitSubtaskCounts();
+      },
+      error: () => this.toast.show('Failed to delete subtask.', 'error'),
     });
   }
 

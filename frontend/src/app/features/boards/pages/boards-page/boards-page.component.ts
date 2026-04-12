@@ -42,11 +42,14 @@ export class BoardsPageComponent implements OnInit {
     const title = this.newTitle.trim();
     if (!title) return;
 
-    this.api.create(title).subscribe(board => {
-      this.boards.update(b => [...b, board]);
-      this.newTitle = '';
-      this.showForm.set(false);
-      this.toast.show('Board created');
+    this.api.create(title).subscribe({
+      next: board => {
+        this.boards.update(b => [...b, board]);
+        this.newTitle = '';
+        this.showForm.set(false);
+        this.toast.show('Board created');
+      },
+      error: () => this.toast.show('Failed to create board.', 'error'),
     });
   }
 
@@ -62,10 +65,13 @@ export class BoardsPageComponent implements OnInit {
   confirmDelete(): void {
     const id = this.pendingDeleteId();
     if (id === null) return;
-    this.api.delete(id).subscribe(() => {
-      this.boards.update(b => b.filter(board => board.id !== id));
-      this.pendingDeleteId.set(null);
-      this.toast.show('Board deleted');
+    this.api.delete(id).subscribe({
+      next: () => {
+        this.boards.update(b => b.filter(board => board.id !== id));
+        this.pendingDeleteId.set(null);
+        this.toast.show('Board deleted');
+      },
+      error: () => this.toast.show('Failed to delete board.', 'error'),
     });
   }
 }

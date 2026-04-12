@@ -95,10 +95,13 @@ export class BoardDetailPageComponent implements OnInit {
     const title = this.newColumnTitle.trim();
     if (!title) return;
 
-    this.columnsApi.create(this.boardId(), title).subscribe(col => {
-      this.columns.update(c => [...c, col]);
-      this.newColumnTitle = '';
-      this.showColumnForm.set(false);
+    this.columnsApi.create(this.boardId(), title).subscribe({
+      next: col => {
+        this.columns.update(c => [...c, col]);
+        this.newColumnTitle = '';
+        this.showColumnForm.set(false);
+      },
+      error: () => this.toast.show('Failed to create column.', 'error'),
     });
   }
 
@@ -110,9 +113,12 @@ export class BoardDetailPageComponent implements OnInit {
   confirmRenameBoardTitle(): void {
     const title = this.boardTitleInput.trim();
     if (!title) { this.editingBoardTitle.set(false); return; }
-    this.boardsApi.patch(this.boardId(), { title }).subscribe(updated => {
-      this.board.set(updated);
-      this.editingBoardTitle.set(false);
+    this.boardsApi.patch(this.boardId(), { title }).subscribe({
+      next: updated => {
+        this.board.set(updated);
+        this.editingBoardTitle.set(false);
+      },
+      error: () => this.toast.show('Failed to rename board.', 'error'),
     });
   }
 
@@ -124,9 +130,12 @@ export class BoardDetailPageComponent implements OnInit {
   confirmRenameColumn(id: number): void {
     const title = this.editingColumnTitle.trim();
     if (!title) { this.editingColumnId.set(null); return; }
-    this.columnsApi.patch(id, { title }).subscribe(updated => {
-      this.columns.update(cols => cols.map(c => c.id === id ? updated : c));
-      this.editingColumnId.set(null);
+    this.columnsApi.patch(id, { title }).subscribe({
+      next: updated => {
+        this.columns.update(cols => cols.map(c => c.id === id ? updated : c));
+        this.editingColumnId.set(null);
+      },
+      error: () => this.toast.show('Failed to rename column.', 'error'),
     });
   }
 
@@ -137,11 +146,14 @@ export class BoardDetailPageComponent implements OnInit {
   confirmDeleteColumn(): void {
     const id = this.pendingDeleteColumnId();
     if (id === null) return;
-    this.columnsApi.delete(id).subscribe(() => {
-      this.columns.update(c => c.filter(col => col.id !== id));
-      this.tasks.update(t => t.filter(task => task.column !== id));
-      this.pendingDeleteColumnId.set(null);
-      this.toast.show('Column deleted');
+    this.columnsApi.delete(id).subscribe({
+      next: () => {
+        this.columns.update(c => c.filter(col => col.id !== id));
+        this.tasks.update(t => t.filter(task => task.column !== id));
+        this.pendingDeleteColumnId.set(null);
+        this.toast.show('Column deleted');
+      },
+      error: () => this.toast.show('Failed to delete column.', 'error'),
     });
   }
 
@@ -150,10 +162,13 @@ export class BoardDetailPageComponent implements OnInit {
   }
 
   createTask(payload: CreateTaskPayload): void {
-    this.tasksApi.create(this.boardId(), payload).subscribe(task => {
-      this.tasks.update(t => [...t, task]);
-      this.addingTaskForColumn.set(null);
-      this.toast.show('Task created');
+    this.tasksApi.create(this.boardId(), payload).subscribe({
+      next: task => {
+        this.tasks.update(t => [...t, task]);
+        this.addingTaskForColumn.set(null);
+        this.toast.show('Task created');
+      },
+      error: () => this.toast.show('Failed to create task.', 'error'),
     });
   }
 
@@ -176,10 +191,13 @@ export class BoardDetailPageComponent implements OnInit {
   confirmDeleteTask(): void {
     const id = this.pendingDeleteTaskId();
     if (id === null) return;
-    this.tasksApi.delete(id).subscribe(() => {
-      this.tasks.update(t => t.filter(task => task.id !== id));
-      this.pendingDeleteTaskId.set(null);
-      this.toast.show('Task deleted');
+    this.tasksApi.delete(id).subscribe({
+      next: () => {
+        this.tasks.update(t => t.filter(task => task.id !== id));
+        this.pendingDeleteTaskId.set(null);
+        this.toast.show('Task deleted');
+      },
+      error: () => this.toast.show('Failed to delete task.', 'error'),
     });
   }
 
