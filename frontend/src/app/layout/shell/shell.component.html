@@ -18,6 +18,10 @@
         <span class="nav-icon">&#128100;</span>
         Contacts
       </a>
+      <a routerLink="/calendar" routerLinkActive="active">
+        <span class="nav-icon">&#128197;</span>
+        Calendar
+      </a>
       @if (auth.user()?.is_staff) {
         <a routerLink="/admin" routerLinkActive="active">
           <span class="nav-icon">&#9881;</span>

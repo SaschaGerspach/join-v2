@@ -15,6 +15,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { NotFoundPageComponent } from './features/not-found/not-found-page.component';
 import { AdminPageComponent } from './features/admin/pages/admin-page/admin-page.component';
+import { CalendarPageComponent } from './features/calendar/pages/calendar-page/calendar-page.component';
 
 export const routes: Routes = [
     {path: 'login', title: 'Log in | Join', component: LoginPageComponent},
@@ -35,6 +36,7 @@ export const routes: Routes = [
                 {path: 'boards/:id', title: 'Board | Join', component: BoardDetailPageComponent},
                 {path: 'contacts', title: 'Contacts | Join', component: ContactsPageComponent},
                 {path: 'profile', title: 'Profile | Join', component: ProfilePageComponent},
+                {path: 'calendar', title: 'Calendar | Join', component: CalendarPageComponent},
                 {path: 'admin', title: 'Admin | Join', component: AdminPageComponent, canActivate: [adminGuard]},
         ],
     },

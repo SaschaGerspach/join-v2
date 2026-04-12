@@ -1,0 +1,43 @@
+<div class="calendar-page">
+
+  <div class="calendar-header">
+    <button class="btn-nav" (click)="prevMonth()">&#8592;</button>
+    <h1 class="month-label">{{ monthLabel() }}</h1>
+    <button class="btn-nav" (click)="nextMonth()">&#8594;</button>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-hint">Loading tasks…</p>
+  } @else {
+    <div class="calendar-grid">
+      @for (day of weekDays; track day) {
+        <div class="weekday-header">{{ day }}</div>
+      }
+      @for (day of calendarDays(); track $index) {
+        <div class="calendar-cell" [class.today]="day && isToday(day)" [class.empty]="!day">
+          @if (day) {
+            <span class="day-number">{{ day.getDate() }}</span>
+            <div class="task-badges">
+              @for (task of tasksForDay(day); track task.id) {
+                <button class="task-badge" [class]="priorityClass(task.priority)" (click)="openTask(task)">
+                  {{ task.title }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+</div>
+
+@if (selectedTask()) {
+  <app-task-detail-modal
+    [task]="selectedTask()!"
+    [columns]="columnsForTask(selectedTask()!)"
+    (closed)="selectedTask.set(null)"
+    (taskUpdated)="onTaskUpdated($event)"
+    (taskDeleted)="onTaskDeleted($event)"
+  />
+}

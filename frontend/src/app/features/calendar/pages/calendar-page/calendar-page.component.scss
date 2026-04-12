@@ -1,0 +1,142 @@
+$color-primary: #29abe2;
+$color-dark:    #2a3647;
+$color-bg:      var(--color-bg, #f6f7f8);
+$color-surface: var(--color-surface, #ffffff);
+$color-border:  var(--color-border, #d1d1d1);
+$color-muted:   var(--color-muted, #a8a8a8);
+$color-text:    var(--color-text, #2a3647);
+
+$priority-high:   #ff3d00;
+$priority-medium: #ffa800;
+$priority-low:    #7ae229;
+
+.calendar-page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+
+  .month-label {
+    flex: 1;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $color-text;
+  }
+}
+
+.btn-nav {
+  background: none;
+  border: 1px solid $color-border;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: $color-text;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: $color-primary;
+    color: #fff;
+    border-color: $color-primary;
+  }
+}
+
+.loading-hint {
+  text-align: center;
+  color: $color-muted;
+  padding: 3rem 0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: $color-border;
+  border: 1px solid $color-border;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.weekday-header {
+  background: $color-surface;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: $color-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calendar-cell {
+  background: $color-surface;
+  min-height: 100px;
+  padding: 0.5rem;
+  position: relative;
+
+  &.empty {
+    background: $color-bg;
+  }
+
+  &.today {
+    .day-number {
+      background: $color-primary;
+      color: #fff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+  }
+}
+
+.day-number {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $color-muted;
+  margin-bottom: 0.3rem;
+  display: inline-block;
+}
+
+.task-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 0.25rem;
+}
+
+.task-badge {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #fff;
+  transition: opacity 0.15s ease;
+
+  &:hover { opacity: 0.8; }
+
+  &.priority-urgent,
+  &.priority-high   { background: #ff3d00; }
+  &.priority-medium { background: #ffa800; }
+  &.priority-low    { background: #7ae229; color: #2a3647; }
+}
