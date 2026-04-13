@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/Scripts/python manage.py test auth_api --verbosity=2)",
+      "Bash(node_modules/.bin/ng build:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(gh auth:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git:*)",
+      "Bash(.venv/Scripts/python manage.py runserver --noreload)",
+      "Bash(curl -s http://localhost:8000/auth/me)",
+      "Bash(curl:*)",
+      "Bash(taskkill //F //IM python.exe)",
+      "Bash(.venv/Scripts/python manage.py startapp users_api)",
+      "Bash(.venv/Scripts/python:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(node_modules/.bin/ng add:*)",
+      "Bash(npx ng:*)",
+      "Bash(python manage.py collectstatic --noinput)",
+      "Bash(python manage.py makemigrations tasks_api)",
+      "Bash(python manage.py migrate)",
+      "Bash(python manage.py check)",
+      "Bash(python3 -c ':*)",
+      "Bash(python /c/Users/Anwender/OneDrive/Dokumente/Projekte/join-v2/backend/requirements.txt)",
+      "Bash(python3.11 -c \"pass\")",
+      "Bash(py -c ':*)",
+      "Bash(xxd requirements.txt)",
+      "Bash(npm run:*)",
+      "Bash(python manage.py makemigrations boards_api --name add_board_color)",
+      "Bash(python manage.py test boards_api)",
+      "Bash(npm install:*)",
+      "Bash(npx playwright:*)",
+      "Bash(pip install:*)",
+      "Bash(python manage.py test)",
+      "Bash(python manage.py test columns_api.tests.ColumnDetailTests.test_delete_column_forbidden)",
+      "Bash(python manage.py makemigrations tasks_api --name add_labels)",
+      "Bash(python manage.py makemigrations tasks_api --name add_attachment)"
+    ]
+  }
+}
