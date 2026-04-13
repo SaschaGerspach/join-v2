@@ -4,3 +4,4 @@ backend/staticfiles/
 frontend/dist/
 frontend/node_modules/
 .env
+*.sqlite3
