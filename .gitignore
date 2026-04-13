@@ -3,5 +3,9 @@ __pycache__/
 backend/staticfiles/
 frontend/dist/
 frontend/node_modules/
-.env
+.env*
+!.env.example
 *.sqlite3
+*.log
+.venv/
+venv/
