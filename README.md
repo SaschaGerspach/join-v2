@@ -108,6 +108,16 @@ docker compose up -d
 # The app is now running at http://localhost
 ```
 
+### Local Development (with Docker)
+
+```bash
+docker compose -f docker-compose.dev.yml up --build
+```
+
+- Frontend: `http://localhost:4200` (Angular dev server with hot reload)
+- Backend: `http://localhost:8000` (Django runserver with auto reload)
+- PostgreSQL: `localhost:5432`
+
 ### Local Development (without Docker)
 
 **Backend:**
