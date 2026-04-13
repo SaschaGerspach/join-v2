@@ -6,7 +6,10 @@ from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from columns_api.models import Column
 from .models import Board, BoardMember
+
+DEFAULT_COLUMNS = ["To do", "In progress", "Await feedback", "Done"]
 
 User = get_user_model()
 
@@ -58,6 +61,9 @@ def board_list(request):
         return Response({"detail": "Title is required."}, status=status.HTTP_400_BAD_REQUEST)
 
     board = Board.objects.create(title=title, created_by=request.user)
+    Column.objects.bulk_create([
+        Column(board=board, title=t, order=i) for i, t in enumerate(DEFAULT_COLUMNS)
+    ])
     return Response(serialize_board(board), status=status.HTTP_201_CREATED)
 
 

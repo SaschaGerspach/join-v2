@@ -14,7 +14,7 @@ $color-primary: #29abe2;
 }
 
 .dialog {
-  background: $color-white;
+  background: var(--color-surface);
   border-radius: 20px;
   padding: 2rem 2.5rem;
   max-width: 380px;
@@ -27,7 +27,7 @@ $color-primary: #29abe2;
 
 .message {
   font-size: 1rem;
-  color: $color-dark;
+  color: var(--color-text);
   text-align: center;
   font-weight: 500;
 }
@@ -39,8 +39,8 @@ $color-primary: #29abe2;
 }
 
 .btn-cancel {
-  background: $color-white;
-  color: $color-dark;
+  background: var(--color-surface);
+  color: var(--color-text);
   border: 2px solid $color-dark;
   border-radius: 8px;
   padding: 0.5rem 1.5rem;

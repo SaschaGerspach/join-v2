@@ -35,7 +35,7 @@ $color-error:   #ff8190;
   h1 {
     font-size: 2rem;
     font-weight: 700;
-    color: $color-dark;
+    color: var(--color-text);
   }
 }
 
@@ -136,7 +136,7 @@ $color-error:   #ff8190;
 .contact-list-name {
   font-weight: 600;
   font-size: 0.95rem;
-  color: $color-dark;
+  color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -169,7 +169,7 @@ $color-error:   #ff8190;
 // ─── Detail Card ─────────────────────────────────────────────────────────────
 
 .contact-detail-card {
-  background: $color-white;
+  background: var(--color-surface);
   border-radius: 24px;
   padding: 2rem;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
@@ -202,7 +202,7 @@ $color-error:   #ff8190;
 .detail-name-block h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: $color-dark;
+  color: var(--color-text);
 }
 
 .detail-fields {
@@ -227,7 +227,7 @@ $color-error:   #ff8190;
 
 .detail-value {
   font-size: 1rem;
-  color: $color-dark;
+  color: var(--color-text);
 
   &.link {
     color: $color-primary;
@@ -247,7 +247,7 @@ $color-error:   #ff8190;
 // ─── Form Card ────────────────────────────────────────────────────────────────
 
 .contact-form-card {
-  background: $color-white;
+  background: var(--color-surface);
   border-radius: 24px;
   padding: 2rem;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
@@ -258,7 +258,7 @@ $color-error:   #ff8190;
   h2 {
     font-size: 1.4rem;
     font-weight: 700;
-    color: $color-dark;
+    color: var(--color-text);
   }
 }
 
@@ -291,7 +291,7 @@ $color-error:   #ff8190;
   border-radius: 10px;
   padding: 0.55rem 0.9rem;
   font-size: 0.95rem;
-  color: $color-dark;
+  color: var(--color-text);
   background: $color-bg;
   width: 100%;
   box-sizing: border-box;
@@ -345,8 +345,8 @@ $color-error:   #ff8190;
 }
 
 .btn-cancel {
-  background: $color-white;
-  color: $color-dark;
+  background: var(--color-surface);
+  color: var(--color-text);
   border: 2px solid $color-dark;
   border-radius: 8px;
   padding: 0.5rem 1.25rem;

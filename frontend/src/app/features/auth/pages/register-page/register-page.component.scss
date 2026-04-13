@@ -20,13 +20,13 @@ $color-error:   #ff8190;
   span {
     font-size: 3rem;
     font-weight: 700;
-    color: $color-dark;
+    color: var(--color-text);
     letter-spacing: 2px;
   }
 }
 
 .auth-card {
-  background: $color-white;
+  background: var(--color-surface);
   border-radius: 30px;
   padding: 2.5rem 3rem;
   width: 100%;
@@ -36,7 +36,7 @@ $color-error:   #ff8190;
   h1 {
     font-size: 2rem;
     font-weight: 700;
-    color: $color-dark;
+    color: var(--color-text);
     margin-bottom: 1rem;
   }
 }
@@ -59,7 +59,7 @@ $color-error:   #ff8190;
     border-radius: 10px;
     padding: 0.8rem 1.5rem;
     font-size: 1rem;
-    background: $color-white;
+    background: var(--color-surface);
     transition: border-color 0.2s ease;
 
     &::placeholder {
@@ -105,7 +105,7 @@ $color-error:   #ff8190;
   color: $color-border;
 
   &:hover {
-    color: $color-dark;
+    color: var(--color-text);
   }
 }
 
@@ -185,8 +185,8 @@ $color-error:   #ff8190;
   }
 
   .btn-secondary {
-    background-color: $color-white;
-    color: $color-dark;
+    background-color: var(--color-surface);
+    color: var(--color-text);
     border: 2px solid $color-dark;
 
     &:hover {

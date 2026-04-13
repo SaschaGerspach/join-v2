@@ -17,11 +17,11 @@ $color-error:   #ff8190;
 .page-title {
   font-size: 2rem;
   font-weight: 700;
-  color: $color-dark;
+  color: var(--color-text);
 }
 
 .profile-card {
-  background: $color-white;
+  background: var(--color-surface);
   border-radius: 24px;
   padding: 2rem;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
@@ -61,7 +61,7 @@ $color-error:   #ff8190;
 .profile-full-name {
   font-size: 1.25rem;
   font-weight: 700;
-  color: $color-dark;
+  color: var(--color-text);
 }
 
 .profile-email-display {
@@ -80,7 +80,7 @@ $color-error:   #ff8190;
 .section-title {
   font-size: 1rem;
   font-weight: 700;
-  color: $color-dark;
+  color: var(--color-text);
   padding-bottom: 0.5rem;
   border-bottom: 1px solid $color-border;
 }
@@ -114,7 +114,7 @@ $color-error:   #ff8190;
   border-radius: 10px;
   padding: 0.6rem 0.9rem;
   font-size: 0.95rem;
-  color: $color-dark;
+  color: var(--color-text);
   background: $color-bg;
   width: 100%;
   box-sizing: border-box;

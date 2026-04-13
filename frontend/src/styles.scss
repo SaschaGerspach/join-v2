@@ -140,8 +140,8 @@ input, textarea, select {
 }
 
 .btn-secondary {
-  background-color: $color-white;
-  color: $color-dark;
+  background-color: var(--color-surface);
+  color: var(--color-text);
   font-weight: 700;
   font-size: 1rem;
   padding: 1rem 2rem;
@@ -163,7 +163,7 @@ input, textarea, select {
   border-radius: $radius-input;
   padding: 0.8rem 1.5rem;
   font-size: $font-size-base;
-  background: $color-white;
+  background: var(--color-surface);
   transition: border-color 0.2s ease;
 
   &::placeholder {

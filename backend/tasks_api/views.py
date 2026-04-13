@@ -54,12 +54,17 @@ def task_list(request):
     if not title:
         return Response({"detail": "Title is required."}, status=status.HTTP_400_BAD_REQUEST)
 
+    column_id = request.data.get("column")
+    if not column_id:
+        first_column = board.columns.order_by("order").first()
+        column_id = first_column.pk if first_column else None
+
     task = Task.objects.create(
         board=board,
         title=title,
         description=request.data.get("description", ""),
         priority=request.data.get("priority", Task.Priority.MEDIUM),
-        column_id=request.data.get("column"),
+        column_id=column_id,
         assigned_to_id=request.data.get("assigned_to"),
         due_date=request.data.get("due_date"),
     )

@@ -1,9 +1,9 @@
 import json
 
-from channels.generic.websocket import AsyncWebSocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 
 
-class BoardConsumer(AsyncWebSocketConsumer):
+class BoardConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.board_id = self.scope["url_route"]["kwargs"]["board_id"]
         self.group_name = f"board_{self.board_id}"

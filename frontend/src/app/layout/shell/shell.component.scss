@@ -37,7 +37,10 @@ $bp-mobile:         800px;
 }
 
 .sidebar-logo {
-  padding: 4rem 2rem 2rem;
+  height: $header-height;
+  display: flex;
+  align-items: center;
+  padding-left: 3.25rem;
 
   .logo-text {
     color: $color-white;
@@ -51,13 +54,13 @@ $bp-mobile:         800px;
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding-top: 1rem;
+  padding-top: 2rem;
 
   a {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.9rem 0 0.9rem 25%;
+    padding: 0.9rem 0 0.9rem 3.25rem;
     color: $color-text-muted;
     text-decoration: none;
     font-size: 1rem;
@@ -82,7 +85,7 @@ $bp-mobile:         800px;
 }
 
 .sidebar-footer {
-  padding: 1.5rem 2rem;
+  padding: 1.5rem 0 1.5rem 3.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -130,7 +133,7 @@ $bp-mobile:         800px;
 .topbar-title {
   font-size: 1.25rem;
   font-weight: 400;
-  color: $color-dark;
+  color: var(--color-text);
 
   @media (max-width: $bp-mobile) {
     display: none;
