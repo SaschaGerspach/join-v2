@@ -13,11 +13,18 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-xj-26swr2^dfo2a)2o3^dp3a0zqo8tqlk+t()^y%j=dm%=d00e')
-
 DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() == 'true'
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'django-insecure-xj-26swr2^dfo2a)2o3^dp3a0zqo8tqlk+t()^y%j=dm%=d00e'
+    else:
+        raise ImproperlyConfigured('DJANGO_SECRET_KEY must be set when DJANGO_DEBUG=false')
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost 127.0.0.1').split()
 
