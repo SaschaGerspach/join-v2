@@ -197,11 +197,12 @@ FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:4200')
 CORS_ALLOW_CREDENTIALS = True
 
 _secure_cookies_default = 'false' if DEBUG else 'true'
+_samesite_default = 'Lax' if DEBUG else 'None'
 
-SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = os.environ.get('SESSION_COOKIE_SAMESITE', _samesite_default)
 SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', _secure_cookies_default).lower() == 'true'
 
-CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = os.environ.get('CSRF_COOKIE_SAMESITE', _samesite_default)
 CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', _secure_cookies_default).lower() == 'true'
 CSRF_COOKIE_HTTPONLY = False
 
