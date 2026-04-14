@@ -28,7 +28,8 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              { "glob": ".htaccess", "input": "src", "output": "/" }
             ],
             "styles": [
               "src/styles.scss"
@@ -96,7 +97,8 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              { "glob": ".htaccess", "input": "src", "output": "/" }
             ],
             "styles": [
               "src/styles.scss"
