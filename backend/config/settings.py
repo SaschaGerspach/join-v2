@@ -208,6 +208,11 @@ CSRF_COOKIE_SAMESITE = os.environ.get('CSRF_COOKIE_SAMESITE', _samesite_default)
 CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', _secure_cookies_default).lower() == 'true'
 CSRF_COOKIE_HTTPONLY = False
 
+_cookie_domain = os.environ.get('COOKIE_DOMAIN', '').strip()
+if _cookie_domain:
+    SESSION_COOKIE_DOMAIN = _cookie_domain
+    CSRF_COOKIE_DOMAIN = _cookie_domain
+
 LOG_DIR = Path(os.environ.get('DJANGO_LOG_DIR', BASE_DIR / 'logs'))
 if not DEBUG:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
