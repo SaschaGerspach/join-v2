@@ -164,16 +164,23 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 
 ## Deployment
 
+### First-time setup (obtains SSL certificate)
+
+On a fresh server with DNS pointing to it, after filling in `.env` (including `DOMAIN` and `CERTBOT_EMAIL`):
+
+```bash
+./init.sh
+```
+
+This creates a temporary self-signed cert so Nginx can start, requests a real Let's Encrypt certificate, reloads Nginx, runs migrations, and collects static files.
+
+### Subsequent deploys
+
 ```bash
 ./deploy.sh
 ```
 
-This pulls the latest code, rebuilds containers, runs migrations, and collects static files.
-
-For initial SSL setup:
-```bash
-docker compose run --rm certbot certonly --webroot -w /var/www/certbot -d yourdomain.com
-```
+Pulls the latest code, rebuilds containers, runs migrations, and collects static files.
 
 ## License
 
