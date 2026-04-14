@@ -27,7 +27,7 @@ def serialize_task(task):
         "order": task.order,
         "subtask_count": subtasks.count(),
         "subtask_done_count": subtasks.filter(done=True).count(),
-        "labels": [serialize_label(l) for l in task.labels.all()],
+        "labels": [serialize_label(label) for label in task.labels.all()],
     }
 
 
@@ -254,7 +254,7 @@ def label_list(request, board_pk):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
-        return Response([serialize_label(l) for l in board.labels.all()])
+        return Response([serialize_label(label) for label in board.labels.all()])
 
     name = request.data.get("name", "").strip()
     color = request.data.get("color", "#29abe2").strip()

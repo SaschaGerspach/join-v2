@@ -131,7 +131,7 @@ def board_members(request, pk):
         return Response({"detail": "User is already a member."}, status=status.HTTP_400_BAD_REQUEST)
 
     send_mail(
-        subject=f"You've been invited to a board — Join",
+        subject="You've been invited to a board — Join",
         message=(
             f"{request.user.first_name or request.user.email} invited you to the board "
             f'"{board.title}" on Join.\n\n'
