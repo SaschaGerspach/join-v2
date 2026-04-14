@@ -288,17 +288,28 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
 
   dropColumn(event: CdkDragDrop<Column[]>): void {
     if (event.previousIndex === event.currentIndex) return;
-    const reordered = [...this.columns()];
+    const snapshot = this.columns();
+    const reordered = [...snapshot];
     const [moved] = reordered.splice(event.previousIndex, 1);
     reordered.splice(event.currentIndex, 0, moved);
     const updated = reordered.map((c, i) => ({ ...c, order: i }));
     this.columns.set(updated);
-    updated.forEach(col => this.columnsApi.patch(col.id, { order: col.order }).subscribe());
+
+    let failed = false;
+    updated.forEach(col => this.columnsApi.patch(col.id, { order: col.order }).subscribe({
+      error: () => {
+        if (failed) return;
+        failed = true;
+        this.columns.set(snapshot);
+        this.toast.show('Failed to reorder columns.', 'error');
+      },
+    }));
   }
 
   drop(event: CdkDragDrop<Task[]>, targetColumnId: number): void {
     const task: Task = event.item.data;
     const isSameColumn = event.previousContainer === event.container;
+    const snapshot = this.tasks();
 
     if (isSameColumn) {
       const colTasks = this.tasksForColumn(targetColumnId);
@@ -309,7 +320,12 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
       this.tasks.update(tasks =>
         tasks.map(t => updated.find(u => u.id === t.id) ?? t)
       );
-      this.tasksApi.reorder(updated.map(t => ({ id: t.id, order: t.order, column: t.column }))).subscribe();
+      this.tasksApi.reorder(updated.map(t => ({ id: t.id, order: t.order, column: t.column }))).subscribe({
+        error: () => {
+          this.tasks.set(snapshot);
+          this.toast.show('Failed to reorder tasks.', 'error');
+        },
+      });
     } else {
       const prevTasks = this.tasksForColumn(task.column!).filter(t => t.id !== task.id)
         .map((t, i) => ({ ...t, order: i }));
@@ -328,7 +344,12 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
       this.tasksApi.reorder([
         ...prevTasks.map(t => ({ id: t.id, order: t.order, column: t.column })),
         ...updatedTarget.map(t => ({ id: t.id, order: t.order, column: t.column })),
-      ]).subscribe();
+      ]).subscribe({
+        error: () => {
+          this.tasks.set(snapshot);
+          this.toast.show('Failed to move task.', 'error');
+        },
+      });
     }
   }
 
@@ -355,15 +376,19 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
     if (targetCol === null) return;
     const ids = [...this.selectedTaskIds()];
     const items = ids.map((id, i) => ({ id, order: i, column: targetCol }));
+    const snapshot = this.tasks();
+
+    this.tasks.update(tasks =>
+      tasks.map(t => ids.includes(t.id) ? { ...t, column: targetCol } : t)
+    );
+    this.clearSelection();
+
     this.tasksApi.reorder(items).subscribe({
-      next: () => {
-        this.tasks.update(tasks =>
-          tasks.map(t => ids.includes(t.id) ? { ...t, column: targetCol } : t)
-        );
-        this.clearSelection();
-        this.toast.show(`Moved ${ids.length} task(s)`);
+      next: () => this.toast.show(`Moved ${ids.length} task(s)`),
+      error: () => {
+        this.tasks.set(snapshot);
+        this.toast.show('Failed to move tasks.', 'error');
       },
-      error: () => this.toast.show('Failed to move tasks.', 'error'),
     });
   }
 
