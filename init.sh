@@ -48,10 +48,10 @@ docker compose run --rm --entrypoint "\
   certbot certonly --webroot -w /var/www/certbot \
     --email ${EMAIL} \
     --agree-tos --no-eff-email \
-    -d ${DOMAIN} -d www.${DOMAIN}" certbot
+    -d ${DOMAIN}" certbot
 
 echo "==> Reloading nginx with real certificate…"
-docker compose exec frontend nginx -s reload
+docker compose exec nginx nginx -s reload
 
 echo "==> Running migrations and collectstatic…"
 docker compose exec backend python manage.py migrate --noinput
