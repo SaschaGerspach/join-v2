@@ -4,10 +4,6 @@
     <button class="btn-add" (click)="showForm.set(true)">+ New Board</button>
   </div>
 
-  @if (error()) {
-    <p class="error-banner">{{ error() }}</p>
-  }
-
   @if (showForm()) {
     <div class="board-form">
       <input

@@ -22,7 +22,6 @@ export class BoardsPageComponent implements OnInit {
   newTitle = '';
   showForm = signal(false);
   loading = signal(true);
-  error = signal('');
   pendingDeleteId = signal<number | null>(null);
 
   managingBoard = signal<Board | null>(null);
@@ -36,10 +35,9 @@ export class BoardsPageComponent implements OnInit {
 
   loadBoards(): void {
     this.loading.set(true);
-    this.error.set('');
     this.api.getAll().subscribe({
       next: boards => { this.boards.set(boards); this.loading.set(false); },
-      error: () => { this.error.set('Failed to load boards.'); this.loading.set(false); },
+      error: () => { this.toast.show('Failed to load boards.', 'error'); this.loading.set(false); },
     });
   }
 

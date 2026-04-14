@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 type ContactForm = {
   first_name: string;
@@ -20,13 +21,13 @@ type ContactForm = {
 })
 export class ContactsPageComponent implements OnInit {
   private readonly api = inject(ContactsApiService);
+  private readonly toast = inject(ToastService);
 
   contacts = signal<Contact[]>([]);
   selectedContact = signal<Contact | null>(null);
   showForm = signal(false);
   editMode = signal(false);
   loading = signal(true);
-  error = signal('');
   pendingDeleteId = signal<number | null>(null);
 
   form: ContactForm = { first_name: '', last_name: '', email: '', phone: '' };
@@ -44,7 +45,7 @@ export class ContactsPageComponent implements OnInit {
   ngOnInit(): void {
     this.api.getAll().subscribe({
       next: contacts => { this.contacts.set(contacts); this.loading.set(false); },
-      error: () => { this.error.set('Failed to load contacts.'); this.loading.set(false); },
+      error: () => { this.toast.show('Failed to load contacts.', 'error'); this.loading.set(false); },
     });
   }
 

@@ -56,14 +56,6 @@ $color-error:   #ff8190;
   }
 }
 
-.error-banner {
-  background: rgba($color-error, 0.1);
-  color: darken($color-error, 15%);
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
-  font-size: 0.9rem;
-}
-
 .contact-list {
   flex: 1;
   overflow-y: auto;

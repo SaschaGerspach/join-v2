@@ -8,8 +8,6 @@
 
   @if (loading()) {
     <app-loading-spinner />
-  } @else if (error()) {
-    <p class="error-banner">{{ error() }}</p>
   } @else if (stats()) {
     <div class="stats-grid">
       <div class="stat-card">

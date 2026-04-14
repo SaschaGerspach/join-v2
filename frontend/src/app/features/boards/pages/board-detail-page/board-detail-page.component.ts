@@ -87,7 +87,6 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
 
   selectedTask = signal<Task | null>(null);
   loading = signal(true);
-  error = signal('');
 
   pendingDeleteColumnId = signal<number | null>(null);
   pendingDeleteTaskId = signal<number | null>(null);
@@ -146,13 +145,12 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
 
   loadData(boardId: number): void {
     this.loading.set(true);
-    this.error.set('');
     this.boardsApi.getById(boardId).subscribe({
       next: board => {
         this.board.set(board);
         this.titleService.setTitle(`${board.title} | Join`);
       },
-      error: () => { this.error.set('Failed to load board.'); this.loading.set(false); },
+      error: () => { this.toast.show('Failed to load board.', 'error'); this.loading.set(false); },
     });
     this.columnsApi.getByBoard(boardId).subscribe(cols => this.columns.set(cols));
     this.tasksApi.getByBoard(boardId).subscribe(tasks => {
