@@ -171,17 +171,11 @@ Frontend and backend are deployed separately:
 
 The Angular app calls the backend by the absolute URL in `frontend/src/environments/environment.prod.ts`.
 
-### Backend — first-time setup (obtains SSL certificate)
+### Backend deploy
 
-On the backend server, after a DNS A-record points the backend domain to the server and `.env` is filled in:
+The backend runs behind a shared Traefik reverse proxy on the host (network `root_default`). Traefik handles HTTPS via Let's Encrypt automatically through container labels.
 
-```bash
-./init.sh
-```
-
-This creates a temporary self-signed cert so Nginx can start, requests a real Let's Encrypt certificate for `DOMAIN`, reloads Nginx, runs migrations, and collects static files.
-
-### Backend — subsequent deploys
+After DNS A-record points `DOMAIN` to the server and `.env` is filled in:
 
 ```bash
 ./deploy.sh

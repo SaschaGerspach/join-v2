@@ -49,33 +49,25 @@ services:
         condition: service_healthy
     expose:
       - "8000"
+    networks:
+      - default
+      - traefik
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
-
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/backend.conf.template:/etc/nginx/templates/default.conf.template:ro
-      - certbot_certs:/etc/letsencrypt
-      - certbot_www:/var/www/certbot
-    environment:
-      DOMAIN: ${DOMAIN:?DOMAIN required}
-    depends_on:
-      - backend
-
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - certbot_certs:/etc/letsencrypt
-      - certbot_www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=root_default"
+      - "traefik.http.routers.join-backend.rule=Host(`${DOMAIN:?DOMAIN required}`)"
+      - "traefik.http.routers.join-backend.entrypoints=web,websecure"
+      - "traefik.http.routers.join-backend.tls=true"
+      - "traefik.http.routers.join-backend.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.join-backend.middlewares=join-backend-https-redirect@docker"
+      - "traefik.http.middlewares.join-backend-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.services.join-backend.loadbalancer.server.port=8000"
 
   backup:
     image: postgres:16-alpine
@@ -90,8 +82,12 @@ services:
         condition: service_healthy
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do pg_dump -h db -U $$POSTGRES_USER $$POSTGRES_DB > /backups/backup_$$(date +%Y%m%d_%H%M%S).sql; sleep 24h & wait $${!}; done;'"
 
+networks:
+  default:
+  traefik:
+    name: root_default
+    external: true
+
 volumes:
   postgres_data:
   db_backups:
-  certbot_certs:
-  certbot_www:
