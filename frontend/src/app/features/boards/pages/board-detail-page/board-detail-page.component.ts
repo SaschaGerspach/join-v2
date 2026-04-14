@@ -182,7 +182,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
 
     this.columnsApi.create(this.boardId(), title).subscribe({
       next: col => {
-        this.columns.update(c => [...c, col]);
+        this.columns.update(c => c.some(x => x.id === col.id) ? c : [...c, col]);
         this.newColumnTitle = '';
         this.showColumnForm.set(false);
       },
@@ -249,7 +249,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   createTask(payload: CreateTaskPayload): void {
     this.tasksApi.create(this.boardId(), payload).subscribe({
       next: task => {
-        this.tasks.update(t => [...t, task]);
+        this.tasks.update(t => t.some(x => x.id === task.id) ? t : [...t, task]);
         this.addingTaskForColumn.set(null);
         this.toast.show('Task created');
       },
