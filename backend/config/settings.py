@@ -205,6 +205,28 @@ CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', _secure_cookies_default).lower() == 'true'
 CSRF_COOKIE_HTTPONLY = False
 
+LOG_DIR = Path(os.environ.get('DJANGO_LOG_DIR', BASE_DIR / 'logs'))
+if not DEBUG:
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+_log_handlers = ["console"]
+_handlers_config = {
+    "console": {
+        "class": "logging.StreamHandler",
+        "formatter": "verbose",
+    },
+}
+if not DEBUG:
+    _handlers_config["file"] = {
+        "class": "logging.handlers.RotatingFileHandler",
+        "filename": str(LOG_DIR / "django.log"),
+        "maxBytes": 5 * 1024 * 1024,
+        "backupCount": 5,
+        "formatter": "verbose",
+        "level": "WARNING",
+    }
+    _log_handlers.append("file")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -214,19 +236,14 @@ LOGGING = {
             "style": "{",
         },
     },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "verbose",
-        },
-    },
+    "handlers": _handlers_config,
     "root": {
-        "handlers": ["console"],
+        "handlers": _log_handlers,
         "level": "WARNING",
     },
     "loggers": {
         "django": {
-            "handlers": ["console"],
+            "handlers": _log_handlers,
             "level": "ERROR",
             "propagate": False,
         },
