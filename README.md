@@ -164,23 +164,36 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 
 ## Deployment
 
-### First-time setup (obtains SSL certificate)
+Frontend and backend are deployed separately:
 
-On a fresh server with DNS pointing to it, after filling in `.env` (including `DOMAIN` and `CERTBOT_EMAIL`):
+- **Frontend** (Angular build) is served as static files on the frontend host (e.g. all-inkl).
+- **Backend** (Django + Postgres + Redis + Nginx reverse proxy) runs via Docker Compose on its own server (e.g. Hostinger).
+
+The Angular app calls the backend by the absolute URL in `frontend/src/environments/environment.prod.ts`.
+
+### Backend — first-time setup (obtains SSL certificate)
+
+On the backend server, after a DNS A-record points the backend domain to the server and `.env` is filled in:
 
 ```bash
 ./init.sh
 ```
 
-This creates a temporary self-signed cert so Nginx can start, requests a real Let's Encrypt certificate, reloads Nginx, runs migrations, and collects static files.
+This creates a temporary self-signed cert so Nginx can start, requests a real Let's Encrypt certificate for `DOMAIN`, reloads Nginx, runs migrations, and collects static files.
 
-### Subsequent deploys
+### Backend — subsequent deploys
 
 ```bash
 ./deploy.sh
 ```
 
-Pulls the latest code, rebuilds containers, runs migrations, and collects static files.
+### Frontend build for production
+
+```bash
+cd frontend
+npx ng build --configuration=production
+# Upload the contents of frontend/dist/<project>/ to the frontend host.
+```
 
 ## License
 
