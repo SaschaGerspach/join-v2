@@ -14,9 +14,16 @@ from config.serializers import DetailSerializer
 from contacts_api.models import Contact
 from .models import Task, Subtask, Comment, Label, Attachment
 from .serializers import (
+    AttachmentSerializer,
+    AttachmentUploadSerializer,
+    CommentCreateSerializer,
+    CommentSerializer,
     LabelCreateSerializer,
     LabelSerializer,
     LabelUpdateSerializer,
+    SubtaskCreateSerializer,
+    SubtaskSerializer,
+    SubtaskUpdateSerializer,
     TaskCreateSerializer,
     TaskReorderItemSerializer,
     TaskSerializer,
@@ -242,6 +249,15 @@ def serialize_subtask(subtask):
     }
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: SubtaskSerializer(many=True), 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["POST"],
+    request=SubtaskCreateSerializer,
+    responses={201: SubtaskSerializer, 400: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["GET", "POST"])
 def subtask_list(request, task_pk):
     try:
@@ -263,6 +279,15 @@ def subtask_list(request, task_pk):
     return Response(serialize_subtask(subtask), status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    methods=["PATCH"],
+    request=SubtaskUpdateSerializer,
+    responses={200: SubtaskSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={204: None, 404: DetailSerializer},
+)
 @api_view(["PATCH", "DELETE"])
 def subtask_detail(request, task_pk, pk):
     try:
@@ -335,6 +360,15 @@ def serialize_comment(comment):
     }
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: CommentSerializer(many=True), 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["POST"],
+    request=CommentCreateSerializer,
+    responses={201: CommentSerializer, 400: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["GET", "POST"])
 def comment_list(request, task_pk):
     try:
@@ -357,6 +391,15 @@ def comment_list(request, task_pk):
     return Response(serialize_comment(comment), status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    methods=["PATCH"],
+    request=CommentCreateSerializer,
+    responses={200: CommentSerializer, 400: DetailSerializer, 403: DetailSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={204: None, 403: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["PATCH", "DELETE"])
 def comment_detail(request, task_pk, pk):
     try:
@@ -458,6 +501,15 @@ def serialize_attachment(att, request):
     }
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: AttachmentSerializer(many=True), 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["POST"],
+    request={"multipart/form-data": AttachmentUploadSerializer},
+    responses={201: AttachmentSerializer, 400: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["GET", "POST"])
 def attachment_list(request, task_pk):
     try:
@@ -489,6 +541,7 @@ def attachment_list(request, task_pk):
     return Response(serialize_attachment(att, request), status=status.HTTP_201_CREATED)
 
 
+@extend_schema(responses={204: None, 404: DetailSerializer})
 @api_view(["DELETE"])
 def attachment_detail(request, task_pk, pk):
     try:
@@ -506,6 +559,12 @@ def attachment_detail(request, task_pk, pk):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    responses={
+        (200, "application/octet-stream"): bytes,
+        404: DetailSerializer,
+    },
+)
 @api_view(["GET"])
 def attachment_download(request, task_pk, pk):
     try:

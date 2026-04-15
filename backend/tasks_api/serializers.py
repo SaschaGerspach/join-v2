@@ -58,3 +58,45 @@ class TaskReorderItemSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     order = serializers.IntegerField(required=False)
     column = serializers.IntegerField(required=False)
+
+
+class SubtaskSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    task = serializers.IntegerField()
+    title = serializers.CharField()
+    done = serializers.BooleanField()
+
+
+class SubtaskCreateSerializer(serializers.Serializer):
+    title = serializers.CharField()
+
+
+class SubtaskUpdateSerializer(serializers.Serializer):
+    title = serializers.CharField(required=False)
+    done = serializers.BooleanField(required=False)
+
+
+class CommentSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    task = serializers.IntegerField()
+    author_id = serializers.IntegerField()
+    author_name = serializers.CharField()
+    text = serializers.CharField()
+    created_at = serializers.DateTimeField()
+    updated_at = serializers.DateTimeField()
+
+
+class CommentCreateSerializer(serializers.Serializer):
+    text = serializers.CharField()
+
+
+class AttachmentSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    filename = serializers.CharField()
+    url = serializers.URLField()
+    size = serializers.IntegerField()
+    uploaded_at = serializers.DateTimeField()
+
+
+class AttachmentUploadSerializer(serializers.Serializer):
+    file = serializers.FileField()
