@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.http import FileResponse
 from django.urls import reverse
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -9,8 +10,18 @@ from rest_framework.response import Response
 from boards_api.models import Board
 from boards_api.views import _can_access
 from boards_api.ws_events import send_board_event
+from config.serializers import DetailSerializer
 from contacts_api.models import Contact
 from .models import Task, Subtask, Comment, Label, Attachment
+from .serializers import (
+    LabelCreateSerializer,
+    LabelSerializer,
+    LabelUpdateSerializer,
+    TaskCreateSerializer,
+    TaskReorderItemSerializer,
+    TaskSerializer,
+    TaskUpdateSerializer,
+)
 
 ALLOWED_ATTACHMENT_EXTENSIONS = {
     "png", "jpg", "jpeg", "gif", "webp",
@@ -120,6 +131,17 @@ def serialize_task(task):
     }
 
 
+@extend_schema(
+    methods=["GET"],
+    parameters=[OpenApiParameter(name="board", type=int, required=True, location=OpenApiParameter.QUERY)],
+    responses={200: TaskSerializer(many=True), 400: DetailSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["POST"],
+    parameters=[OpenApiParameter(name="board", type=int, required=True, location=OpenApiParameter.QUERY)],
+    request=TaskCreateSerializer,
+    responses={201: TaskSerializer, 400: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["GET", "POST"])
 def task_list(request):
     board_id = request.query_params.get("board")
@@ -163,6 +185,19 @@ def task_list(request):
     return Response(data, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: TaskSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["PATCH"],
+    request=TaskUpdateSerializer,
+    responses={200: TaskSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={204: None, 404: DetailSerializer},
+)
 @api_view(["GET", "PATCH", "DELETE"])
 def task_detail(request, pk):
     try:
@@ -250,6 +285,10 @@ def subtask_detail(request, task_pk, pk):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    request=TaskReorderItemSerializer(many=True),
+    responses={204: None, 400: DetailSerializer, 403: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["POST"])
 def task_reorder(request):
     items = request.data
@@ -340,6 +379,15 @@ def comment_detail(request, task_pk, pk):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: LabelSerializer(many=True), 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["POST"],
+    request=LabelCreateSerializer,
+    responses={201: LabelSerializer, 400: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["GET", "POST"])
 def label_list(request, board_pk):
     try:
@@ -364,6 +412,15 @@ def label_list(request, board_pk):
     return Response(serialize_label(label), status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    methods=["PATCH"],
+    request=LabelUpdateSerializer,
+    responses={200: LabelSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={204: None, 404: DetailSerializer},
+)
 @api_view(["PATCH", "DELETE"])
 def label_detail(request, board_pk, pk):
     try:
