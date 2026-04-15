@@ -1,13 +1,22 @@
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.conf import settings
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from columns_api.models import Column
+from config.serializers import DetailSerializer
 from .models import Board, BoardMember
+from .serializers import (
+    BoardCreateSerializer,
+    BoardMemberInviteSerializer,
+    BoardMemberSerializer,
+    BoardSerializer,
+    BoardUpdateSerializer,
+)
 
 DEFAULT_COLUMNS = ["To do", "In progress", "Await feedback", "Done"]
 
@@ -46,6 +55,15 @@ def serialize_shared_board(board, user):
     }
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: BoardSerializer(many=True)},
+)
+@extend_schema(
+    methods=["POST"],
+    request=BoardCreateSerializer,
+    responses={201: BoardSerializer, 400: DetailSerializer},
+)
 @api_view(["GET", "POST"])
 def board_list(request):
     if request.method == "GET":
@@ -67,6 +85,19 @@ def board_list(request):
     return Response(serialize_board(board), status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: BoardSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["PATCH"],
+    request=BoardUpdateSerializer,
+    responses={200: BoardSerializer, 403: DetailSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={204: None, 403: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["GET", "PATCH", "DELETE"])
 def board_detail(request, pk):
     try:
@@ -97,6 +128,20 @@ def board_detail(request, pk):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: BoardMemberSerializer(many=True), 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["POST"],
+    request=BoardMemberInviteSerializer,
+    responses={
+        201: BoardMemberSerializer,
+        400: DetailSerializer,
+        403: DetailSerializer,
+        404: DetailSerializer,
+    },
+)
 @api_view(["GET", "POST"])
 def board_members(request, pk):
     try:
@@ -156,6 +201,7 @@ def board_members(request, pk):
     }, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(responses={204: None, 404: DetailSerializer})
 @api_view(["DELETE"])
 def board_member_detail(request, pk, user_pk):
     try:

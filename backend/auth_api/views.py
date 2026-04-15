@@ -13,8 +13,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 
+from config.serializers import DetailSerializer
+
 from .serializers import (
-    DetailSerializer,
     EmailSerializer,
     LoginErrorSerializer,
     LoginSerializer,

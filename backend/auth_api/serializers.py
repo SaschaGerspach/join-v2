@@ -44,10 +44,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     password = serializers.CharField(min_length=8, write_only=True)
 
 
-class DetailSerializer(serializers.Serializer):
-    detail = serializers.CharField()
-
-
 class LoginErrorSerializer(serializers.Serializer):
     detail = serializers.CharField()
     code = serializers.CharField(required=False)
