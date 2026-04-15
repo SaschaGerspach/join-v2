@@ -6,11 +6,25 @@ from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.csrf import ensure_csrf_cookie
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
+
+from .serializers import (
+    DetailSerializer,
+    EmailSerializer,
+    LoginErrorSerializer,
+    LoginSerializer,
+    MeSerializer,
+    PasswordResetConfirmSerializer,
+    RegisterResponseSerializer,
+    RegisterSerializer,
+    UserSerializer,
+    VerifyEmailSerializer,
+)
 
 
 class AuthRateThrottle(AnonRateThrottle):
@@ -21,6 +35,10 @@ class AuthRateThrottle(AnonRateThrottle):
 User = get_user_model()
 
 
+@extend_schema(
+    request=RegisterSerializer,
+    responses={201: RegisterResponseSerializer, 400: DetailSerializer},
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
@@ -63,6 +81,15 @@ def register(request):
     )
 
 
+@extend_schema(
+    request=LoginSerializer,
+    responses={
+        200: UserSerializer,
+        400: DetailSerializer,
+        401: DetailSerializer,
+        403: LoginErrorSerializer,
+    },
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
@@ -99,6 +126,7 @@ def login_view(request):
     })
 
 
+@extend_schema(request=None, responses={204: None})
 @api_view(["POST"])
 def logout_view(request):
     logout(request)
@@ -118,6 +146,10 @@ def _send_verification_email(user):
     )
 
 
+@extend_schema(
+    request=VerifyEmailSerializer,
+    responses={204: None, 400: DetailSerializer},
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def verify_email(request):
@@ -141,6 +173,10 @@ def verify_email(request):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    request=EmailSerializer,
+    responses={204: None, 400: DetailSerializer},
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
@@ -160,6 +196,10 @@ def resend_verification(request):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    request=EmailSerializer,
+    responses={204: None, 400: DetailSerializer},
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
@@ -187,6 +227,10 @@ def password_reset_request(request):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    request=PasswordResetConfirmSerializer,
+    responses={204: None, 400: DetailSerializer},
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def password_reset_confirm(request):
@@ -215,6 +259,7 @@ def password_reset_confirm(request):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(responses={200: MeSerializer})
 @ensure_csrf_cookie
 @api_view(["GET"])
 def me(request):
