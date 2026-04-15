@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../auth/auth.service';
 
 export type BoardWsEvent = {
   event: string;
@@ -9,6 +10,7 @@ export type BoardWsEvent = {
 
 @Injectable({ providedIn: 'root' })
 export class BoardWsService {
+  private readonly auth = inject(AuthService);
   private ws: WebSocket | null = null;
   readonly events$ = new Subject<BoardWsEvent>();
 
@@ -16,7 +18,9 @@ export class BoardWsService {
     this.disconnect();
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
     const host = new URL(environment.apiUrl).host;
-    this.ws = new WebSocket(`${protocol}://${host}/ws/board/${boardId}/`);
+    const token = this.auth.getAccessToken();
+    const query = token ? `?token=${encodeURIComponent(token)}` : '';
+    this.ws = new WebSocket(`${protocol}://${host}/ws/board/${boardId}/${query}`);
 
     this.ws.onmessage = (msg) => {
       try {
