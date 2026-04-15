@@ -1,3 +1,4 @@
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -5,7 +6,13 @@ from rest_framework.response import Response
 from boards_api.models import Board
 from boards_api.views import _can_access
 from boards_api.ws_events import send_board_event
+from config.serializers import DetailSerializer
 from .models import Column
+from .serializers import (
+    ColumnCreateSerializer,
+    ColumnSerializer,
+    ColumnUpdateSerializer,
+)
 
 
 def serialize_column(col):
@@ -17,6 +24,17 @@ def serialize_column(col):
     }
 
 
+@extend_schema(
+    methods=["GET"],
+    parameters=[OpenApiParameter(name="board", type=int, required=True, location=OpenApiParameter.QUERY)],
+    responses={200: ColumnSerializer(many=True), 400: DetailSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["POST"],
+    parameters=[OpenApiParameter(name="board", type=int, required=True, location=OpenApiParameter.QUERY)],
+    request=ColumnCreateSerializer,
+    responses={201: ColumnSerializer, 400: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["GET", "POST"])
 def column_list(request):
     board_id = request.query_params.get("board")
@@ -47,6 +65,15 @@ def column_list(request):
     return Response(data, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    methods=["PATCH"],
+    request=ColumnUpdateSerializer,
+    responses={200: ColumnSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={204: None, 404: DetailSerializer},
+)
 @api_view(["PATCH", "DELETE"])
 def column_detail(request, pk):
     try:
