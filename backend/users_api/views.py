@@ -1,7 +1,11 @@
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from config.serializers import DetailSerializer
+from .serializers import PublicUserSerializer, UserUpdateSerializer
 
 User = get_user_model()
 
@@ -15,12 +19,26 @@ def serialize_user(user):
     }
 
 
+@extend_schema(responses={200: PublicUserSerializer(many=True)})
 @api_view(["GET"])
 def user_list(request):
     users = User.objects.filter(is_active=True).order_by("id")
     return Response([serialize_user(u) for u in users])
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: PublicUserSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["PATCH"],
+    request=UserUpdateSerializer,
+    responses={200: PublicUserSerializer, 400: DetailSerializer, 403: DetailSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={204: None, 403: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["GET", "PATCH", "DELETE"])
 def user_detail(request, pk):
     try:
