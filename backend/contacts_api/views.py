@@ -1,9 +1,16 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from config.serializers import DetailSerializer
 from .models import Contact
+from .serializers import (
+    ContactCreateSerializer,
+    ContactSerializer,
+    ContactUpdateSerializer,
+)
 
 
 class _ContactPagination(PageNumberPagination):
@@ -22,6 +29,15 @@ def serialize_contact(contact):
     }
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: ContactSerializer(many=True)},
+)
+@extend_schema(
+    methods=["POST"],
+    request=ContactCreateSerializer,
+    responses={201: ContactSerializer, 400: DetailSerializer},
+)
 @api_view(["GET", "POST"])
 def contact_list(request):
     if request.method == "GET":
@@ -45,6 +61,15 @@ def contact_list(request):
     return Response(serialize_contact(contact), status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    methods=["PATCH"],
+    request=ContactUpdateSerializer,
+    responses={200: ContactSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={204: None, 404: DetailSerializer},
+)
 @api_view(["PATCH", "DELETE"])
 def contact_detail(request, pk):
     try:
