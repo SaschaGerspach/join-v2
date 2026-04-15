@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.mail import send_mail
 from django.http import FileResponse
 from django.urls import reverse
 from rest_framework import status
@@ -7,6 +9,7 @@ from rest_framework.response import Response
 from boards_api.models import Board
 from boards_api.views import _can_access
 from boards_api.ws_events import send_board_event
+from contacts_api.models import Contact
 from .models import Task, Subtask, Comment, Label, Attachment
 
 ALLOWED_ATTACHMENT_EXTENSIONS = {
@@ -15,6 +18,82 @@ ALLOWED_ATTACHMENT_EXTENSIONS = {
     "doc", "docx", "xls", "xlsx", "ppt", "pptx",
     "zip",
 }
+
+
+def _notify(subject, body, recipients):
+    recipients = [r for r in {r.strip().lower() for r in recipients if r} if r]
+    if not recipients:
+        return
+    send_mail(
+        subject=subject,
+        message=body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=recipients,
+        fail_silently=True,
+    )
+
+
+def _actor_name(user):
+    return user.first_name or user.email
+
+
+def _notify_comment(comment, actor):
+    task = comment.task
+    recipients = set()
+
+    if task.assigned_to_id:
+        try:
+            contact = Contact.objects.get(pk=task.assigned_to_id)
+            if contact.email:
+                recipients.add(contact.email.lower())
+        except Contact.DoesNotExist:
+            pass
+
+    if task.board.created_by_id != actor.id and task.board.created_by.email:
+        recipients.add(task.board.created_by.email.lower())
+
+    prior_authors = (
+        Comment.objects.filter(task=task)
+        .exclude(pk=comment.pk)
+        .select_related("author")
+    )
+    for c in prior_authors:
+        if c.author.email:
+            recipients.add(c.author.email.lower())
+
+    recipients.discard(actor.email.lower())
+
+    if not recipients:
+        return
+    _notify(
+        subject=f'New comment on "{task.title}" — Join',
+        body=(
+            f'{_actor_name(actor)} commented on "{task.title}":\n\n'
+            f"{comment.text}\n\n"
+            f"Open: {settings.FRONTEND_URL}/boards/{task.board_id}"
+        ),
+        recipients=list(recipients),
+    )
+
+
+def _notify_assignment(task, actor):
+    if not task.assigned_to_id:
+        return
+    try:
+        contact = Contact.objects.get(pk=task.assigned_to_id)
+    except Contact.DoesNotExist:
+        return
+    if not contact.email or contact.email.lower() == actor.email.lower():
+        return
+    _notify(
+        subject="You were assigned to a task — Join",
+        body=(
+            f'{_actor_name(actor)} assigned you to "{task.title}" '
+            f'on board "{task.board.title}".\n\n'
+            f"Open: {settings.FRONTEND_URL}/boards/{task.board_id}"
+        ),
+        recipients=[contact.email],
+    )
 
 
 def serialize_label(label):
@@ -78,6 +157,7 @@ def task_list(request):
         assigned_to_id=request.data.get("assigned_to"),
         due_date=request.data.get("due_date"),
     )
+    _notify_assignment(task, request.user)
     data = serialize_task(task)
     send_board_event(board.pk, "task_created", data)
     return Response(data, status=status.HTTP_201_CREATED)
@@ -97,6 +177,7 @@ def task_detail(request, pk):
         return Response(serialize_task(task))
 
     if request.method == "PATCH":
+        previous_assignee_id = task.assigned_to_id
         for field in ["title", "description", "priority", "column", "assigned_to", "due_date", "order"]:
             key = field if field not in ["column", "assigned_to"] else f"{field}_id"
             if field in request.data:
@@ -104,6 +185,8 @@ def task_detail(request, pk):
         task.save()
         if "label_ids" in request.data:
             task.labels.set(Label.objects.filter(pk__in=request.data["label_ids"], board=task.board))
+        if task.assigned_to_id and task.assigned_to_id != previous_assignee_id:
+            _notify_assignment(task, request.user)
         data = serialize_task(task)
         send_board_event(task.board_id, "task_updated", data)
         return Response(data)
@@ -231,6 +314,7 @@ def comment_list(request, task_pk):
         return Response({"detail": "Text is required."}, status=status.HTTP_400_BAD_REQUEST)
 
     comment = Comment.objects.create(task=task, author=request.user, text=text)
+    _notify_comment(comment, request.user)
     return Response(serialize_comment(comment), status=status.HTTP_201_CREATED)
 
 
