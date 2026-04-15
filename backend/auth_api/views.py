@@ -1,14 +1,13 @@
 from django.conf import settings
-from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.views.decorators.csrf import ensure_csrf_cookie
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes, throttle_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
@@ -147,7 +146,6 @@ def login_view(request):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    login(request, user)
     refresh, access = _issue_tokens_for(user)
     response = Response({
         "id": user.pk,
@@ -162,7 +160,6 @@ def login_view(request):
 
 @extend_schema(request=None, responses={204: None})
 @api_view(["POST"])
-@authentication_classes([])
 @permission_classes([AllowAny])
 def logout_view(request):
     raw = request.COOKIES.get(settings.REFRESH_COOKIE_NAME)
@@ -171,7 +168,6 @@ def logout_view(request):
             RefreshToken(raw).blacklist()
         except TokenError:
             pass
-    logout(request)
     response = Response(status=status.HTTP_204_NO_CONTENT)
     _clear_refresh_cookie(response)
     return response
@@ -182,7 +178,6 @@ def logout_view(request):
     responses={200: AccessTokenSerializer, 401: DetailSerializer},
 )
 @api_view(["POST"])
-@authentication_classes([])
 @permission_classes([AllowAny])
 def token_refresh(request):
     raw = request.COOKIES.get(settings.REFRESH_COOKIE_NAME)
@@ -339,7 +334,6 @@ def password_reset_confirm(request):
 
 
 @extend_schema(responses={200: MeSerializer})
-@ensure_csrf_cookie
 @api_view(["GET"])
 def me(request):
     user = request.user

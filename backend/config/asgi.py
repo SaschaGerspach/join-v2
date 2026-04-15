@@ -1,6 +1,5 @@
 import os
 
-from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import OriginValidator
 from django.conf import settings
@@ -15,7 +14,7 @@ from boards_api.routing import websocket_urlpatterns  # noqa: E402
 application = ProtocolTypeRouter({
     "http": django_asgi,
     "websocket": OriginValidator(
-        JWTAuthMiddleware(AuthMiddlewareStack(URLRouter(websocket_urlpatterns))),
+        JWTAuthMiddleware(URLRouter(websocket_urlpatterns)),
         settings.CORS_ALLOWED_ORIGINS,
     ),
 })
