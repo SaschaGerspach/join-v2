@@ -164,10 +164,13 @@ def task_reorder(request):
         return Response({"detail": "Expected a list."}, status=status.HTTP_400_BAD_REQUEST)
 
     task_ids = [item["id"] for item in items if "id" in item]
-    tasks = {
-        t.pk: t for t in Task.objects.filter(pk__in=task_ids)
-        if _can_access(t.board, request.user)
-    }
+    fetched = list(Task.objects.filter(pk__in=task_ids).select_related("board"))
+    if len(fetched) != len(set(task_ids)):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+    for t in fetched:
+        if not _can_access(t.board, request.user):
+            return Response({"detail": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
+    tasks = {t.pk: t for t in fetched}
 
     for item in items:
         task = tasks.get(item.get("id"))
