@@ -90,7 +90,7 @@ class LogoutViewTests(APITestCase):
 
     def test_logout_unauthenticated(self):
         response = self.client.post(self.url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
 class MeViewTests(APITestCase):
@@ -111,4 +111,4 @@ class MeViewTests(APITestCase):
 
     def test_me_unauthenticated(self):
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

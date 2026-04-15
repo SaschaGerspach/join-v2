@@ -29,6 +29,14 @@ class MeSerializer(UserSerializer):
     is_staff = serializers.BooleanField()
 
 
+class LoginResponseSerializer(UserSerializer):
+    access = serializers.CharField()
+
+
+class AccessTokenSerializer(serializers.Serializer):
+    access = serializers.CharField()
+
+
 class EmailSerializer(serializers.Serializer):
     email = serializers.EmailField()
 

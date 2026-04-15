@@ -12,20 +12,49 @@ from rest_framework.decorators import api_view, permission_classes, throttle_cla
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from config.serializers import DetailSerializer
 
 from .serializers import (
+    AccessTokenSerializer,
     EmailSerializer,
     LoginErrorSerializer,
+    LoginResponseSerializer,
     LoginSerializer,
     MeSerializer,
     PasswordResetConfirmSerializer,
     RegisterResponseSerializer,
     RegisterSerializer,
-    UserSerializer,
     VerifyEmailSerializer,
 )
+
+
+def _set_refresh_cookie(response, token):
+    response.set_cookie(
+        key=settings.REFRESH_COOKIE_NAME,
+        value=str(token),
+        max_age=int(settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds()),
+        httponly=True,
+        secure=settings.SESSION_COOKIE_SECURE,
+        samesite=settings.SESSION_COOKIE_SAMESITE,
+        path=settings.REFRESH_COOKIE_PATH,
+        domain=getattr(settings, "SESSION_COOKIE_DOMAIN", None),
+    )
+
+
+def _clear_refresh_cookie(response):
+    response.delete_cookie(
+        key=settings.REFRESH_COOKIE_NAME,
+        path=settings.REFRESH_COOKIE_PATH,
+        domain=getattr(settings, "SESSION_COOKIE_DOMAIN", None),
+    )
+
+
+def _issue_tokens_for(user):
+    refresh = RefreshToken.for_user(user)
+    return refresh, refresh.access_token
 
 
 class AuthRateThrottle(AnonRateThrottle):
@@ -85,7 +114,7 @@ def register(request):
 @extend_schema(
     request=LoginSerializer,
     responses={
-        200: UserSerializer,
+        200: LoginResponseSerializer,
         400: DetailSerializer,
         401: DetailSerializer,
         403: LoginErrorSerializer,
@@ -119,19 +148,66 @@ def login_view(request):
         )
 
     login(request, user)
-    return Response({
+    refresh, access = _issue_tokens_for(user)
+    response = Response({
         "id": user.pk,
         "email": user.email,
         "first_name": user.first_name,
         "last_name": user.last_name,
+        "access": str(access),
     })
+    _set_refresh_cookie(response, refresh)
+    return response
 
 
 @extend_schema(request=None, responses={204: None})
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def logout_view(request):
+    raw = request.COOKIES.get(settings.REFRESH_COOKIE_NAME)
+    if raw:
+        try:
+            RefreshToken(raw).blacklist()
+        except TokenError:
+            pass
     logout(request)
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    response = Response(status=status.HTTP_204_NO_CONTENT)
+    _clear_refresh_cookie(response)
+    return response
+
+
+@extend_schema(
+    request=None,
+    responses={200: AccessTokenSerializer, 401: DetailSerializer},
+)
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def token_refresh(request):
+    raw = request.COOKIES.get(settings.REFRESH_COOKIE_NAME)
+    if not raw:
+        return Response({"detail": "No refresh token."}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        refresh = RefreshToken(raw)
+    except TokenError:
+        response = Response({"detail": "Invalid or expired refresh token."}, status=status.HTTP_401_UNAUTHORIZED)
+        _clear_refresh_cookie(response)
+        return response
+
+    access = refresh.access_token
+
+    if settings.SIMPLE_JWT.get("ROTATE_REFRESH_TOKENS"):
+        if settings.SIMPLE_JWT.get("BLACKLIST_AFTER_ROTATION"):
+            try:
+                refresh.blacklist()
+            except AttributeError:
+                pass
+        refresh.set_jti()
+        refresh.set_exp()
+        refresh.set_iat()
+
+    response = Response({"access": str(access)})
+    _set_refresh_cookie(response, refresh)
+    return response
 
 
 def _send_verification_email(user):
