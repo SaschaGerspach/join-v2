@@ -84,7 +84,7 @@ class LogoutViewTests(APITestCase):
         )
 
     def test_logout_success(self):
-        self.client.login(username="test@example.com", password="securepass123")
+        self.client.force_authenticate(user=self.user)
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -103,7 +103,7 @@ class MeViewTests(APITestCase):
         )
 
     def test_me_authenticated(self):
-        self.client.login(username="test@example.com", password="securepass123")
+        self.client.force_authenticate(user=self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["email"], "test@example.com")

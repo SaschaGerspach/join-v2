@@ -15,7 +15,7 @@ class ColumnListTests(APITestCase):
         self.user = User.objects.create_user(email="a@example.com", password="pass")
         self.other = User.objects.create_user(email="b@example.com", password="pass")
         self.board = Board.objects.create(title="Board", created_by=self.user)
-        self.client.login(username="a@example.com", password="pass")
+        self.client.force_authenticate(user=self.user)
 
     def test_list_columns(self):
         Column.objects.create(board=self.board, title="Todo", order=0)
@@ -48,7 +48,7 @@ class ColumnDetailTests(APITestCase):
         self.other = User.objects.create_user(email="b@example.com", password="pass")
         self.board = Board.objects.create(title="Board", created_by=self.user)
         self.column = Column.objects.create(board=self.board, title="Todo", order=0)
-        self.client.login(username="a@example.com", password="pass")
+        self.client.force_authenticate(user=self.user)
 
     def url(self, pk):
         return f"/columns/{pk}/"
@@ -59,8 +59,7 @@ class ColumnDetailTests(APITestCase):
         self.assertEqual(response.data["title"], "Updated")
 
     def test_patch_column_forbidden(self):
-        self.client.logout()
-        self.client.login(username="b@example.com", password="pass")
+        self.client.force_authenticate(user=self.other)
         response = self.client.patch(self.url(self.column.pk), {"title": "Hacked"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -70,7 +69,6 @@ class ColumnDetailTests(APITestCase):
         self.assertEqual(Column.objects.count(), 0)
 
     def test_delete_column_forbidden(self):
-        self.client.logout()
-        self.client.login(username="b@example.com", password="pass")
+        self.client.force_authenticate(user=self.other)
         response = self.client.delete(self.url(self.column.pk))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

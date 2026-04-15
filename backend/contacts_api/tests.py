@@ -13,7 +13,7 @@ class ContactListTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(email="a@example.com", password="pass")
         self.other = User.objects.create_user(email="b@example.com", password="pass")
-        self.client.login(username="a@example.com", password="pass")
+        self.client.force_authenticate(user=self.user)
 
     def test_list_own_contacts(self):
         Contact.objects.create(owner=self.user, first_name="Anna", last_name="A", email="anna@example.com")
@@ -34,7 +34,7 @@ class ContactListTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_list_unauthenticated(self):
-        self.client.logout()
+        self.client.force_authenticate(user=None)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -44,7 +44,7 @@ class ContactDetailTests(APITestCase):
         self.user = User.objects.create_user(email="a@example.com", password="pass")
         self.other = User.objects.create_user(email="b@example.com", password="pass")
         self.contact = Contact.objects.create(owner=self.user, first_name="Anna", last_name="A", email="anna@example.com")
-        self.client.login(username="a@example.com", password="pass")
+        self.client.force_authenticate(user=self.user)
 
     def url(self, pk):
         return f"/contacts/{pk}/"

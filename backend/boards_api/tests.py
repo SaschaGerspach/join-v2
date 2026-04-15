@@ -13,7 +13,7 @@ class BoardListTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(email="a@example.com", password="pass")
         self.other = User.objects.create_user(email="b@example.com", password="pass")
-        self.client.login(username="a@example.com", password="pass")
+        self.client.force_authenticate(user=self.user)
 
     def test_list_own_boards(self):
         Board.objects.create(title="My Board", created_by=self.user)
@@ -34,7 +34,7 @@ class BoardListTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_list_unauthenticated(self):
-        self.client.logout()
+        self.client.force_authenticate(user=None)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -44,7 +44,7 @@ class BoardDetailTests(APITestCase):
         self.user = User.objects.create_user(email="a@example.com", password="pass")
         self.other = User.objects.create_user(email="b@example.com", password="pass")
         self.board = Board.objects.create(title="My Board", created_by=self.user)
-        self.client.login(username="a@example.com", password="pass")
+        self.client.force_authenticate(user=self.user)
 
     def url(self, pk):
         return f"/boards/{pk}/"
@@ -64,8 +64,7 @@ class BoardDetailTests(APITestCase):
         self.assertEqual(response.data["title"], "Updated")
 
     def test_patch_other_board_returns_404(self):
-        self.client.logout()
-        self.client.login(username="b@example.com", password="pass")
+        self.client.force_authenticate(user=self.other)
         response = self.client.patch(self.url(self.board.pk), {"title": "Hacked"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -75,7 +74,6 @@ class BoardDetailTests(APITestCase):
         self.assertEqual(Board.objects.count(), 0)
 
     def test_delete_other_board_returns_404(self):
-        self.client.logout()
-        self.client.login(username="b@example.com", password="pass")
+        self.client.force_authenticate(user=self.other)
         response = self.client.delete(self.url(self.board.pk))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

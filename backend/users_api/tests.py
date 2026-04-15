@@ -11,7 +11,7 @@ class UserListTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(email="a@example.com", password="pass", first_name="Anna", last_name="A")
         User.objects.create_user(email="b@example.com", password="pass", first_name="Bob", last_name="B")
-        self.client.login(username="a@example.com", password="pass")
+        self.client.force_authenticate(user=self.user)
 
     def test_list_returns_all_active_users(self):
         response = self.client.get(self.url)
@@ -19,7 +19,7 @@ class UserListTests(APITestCase):
         self.assertEqual(len(response.data), 2)
 
     def test_list_unauthenticated(self):
-        self.client.logout()
+        self.client.force_authenticate(user=None)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -28,7 +28,7 @@ class UserDetailTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(email="a@example.com", password="pass", first_name="Anna", last_name="A")
         self.other = User.objects.create_user(email="b@example.com", password="pass", first_name="Bob", last_name="B")
-        self.client.login(username="a@example.com", password="pass")
+        self.client.force_authenticate(user=self.user)
 
     def url(self, pk):
         return f"/users/{pk}/"
