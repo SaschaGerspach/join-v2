@@ -100,8 +100,11 @@ def board_detail(request, pk):
 @api_view(["GET", "POST"])
 def board_members(request, pk):
     try:
-        board = Board.objects.get(pk=pk, created_by=request.user)
+        board = Board.objects.get(pk=pk)
     except Board.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not _can_access(board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -113,6 +116,9 @@ def board_members(request, pk):
             "last_name": m.user.last_name,
             "invited_at": m.invited_at,
         } for m in members])
+
+    if board.created_by != request.user:
+        return Response({"detail": "Only the owner can invite members."}, status=status.HTTP_403_FORBIDDEN)
 
     email = request.data.get("email", "").strip().lower()
     if not email:
