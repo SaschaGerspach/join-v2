@@ -8,7 +8,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.csrf import ensure_csrf_cookie
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes, throttle_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
@@ -162,6 +162,7 @@ def login_view(request):
 
 @extend_schema(request=None, responses={204: None})
 @api_view(["POST"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def logout_view(request):
     raw = request.COOKIES.get(settings.REFRESH_COOKIE_NAME)
@@ -181,6 +182,7 @@ def logout_view(request):
     responses={200: AccessTokenSerializer, 401: DetailSerializer},
 )
 @api_view(["POST"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def token_refresh(request):
     raw = request.COOKIES.get(settings.REFRESH_COOKIE_NAME)
