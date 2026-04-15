@@ -1,3 +1,5 @@
+from django.http import FileResponse
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -293,10 +295,11 @@ def label_detail(request, board_pk, pk):
 
 
 def serialize_attachment(att, request):
+    download_url = reverse("tasks_api:attachment-download", kwargs={"task_pk": att.task_id, "pk": att.pk})
     return {
         "id": att.pk,
         "filename": att.filename,
-        "url": request.build_absolute_uri(att.file.url),
+        "url": request.build_absolute_uri(download_url),
         "uploaded_at": att.uploaded_at,
     }
 
@@ -337,3 +340,16 @@ def attachment_detail(request, task_pk, pk):
     att.file.delete()
     att.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET"])
+def attachment_download(request, task_pk, pk):
+    try:
+        att = Attachment.objects.select_related("task__board").get(pk=pk, task_id=task_pk)
+    except Attachment.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not _can_access(att.task.board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    return FileResponse(att.file.open("rb"), as_attachment=True, filename=att.filename)

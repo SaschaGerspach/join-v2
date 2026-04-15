@@ -13,4 +13,5 @@ urlpatterns = [
     path("<int:task_pk>/comments/<int:pk>/", views.comment_detail, name="comment-detail"),
     path("<int:task_pk>/attachments/", views.attachment_list, name="attachment-list"),
     path("<int:task_pk>/attachments/<int:pk>/", views.attachment_detail, name="attachment-detail"),
+    path("<int:task_pk>/attachments/<int:pk>/download/", views.attachment_download, name="attachment-download"),
 ]

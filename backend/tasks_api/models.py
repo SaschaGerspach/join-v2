@@ -1,7 +1,13 @@
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 
 from boards_api.models import Board
 from columns_api.models import Column
+
+
+def _private_storage():
+    return FileSystemStorage(location=settings.PRIVATE_MEDIA_ROOT)
 
 
 class Task(models.Model):
@@ -78,7 +84,7 @@ def attachment_path(instance, filename):
 
 class Attachment(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="attachments")
-    file = models.FileField(upload_to=attachment_path)
+    file = models.FileField(upload_to=attachment_path, storage=_private_storage)
     filename = models.CharField(max_length=255)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
