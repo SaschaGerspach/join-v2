@@ -469,6 +469,13 @@ $priority-urgent: #ff3d00;
   white-space: nowrap;
 }
 
+.attachment-badge {
+  font-size: 0.75rem;
+  color: $color-muted;
+  white-space: nowrap;
+  margin-left: 0.5rem;
+}
+
 // ─── Task Input ───────────────────────────────────────────────────────────────
 
 .task-input-card {

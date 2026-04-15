@@ -166,6 +166,9 @@
                   <span class="subtask-progress-label">{{ task.subtask_done_count }}/{{ task.subtask_count }}</span>
                 </div>
               }
+              @if (task.attachment_count > 0) {
+                <span class="attachment-badge" title="Attachments">📎 {{ task.attachment_count }}</span>
+              }
             </div>
           }
 

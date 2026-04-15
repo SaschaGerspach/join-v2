@@ -36,6 +36,7 @@ def serialize_task(task):
         "order": task.order,
         "subtask_count": subtasks.count(),
         "subtask_done_count": subtasks.filter(done=True).count(),
+        "attachment_count": task.attachments.count(),
         "labels": [serialize_label(label) for label in task.labels.all()],
     }
 
@@ -338,6 +339,7 @@ def attachment_list(request, task_pk):
         )
 
     att = Attachment.objects.create(task=task, file=file, filename=file.name)
+    send_board_event(task.board_id, "task_updated", serialize_task(task))
     return Response(serialize_attachment(att, request), status=status.HTTP_201_CREATED)
 
 
@@ -351,8 +353,10 @@ def attachment_detail(request, task_pk, pk):
     if not _can_access(att.task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    task = att.task
     att.file.delete()
     att.delete()
+    send_board_event(task.board_id, "task_updated", serialize_task(task))
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
