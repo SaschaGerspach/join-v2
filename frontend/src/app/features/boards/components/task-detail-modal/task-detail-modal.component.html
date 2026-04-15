@@ -112,6 +112,7 @@
           @for (att of attachments(); track att.id) {
             <div class="attachment-item">
               <a [href]="att.url" target="_blank" class="attachment-link">{{ att.filename }}</a>
+              <span class="attachment-size">{{ formatSize(att.size) }}</span>
               <button class="btn-remove-sub" (click)="deleteAttachment(att)">&#10005;</button>
             </div>
           }

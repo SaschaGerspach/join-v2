@@ -237,6 +237,12 @@ $priority-urgent: #ff3d00;
   &:hover { text-decoration: underline; }
 }
 
+.attachment-size {
+  font-size: 0.75rem;
+  color: $color-muted;
+  white-space: nowrap;
+}
+
 .file-input {
   font-size: 0.85rem;
   color: var(--color-text);

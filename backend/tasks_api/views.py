@@ -304,10 +304,15 @@ def label_detail(request, board_pk, pk):
 
 def serialize_attachment(att, request):
     download_url = reverse("tasks_api:attachment-download", kwargs={"task_pk": att.task_id, "pk": att.pk})
+    try:
+        size = att.file.size
+    except (OSError, ValueError):
+        size = 0
     return {
         "id": att.pk,
         "filename": att.filename,
         "url": request.build_absolute_uri(download_url),
+        "size": size,
         "uploaded_at": att.uploaded_at,
     }
 

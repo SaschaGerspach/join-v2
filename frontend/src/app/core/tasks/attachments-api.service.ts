@@ -7,6 +7,7 @@ export type Attachment = {
   id: number;
   filename: string;
   url: string;
+  size: number;
   uploaded_at: string;
 };
 
