@@ -9,6 +9,13 @@ from boards_api.views import _can_access
 from boards_api.ws_events import send_board_event
 from .models import Task, Subtask, Comment, Label, Attachment
 
+ALLOWED_ATTACHMENT_EXTENSIONS = {
+    "png", "jpg", "jpeg", "gif", "webp",
+    "pdf", "txt", "md", "csv",
+    "doc", "docx", "xls", "xlsx", "ppt", "pptx",
+    "zip",
+}
+
 
 def serialize_label(label):
     return {"id": label.pk, "name": label.name, "color": label.color}
@@ -322,6 +329,13 @@ def attachment_list(request, task_pk):
         return Response({"detail": "File is required."}, status=status.HTTP_400_BAD_REQUEST)
     if file.size > 5 * 1024 * 1024:
         return Response({"detail": "File too large (max 5MB)."}, status=status.HTTP_400_BAD_REQUEST)
+
+    ext = file.name.rsplit(".", 1)[-1].lower() if "." in file.name else ""
+    if ext not in ALLOWED_ATTACHMENT_EXTENSIONS:
+        return Response(
+            {"detail": "File type not allowed."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     att = Attachment.objects.create(task=task, file=file, filename=file.name)
     return Response(serialize_attachment(att, request), status=status.HTTP_201_CREATED)

@@ -119,7 +119,12 @@
             <span class="comments-empty">No files attached.</span>
           }
         </div>
-        <input type="file" class="file-input" (change)="onFileSelected($event)" />
+        <input
+          type="file"
+          class="file-input"
+          accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.md,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
+          (change)="onFileSelected($event)"
+        />
       </div>
 
       <div class="field-group">

@@ -64,6 +64,13 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
 
   attachments = signal<Attachment[]>([]);
 
+  private readonly allowedExtensions = new Set([
+    'png', 'jpg', 'jpeg', 'gif', 'webp',
+    'pdf', 'txt', 'md', 'csv',
+    'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+    'zip',
+  ]);
+
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
 
   ngAfterViewInit(): void {
@@ -183,6 +190,13 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
       this.toast.show('File too large (max 5MB).', 'error');
+      input.value = '';
+      return;
+    }
+    const ext = file.name.includes('.') ? file.name.split('.').pop()!.toLowerCase() : '';
+    if (!this.allowedExtensions.has(ext)) {
+      this.toast.show('File type not allowed.', 'error');
+      input.value = '';
       return;
     }
     this.attachmentsApi.upload(this.task().id, file).subscribe({
