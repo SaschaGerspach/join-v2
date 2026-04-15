@@ -20,6 +20,8 @@ export class AuthService {
     private readonly _user = signal<AuthUser | null>(null);
     user = this._user.asReadonly();
 
+    private accessToken: string | null = null;
+
     init(): void {
         this._authChecked.set(false);
 
@@ -42,16 +44,30 @@ export class AuthService {
 
     login(email: string, password: string) {
         return this.api.login({ email, password }).pipe(
-            tap((u) => this._user.set(u))
+            tap((res) => {
+                const { access, ...user } = res;
+                this.accessToken = access;
+                this._user.set(user as AuthUser);
+            })
         );
     }
 
     clearUser(): void {
         this._user.set(null);
+        this.accessToken = null;
     }
 
     logout(): void {
         this.api.logout().subscribe();
         this._user.set(null);
+        this.accessToken = null;
+    }
+
+    getAccessToken(): string | null {
+        return this.accessToken;
+    }
+
+    setAccessToken(token: string | null): void {
+        this.accessToken = token;
     }
 }

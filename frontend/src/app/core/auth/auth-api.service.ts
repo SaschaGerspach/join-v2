@@ -16,6 +16,8 @@ type RegisterRequest = {
     last_name: string;
 };
 
+export type LoginResponse = AuthUser & { access: string };
+
 @Injectable({providedIn: 'root'})
 export class AuthApiService {
     private readonly http = inject(HttpClient);
@@ -34,8 +36,14 @@ export class AuthApiService {
         });
     }
 
-    login(payload: LoginRequest): Observable<AuthUser> {
-        return this.http.post<AuthUser>(`${this.baseUrl}/auth/login`, payload, {
+    login(payload: LoginRequest): Observable<LoginResponse> {
+        return this.http.post<LoginResponse>(`${this.baseUrl}/auth/login`, payload, {
+            withCredentials: true,
+        });
+    }
+
+    refreshToken(): Observable<{ access: string }> {
+        return this.http.post<{ access: string }>(`${this.baseUrl}/auth/token/refresh`, null, {
             withCredentials: true,
         });
     }
