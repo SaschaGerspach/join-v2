@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { PendingEmailService } from '../../../../core/auth/pending-email.service';
 
 @Component({
   selector: 'app-login-page',
@@ -13,6 +14,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 export class LoginPageComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly pendingEmail = inject(PendingEmailService);
 
   email = '';
   password = '';
@@ -21,6 +23,14 @@ export class LoginPageComponent {
   submitting = signal(false);
 
   unverifiedEmail = signal<string | null>(null);
+
+  resendVerification(): void {
+    const email = this.unverifiedEmail();
+    if (email) {
+      this.pendingEmail.set(email);
+      this.router.navigate(['/verify-email-sent']);
+    }
+  }
 
   login(form: NgForm): void {
     if (form.invalid) return;

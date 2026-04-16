@@ -14,6 +14,7 @@ from boards_api.models import Board
 from boards_api.views import _can_access
 from boards_api.ws_events import send_board_event
 from config.serializers import DetailSerializer
+from columns_api.models import Column
 from contacts_api.models import Contact
 from .models import Task, Subtask, Comment, Label, Attachment
 from .serializers import (
@@ -183,6 +184,8 @@ def task_list(request):
     if not column_id:
         first_column = board.columns.order_by("order").first()
         column_id = first_column.pk if first_column else None
+    elif not Column.objects.filter(pk=column_id, board=board).exists():
+        return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
 
     assigned_to_id = request.data.get("assigned_to")
     if assigned_to_id and not Contact.objects.filter(pk=assigned_to_id, owner=request.user).exists():
@@ -233,6 +236,9 @@ def task_detail(request, pk):
         if "assigned_to" in request.data and request.data["assigned_to"]:
             if not Contact.objects.filter(pk=request.data["assigned_to"], owner=request.user).exists():
                 return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
+        if "column" in request.data and request.data["column"]:
+            if not Column.objects.filter(pk=request.data["column"], board=task.board).exists():
+                return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
         previous_assignee_id = task.assigned_to_id
         for field in ["title", "description", "priority", "column", "assigned_to", "due_date", "order"]:
             key = field if field not in ["column", "assigned_to"] else f"{field}_id"
@@ -343,6 +349,9 @@ def task_reorder(request):
             return Response({"detail": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
     tasks = {t.pk: t for t in fetched}
 
+    board_ids = {t.board_id for t in fetched}
+    valid_columns = set(Column.objects.filter(board_id__in=board_ids).values_list("pk", flat=True))
+
     for item in items:
         task = tasks.get(item.get("id"))
         if not task:
@@ -350,6 +359,8 @@ def task_reorder(request):
         if "order" in item:
             task.order = item["order"]
         if "column" in item:
+            if item["column"] not in valid_columns:
+                return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
             task.column_id = item["column"]
 
     Task.objects.bulk_update(list(tasks.values()), ["order", "column_id"])

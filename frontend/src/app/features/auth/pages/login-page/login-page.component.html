@@ -55,7 +55,7 @@
       @if (unverifiedEmail()) {
         <p class="error-message">
           Email not verified.
-          <a [routerLink]="['/verify-email-sent']" [queryParams]="{email: unverifiedEmail()}" class="link-subtle">Resend link</a>
+          <a href="#" (click)="resendVerification(); $event.preventDefault()" class="link-subtle">Resend link</a>
         </p>
       }
 
