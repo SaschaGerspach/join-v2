@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.conf import settings
@@ -119,7 +121,7 @@ def board_detail(request, pk):
             board.title = request.data["title"].strip()
         if "color" in request.data:
             color = request.data["color"].strip()
-            if len(color) == 7 and color.startswith("#"):
+            if re.fullmatch(r'#[0-9a-fA-F]{6}', color):
                 board.color = color
         board.save()
         return Response(serialize_shared_board(board, request.user))

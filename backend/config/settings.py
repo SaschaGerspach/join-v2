@@ -170,6 +170,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 PRIVATE_MEDIA_ROOT = BASE_DIR / 'private_media'
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2_621_440  # 2.5MB
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

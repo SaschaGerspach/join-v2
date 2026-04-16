@@ -180,13 +180,17 @@ def task_list(request):
         first_column = board.columns.order_by("order").first()
         column_id = first_column.pk if first_column else None
 
+    assigned_to_id = request.data.get("assigned_to")
+    if assigned_to_id and not Contact.objects.filter(pk=assigned_to_id, owner=request.user).exists():
+        return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
+
     task = Task.objects.create(
         board=board,
         title=title,
         description=request.data.get("description", ""),
         priority=request.data.get("priority", Task.Priority.MEDIUM),
         column_id=column_id,
-        assigned_to_id=request.data.get("assigned_to"),
+        assigned_to_id=assigned_to_id,
         due_date=request.data.get("due_date"),
     )
     _notify_assignment(task, request.user)
@@ -222,6 +226,9 @@ def task_detail(request, pk):
         return Response(serialize_task(task))
 
     if request.method == "PATCH":
+        if "assigned_to" in request.data and request.data["assigned_to"]:
+            if not Contact.objects.filter(pk=request.data["assigned_to"], owner=request.user).exists():
+                return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
         previous_assignee_id = task.assigned_to_id
         for field in ["title", "description", "priority", "column", "assigned_to", "due_date", "order"]:
             key = field if field not in ["column", "assigned_to"] else f"{field}_id"
