@@ -18,9 +18,16 @@ export class BoardWsService {
     this.disconnect();
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
     const host = new URL(environment.apiUrl).host;
-    const token = this.auth.getAccessToken();
-    const query = token ? `?token=${encodeURIComponent(token)}` : '';
-    this.ws = new WebSocket(`${protocol}://${host}/ws/board/${boardId}/${query}`);
+    this.ws = new WebSocket(`${protocol}://${host}/ws/board/${boardId}/`);
+
+    this.ws.onopen = () => {
+      const token = this.auth.getAccessToken();
+      if (token) {
+        this.ws?.send(JSON.stringify({ type: 'authenticate', token }));
+      } else {
+        this.ws?.close();
+      }
+    };
 
     this.ws.onmessage = (msg) => {
       try {

@@ -18,14 +18,11 @@ from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() == 'true'
+DEBUG = os.environ.get('DJANGO_DEBUG', 'false').lower() == 'true'
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
-    if DEBUG:
-        SECRET_KEY = 'django-insecure-xj-26swr2^dfo2a)2o3^dp3a0zqo8tqlk+t()^y%j=dm%=d00e'
-    else:
-        raise ImproperlyConfigured('DJANGO_SECRET_KEY must be set when DJANGO_DEBUG=false')
+    raise ImproperlyConfigured('DJANGO_SECRET_KEY must be set')
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost 127.0.0.1').split()
 
@@ -211,7 +208,7 @@ SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', _secure_cookies_
 
 CSRF_COOKIE_SAMESITE = os.environ.get('CSRF_COOKIE_SAMESITE', _samesite_default)
 CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', _secure_cookies_default).lower() == 'true'
-CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_HTTPONLY = True
 
 _cookie_domain = os.environ.get('COOKIE_DOMAIN', '').strip()
 if _cookie_domain:
