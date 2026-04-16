@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
+import { PendingEmailService } from '../../../../core/auth/pending-email.service';
 
 @Component({
   selector: 'app-verify-email-sent-page',
@@ -35,7 +36,8 @@ import { AuthApiService } from '../../../../core/auth/auth-api.service';
 })
 export class VerifyEmailSentPageComponent implements OnInit {
   private readonly authApi = inject(AuthApiService);
-  private readonly route = inject(ActivatedRoute);
+  private readonly pendingEmail = inject(PendingEmailService);
+  private readonly router = inject(Router);
 
   email = signal('');
   resending = signal(false);
@@ -43,7 +45,12 @@ export class VerifyEmailSentPageComponent implements OnInit {
   error = signal('');
 
   ngOnInit(): void {
-    this.email.set(this.route.snapshot.queryParamMap.get('email') ?? '');
+    const email = this.pendingEmail.consume();
+    if (!email) {
+      this.router.navigate(['/register']);
+      return;
+    }
+    this.email.set(email);
   }
 
   resend(): void {

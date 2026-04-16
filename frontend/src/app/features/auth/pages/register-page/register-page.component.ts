@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { PendingEmailService } from '../../../../core/auth/pending-email.service';
 
 @Component({
   selector: 'app-register-page',
@@ -15,6 +16,7 @@ export class RegisterPageComponent {
   private readonly api = inject(AuthApiService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly pendingEmail = inject(PendingEmailService);
 
   firstName = '';
   lastName = '';
@@ -47,7 +49,8 @@ export class RegisterPageComponent {
       last_name: this.lastName,
     }).subscribe({
       next: () => {
-        this.router.navigate(['/verify-email-sent'], { queryParams: { email: this.email } });
+        this.pendingEmail.set(this.email);
+        this.router.navigate(['/verify-email-sent']);
       },
       error: (err) => {
         this.error.set(err?.error?.detail ?? 'Registration failed. Email may already be in use.');

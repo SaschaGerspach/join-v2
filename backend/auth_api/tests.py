@@ -33,7 +33,7 @@ class RegisterViewTests(APITestCase):
             "email": "test@example.com",
             "password": "otherpass123",
         })
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
 class LoginViewTests(APITestCase):

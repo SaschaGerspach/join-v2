@@ -1,3 +1,6 @@
+import re
+import uuid
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.http import FileResponse
@@ -536,7 +539,9 @@ def attachment_list(request, task_pk):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    att = Attachment.objects.create(task=task, file=file, filename=file.name)
+    safe_name = re.sub(r'[^\w.\-]', '_', file.name)
+    file.name = f"{uuid.uuid4().hex}_{safe_name}"
+    att = Attachment.objects.create(task=task, file=file, filename=safe_name)
     send_board_event(task.board_id, "task_updated", serialize_task(task))
     return Response(serialize_attachment(att, request), status=status.HTTP_201_CREATED)
 

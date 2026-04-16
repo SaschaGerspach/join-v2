@@ -181,11 +181,13 @@ def board_members(request, pk):
     if not created:
         return Response({"detail": "User is already a member."}, status=status.HTTP_400_BAD_REQUEST)
 
+    inviter = (request.user.first_name or request.user.email).replace('\n', '').replace('\r', '')
+    board_title = board.title.replace('\n', '').replace('\r', '')
     send_mail(
         subject="You've been invited to a board — Join",
         message=(
-            f"{request.user.first_name or request.user.email} invited you to the board "
-            f'"{board.title}" on Join.\n\n'
+            f"{inviter} invited you to the board "
+            f'"{board_title}" on Join.\n\n'
             f"Log in to access it: {settings.FRONTEND_URL}/boards/{board.pk}"
         ),
         from_email=settings.DEFAULT_FROM_EMAIL,

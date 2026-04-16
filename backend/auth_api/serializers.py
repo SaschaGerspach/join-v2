@@ -9,7 +9,6 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class RegisterResponseSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
     email = serializers.EmailField()
 
 

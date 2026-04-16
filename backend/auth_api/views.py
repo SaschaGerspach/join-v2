@@ -91,8 +91,8 @@ def register(request):
 
     if User.objects.filter(email=email).exists():
         return Response(
-            {"detail": "A user with this email already exists."},
-            status=status.HTTP_400_BAD_REQUEST,
+            {"email": email},
+            status=status.HTTP_201_CREATED,
         )
 
     user = User.objects.create_user(
@@ -105,7 +105,7 @@ def register(request):
     _send_verification_email(user)
 
     return Response(
-        {"id": user.pk, "email": user.email},
+        {"email": user.email},
         status=status.HTTP_201_CREATED,
     )
 
