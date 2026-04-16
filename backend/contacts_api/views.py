@@ -55,7 +55,7 @@ def contact_list(request):
         owner=request.user,
         first_name=request.data["first_name"].strip(),
         last_name=request.data["last_name"].strip(),
-        email=request.data["email"].strip(),
+        email=request.data["email"].strip().lower(),
         phone=request.data.get("phone", "").strip(),
     )
     return Response(serialize_contact(contact), status=status.HTTP_201_CREATED)
@@ -80,7 +80,10 @@ def contact_detail(request, pk):
     if request.method == "PATCH":
         for field in ["first_name", "last_name", "email", "phone"]:
             if field in request.data:
-                setattr(contact, field, request.data[field].strip())
+                value = request.data[field].strip()
+                if field == "email":
+                    value = value.lower()
+                setattr(contact, field, value)
         contact.save()
         return Response(serialize_contact(contact))
 

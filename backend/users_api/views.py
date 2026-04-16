@@ -63,7 +63,10 @@ def user_detail(request, pk):
             return Response({"detail": "You can only edit your own profile."}, status=status.HTTP_403_FORBIDDEN)
         for field in ["first_name", "last_name", "email"]:
             if field in request.data:
-                setattr(user, field, request.data[field])
+                value = request.data[field].strip()
+                if field == "email":
+                    value = value.lower()
+                setattr(user, field, value)
         if "password" in request.data:
             new_password = request.data["password"].strip()
             if len(new_password) < 8:

@@ -54,8 +54,12 @@ def _notify(subject, body, recipients):
     )
 
 
+def _sanitize(value):
+    return value.replace('\n', '').replace('\r', '')
+
+
 def _actor_name(user):
-    return user.first_name or user.email
+    return _sanitize(user.first_name or user.email)
 
 
 def _notify_comment(comment, actor):
@@ -87,10 +91,10 @@ def _notify_comment(comment, actor):
     if not recipients:
         return
     _notify(
-        subject=f'New comment on "{task.title}" — Join',
+        subject=f'New comment on "{_sanitize(task.title)}" — Join',
         body=(
-            f'{_actor_name(actor)} commented on "{task.title}":\n\n'
-            f"{comment.text}\n\n"
+            f'{_actor_name(actor)} commented on "{_sanitize(task.title)}":\n\n'
+            f"{_sanitize(comment.text)}\n\n"
             f"Open: {settings.FRONTEND_URL}/boards/{task.board_id}"
         ),
         recipients=list(recipients),
@@ -109,8 +113,8 @@ def _notify_assignment(task, actor):
     _notify(
         subject="You were assigned to a task — Join",
         body=(
-            f'{_actor_name(actor)} assigned you to "{task.title}" '
-            f'on board "{task.board.title}".\n\n'
+            f'{_actor_name(actor)} assigned you to "{_sanitize(task.title)}" '
+            f'on board "{_sanitize(task.board.title)}".\n\n'
             f"Open: {settings.FRONTEND_URL}/boards/{task.board_id}"
         ),
         recipients=[contact.email],
@@ -458,6 +462,8 @@ def label_list(request, board_pk):
     color = request.data.get("color", "#29abe2").strip()
     if not name:
         return Response({"detail": "Name is required."}, status=status.HTTP_400_BAD_REQUEST)
+    if not re.fullmatch(r'#[0-9a-fA-F]{6}', color):
+        return Response({"detail": "Invalid color."}, status=status.HTTP_400_BAD_REQUEST)
 
     label, created = Label.objects.get_or_create(board=board, name=name, defaults={"color": color})
     if not created:
@@ -488,7 +494,10 @@ def label_detail(request, board_pk, pk):
         if "name" in request.data:
             label.name = request.data["name"].strip()
         if "color" in request.data:
-            label.color = request.data["color"].strip()
+            color = request.data["color"].strip()
+            if not re.fullmatch(r'#[0-9a-fA-F]{6}', color):
+                return Response({"detail": "Invalid color."}, status=status.HTTP_400_BAD_REQUEST)
+            label.color = color
         label.save()
         return Response(serialize_label(label))
 
