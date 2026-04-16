@@ -16,7 +16,7 @@ class UserListTests(APITestCase):
     def test_list_returns_all_active_users(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data["results"]), 2)
 
     def test_list_unauthenticated(self):
         self.client.force_authenticate(user=None)

@@ -200,6 +200,8 @@ FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:4200')
 CORS_ALLOW_CREDENTIALS = True
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
 
 _secure_cookies_default = 'false' if DEBUG else 'true'
 _samesite_default = 'Lax' if DEBUG else 'None'

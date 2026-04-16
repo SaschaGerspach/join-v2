@@ -20,9 +20,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -41,9 +42,14 @@ def health(request):
     return JsonResponse({"status": "ok"})
 
 
+class _AdminThrottle(UserRateThrottle):
+    rate = "30/minute"
+
+
 @extend_schema(responses={200: AdminStatsSerializer})
 @api_view(["GET"])
 @permission_classes([IsAdminUser])
+@throttle_classes([_AdminThrottle])
 def admin_stats(request):
     User = get_user_model()
     return Response({
