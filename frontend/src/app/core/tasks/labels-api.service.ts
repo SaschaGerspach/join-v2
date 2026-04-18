@@ -22,6 +22,10 @@ export class LabelsApiService {
     return this.http.post<Label>(`${this.baseUrl}/boards/${boardId}/labels/`, { name, color }, { withCredentials: true });
   }
 
+  patch(boardId: number, labelId: number, payload: Partial<{ name: string; color: string }>): Observable<Label> {
+    return this.http.patch<Label>(`${this.baseUrl}/boards/${boardId}/labels/${labelId}/`, payload, { withCredentials: true });
+  }
+
   delete(boardId: number, labelId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/boards/${boardId}/labels/${labelId}/`, { withCredentials: true });
   }

@@ -29,6 +29,11 @@ export type CreateTaskPayload = {
   assigned_to?: number | null;
 };
 
+export type UpdateTaskPayload = Partial<CreateTaskPayload> & {
+  order?: number;
+  label_ids?: number[];
+};
+
 @Injectable({ providedIn: 'root' })
 export class TasksApiService {
   private readonly http = inject(HttpClient);
@@ -49,7 +54,7 @@ export class TasksApiService {
     );
   }
 
-  patch(id: number, payload: Partial<CreateTaskPayload>): Observable<Task> {
+  patch(id: number, payload: UpdateTaskPayload): Observable<Task> {
     return this.http.patch<Task>(`${this.baseUrl}/tasks/${id}/`, payload, { withCredentials: true });
   }
 

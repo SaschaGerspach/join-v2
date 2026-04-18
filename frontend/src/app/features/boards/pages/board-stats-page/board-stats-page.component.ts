@@ -1,5 +1,7 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { ChartData, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
@@ -15,6 +17,7 @@ import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service'
 })
 export class BoardStatsPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly boardsApi = inject(BoardsApiService);
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly tasksApi = inject(TasksApiService);
@@ -42,13 +45,16 @@ export class BoardStatsPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.boardId = Number(this.route.snapshot.paramMap.get('id'));
-    this.boardsApi.getById(this.boardId).subscribe(b => this.boardTitle.set(b.title));
+    this.boardsApi.getById(this.boardId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(b => this.boardTitle.set(b.title));
 
-    this.columnsApi.getByBoard(this.boardId).subscribe(columns => {
-      this.tasksApi.getByBoard(this.boardId).subscribe(tasks => {
-        this.buildCharts(columns, tasks);
-        this.loading.set(false);
-      });
+    forkJoin([
+      this.columnsApi.getByBoard(this.boardId),
+      this.tasksApi.getByBoard(this.boardId),
+    ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([columns, tasks]) => {
+      this.buildCharts(columns, tasks);
+      this.loading.set(false);
     });
   }
 

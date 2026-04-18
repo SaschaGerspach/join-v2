@@ -1,4 +1,5 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -15,6 +16,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
 })
 export class ProfilePageComponent implements OnInit {
   private readonly auth = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly usersApi = inject(UsersApiService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
@@ -42,10 +44,13 @@ export class ProfilePageComponent implements OnInit {
     if (!user) return;
     this.userId = Number(user.id);
 
-    this.usersApi.get(this.userId).subscribe(profile => {
-      this.firstName.set(profile.first_name);
-      this.lastName.set(profile.last_name);
-      this.email.set(profile.email);
+    this.usersApi.get(this.userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (profile) => {
+        this.firstName.set(profile.first_name);
+        this.lastName.set(profile.last_name);
+        this.email.set(profile.email);
+      },
+      error: () => this.toast.show('Failed to load profile.', 'error'),
     });
   }
 

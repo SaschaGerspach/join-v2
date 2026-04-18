@@ -2,7 +2,7 @@ import { Component, AfterViewInit, DestroyRef, ElementRef, HostListener, inject,
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { SlicePipe } from '@angular/common';
-import { Task, TasksApiService } from '../../../../core/tasks/tasks-api.service';
+import { Task, TasksApiService, UpdateTaskPayload } from '../../../../core/tasks/tasks-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api.service';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
@@ -97,7 +97,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   }
 
   save(): void {
-    const payload: any = {
+    const payload: UpdateTaskPayload = {
       title: this.title().trim(),
       description: this.description().trim(),
       priority: this.priority(),
