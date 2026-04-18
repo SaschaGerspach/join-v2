@@ -1,4 +1,5 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
@@ -22,6 +23,7 @@ type ContactForm = {
 export class ContactsPageComponent implements OnInit {
   private readonly api = inject(ContactsApiService);
   private readonly toast = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
 
   contacts = signal<Contact[]>([]);
   selectedContact = signal<Contact | null>(null);
@@ -43,7 +45,7 @@ export class ContactsPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.api.getAll().subscribe({
+    this.api.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: contacts => { this.contacts.set(contacts); this.loading.set(false); },
       error: () => { this.toast.show('Failed to load contacts.', 'error'); this.loading.set(false); },
     });
@@ -71,13 +73,13 @@ export class ContactsPageComponent implements OnInit {
     if (!this.form.first_name.trim() || !this.form.last_name.trim() || !this.form.email.trim()) return;
 
     if (this.editMode() && this.selectedContact()) {
-      this.api.patch(this.selectedContact()!.id, this.form).subscribe(updated => {
+      this.api.patch(this.selectedContact()!.id, this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(updated => {
         this.contacts.update(c => c.map(x => x.id === updated.id ? updated : x));
         this.selectedContact.set(updated);
         this.showForm.set(false);
       });
     } else {
-      this.api.create(this.form).subscribe(created => {
+      this.api.create(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(created => {
         this.contacts.update(c => [...c, created]);
         this.selectedContact.set(created);
         this.showForm.set(false);
@@ -92,7 +94,7 @@ export class ContactsPageComponent implements OnInit {
   confirmDeleteContact(): void {
     const id = this.pendingDeleteId();
     if (id === null) return;
-    this.api.delete(id).subscribe(() => {
+    this.api.delete(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.contacts.update(c => c.filter(x => x.id !== id));
       if (this.selectedContact()?.id === id) {
         this.selectedContact.set(null);

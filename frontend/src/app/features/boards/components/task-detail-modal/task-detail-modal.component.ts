@@ -1,4 +1,5 @@
-import { Component, AfterViewInit, ElementRef, HostListener, inject, input, output, signal, OnInit, ViewChild } from '@angular/core';
+import { Component, AfterViewInit, DestroyRef, ElementRef, HostListener, inject, input, output, signal, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { SlicePipe } from '@angular/common';
 import { Task, TasksApiService } from '../../../../core/tasks/tasks-api.service';
@@ -28,6 +29,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   private readonly labelsApi = inject(LabelsApiService);
   private readonly attachmentsApi = inject(AttachmentsApiService);
   private readonly toast = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
   readonly auth = inject(AuthService);
 
   task = input.required<Task>();
@@ -86,12 +88,12 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.columnId.set(t.column);
     this.assignedTo.set(t.assigned_to);
 
-    this.subtasksApi.getByTask(t.id).subscribe(subs => this.subtasks.set(subs));
-    this.contactsApi.getAll().subscribe(contacts => this.contacts.set(contacts));
-    this.commentsApi.getAll(t.id).subscribe(comments => this.comments.set(comments));
-    this.labelsApi.getByBoard(t.board).subscribe(labels => this.boardLabels.set(labels));
+    this.subtasksApi.getByTask(t.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(subs => this.subtasks.set(subs));
+    this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(contacts => this.contacts.set(contacts));
+    this.commentsApi.getAll(t.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(comments => this.comments.set(comments));
+    this.labelsApi.getByBoard(t.board).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(labels => this.boardLabels.set(labels));
     this.selectedLabelIds.set(new Set(t.labels?.map(l => l.id) ?? []));
-    this.attachmentsApi.getByTask(t.id).subscribe(atts => this.attachments.set(atts));
+    this.attachmentsApi.getByTask(t.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(atts => this.attachments.set(atts));
   }
 
   save(): void {
@@ -105,7 +107,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       label_ids: [...this.selectedLabelIds()],
     };
 
-    this.tasksApi.patch(this.task().id, payload).subscribe({
+    this.tasksApi.patch(this.task().id, payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => {
         this.taskUpdated.emit(updated);
         this.closed.emit();
@@ -120,7 +122,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   }
 
   confirmDeleteTask(): void {
-    this.tasksApi.delete(this.task().id).subscribe({
+    this.tasksApi.delete(this.task().id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.taskDeleted.emit(this.task().id);
         this.closed.emit();
@@ -133,7 +135,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     const title = this.newSubtaskTitle().trim();
     if (!title) return;
 
-    this.subtasksApi.create(this.task().id, title).subscribe({
+    this.subtasksApi.create(this.task().id, title).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: sub => {
         this.subtasks.update(s => [...s, sub]);
         this.newSubtaskTitle.set('');
@@ -144,14 +146,16 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   }
 
   toggleSubtask(sub: Subtask): void {
-    this.subtasksApi.patch(this.task().id, sub.id, { done: !sub.done }).subscribe(updated => {
-      this.subtasks.update(s => s.map(x => x.id === updated.id ? updated : x));
-      this.emitSubtaskCounts();
-    });
+    this.subtasksApi.patch(this.task().id, sub.id, { done: !sub.done })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(updated => {
+        this.subtasks.update(s => s.map(x => x.id === updated.id ? updated : x));
+        this.emitSubtaskCounts();
+      });
   }
 
   deleteSubtask(sub: Subtask): void {
-    this.subtasksApi.delete(this.task().id, sub.id).subscribe({
+    this.subtasksApi.delete(this.task().id, sub.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.subtasks.update(s => s.filter(x => x.id !== sub.id));
         this.emitSubtaskCounts();
@@ -169,7 +173,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     const title = this.editingSubtaskTitle.trim();
     this.editingSubtaskId.set(null);
     if (!title || title === sub.title) return;
-    this.subtasksApi.patch(this.task().id, sub.id, { title }).subscribe({
+    this.subtasksApi.patch(this.task().id, sub.id, { title }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => this.subtasks.update(s => s.map(x => x.id === updated.id ? updated : x)),
       error: () => this.toast.show('Failed to rename subtask.', 'error'),
     });
@@ -199,7 +203,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       input.value = '';
       return;
     }
-    this.attachmentsApi.upload(this.task().id, file).subscribe({
+    this.attachmentsApi.upload(this.task().id, file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: att => this.attachments.update(list => [...list, att]),
       error: () => this.toast.show('Failed to upload file.', 'error'),
     });
@@ -213,7 +217,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   }
 
   deleteAttachment(att: Attachment): void {
-    this.attachmentsApi.delete(this.task().id, att.id).subscribe({
+    this.attachmentsApi.delete(this.task().id, att.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.attachments.update(list => list.filter(a => a.id !== att.id)),
       error: () => this.toast.show('Failed to delete file.', 'error'),
     });
@@ -231,7 +235,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   createLabel(): void {
     const name = this.newLabelName.trim();
     if (!name) return;
-    this.labelsApi.create(this.task().board, name, this.newLabelColor).subscribe({
+    this.labelsApi.create(this.task().board, name, this.newLabelColor).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: label => {
         this.boardLabels.update(l => [...l, label]);
         this.selectedLabelIds.update(s => { const n = new Set(s); n.add(label.id); return n; });
@@ -244,7 +248,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   addComment(): void {
     const text = this.newCommentText().trim();
     if (!text) return;
-    this.commentsApi.create(this.task().id, text).subscribe({
+    this.commentsApi.create(this.task().id, text).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: c => { this.comments.update(list => [...list, c]); this.newCommentText.set(''); },
       error: () => this.toast.show('Failed to add comment.', 'error'),
     });
@@ -259,14 +263,14 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     const text = this.editingCommentText.trim();
     this.editingCommentId.set(null);
     if (!text || text === c.text) return;
-    this.commentsApi.patch(this.task().id, c.id, text).subscribe({
+    this.commentsApi.patch(this.task().id, c.id, text).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => this.comments.update(list => list.map(x => x.id === updated.id ? updated : x)),
       error: () => this.toast.show('Failed to edit comment.', 'error'),
     });
   }
 
   deleteComment(id: number): void {
-    this.commentsApi.delete(this.task().id, id).subscribe({
+    this.commentsApi.delete(this.task().id, id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.comments.update(list => list.filter(c => c.id !== id)),
       error: () => this.toast.show('Failed to delete comment.', 'error'),
     });

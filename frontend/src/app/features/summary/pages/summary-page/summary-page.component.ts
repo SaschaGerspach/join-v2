@@ -1,10 +1,11 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { SlicePipe } from '@angular/common';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-summary-page',
@@ -18,6 +19,7 @@ export class SummaryPageComponent implements OnInit {
   private readonly boardsApi = inject(BoardsApiService);
   private readonly tasksApi = inject(TasksApiService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   boards = signal<Board[]>([]);
   tasks = signal<Task[]>([]);
@@ -52,15 +54,18 @@ export class SummaryPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.boardsApi.getAll().subscribe(boards => {
-      this.boards.set(boards);
-      if (boards.length === 0) {
-        this.tasks.set([]);
-        return;
-      }
-      forkJoin(boards.map(b => this.tasksApi.getByBoard(b.id))).subscribe(taskArrays => {
-        this.tasks.set(taskArrays.flat());
-      });
+    this.boardsApi.getAll().pipe(
+      switchMap(boards => {
+        this.boards.set(boards);
+        if (boards.length === 0) {
+          return of([] as Task[][]);
+        }
+        return forkJoin(boards.map(b => this.tasksApi.getByBoard(b.id)));
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: taskArrays => this.tasks.set(taskArrays.flat()),
+      error: () => this.tasks.set([]),
     });
   }
 

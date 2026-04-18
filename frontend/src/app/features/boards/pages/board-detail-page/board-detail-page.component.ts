@@ -1,5 +1,6 @@
-import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, DestroyRef, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -32,7 +33,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   private readonly contactsApi = inject(ContactsApiService);
   private readonly toast = inject(ToastService);
   private readonly boardWs = inject(BoardWsService);
-  private wsSub?: Subscription;
+  private readonly destroyRef = inject(DestroyRef);
 
   boardId = signal<number>(0);
   board = signal<Board | null>(null);
@@ -104,13 +105,12 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.wsSub?.unsubscribe();
     this.boardWs.disconnect();
   }
 
   private connectWebSocket(boardId: number): void {
     this.boardWs.connect(boardId);
-    this.wsSub = this.boardWs.events$.subscribe(evt => {
+    this.boardWs.events$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(evt => {
       switch (evt.event) {
         case 'task_created':
           this.tasks.update(t => t.some(x => x.id === evt.data.id) ? t : [...t, evt.data]);
@@ -145,19 +145,19 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
 
   loadData(boardId: number): void {
     this.loading.set(true);
-    this.boardsApi.getById(boardId).subscribe({
+    this.boardsApi.getById(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: board => {
         this.board.set(board);
         this.titleService.setTitle(`${board.title} | Join`);
       },
       error: () => { this.toast.show('Failed to load board.', 'error'); this.loading.set(false); },
     });
-    this.columnsApi.getByBoard(boardId).subscribe(cols => this.columns.set(cols));
-    this.tasksApi.getByBoard(boardId).subscribe(tasks => {
+    this.columnsApi.getByBoard(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(cols => this.columns.set(cols));
+    this.tasksApi.getByBoard(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(tasks => {
       this.tasks.set(tasks);
       this.loading.set(false);
     });
-    this.contactsApi.getAll().subscribe(contacts => this.contacts.set(contacts));
+    this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(contacts => this.contacts.set(contacts));
   }
 
   contactName(id: number | null): string {
@@ -180,7 +180,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
     const title = this.newColumnTitle.trim();
     if (!title) return;
 
-    this.columnsApi.create(this.boardId(), title).subscribe({
+    this.columnsApi.create(this.boardId(), title).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: col => {
         this.columns.update(c => c.some(x => x.id === col.id) ? c : [...c, col]);
         this.newColumnTitle = '';
@@ -198,7 +198,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   confirmRenameBoardTitle(): void {
     const title = this.boardTitleInput.trim();
     if (!title) { this.editingBoardTitle.set(false); return; }
-    this.boardsApi.patch(this.boardId(), { title }).subscribe({
+    this.boardsApi.patch(this.boardId(), { title }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => {
         this.board.set(updated);
         this.editingBoardTitle.set(false);
@@ -215,7 +215,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   confirmRenameColumn(id: number): void {
     const title = this.editingColumnTitle.trim();
     if (!title) { this.editingColumnId.set(null); return; }
-    this.columnsApi.patch(id, { title }).subscribe({
+    this.columnsApi.patch(id, { title }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => {
         this.columns.update(cols => cols.map(c => c.id === id ? updated : c));
         this.editingColumnId.set(null);
@@ -231,7 +231,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   confirmDeleteColumn(): void {
     const id = this.pendingDeleteColumnId();
     if (id === null) return;
-    this.columnsApi.delete(id).subscribe({
+    this.columnsApi.delete(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.columns.update(c => c.filter(col => col.id !== id));
         this.tasks.update(t => t.filter(task => task.column !== id));
@@ -247,7 +247,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   }
 
   createTask(payload: CreateTaskPayload): void {
-    this.tasksApi.create(this.boardId(), payload).subscribe({
+    this.tasksApi.create(this.boardId(), payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: task => {
         this.tasks.update(t => t.some(x => x.id === task.id) ? t : [...t, task]);
         this.addingTaskForColumn.set(null);
@@ -276,7 +276,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   confirmDeleteTask(): void {
     const id = this.pendingDeleteTaskId();
     if (id === null) return;
-    this.tasksApi.delete(id).subscribe({
+    this.tasksApi.delete(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.tasks.update(t => t.filter(task => task.id !== id));
         this.pendingDeleteTaskId.set(null);
@@ -295,15 +295,14 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
     const updated = reordered.map((c, i) => ({ ...c, order: i }));
     this.columns.set(updated);
 
-    let failed = false;
-    updated.forEach(col => this.columnsApi.patch(col.id, { order: col.order }).subscribe({
-      error: () => {
-        if (failed) return;
-        failed = true;
-        this.columns.set(snapshot);
-        this.toast.show('Failed to reorder columns.', 'error');
-      },
-    }));
+    forkJoin(updated.map(col => this.columnsApi.patch(col.id, { order: col.order })))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => {
+          this.columns.set(snapshot);
+          this.toast.show('Failed to reorder columns.', 'error');
+        },
+      });
   }
 
   drop(event: CdkDragDrop<Task[]>, targetColumnId: number): void {
@@ -320,12 +319,14 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
       this.tasks.update(tasks =>
         tasks.map(t => updated.find(u => u.id === t.id) ?? t)
       );
-      this.tasksApi.reorder(updated.map(t => ({ id: t.id, order: t.order, column: t.column }))).subscribe({
-        error: () => {
-          this.tasks.set(snapshot);
-          this.toast.show('Failed to reorder tasks.', 'error');
-        },
-      });
+      this.tasksApi.reorder(updated.map(t => ({ id: t.id, order: t.order, column: t.column })))
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          error: () => {
+            this.tasks.set(snapshot);
+            this.toast.show('Failed to reorder tasks.', 'error');
+          },
+        });
     } else {
       const prevTasks = this.tasksForColumn(task.column!).filter(t => t.id !== task.id)
         .map((t, i) => ({ ...t, order: i }));
@@ -344,7 +345,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
       this.tasksApi.reorder([
         ...prevTasks.map(t => ({ id: t.id, order: t.order, column: t.column })),
         ...updatedTarget.map(t => ({ id: t.id, order: t.order, column: t.column })),
-      ]).subscribe({
+      ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         error: () => {
           this.tasks.set(snapshot);
           this.toast.show('Failed to move task.', 'error');
@@ -383,7 +384,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
     );
     this.clearSelection();
 
-    this.tasksApi.reorder(items).subscribe({
+    this.tasksApi.reorder(items).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.toast.show(`Moved ${ids.length} task(s)`),
       error: () => {
         this.tasks.set(snapshot);
@@ -399,20 +400,18 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   confirmBulkDelete(): void {
     const ids = [...this.selectedTaskIds()];
     this.pendingBulkDelete.set(false);
-    let done = 0;
-    ids.forEach(id => {
-      this.tasksApi.delete(id).subscribe({
+    if (ids.length === 0) return;
+
+    forkJoin(ids.map(id => this.tasksApi.delete(id)))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
         next: () => {
-          this.tasks.update(t => t.filter(task => task.id !== id));
-          done++;
-          if (done === ids.length) {
-            this.clearSelection();
-            this.toast.show(`Deleted ${ids.length} task(s)`);
-          }
+          this.tasks.update(t => t.filter(task => !ids.includes(task.id)));
+          this.clearSelection();
+          this.toast.show(`Deleted ${ids.length} task(s)`);
         },
-        error: () => this.toast.show('Failed to delete some tasks.', 'error'),
+        error: () => this.toast.show(`Failed to delete ${ids.length} task(s).`, 'error'),
       });
-    });
   }
 
   priorityClass(priority: string): string {
