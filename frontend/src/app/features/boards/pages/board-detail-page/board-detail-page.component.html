@@ -9,6 +9,7 @@
       <input
         class="board-title-input"
         type="text"
+        aria-label="Board title"
         [(ngModel)]="boardTitleInput"
         (keyup.enter)="confirmRenameBoardTitle()"
         (keyup.escape)="state.editingBoardTitle.set(false)"
@@ -20,24 +21,25 @@
     <input
       class="search-input"
       type="search"
+      aria-label="Search tasks"
       placeholder="Search tasks…"
       [value]="state.searchQuery()"
       (input)="state.searchQuery.set($any($event.target).value)"
     />
-    <select class="filter-select" [ngModel]="state.filterPriority()" (ngModelChange)="state.filterPriority.set($event)">
+    <select class="filter-select" aria-label="Filter by priority" [ngModel]="state.filterPriority()" (ngModelChange)="state.filterPriority.set($event)">
       <option value="">All priorities</option>
       <option value="urgent">Urgent</option>
       <option value="high">High</option>
       <option value="medium">Medium</option>
       <option value="low">Low</option>
     </select>
-    <select class="filter-select" [ngModel]="state.filterAssignee()" (ngModelChange)="state.filterAssignee.set($event === '' ? '' : +$event)">
+    <select class="filter-select" aria-label="Filter by assignee" [ngModel]="state.filterAssignee()" (ngModelChange)="state.filterAssignee.set($event === '' ? '' : +$event)">
       <option value="">All assignees</option>
       @for (c of state.contacts(); track c.id) {
         <option [value]="c.id">{{ c.first_name }} {{ c.last_name }}</option>
       }
     </select>
-    <select class="filter-select" [ngModel]="state.filterDue()" (ngModelChange)="state.filterDue.set($event)">
+    <select class="filter-select" aria-label="Filter by due date" [ngModel]="state.filterDue()" (ngModelChange)="state.filterDue.set($event)">
       <option value="">Any due date</option>
       <option value="overdue">Overdue</option>
       <option value="soon">Due soon</option>
@@ -52,7 +54,7 @@
   @if (state.bulkMode()) {
     <div class="bulk-toolbar">
       <span class="bulk-count">{{ state.selectedTaskIds().size }} selected</span>
-      <select class="filter-select" [ngModel]="state.bulkMoveTarget()" (ngModelChange)="state.bulkMoveTarget.set($event === '' ? null : +$event)">
+      <select class="filter-select" aria-label="Move tasks to column" [ngModel]="state.bulkMoveTarget()" (ngModelChange)="state.bulkMoveTarget.set($event === '' ? null : +$event)">
         <option value="">Move to…</option>
         @for (col of state.columns(); track col.id) {
           <option [value]="col.id">{{ col.title }}</option>
@@ -69,6 +71,7 @@
       <input
         class="form-input"
         type="text"
+        aria-label="New column title"
         [(ngModel)]="newColumnTitle"
         placeholder="Column title"
         (keyup.enter)="createColumn()"
@@ -96,6 +99,7 @@
             <input
               class="column-title-input"
               type="text"
+              aria-label="Column title"
               [(ngModel)]="editingColumnTitle"
               (keyup.enter)="confirmRenameColumn(column.id)"
               (keyup.escape)="state.editingColumnId.set(null)"
@@ -104,7 +108,7 @@
           } @else {
             <span class="column-title" (dblclick)="startRenameColumn(column)">{{ column.title }}</span>
           }
-          <button class="btn-icon" (click)="state.pendingDeleteColumnId.set(column.id)" title="Delete column">&#10005;</button>
+          <button class="btn-icon" (click)="state.pendingDeleteColumnId.set(column.id)" title="Delete column" aria-label="Delete column">&#10005;</button>
         </div>
 
         <div
@@ -122,13 +126,14 @@
                 <input
                   type="checkbox"
                   class="task-select-checkbox"
+                  aria-label="Select task"
                   [checked]="state.isTaskSelected(task.id)"
                   (click)="state.toggleTaskSelection(task.id, $event)"
                 />
                 <span class="task-priority" [class]="state.priorityClass(task.priority)">
                   {{ task.priority }}
                 </span>
-                <button class="btn-icon small" (click)="$event.stopPropagation(); state.pendingDeleteTaskId.set(task.id)">&#10005;</button>
+                <button class="btn-icon small" aria-label="Delete task" (click)="$event.stopPropagation(); state.pendingDeleteTaskId.set(task.id)">&#10005;</button>
               </div>
               <p class="task-title">{{ task.title }}</p>
               @if (task.labels && task.labels.length > 0) {

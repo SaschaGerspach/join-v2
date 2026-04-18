@@ -1,6 +1,6 @@
 <div class="toast-container">
   @for (toast of toastService.toasts(); track toast.id) {
-    <div class="toast" [class]="'toast-' + toast.type" (click)="toastService.dismiss(toast.id)">
+    <div class="toast" role="alert" [class]="'toast-' + toast.type" (click)="toastService.dismiss(toast.id)">
       {{ toast.message }}
     </div>
   }

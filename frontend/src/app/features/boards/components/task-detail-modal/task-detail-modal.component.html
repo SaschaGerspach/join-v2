@@ -10,7 +10,7 @@
         (ngModelChange)="title.set($event)"
         placeholder="Task title"
       />
-      <button class="btn-close" (click)="close()">&#10005;</button>
+      <button class="btn-close" aria-label="Close" (click)="close()">&#10005;</button>
     </div>
 
     <div class="modal-body">
@@ -101,8 +101,8 @@
             placeholder="New label…"
             (keyup.enter)="createLabel()"
           />
-          <input type="color" [(ngModel)]="newLabelColor" class="label-color-input" />
-          <button class="btn-add-sub" (click)="createLabel()">+</button>
+          <input type="color" [(ngModel)]="newLabelColor" class="label-color-input" aria-label="Label color" />
+          <button class="btn-add-sub" aria-label="Add label" (click)="createLabel()">+</button>
         </div>
       </div>
 
@@ -113,7 +113,7 @@
             <div class="attachment-item">
               <a [href]="att.url" target="_blank" class="attachment-link">{{ att.filename }}</a>
               <span class="attachment-size">{{ formatSize(att.size) }}</span>
-              <button class="btn-remove-sub" (click)="deleteAttachment(att)">&#10005;</button>
+              <button class="btn-remove-sub" aria-label="Delete attachment" (click)="deleteAttachment(att)">&#10005;</button>
             </div>
           }
           @if (attachments().length === 0) {
@@ -123,6 +123,7 @@
         <input
           type="file"
           class="file-input"
+          aria-label="Upload attachment"
           accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.md,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
           (change)="onFileSelected($event)"
         />
@@ -152,7 +153,7 @@
               } @else {
                 <label [for]="'sub-' + sub.id" [class.done]="sub.done" (dblclick)="startEditSubtask(sub)">{{ sub.title }}</label>
               }
-              <button class="btn-remove-sub" (click)="deleteSubtask(sub)">&#10005;</button>
+              <button class="btn-remove-sub" aria-label="Delete subtask" (click)="deleteSubtask(sub)">&#10005;</button>
             </div>
           }
         </div>
@@ -165,7 +166,7 @@
             placeholder="Add subtask..."
             (keyup.enter)="addSubtask()"
           />
-          <button class="btn-add-sub" (click)="addSubtask()">+</button>
+          <button class="btn-add-sub" aria-label="Add subtask" (click)="addSubtask()">+</button>
         </div>
       </div>
 

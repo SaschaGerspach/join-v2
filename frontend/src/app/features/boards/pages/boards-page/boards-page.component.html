@@ -9,6 +9,7 @@
       <input
         class="form-input"
         type="text"
+        aria-label="Board title"
         [(ngModel)]="newTitle"
         placeholder="Board title"
         (keyup.enter)="createBoard()"
@@ -42,13 +43,14 @@
               <input
                 class="color-picker"
                 type="color"
+                aria-label="Board color"
                 [value]="board.color"
                 (click)="$event.stopPropagation()"
                 (change)="changeColor(board, $any($event.target).value)"
                 title="Board color"
               />
-              <button class="btn-members" (click)="openMembers(board, $event)" title="Manage members">&#128101;</button>
-              <button class="btn-delete" (click)="deleteBoard(board.id, $event)" title="Delete board">&#10005;</button>
+              <button class="btn-members" aria-label="Manage members" (click)="openMembers(board, $event)" title="Manage members">&#128101;</button>
+              <button class="btn-delete" aria-label="Delete board" (click)="deleteBoard(board.id, $event)" title="Delete board">&#10005;</button>
             }
           </div>
         </div>
@@ -70,13 +72,14 @@
     <div class="members-modal" (click)="$event.stopPropagation()">
       <div class="members-modal-header">
         <h2>Members — {{ managingBoard()!.title }}</h2>
-        <button class="btn-icon" (click)="managingBoard.set(null)">&#10005;</button>
+        <button class="btn-icon" aria-label="Close" (click)="managingBoard.set(null)">&#10005;</button>
       </div>
 
       <div class="invite-row">
         <input
           class="invite-input"
           type="email"
+          aria-label="Invite by email"
           [(ngModel)]="inviteEmail"
           placeholder="Invite by email"
           (keyup.enter)="invite()"
@@ -92,7 +95,7 @@
           <li class="member-item">
             <span class="member-name">{{ m.first_name }} {{ m.last_name }}</span>
             <span class="member-email">{{ m.email }}</span>
-            <button class="btn-icon small" (click)="removeMember(m.user_id)" title="Remove">&#10005;</button>
+            <button class="btn-icon small" aria-label="Remove member" (click)="removeMember(m.user_id)" title="Remove">&#10005;</button>
           </li>
         }
         @if (members().length === 0) {

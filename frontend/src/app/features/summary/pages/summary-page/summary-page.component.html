@@ -6,7 +6,7 @@
 
   <div class="stats-grid">
 
-    <div class="stat-card accent" (click)="goToBoards()">
+    <div class="stat-card accent" role="button" aria-label="Go to boards" (click)="goToBoards()">
       <div class="stat-icon">&#9776;</div>
       <div class="stat-body">
         <span class="stat-number">{{ boards().length }}</span>
