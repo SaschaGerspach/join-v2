@@ -58,4 +58,8 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   confirmRenameColumn(id: number): void {
     this.state.renameColumn(id, this.editingColumnTitle);
   }
+
+  inputValue(event: Event): string {
+    return (event.target as HTMLInputElement).value;
+  }
 }

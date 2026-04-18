@@ -46,7 +46,7 @@
                 aria-label="Board color"
                 [value]="board.color"
                 (click)="$event.stopPropagation()"
-                (change)="changeColor(board, $any($event.target).value)"
+                (change)="changeColor(board, inputValue($event))"
                 title="Board color"
               />
               <button class="btn-members" aria-label="Manage members" (click)="openMembers(board, $event)" title="Manage members">&#128101;</button>

@@ -24,7 +24,7 @@
       aria-label="Search tasks"
       placeholder="Search tasks…"
       [value]="state.searchQuery()"
-      (input)="state.searchQuery.set($any($event.target).value)"
+      (input)="state.searchQuery.set(inputValue($event))"
     />
     <select class="filter-select" aria-label="Filter by priority" [ngModel]="state.filterPriority()" (ngModelChange)="state.filterPriority.set($event)">
       <option value="">All priorities</option>

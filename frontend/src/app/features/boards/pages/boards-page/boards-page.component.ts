@@ -116,4 +116,8 @@ export class BoardsPageComponent implements OnInit {
       error: () => this.toast.show('Failed to remove member.', 'error'),
     });
   }
+
+  inputValue(event: Event): string {
+    return (event.target as HTMLInputElement).value;
+  }
 }
