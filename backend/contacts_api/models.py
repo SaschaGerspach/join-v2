@@ -13,5 +13,8 @@ class Contact(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=30, blank=True)
 
+    class Meta:
+        unique_together = ("owner", "email")
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
