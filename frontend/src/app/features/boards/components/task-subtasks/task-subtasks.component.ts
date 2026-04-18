@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, input, output, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, output, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api.service';
@@ -10,6 +10,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
   imports: [FormsModule],
   templateUrl: './task-subtasks.component.html',
   styleUrl: './task-subtasks.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskSubtasksComponent implements OnInit {
   private readonly subtasksApi = inject(SubtasksApiService);

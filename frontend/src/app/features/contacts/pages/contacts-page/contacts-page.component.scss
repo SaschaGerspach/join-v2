@@ -283,8 +283,8 @@ $color-error:   #ff8190;
   border-radius: 10px;
   padding: 0.55rem 0.9rem;
   font-size: 0.95rem;
-  color: var(--color-text);
-  background: $color-bg;
+  color: $color-dark;
+  background: $color-white;
   width: 100%;
   box-sizing: border-box;
 

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Attachment, AttachmentsApiService } from '../../../../core/tasks/attachments-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -8,6 +8,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
   standalone: true,
   templateUrl: './task-attachments.component.html',
   styleUrl: './task-attachments.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskAttachmentsComponent implements OnInit {
   private readonly attachmentsApi = inject(AttachmentsApiService);

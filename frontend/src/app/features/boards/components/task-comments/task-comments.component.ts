@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { SlicePipe } from '@angular/common';
@@ -12,6 +12,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
   imports: [FormsModule, SlicePipe],
   templateUrl: './task-comments.component.html',
   styleUrl: './task-comments.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskCommentsComponent implements OnInit {
   private readonly commentsApi = inject(CommentsApiService);

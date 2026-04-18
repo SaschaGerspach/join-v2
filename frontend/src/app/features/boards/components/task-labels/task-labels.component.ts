@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, input, signal, OnInit, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit, model } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Label, LabelsApiService } from '../../../../core/tasks/labels-api.service';
@@ -10,6 +10,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
   imports: [FormsModule],
   templateUrl: './task-labels.component.html',
   styleUrl: './task-labels.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskLabelsComponent implements OnInit {
   private readonly labelsApi = inject(LabelsApiService);

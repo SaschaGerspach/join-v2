@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
@@ -11,6 +11,7 @@ import { PendingEmailService } from '../../../../core/auth/pending-email.service
   imports: [FormsModule, RouterLink],
   templateUrl: './register-page.component.html',
   styleUrl: './register-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterPageComponent {
   private readonly api = inject(AuthApiService);

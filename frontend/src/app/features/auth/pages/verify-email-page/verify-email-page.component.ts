@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
 
@@ -31,6 +31,7 @@ import { AuthApiService } from '../../../../core/auth/auth-api.service';
     </div>
   `,
   styleUrls: ['../login-page/login-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VerifyEmailPageComponent implements OnInit {
   private readonly authApi = inject(AuthApiService);

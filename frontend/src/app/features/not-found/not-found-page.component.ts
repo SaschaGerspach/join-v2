@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -28,5 +28,6 @@ import { RouterLink } from '@angular/router';
     a { color: #2a9d8f; text-decoration: none; font-weight: 500; }
     a:hover { text-decoration: underline; }
   `],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotFoundPageComponent {}

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -15,6 +15,7 @@ import { BRAND_COLOR, PRIORITY_COLORS } from '../../../../shared/constants/color
   imports: [BaseChartDirective, RouterModule],
   templateUrl: './board-stats-page.component.html',
   styleUrl: './board-stats-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardStatsPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);

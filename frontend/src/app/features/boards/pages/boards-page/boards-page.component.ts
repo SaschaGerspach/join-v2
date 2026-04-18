@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +12,8 @@ import { ToastService } from '../../../../shared/services/toast.service';
   standalone: true,
   imports: [FormsModule, LoadingSpinnerComponent, ConfirmDialogComponent],
   templateUrl: './boards-page.component.html',
-  styleUrl: './boards-page.component.scss'
+  styleUrl: './boards-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardsPageComponent implements OnInit {
   private readonly api = inject(BoardsApiService);

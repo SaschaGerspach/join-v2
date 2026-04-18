@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -10,6 +10,7 @@ import { PendingEmailService } from '../../../../core/auth/pending-email.service
   imports: [FormsModule, RouterModule],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginPageComponent {
   private readonly auth = inject(AuthService);

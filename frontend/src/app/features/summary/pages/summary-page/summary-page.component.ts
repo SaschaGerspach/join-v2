@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { SlicePipe } from '@angular/common';
@@ -13,6 +13,7 @@ import { forkJoin, of, switchMap } from 'rxjs';
   imports: [SlicePipe],
   templateUrl: './summary-page.component.html',
   styleUrl: './summary-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SummaryPageComponent implements OnInit {
   private readonly auth = inject(AuthService);

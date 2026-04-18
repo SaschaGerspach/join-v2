@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, DestroyRef, ElementRef, HostListener, inject, input, output, signal, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, AfterViewInit, DestroyRef, ElementRef, HostListener, inject, input, output, signal, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Task, TasksApiService, UpdateTaskPayload } from '../../../../core/tasks/tasks-api.service';
@@ -17,6 +17,7 @@ import { TaskLabelsComponent } from '../task-labels/task-labels.component';
   imports: [FormsModule, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent],
   templateUrl: './task-detail-modal.component.html',
   styleUrl: './task-detail-modal.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   @ViewChild('titleInput') titleInput!: ElementRef<HTMLInputElement>;

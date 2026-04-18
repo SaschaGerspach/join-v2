@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SlicePipe } from '@angular/common';
@@ -17,6 +17,7 @@ import { Column } from '../../../../core/columns/columns-api.service';
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
   providers: [BoardStateService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardDetailPageComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);

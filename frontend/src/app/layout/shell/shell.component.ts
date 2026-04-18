@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed, HostListener } from '@angular/core';
 import { Router, RouterModule } from "@angular/router";
 import { AuthService } from '../../core/auth/auth.service';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
@@ -10,7 +10,8 @@ import { KeyboardShortcutsModalComponent } from '../../shared/components/keyboar
   standalone: true,
   imports: [RouterModule, ToastComponent, KeyboardShortcutsModalComponent],
   templateUrl: './shell.component.html',
-  styleUrl: './shell.component.scss'
+  styleUrl: './shell.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShellComponent {
   readonly auth = inject(AuthService);

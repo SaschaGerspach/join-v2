@@ -1,4 +1,4 @@
-import { Component, HostListener, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, output } from '@angular/core';
 
 export type Shortcut = { key: string; description: string };
 
@@ -54,6 +54,7 @@ export type Shortcut = { key: string; description: string };
       span { font-size: 0.9rem; color: var(--color-text, #2a3647); }
     }
   `],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class KeyboardShortcutsModalComponent {
   closed = output<void>();

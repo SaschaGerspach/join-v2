@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,6 +13,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
   imports: [FormsModule, ConfirmDialogComponent],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfilePageComponent implements OnInit {
   private readonly auth = inject(AuthService);

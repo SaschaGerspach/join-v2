@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
@@ -20,6 +20,7 @@ type ContactForm = {
   imports: [FormsModule, LoadingSpinnerComponent, ConfirmDialogComponent],
   templateUrl: './contacts-page.component.html',
   styleUrl: './contacts-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactsPageComponent implements OnInit {
   private readonly api = inject(ContactsApiService);

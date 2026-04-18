@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -13,6 +13,7 @@ import { TaskDetailModalComponent } from '../../../boards/components/task-detail
   imports: [TaskDetailModalComponent],
   templateUrl: './calendar-page.component.html',
   styleUrl: './calendar-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarPageComponent implements OnInit {
   private readonly boardsApi = inject(BoardsApiService);

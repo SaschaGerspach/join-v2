@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
@@ -17,6 +17,7 @@ type AdminStats = {
   imports: [LoadingSpinnerComponent],
   templateUrl: './admin-page.component.html',
   styleUrl: './admin-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminPageComponent implements OnInit {
   private readonly http = inject(HttpClient);
