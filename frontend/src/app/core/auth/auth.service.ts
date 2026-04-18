@@ -58,7 +58,7 @@ export class AuthService {
     }
 
     logout(): void {
-        this.api.logout().subscribe();
+        this.api.logout().pipe(catchError(() => of(null))).subscribe();
         this._user.set(null);
         this.accessToken = null;
     }
