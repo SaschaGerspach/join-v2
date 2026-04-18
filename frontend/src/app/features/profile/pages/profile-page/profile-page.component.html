@@ -34,8 +34,8 @@
       <h2 class="section-title">Change Password</h2>
       <div class="form-grid">
         <div class="form-field full-width">
-          <label>New password</label>
-          <input class="field-input" type="password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" placeholder="Leave blank to keep current" />
+          <label>New password (min. 8 characters)</label>
+          <input class="field-input" type="password" minlength="8" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" placeholder="Leave blank to keep current" />
         </div>
         <div class="form-field full-width">
           <label>Confirm new password</label>

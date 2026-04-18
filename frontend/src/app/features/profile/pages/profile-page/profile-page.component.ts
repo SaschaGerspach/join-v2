@@ -61,6 +61,10 @@ export class ProfilePageComponent implements OnInit {
     const pw = this.newPassword().trim();
     const confirm = this.confirmPassword().trim();
 
+    if (pw && pw.length < 8) {
+      this.errorMessage.set('Password must be at least 8 characters.');
+      return;
+    }
     if (pw && pw !== confirm) {
       this.errorMessage.set('Passwords do not match.');
       return;
