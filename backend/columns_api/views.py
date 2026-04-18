@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.models import Board
-from boards_api.views import _can_access
+from boards_api.permissions import can_access_board
 from boards_api.ws_events import send_board_event
 from config.serializers import DetailSerializer
 from .models import Column
@@ -47,7 +47,7 @@ def column_list(request):
     except Board.DoesNotExist:
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(board, request.user):
+    if not can_access_board(board, request.user):
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -81,7 +81,7 @@ def column_detail(request, pk):
     except Column.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(column.board, request.user):
+    if not can_access_board(column.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PATCH":

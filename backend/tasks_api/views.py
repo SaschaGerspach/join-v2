@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.models import Board
-from boards_api.views import _can_access
+from boards_api.permissions import can_access_board
 from boards_api.ws_events import send_board_event
 from config.serializers import DetailSerializer
 from columns_api.models import Column
@@ -169,7 +169,7 @@ def task_list(request):
     except Board.DoesNotExist:
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(board, request.user):
+    if not can_access_board(board, request.user):
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -226,7 +226,7 @@ def task_detail(request, pk):
     except Task.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(task.board, request.user):
+    if not can_access_board(task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -285,7 +285,7 @@ def subtask_list(request, task_pk):
     except Task.DoesNotExist:
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(task.board, request.user):
+    if not can_access_board(task.board, request.user):
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -315,7 +315,7 @@ def subtask_detail(request, task_pk, pk):
     except Subtask.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(subtask.task.board, request.user):
+    if not can_access_board(subtask.task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PATCH":
@@ -345,7 +345,7 @@ def task_reorder(request):
     if len(fetched) != len(set(task_ids)):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
     for t in fetched:
-        if not _can_access(t.board, request.user):
+        if not can_access_board(t.board, request.user):
             return Response({"detail": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
     tasks = {t.pk: t for t in fetched}
 
@@ -401,7 +401,7 @@ def comment_list(request, task_pk):
     except Task.DoesNotExist:
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(task.board, request.user):
+    if not can_access_board(task.board, request.user):
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -463,7 +463,7 @@ def label_list(request, board_pk):
     except Board.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(board, request.user):
+    if not can_access_board(board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -498,7 +498,7 @@ def label_detail(request, board_pk, pk):
     except Label.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(label.board, request.user):
+    if not can_access_board(label.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PATCH":
@@ -547,7 +547,7 @@ def attachment_list(request, task_pk):
     except Task.DoesNotExist:
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(task.board, request.user):
+    if not can_access_board(task.board, request.user):
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -581,7 +581,7 @@ def attachment_detail(request, task_pk, pk):
     except Attachment.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(att.task.board, request.user):
+    if not can_access_board(att.task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     task = att.task
@@ -604,7 +604,7 @@ def attachment_download(request, task_pk, pk):
     except Attachment.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(att.task.board, request.user):
+    if not can_access_board(att.task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     return FileResponse(att.file.open("rb"), as_attachment=True, filename=att.filename)

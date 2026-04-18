@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from columns_api.models import Column
 from config.serializers import DetailSerializer
 from .models import Board, BoardMember
+from .permissions import can_access_board
 from .serializers import (
     BoardCreateSerializer,
     BoardMemberInviteSerializer,
@@ -29,10 +30,6 @@ class _BoardPagination(PageNumberPagination):
     page_size = 50
     page_size_query_param = "page_size"
     max_page_size = 200
-
-
-def _can_access(board, user):
-    return board.created_by == user or board.members.filter(user=user).exists()
 
 
 def serialize_board(board):
@@ -107,7 +104,7 @@ def board_detail(request, pk):
     except Board.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(board, request.user):
+    if not can_access_board(board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
@@ -151,7 +148,7 @@ def board_members(request, pk):
     except Board.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not _can_access(board, request.user):
+    if not can_access_board(board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
