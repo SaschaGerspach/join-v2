@@ -133,9 +133,9 @@ export class BoardStateService {
           break;
         case 'tasks_reordered':
           this.tasks.update(tasks => {
-            const updated = evt.data as any[];
+            const updated = evt.data;
             return tasks.map(t => {
-              const u = updated.find((x: any) => x.id === t.id);
+              const u = updated.find(x => x.id === t.id);
               return u ?? t;
             });
           });

@@ -1,12 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { Subject } from 'rxjs';
+import { Column } from '../columns/columns-api.service';
+import { Task } from '../tasks/tasks-api.service';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../auth/auth.service';
 
-export type BoardWsEvent = {
-  event: string;
-  data: any;
-};
+export type BoardWsEvent =
+  | { event: 'task_created'; data: Task }
+  | { event: 'task_updated'; data: Task }
+  | { event: 'task_deleted'; data: { id: number } }
+  | { event: 'tasks_reordered'; data: Task[] }
+  | { event: 'column_created'; data: Column }
+  | { event: 'column_updated'; data: Column }
+  | { event: 'column_deleted'; data: { id: number } };
 
 @Injectable({ providedIn: 'root' })
 export class BoardWsService {
