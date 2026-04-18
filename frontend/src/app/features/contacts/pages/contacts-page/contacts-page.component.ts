@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { AVATAR_COLORS } from '../../../../shared/constants/colors';
 import { ToastService } from '../../../../shared/services/toast.service';
 
 type ContactForm = {
@@ -113,11 +114,7 @@ export class ContactsPageComponent implements OnInit {
   }
 
   avatarColor(contact: Contact): string {
-    const colors = [
-      '#6e40c9', '#29abe2', '#e44a76', '#2d8a4e',
-      '#d97c0e', '#4a90d9', '#c94040', '#3a7d44',
-      '#8b4fc4', '#1a7f8f',
-    ];
+    const colors = AVATAR_COLORS;
     const name = contact.first_name + contact.last_name;
     let hash = 0;
     for (let i = 0; i < name.length; i++) {

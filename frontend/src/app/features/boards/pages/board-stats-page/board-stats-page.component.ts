@@ -7,6 +7,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
+import { BRAND_COLOR, PRIORITY_COLORS } from '../../../../shared/constants/colors';
 
 @Component({
   selector: 'app-board-stats-page',
@@ -67,20 +68,17 @@ export class BoardStatsPageComponent implements OnInit {
       labels: columns.map(c => c.title),
       datasets: [{
         data: columns.map(c => tasks.filter(t => t.column === c.id).length),
-        backgroundColor: '#29abe2',
+        backgroundColor: BRAND_COLOR,
         borderRadius: 6,
       }],
     });
 
-    const priorityColors: Record<string, string> = {
-      urgent: '#ff3d00', high: '#ff3d00', medium: '#ffa800', low: '#7ae229',
-    };
     const priorities = ['urgent', 'high', 'medium', 'low'];
     this.priorityChartData.set({
       labels: priorities.map(p => p.charAt(0).toUpperCase() + p.slice(1)),
       datasets: [{
         data: priorities.map(p => tasks.filter(t => t.priority === p).length),
-        backgroundColor: priorities.map(p => priorityColors[p]),
+        backgroundColor: priorities.map(p => PRIORITY_COLORS[p]),
       }],
     });
   }
