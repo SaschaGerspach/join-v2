@@ -1,15 +1,4 @@
-$color-dark:    #2a3647;
-$color-primary: #29abe2;
-$color-white:   #ffffff;
-$color-bg:      #f6f7f8;
-$color-border:  #d1d1d1;
-$color-muted:   #a8a8a8;
-$color-error:   #ff8190;
-
-$priority-high:   #ff3d00;
-$priority-medium: #ffa800;
-$priority-low:    #7ae229;
-$priority-urgent: #ff3d00;
+@use 'variables' as *;
 
 .modal-backdrop {
   position: fixed;

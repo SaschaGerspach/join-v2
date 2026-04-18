@@ -1,9 +1,4 @@
-$color-primary: #29abe2;
-$color-dark:    #2a3647;
-$color-white:   #ffffff;
-$color-bg:      #f6f7f8;
-$color-border:  #d1d1d1;
-$color-muted:   #a8a8a8;
+@use 'variables' as *;
 
 .field-group {
   display: flex;
