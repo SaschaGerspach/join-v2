@@ -18,7 +18,7 @@ export class TaskCommentsComponent implements OnInit {
   private readonly commentsApi = inject(CommentsApiService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
-  readonly auth = inject(AuthService);
+  private readonly auth = inject(AuthService);
 
   taskId = input.required<number>();
 
@@ -62,6 +62,10 @@ export class TaskCommentsComponent implements OnInit {
         next: updated => this.comments.update(list => list.map(x => x.id === updated.id ? updated : x)),
         error: () => this.toast.show('Failed to edit comment.', 'error'),
       });
+  }
+
+  isOwnComment(c: Comment): boolean {
+    return c.author_id === +(this.auth.user()?.id ?? 0);
   }
 
   deleteComment(id: number): void {

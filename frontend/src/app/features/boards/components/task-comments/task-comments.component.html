@@ -7,7 +7,7 @@
         <div class="comment-header">
           <span class="comment-author">{{ c.author_name }}</span>
           <span class="comment-date">{{ c.created_at | slice:0:10 }}</span>
-          @if (c.author_id === +auth.user()!.id) {
+          @if (isOwnComment(c)) {
             <button class="btn-comment-action" (click)="startEditComment(c)">Edit</button>
             <button class="btn-comment-action danger" (click)="deleteComment(c.id)">Delete</button>
           }
