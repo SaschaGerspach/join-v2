@@ -74,7 +74,7 @@ export class ProfilePageComponent implements OnInit {
     if (pw) payload['password'] = pw;
 
     this.saving.set(true);
-    this.usersApi.patch(this.userId, payload).subscribe({
+    this.usersApi.patch(this.userId, payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.newPassword.set('');
         this.confirmPassword.set('');
@@ -89,7 +89,7 @@ export class ProfilePageComponent implements OnInit {
   }
 
   confirmDeleteAccount(): void {
-    this.usersApi.delete(this.userId).subscribe({
+    this.usersApi.delete(this.userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.auth.clearUser();
         this.router.navigate(['/login']);

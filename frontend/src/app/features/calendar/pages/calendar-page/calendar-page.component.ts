@@ -1,4 +1,5 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
@@ -17,6 +18,7 @@ export class CalendarPageComponent implements OnInit {
   private readonly boardsApi = inject(BoardsApiService);
   private readonly tasksApi = inject(TasksApiService);
   private readonly columnsApi = inject(ColumnsApiService);
+  private readonly destroyRef = inject(DestroyRef);
 
   viewDate = signal(new Date());
   tasks = signal<Task[]>([]);
@@ -52,6 +54,7 @@ export class CalendarPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.boardsApi.getAll().pipe(
+      takeUntilDestroyed(this.destroyRef),
       switchMap(boards => {
         const taskRequests = boards.map(b => this.tasksApi.getByBoard(b.id));
         const colRequests = boards.map(b => this.columnsApi.getByBoard(b.id).pipe());
