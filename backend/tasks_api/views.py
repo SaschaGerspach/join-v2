@@ -3,6 +3,7 @@ import uuid
 
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db import transaction
 from django.http import FileResponse
 from django.urls import reverse
 from drf_spectacular.utils import OpenApiParameter, extend_schema
@@ -127,7 +128,9 @@ def serialize_label(label):
 
 
 def serialize_task(task):
-    subtasks = task.subtasks.all()
+    subtasks = list(task.subtasks.all())
+    attachments = list(task.attachments.all())
+    labels = list(task.labels.all())
     return {
         "id": task.pk,
         "board": task.board_id,
@@ -139,10 +142,10 @@ def serialize_task(task):
         "due_date": task.due_date,
         "created_at": task.created_at,
         "order": task.order,
-        "subtask_count": subtasks.count(),
-        "subtask_done_count": subtasks.filter(done=True).count(),
-        "attachment_count": task.attachments.count(),
-        "labels": [serialize_label(label) for label in task.labels.all()],
+        "subtask_count": len(subtasks),
+        "subtask_done_count": sum(1 for s in subtasks if s.done),
+        "attachment_count": len(attachments),
+        "labels": [serialize_label(label) for label in labels],
     }
 
 
@@ -173,7 +176,11 @@ def task_list(request):
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
-        tasks = board.tasks.all().order_by("order", "created_at")
+        tasks = (
+            board.tasks
+            .prefetch_related("subtasks", "attachments", "labels")
+            .order_by("order", "created_at")
+        )
         return Response([serialize_task(t) for t in tasks])
 
     title = request.data.get("title", "").strip()
@@ -363,11 +370,18 @@ def task_reorder(request):
                 return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
             task.column_id = item["column"]
 
-    Task.objects.bulk_update(list(tasks.values()), ["order", "column_id"])
+    with transaction.atomic():
+        Task.objects.bulk_update(list(tasks.values()), ["order", "column_id"])
 
     board_ids = {t.board_id for t in tasks.values()}
+    refreshed = {
+        t.pk: t
+        for t in Task.objects
+        .filter(pk__in=tasks.keys())
+        .prefetch_related("subtasks", "attachments", "labels")
+    }
     for bid in board_ids:
-        board_tasks = [serialize_task(t) for t in tasks.values() if t.board_id == bid]
+        board_tasks = [serialize_task(refreshed[pk]) for pk in tasks if refreshed[pk].board_id == bid]
         send_board_event(bid, "tasks_reordered", board_tasks)
 
     return Response(status=status.HTTP_204_NO_CONTENT)
