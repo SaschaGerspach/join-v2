@@ -81,134 +81,21 @@
         </div>
       </div>
 
-      <div class="field-group">
-        <label class="field-label">Labels</label>
-        <div class="label-options">
-          @for (label of boardLabels(); track label.id) {
-            <button
-              class="label-toggle"
-              [style.background]="label.color"
-              [class.active]="selectedLabelIds().has(label.id)"
-              (click)="toggleLabel(label.id)"
-            >{{ label.name }}</button>
-          }
-        </div>
-        <div class="subtask-add">
-          <input
-            class="field-input"
-            type="text"
-            [(ngModel)]="newLabelName"
-            placeholder="New label…"
-            (keyup.enter)="createLabel()"
-          />
-          <input type="color" [(ngModel)]="newLabelColor" class="label-color-input" aria-label="Label color" />
-          <button class="btn-add-sub" aria-label="Add label" (click)="createLabel()">+</button>
-        </div>
-      </div>
+      <app-task-labels
+        [boardId]="task().board"
+        [(selectedLabelIds)]="selectedLabelIds"
+      />
 
-      <div class="field-group">
-        <label class="field-label">Attachments</label>
-        <div class="attachment-list">
-          @for (att of attachments(); track att.id) {
-            <div class="attachment-item">
-              <a [href]="att.url" target="_blank" class="attachment-link">{{ att.filename }}</a>
-              <span class="attachment-size">{{ formatSize(att.size) }}</span>
-              <button class="btn-remove-sub" aria-label="Delete attachment" (click)="deleteAttachment(att)">&#10005;</button>
-            </div>
-          }
-          @if (attachments().length === 0) {
-            <span class="comments-empty">No files attached.</span>
-          }
-        </div>
-        <input
-          type="file"
-          class="file-input"
-          aria-label="Upload attachment"
-          accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.md,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
-          (change)="onFileSelected($event)"
-        />
-      </div>
+      <app-task-attachments [taskId]="task().id" />
 
-      <div class="field-group">
-        <label class="field-label">Subtasks</label>
-        <div class="subtask-list">
-          @for (sub of subtasks(); track sub.id) {
-            <div class="subtask-item">
-              <input
-                type="checkbox"
-                [id]="'sub-' + sub.id"
-                [checked]="sub.done"
-                (change)="toggleSubtask(sub)"
-              />
-              @if (editingSubtaskId() === sub.id) {
-                <input
-                  class="subtask-edit-input"
-                  type="text"
-                  [(ngModel)]="editingSubtaskTitle"
-                  (keyup.enter)="confirmEditSubtask(sub)"
-                  (keyup.escape)="editingSubtaskId.set(null)"
-                  (blur)="confirmEditSubtask(sub)"
-                  autofocus
-                />
-              } @else {
-                <label [for]="'sub-' + sub.id" [class.done]="sub.done" (dblclick)="startEditSubtask(sub)">{{ sub.title }}</label>
-              }
-              <button class="btn-remove-sub" aria-label="Delete subtask" (click)="deleteSubtask(sub)">&#10005;</button>
-            </div>
-          }
-        </div>
-        <div class="subtask-add">
-          <input
-            class="field-input"
-            type="text"
-            [ngModel]="newSubtaskTitle()"
-            (ngModelChange)="newSubtaskTitle.set($event)"
-            placeholder="Add subtask..."
-            (keyup.enter)="addSubtask()"
-          />
-          <button class="btn-add-sub" aria-label="Add subtask" (click)="addSubtask()">+</button>
-        </div>
-      </div>
+      <app-task-subtasks
+        [taskId]="task().id"
+        (subtaskCountChanged)="onSubtaskCountChanged($event)"
+      />
 
     </div>
 
-    <div class="comments-section">
-      <h3 class="section-label">Comments</h3>
-
-      <div class="comment-list">
-        @for (c of comments(); track c.id) {
-          <div class="comment-item">
-            <div class="comment-header">
-              <span class="comment-author">{{ c.author_name }}</span>
-              <span class="comment-date">{{ c.created_at | slice:0:10 }}</span>
-              @if (c.author_id === +auth.user()!.id) {
-                <button class="btn-comment-action" (click)="startEditComment(c)">Edit</button>
-                <button class="btn-comment-action danger" (click)="deleteComment(c.id)">Delete</button>
-              }
-            </div>
-            @if (editingCommentId() === c.id) {
-              <textarea class="comment-textarea" [(ngModel)]="editingCommentText" rows="2" (blur)="confirmEditComment(c)"></textarea>
-            } @else {
-              <p class="comment-text">{{ c.text }}</p>
-            }
-          </div>
-        }
-        @if (comments().length === 0) {
-          <p class="comments-empty">No comments yet.</p>
-        }
-      </div>
-
-      <div class="comment-input-row">
-        <textarea
-          class="comment-textarea new"
-          [ngModel]="newCommentText()"
-          (ngModelChange)="newCommentText.set($event)"
-          placeholder="Add a comment…"
-          rows="2"
-        ></textarea>
-        <button class="btn-add-comment" (click)="addComment()">Post</button>
-      </div>
-    </div>
+    <app-task-comments [taskId]="task().id" />
 
     <div class="modal-footer">
       <button class="btn-danger" (click)="deleteTask()">Delete</button>

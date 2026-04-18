@@ -1,0 +1,76 @@
+$color-primary: #29abe2;
+$color-border:  #d1d1d1;
+$color-muted:   #a8a8a8;
+$color-error:   #ff8190;
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: $color-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.attachment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.attachment-link {
+  flex: 1;
+  font-size: 0.85rem;
+  color: $color-primary;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; }
+}
+
+.attachment-size {
+  font-size: 0.75rem;
+  color: $color-muted;
+  white-space: nowrap;
+}
+
+.btn-remove-sub {
+  background: none;
+  border: none;
+  color: $color-muted;
+  font-size: 0.7rem;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &:hover {
+    color: $color-error;
+    background: rgba($color-error, 0.1);
+  }
+}
+
+.comments-empty {
+  font-size: 0.82rem;
+  color: $color-muted;
+  font-style: italic;
+}
+
+.file-input {
+  font-size: 0.85rem;
+  color: var(--color-text);
+}

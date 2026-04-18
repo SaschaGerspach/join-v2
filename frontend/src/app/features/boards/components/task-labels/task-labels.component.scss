@@ -1,0 +1,95 @@
+$color-primary: #29abe2;
+$color-dark:    #2a3647;
+$color-white:   #ffffff;
+$color-bg:      #f6f7f8;
+$color-border:  #d1d1d1;
+$color-muted:   #a8a8a8;
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: $color-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.field-input {
+  border: 1px solid $color-border;
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background: $color-bg;
+  width: 100%;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: $color-primary;
+    outline: none;
+  }
+}
+
+.label-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.label-toggle {
+  border: 2px solid transparent;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+
+  &.active {
+    opacity: 1;
+    border-color: $color-dark;
+  }
+
+  &:hover { opacity: 0.75; }
+}
+
+.label-add {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.label-color-input {
+  width: 32px;
+  height: 32px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.btn-add-sub {
+  background: $color-primary;
+  color: $color-white;
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover { background: $color-dark; }
+}

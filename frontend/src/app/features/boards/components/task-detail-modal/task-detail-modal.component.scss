@@ -11,8 +11,6 @@ $priority-medium: #ffa800;
 $priority-low:    #7ae229;
 $priority-urgent: #ff3d00;
 
-// ─── Backdrop ────────────────────────────────────────────────────────────────
-
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -23,8 +21,6 @@ $priority-urgent: #ff3d00;
   z-index: 1000;
   padding: 1rem;
 }
-
-// ─── Card ─────────────────────────────────────────────────────────────────────
 
 .modal-card {
   background: var(--color-surface);
@@ -37,8 +33,6 @@ $priority-urgent: #ff3d00;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
-
-// ─── Header ──────────────────────────────────────────────────────────────────
 
 .modal-header {
   display: flex;
@@ -77,8 +71,6 @@ $priority-urgent: #ff3d00;
     background: rgba($color-error, 0.1);
   }
 }
-
-// ─── Body ─────────────────────────────────────────────────────────────────────
 
 .modal-body {
   flex: 1;
@@ -140,8 +132,6 @@ $priority-urgent: #ff3d00;
   }
 }
 
-// ─── Priority ────────────────────────────────────────────────────────────────
-
 .priority-options {
   display: flex;
   gap: 0.4rem;
@@ -171,171 +161,6 @@ $priority-urgent: #ff3d00;
   &.priority-medium { background: $priority-medium; }
   &.priority-low    { background: $priority-low; color: $color-dark; }
 }
-
-// ─── Labels ─────────────────────────────────────────────────────────────────
-
-.label-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-bottom: 0.5rem;
-}
-
-.label-toggle {
-  border: 2px solid transparent;
-  border-radius: 6px;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #fff;
-  cursor: pointer;
-  opacity: 0.4;
-  transition: opacity 0.15s ease, border-color 0.15s ease;
-
-  &.active {
-    opacity: 1;
-    border-color: $color-dark;
-  }
-
-  &:hover { opacity: 0.75; }
-}
-
-.label-color-input {
-  width: 32px;
-  height: 32px;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  border-radius: 6px;
-  flex-shrink: 0;
-}
-
-// ─── Attachments ────────────────────────────────────────────────────────────
-
-.attachment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  margin-bottom: 0.5rem;
-}
-
-.attachment-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.attachment-link {
-  flex: 1;
-  font-size: 0.85rem;
-  color: $color-primary;
-  text-decoration: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-  &:hover { text-decoration: underline; }
-}
-
-.attachment-size {
-  font-size: 0.75rem;
-  color: $color-muted;
-  white-space: nowrap;
-}
-
-.file-input {
-  font-size: 0.85rem;
-  color: var(--color-text);
-}
-
-// ─── Subtasks ────────────────────────────────────────────────────────────────
-
-.subtask-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.subtask-item {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-
-  input[type="checkbox"] {
-    accent-color: $color-primary;
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
-  label {
-    flex: 1;
-    font-size: 0.9rem;
-    color: var(--color-text);
-    cursor: pointer;
-
-    &.done {
-      text-decoration: line-through;
-      color: $color-muted;
-    }
-  }
-
-  .subtask-edit-input {
-    flex: 1;
-    font-size: 0.9rem;
-    border: none;
-    border-bottom: 1px solid $color-primary;
-    outline: none;
-    padding: 0;
-    background: transparent;
-    color: var(--color-text);
-  }
-}
-
-.btn-remove-sub {
-  background: none;
-  border: none;
-  color: $color-muted;
-  font-size: 0.7rem;
-  cursor: pointer;
-  padding: 2px 5px;
-  border-radius: 50%;
-  flex-shrink: 0;
-
-  &:hover {
-    color: $color-error;
-    background: rgba($color-error, 0.1);
-  }
-}
-
-.subtask-add {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.btn-add-sub {
-  background: $color-primary;
-  color: $color-white;
-  border: none;
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background: $color-dark;
-  }
-}
-
-// ─── Footer ──────────────────────────────────────────────────────────────────
 
 .modal-footer {
   display: flex;
@@ -397,88 +222,4 @@ $priority-urgent: #ff3d00;
     background: $color-primary;
     border-color: $color-primary;
   }
-}
-
-.comments-section {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid $color-border;
-}
-
-.comment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.comment-item {
-  background: $color-bg;
-  border-radius: 10px;
-  padding: 0.6rem 0.75rem;
-}
-
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-
-  .comment-author { font-weight: 600; font-size: 0.82rem; color: var(--color-text); }
-  .comment-date { font-size: 0.75rem; color: $color-muted; flex: 1; }
-}
-
-.btn-comment-action {
-  background: none;
-  border: none;
-  font-size: 0.75rem;
-  cursor: pointer;
-  color: $color-muted;
-  padding: 0;
-
-  &:hover { color: var(--color-text); }
-  &.danger:hover { color: $color-error; }
-}
-
-.comment-text {
-  font-size: 0.85rem;
-  color: var(--color-text);
-  margin: 0;
-  white-space: pre-wrap;
-}
-
-.comments-empty {
-  font-size: 0.82rem;
-  color: $color-muted;
-  font-style: italic;
-}
-
-.comment-input-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-end;
-}
-
-.comment-textarea {
-  flex: 1;
-  border: 1px solid $color-border;
-  border-radius: 10px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.85rem;
-  font-family: inherit;
-  resize: none;
-
-  &:focus { outline: none; border-color: $color-primary; }
-}
-
-.btn-add-comment {
-  background: $color-dark;
-  color: $color-white;
-  border: none;
-  border-radius: 10px;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-
-  &:hover { background: $color-primary; }
 }

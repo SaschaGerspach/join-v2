@@ -1,0 +1,40 @@
+<div class="field-group">
+  <label class="field-label">Subtasks</label>
+  <div class="subtask-list">
+    @for (sub of subtasks(); track sub.id) {
+      <div class="subtask-item">
+        <input
+          type="checkbox"
+          [id]="'sub-' + sub.id"
+          [checked]="sub.done"
+          (change)="toggleSubtask(sub)"
+        />
+        @if (editingSubtaskId() === sub.id) {
+          <input
+            class="subtask-edit-input"
+            type="text"
+            [(ngModel)]="editingSubtaskTitle"
+            (keyup.enter)="confirmEditSubtask(sub)"
+            (keyup.escape)="editingSubtaskId.set(null)"
+            (blur)="confirmEditSubtask(sub)"
+            autofocus
+          />
+        } @else {
+          <label [for]="'sub-' + sub.id" [class.done]="sub.done" (dblclick)="startEditSubtask(sub)">{{ sub.title }}</label>
+        }
+        <button class="btn-remove-sub" aria-label="Delete subtask" (click)="deleteSubtask(sub)">&#10005;</button>
+      </div>
+    }
+  </div>
+  <div class="subtask-add">
+    <input
+      class="field-input"
+      type="text"
+      [ngModel]="newSubtaskTitle()"
+      (ngModelChange)="newSubtaskTitle.set($event)"
+      placeholder="Add subtask..."
+      (keyup.enter)="addSubtask()"
+    />
+    <button class="btn-add-sub" aria-label="Add subtask" (click)="addSubtask()">+</button>
+  </div>
+</div>
