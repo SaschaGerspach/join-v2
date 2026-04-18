@@ -1,4 +1,4 @@
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -92,7 +92,11 @@ def contact_detail(request, pk):
                 if field == "email":
                     value = value.lower()
                 setattr(contact, field, value)
-        contact.save()
+        try:
+            with transaction.atomic():
+                contact.save()
+        except IntegrityError:
+            return Response({"detail": "A contact with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serialize_contact(contact))
 
     contact.delete()
