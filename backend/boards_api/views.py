@@ -1,7 +1,5 @@
-import logging
-
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
+from config.mail import send_mail_async
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -20,8 +18,6 @@ from .serializers import (
     BoardSerializer,
     BoardUpdateSerializer,
 )
-
-logger = logging.getLogger(__name__)
 
 DEFAULT_COLUMNS = ["To do", "In progress", "Await feedback", "Done"]
 
@@ -187,20 +183,16 @@ def board_members(request, pk):
 
     inviter = (request.user.first_name or request.user.email).replace('\n', '').replace('\r', '')
     board_title = board.title.replace('\n', '').replace('\r', '')
-    try:
-        send_mail(
-            subject="You've been invited to a board — Join",
-            message=(
-                f"{inviter} invited you to the board "
-                f'"{board_title}" on Join.\n\n'
-                f"Log in to access it: {settings.FRONTEND_URL}/boards/{board.pk}"
-            ),
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[invitee.email],
-            fail_silently=False,
-        )
-    except Exception:
-        logger.warning("Board invite mail failed for %s", invitee.email, exc_info=True)
+    send_mail_async(
+        subject="You've been invited to a board — Join",
+        message=(
+            f"{inviter} invited you to the board "
+            f'"{board_title}" on Join.\n\n'
+            f"Log in to access it: {settings.FRONTEND_URL}/boards/{board.pk}"
+        ),
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[invitee.email],
+    )
 
     return Response({
         "user_id": invitee.pk,
