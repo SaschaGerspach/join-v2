@@ -78,9 +78,17 @@ export class CalendarPageComponent implements OnInit {
     });
   }
 
+  tasksByDate = computed(() => {
+    const map: Record<string, Task[]> = {};
+    for (const t of this.tasks()) {
+      const key = t.due_date?.slice(0, 10);
+      if (key) (map[key] ??= []).push(t);
+    }
+    return map;
+  });
+
   tasksForDay(day: Date): Task[] {
-    const iso = day.toISOString().slice(0, 10);
-    return this.tasks().filter(t => t.due_date?.slice(0, 10) === iso);
+    return this.tasksByDate()[day.toISOString().slice(0, 10)] ?? [];
   }
 
   columnsForTask(task: Task): Column[] {
