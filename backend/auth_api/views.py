@@ -57,7 +57,6 @@ def _issue_tokens_for(user):
 
 
 class AuthRateThrottle(AnonRateThrottle):
-    rate = "10/minute"
     scope = "auth_attempts"
 
 
