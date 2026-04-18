@@ -71,7 +71,6 @@ User = get_user_model()
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
 def register(request):
-    from .serializers import RegisterSerializer
     serializer = RegisterSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -115,7 +114,6 @@ def register(request):
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
 def login_view(request):
-    from .serializers import LoginSerializer
     serializer = LoginSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -218,7 +216,6 @@ def _send_verification_email(user):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def verify_email(request):
-    from .serializers import VerifyEmailSerializer
     serializer = VerifyEmailSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -247,7 +244,6 @@ def verify_email(request):
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
 def resend_verification(request):
-    from .serializers import EmailSerializer
     serializer = EmailSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -272,7 +268,6 @@ def resend_verification(request):
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
 def password_reset_request(request):
-    from .serializers import EmailSerializer
     serializer = EmailSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -304,7 +299,6 @@ def password_reset_request(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def password_reset_confirm(request):
-    from .serializers import PasswordResetConfirmSerializer
     serializer = PasswordResetConfirmSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

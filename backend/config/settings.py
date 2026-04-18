@@ -272,13 +272,17 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "10000/day" if os.environ.get("DJANGO_DISABLE_THROTTLE") == "true" else "100/day",
+        "user": "10000/hour" if os.environ.get("DJANGO_DISABLE_THROTTLE") == "true" else "1000/hour",
         "auth_attempts": "1000/minute" if os.environ.get("DJANGO_DISABLE_THROTTLE") == "true" else "10/minute",
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+DEFAULT_BOARD_COLUMNS = ["To do", "In progress", "Await feedback", "Done"]
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Join API",

@@ -19,8 +19,6 @@ from .serializers import (
     BoardUpdateSerializer,
 )
 
-DEFAULT_COLUMNS = ["To do", "In progress", "Await feedback", "Done"]
-
 User = get_user_model()
 
 
@@ -77,7 +75,7 @@ def board_list(request):
 
     board = Board.objects.create(title=serializer.validated_data["title"], created_by=request.user)
     Column.objects.bulk_create([
-        Column(board=board, title=t, order=i) for i, t in enumerate(DEFAULT_COLUMNS)
+        Column(board=board, title=t, order=i) for i, t in enumerate(settings.DEFAULT_BOARD_COLUMNS)
     ])
     return Response(serialize_board(board), status=status.HTTP_201_CREATED)
 
