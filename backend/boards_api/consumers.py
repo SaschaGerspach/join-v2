@@ -1,10 +1,13 @@
 import json
+import logging
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken
+
+logger = logging.getLogger(__name__)
 
 
 class BoardConsumer(AsyncWebsocketConsumer):
@@ -22,10 +25,12 @@ class BoardConsumer(AsyncWebsocketConsumer):
 
         if self.user is None:
             if data.get("type") != "authenticate" or not data.get("token"):
+                logger.warning("WebSocket auth missing token for board %s", self.board_id)
                 await self.close(code=4401)
                 return
             user = await self._authenticate(data["token"])
             if not user or not await self._has_access(user, self.board_id):
+                logger.warning("WebSocket auth failed for board %s", self.board_id)
                 await self.close(code=4401)
                 return
             self.user = user

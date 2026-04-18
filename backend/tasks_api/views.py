@@ -1,3 +1,4 @@
+import logging
 import re
 import uuid
 
@@ -35,6 +36,8 @@ from .serializers import (
     TaskUpdateSerializer,
 )
 
+logger = logging.getLogger(__name__)
+
 ALLOWED_ATTACHMENT_EXTENSIONS = {
     "png", "jpg", "jpeg", "gif", "webp",
     "pdf", "txt", "md", "csv",
@@ -47,13 +50,16 @@ def _notify(subject, body, recipients):
     recipients = [r for r in {r.strip().lower() for r in recipients if r} if r]
     if not recipients:
         return
-    send_mail(
-        subject=subject,
-        message=body,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=recipients,
-        fail_silently=True,
-    )
+    try:
+        send_mail(
+            subject=subject,
+            message=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=recipients,
+            fail_silently=False,
+        )
+    except Exception:
+        logger.warning("Task notification mail failed for %s", recipients, exc_info=True)
 
 
 def _sanitize(value):

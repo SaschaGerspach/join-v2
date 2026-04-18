@@ -34,6 +34,10 @@ class Task(models.Model):
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ["order", "created_at"]
+        indexes = [models.Index(fields=["board", "order"])]
+
     def __str__(self):
         return self.title
 
