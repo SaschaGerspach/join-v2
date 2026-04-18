@@ -1,66 +1,66 @@
 <div class="board-detail">
 
-  @if (loading()) {
+  @if (state.loading()) {
     <app-loading-spinner />
   }
 
   <div class="board-detail-header">
-    @if (editingBoardTitle()) {
+    @if (state.editingBoardTitle()) {
       <input
         class="board-title-input"
         type="text"
         [(ngModel)]="boardTitleInput"
         (keyup.enter)="confirmRenameBoardTitle()"
-        (keyup.escape)="editingBoardTitle.set(false)"
+        (keyup.escape)="state.editingBoardTitle.set(false)"
         (blur)="confirmRenameBoardTitle()"
       />
     } @else {
-      <h1 (dblclick)="startRenameBoardTitle()">{{ board()?.title ?? 'Board' }}</h1>
+      <h1 (dblclick)="startRenameBoardTitle()">{{ state.board()?.title ?? 'Board' }}</h1>
     }
     <input
       class="search-input"
       type="search"
       placeholder="Search tasks…"
-      [value]="searchQuery()"
-      (input)="searchQuery.set($any($event.target).value)"
+      [value]="state.searchQuery()"
+      (input)="state.searchQuery.set($any($event.target).value)"
     />
-    <select class="filter-select" [ngModel]="filterPriority()" (ngModelChange)="filterPriority.set($event)">
+    <select class="filter-select" [ngModel]="state.filterPriority()" (ngModelChange)="state.filterPriority.set($event)">
       <option value="">All priorities</option>
       <option value="urgent">Urgent</option>
       <option value="high">High</option>
       <option value="medium">Medium</option>
       <option value="low">Low</option>
     </select>
-    <select class="filter-select" [ngModel]="filterAssignee()" (ngModelChange)="filterAssignee.set($event === '' ? '' : +$event)">
+    <select class="filter-select" [ngModel]="state.filterAssignee()" (ngModelChange)="state.filterAssignee.set($event === '' ? '' : +$event)">
       <option value="">All assignees</option>
-      @for (c of contacts(); track c.id) {
+      @for (c of state.contacts(); track c.id) {
         <option [value]="c.id">{{ c.first_name }} {{ c.last_name }}</option>
       }
     </select>
-    <select class="filter-select" [ngModel]="filterDue()" (ngModelChange)="filterDue.set($event)">
+    <select class="filter-select" [ngModel]="state.filterDue()" (ngModelChange)="state.filterDue.set($event)">
       <option value="">Any due date</option>
       <option value="overdue">Overdue</option>
       <option value="soon">Due soon</option>
     </select>
-    @if (hasActiveFilter()) {
-      <button class="btn-clear-filter" (click)="clearFilters()">&#10005; Clear</button>
+    @if (state.hasActiveFilter()) {
+      <button class="btn-clear-filter" (click)="state.clearFilters()">&#10005; Clear</button>
     }
-    <a class="btn-stats" [routerLink]="['/boards', boardId(), 'stats']">Stats</a>
+    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'stats']">Stats</a>
     <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>
   </div>
 
-  @if (bulkMode()) {
+  @if (state.bulkMode()) {
     <div class="bulk-toolbar">
-      <span class="bulk-count">{{ selectedTaskIds().size }} selected</span>
-      <select class="filter-select" [ngModel]="bulkMoveTarget()" (ngModelChange)="bulkMoveTarget.set($event === '' ? null : +$event)">
+      <span class="bulk-count">{{ state.selectedTaskIds().size }} selected</span>
+      <select class="filter-select" [ngModel]="state.bulkMoveTarget()" (ngModelChange)="state.bulkMoveTarget.set($event === '' ? null : +$event)">
         <option value="">Move to…</option>
-        @for (col of columns(); track col.id) {
+        @for (col of state.columns(); track col.id) {
           <option [value]="col.id">{{ col.title }}</option>
         }
       </select>
-      <button class="btn-bulk-move" [disabled]="bulkMoveTarget() === null" (click)="bulkMove()">Move</button>
-      <button class="btn-bulk-delete" (click)="bulkDelete()">Delete</button>
-      <button class="btn-clear-filter" (click)="clearSelection()">&#10005; Cancel</button>
+      <button class="btn-bulk-move" [disabled]="state.bulkMoveTarget() === null" (click)="state.bulkMove()">Move</button>
+      <button class="btn-bulk-delete" (click)="state.pendingBulkDelete.set(true)">Delete</button>
+      <button class="btn-clear-filter" (click)="state.clearSelection()">&#10005; Cancel</button>
     </div>
   }
 
@@ -84,51 +84,51 @@
     class="kanban-board"
     cdkDropList
     cdkDropListOrientation="horizontal"
-    [cdkDropListData]="columns()"
-    [cdkDropListDisabled]="hasActiveFilter()"
-    (cdkDropListDropped)="dropColumn($event)"
+    [cdkDropListData]="state.columns()"
+    [cdkDropListDisabled]="state.hasActiveFilter()"
+    (cdkDropListDropped)="state.dropColumn($event)"
   >
-    @for (column of columns(); track column.id) {
+    @for (column of state.columns(); track column.id) {
       <div class="kanban-column" cdkDrag [cdkDragData]="column">
 
         <div class="column-header" cdkDragHandle>
-          @if (editingColumnId() === column.id) {
+          @if (state.editingColumnId() === column.id) {
             <input
               class="column-title-input"
               type="text"
               [(ngModel)]="editingColumnTitle"
               (keyup.enter)="confirmRenameColumn(column.id)"
-              (keyup.escape)="editingColumnId.set(null)"
+              (keyup.escape)="state.editingColumnId.set(null)"
               (blur)="confirmRenameColumn(column.id)"
             />
           } @else {
             <span class="column-title" (dblclick)="startRenameColumn(column)">{{ column.title }}</span>
           }
-          <button class="btn-icon" (click)="deleteColumn(column.id)" title="Delete column">&#10005;</button>
+          <button class="btn-icon" (click)="state.pendingDeleteColumnId.set(column.id)" title="Delete column">&#10005;</button>
         </div>
 
         <div
           class="task-list"
           cdkDropList
           [id]="'col-' + column.id"
-          [cdkDropListData]="tasksForColumn(column.id)"
-          [cdkDropListConnectedTo]="columnListIds()"
-          [cdkDropListDisabled]="hasActiveFilter()"
-          (cdkDropListDropped)="drop($event, column.id)"
+          [cdkDropListData]="state.tasksForColumn(column.id)"
+          [cdkDropListConnectedTo]="state.columnListIds()"
+          [cdkDropListDisabled]="state.hasActiveFilter()"
+          (cdkDropListDropped)="state.drop($event, column.id)"
         >
-          @for (task of tasksForColumn(column.id); track task.id) {
-            <div class="task-card" [class.selected]="isTaskSelected(task.id)" cdkDrag [cdkDragData]="task" (click)="openTask(task)">
+          @for (task of state.tasksForColumn(column.id); track task.id) {
+            <div class="task-card" [class.selected]="state.isTaskSelected(task.id)" cdkDrag [cdkDragData]="task" (click)="state.selectedTask.set(task)">
               <div class="task-card-top">
                 <input
                   type="checkbox"
                   class="task-select-checkbox"
-                  [checked]="isTaskSelected(task.id)"
-                  (click)="toggleTaskSelection(task.id, $event)"
+                  [checked]="state.isTaskSelected(task.id)"
+                  (click)="state.toggleTaskSelection(task.id, $event)"
                 />
-                <span class="task-priority" [class]="priorityClass(task.priority)">
+                <span class="task-priority" [class]="state.priorityClass(task.priority)">
                   {{ task.priority }}
                 </span>
-                <button class="btn-icon small" (click)="$event.stopPropagation(); deleteTask(task.id)">&#10005;</button>
+                <button class="btn-icon small" (click)="$event.stopPropagation(); state.pendingDeleteTaskId.set(task.id)">&#10005;</button>
               </div>
               <p class="task-title">{{ task.title }}</p>
               @if (task.labels && task.labels.length > 0) {
@@ -143,16 +143,16 @@
               }
               @if (task.due_date) {
                 <div class="task-due-date"
-                     [class.overdue]="isOverdue(task.due_date)"
-                     [class.due-soon]="!isOverdue(task.due_date) && isSoon(task.due_date)">
+                     [class.overdue]="state.isOverdue(task.due_date)"
+                     [class.due-soon]="!state.isOverdue(task.due_date) && state.isSoon(task.due_date)">
                   <span class="due-icon">&#128197;</span>
                   <span>{{ task.due_date | slice:0:10 }}</span>
                 </div>
               }
-              @if (task.assigned_to && contactName(task.assigned_to)) {
+              @if (task.assigned_to && state.contactName(task.assigned_to)) {
                 <div class="task-assignee">
-                  <span class="assignee-avatar">{{ contactInitials(task.assigned_to) }}</span>
-                  <span class="assignee-name">{{ contactName(task.assigned_to) }}</span>
+                  <span class="assignee-avatar">{{ state.contactInitials(task.assigned_to) }}</span>
+                  <span class="assignee-name">{{ state.contactName(task.assigned_to) }}</span>
                 </div>
               }
               @if (task.subtask_count > 0) {
@@ -172,17 +172,17 @@
             </div>
           }
 
-          @if (tasksForColumn(column.id).length === 0) {
+          @if (state.tasksForColumn(column.id).length === 0) {
             <p class="column-empty">No tasks yet</p>
           }
 
-          <button class="btn-add-task" (click)="startAddTask(column.id)">+ Add Task</button>
+          <button class="btn-add-task" (click)="state.addingTaskForColumn.set(column.id)">+ Add Task</button>
         </div>
 
       </div>
     }
 
-    @if (columns().length === 0) {
+    @if (state.columns().length === 0) {
       <div class="board-empty">
         <p>No columns yet. Add your first column!</p>
       </div>
@@ -191,46 +191,46 @@
 
 </div>
 
-@if (addingTaskForColumn() !== null) {
+@if (state.addingTaskForColumn() !== null) {
   <app-create-task-modal
-    [columnId]="addingTaskForColumn()!"
-    [columns]="columns()"
-    [contacts]="contacts()"
-    (confirmed)="createTask($event)"
-    (cancelled)="addingTaskForColumn.set(null)"
+    [columnId]="state.addingTaskForColumn()!"
+    [columns]="state.columns()"
+    [contacts]="state.contacts()"
+    (confirmed)="state.createTask($event)"
+    (cancelled)="state.addingTaskForColumn.set(null)"
   />
 }
 
-@if (selectedTask()) {
+@if (state.selectedTask()) {
   <app-task-detail-modal
-    [task]="selectedTask()!"
-    [columns]="columns()"
-    (closed)="selectedTask.set(null)"
-    (taskUpdated)="onTaskUpdated($event)"
-    (taskDeleted)="onTaskDeleted($event)"
+    [task]="state.selectedTask()!"
+    [columns]="state.columns()"
+    (closed)="state.selectedTask.set(null)"
+    (taskUpdated)="state.onTaskUpdated($event)"
+    (taskDeleted)="state.onTaskDeleted($event)"
   />
 }
 
-@if (pendingDeleteColumnId() !== null) {
+@if (state.pendingDeleteColumnId() !== null) {
   <app-confirm-dialog
     message="Delete this column? All tasks inside will be removed."
-    (confirmed)="confirmDeleteColumn()"
-    (cancelled)="pendingDeleteColumnId.set(null)"
+    (confirmed)="state.confirmDeleteColumn()"
+    (cancelled)="state.pendingDeleteColumnId.set(null)"
   />
 }
 
-@if (pendingDeleteTaskId() !== null) {
+@if (state.pendingDeleteTaskId() !== null) {
   <app-confirm-dialog
     message="Delete this task?"
-    (confirmed)="confirmDeleteTask()"
-    (cancelled)="pendingDeleteTaskId.set(null)"
+    (confirmed)="state.confirmDeleteTask()"
+    (cancelled)="state.pendingDeleteTaskId.set(null)"
   />
 }
 
-@if (pendingBulkDelete()) {
+@if (state.pendingBulkDelete()) {
   <app-confirm-dialog
-    [message]="'Delete ' + selectedTaskIds().size + ' selected task(s)?'"
-    (confirmed)="confirmBulkDelete()"
-    (cancelled)="pendingBulkDelete.set(false)"
+    [message]="'Delete ' + state.selectedTaskIds().size + ' selected task(s)?'"
+    (confirmed)="state.confirmBulkDelete()"
+    (cancelled)="state.pendingBulkDelete.set(false)"
   />
 }
