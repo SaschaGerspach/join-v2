@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from boards_api.models import Board
+from boards_api.models import Board, BoardMember
 from .models import Column
 
 User = get_user_model()
@@ -41,6 +41,22 @@ class ColumnListTests(APITestCase):
         response = self.client.post(f"{self.url}?board={self.board.pk}", {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_column_member_forbidden(self):
+        member = User.objects.create_user(email="member@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=member)
+        self.client.force_authenticate(user=member)
+        response = self.client.post(f"{self.url}?board={self.board.pk}", {"title": "New"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_list_columns_as_member(self):
+        Column.objects.create(board=self.board, title="Todo", order=0)
+        member = User.objects.create_user(email="member@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=member)
+        self.client.force_authenticate(user=member)
+        response = self.client.get(self.url, {"board": self.board.pk})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
 
 class ColumnDetailTests(APITestCase):
     def setUp(self):
@@ -72,3 +88,18 @@ class ColumnDetailTests(APITestCase):
         self.client.force_authenticate(user=self.other)
         response = self.client.delete(self.url(self.column.pk))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_column_member_forbidden(self):
+        member = User.objects.create_user(email="member@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=member)
+        self.client.force_authenticate(user=member)
+        response = self.client.delete(self.url(self.column.pk))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_patch_column_as_member(self):
+        member = User.objects.create_user(email="member@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=member)
+        self.client.force_authenticate(user=member)
+        response = self.client.patch(self.url(self.column.pk), {"title": "Renamed"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["title"], "Renamed")

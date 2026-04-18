@@ -37,6 +37,14 @@ class TaskListTests(APITestCase):
         response = self.client.post(f"{self.url}?board={self.board.pk}", {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_task_invalid_priority(self):
+        response = self.client.post(
+            f"{self.url}?board={self.board.pk}",
+            {"title": "Task", "priority": "invalid"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class TaskDetailTests(APITestCase):
     def setUp(self):
@@ -78,6 +86,14 @@ class TaskDetailTests(APITestCase):
         self.client.force_authenticate(user=self.other)
         response = self.client.delete(self.url(self.task.pk))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_patch_task_invalid_priority(self):
+        response = self.client.patch(self.url(self.task.pk), {"priority": "invalid"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_task_negative_order(self):
+        response = self.client.patch(self.url(self.task.pk), {"order": -1}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class SubtaskTests(APITestCase):
