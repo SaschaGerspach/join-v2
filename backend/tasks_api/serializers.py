@@ -1,4 +1,11 @@
+import re
+
 from rest_framework import serializers
+
+from .models import Task
+
+PRIORITY_CHOICES = Task.Priority.choices
+HEX_COLOR_RE = re.compile(r'^#[0-9a-fA-F]{6}$')
 
 
 class LabelSerializer(serializers.Serializer):
@@ -8,13 +15,23 @@ class LabelSerializer(serializers.Serializer):
 
 
 class LabelCreateSerializer(serializers.Serializer):
-    name = serializers.CharField()
-    color = serializers.CharField(required=False)
+    name = serializers.CharField(max_length=50)
+    color = serializers.CharField(max_length=7, default='#29abe2')
+
+    def validate_color(self, value):
+        if not HEX_COLOR_RE.match(value):
+            raise serializers.ValidationError("Invalid hex color.")
+        return value
 
 
 class LabelUpdateSerializer(serializers.Serializer):
-    name = serializers.CharField(required=False)
-    color = serializers.CharField(required=False)
+    name = serializers.CharField(required=False, max_length=50)
+    color = serializers.CharField(required=False, max_length=7)
+
+    def validate_color(self, value):
+        if not HEX_COLOR_RE.match(value):
+            raise serializers.ValidationError("Invalid hex color.")
+        return value
 
 
 class TaskSerializer(serializers.Serializer):
@@ -35,22 +52,22 @@ class TaskSerializer(serializers.Serializer):
 
 
 class TaskCreateSerializer(serializers.Serializer):
-    title = serializers.CharField()
-    description = serializers.CharField(required=False, allow_blank=True)
-    priority = serializers.CharField(required=False)
-    column = serializers.IntegerField(required=False)
+    title = serializers.CharField(max_length=255)
+    description = serializers.CharField(required=False, allow_blank=True, default="")
+    priority = serializers.ChoiceField(choices=PRIORITY_CHOICES, required=False, default=Task.Priority.MEDIUM)
+    column = serializers.IntegerField(required=False, allow_null=True)
     assigned_to = serializers.IntegerField(required=False, allow_null=True)
     due_date = serializers.DateField(required=False, allow_null=True)
 
 
 class TaskUpdateSerializer(serializers.Serializer):
-    title = serializers.CharField(required=False)
+    title = serializers.CharField(required=False, max_length=255)
     description = serializers.CharField(required=False, allow_blank=True)
-    priority = serializers.CharField(required=False)
-    column = serializers.IntegerField(required=False)
+    priority = serializers.ChoiceField(choices=PRIORITY_CHOICES, required=False)
+    column = serializers.IntegerField(required=False, allow_null=True)
     assigned_to = serializers.IntegerField(required=False, allow_null=True)
     due_date = serializers.DateField(required=False, allow_null=True)
-    order = serializers.IntegerField(required=False)
+    order = serializers.IntegerField(required=False, min_value=0)
     label_ids = serializers.ListField(child=serializers.IntegerField(), required=False)
 
 

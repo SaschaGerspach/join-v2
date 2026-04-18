@@ -11,12 +11,12 @@ class BoardSerializer(serializers.Serializer):
 
 
 class BoardCreateSerializer(serializers.Serializer):
-    title = serializers.CharField()
+    title = serializers.CharField(max_length=255)
 
 
 class BoardUpdateSerializer(serializers.Serializer):
-    title = serializers.CharField(required=False)
-    color = serializers.CharField(required=False)
+    title = serializers.CharField(required=False, max_length=255)
+    color = serializers.RegexField(regex=r'^#[0-9a-fA-F]{6}$', required=False)
 
 
 class BoardMemberSerializer(serializers.Serializer):

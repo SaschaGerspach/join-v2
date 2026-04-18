@@ -61,17 +61,18 @@ def user_detail(request, pk):
     if request.method == "PATCH":
         if request.user.pk != pk:
             return Response({"detail": "You can only edit your own profile."}, status=status.HTTP_403_FORBIDDEN)
+        serializer = UserUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = serializer.validated_data
         for field in ["first_name", "last_name", "email"]:
-            if field in request.data:
-                value = request.data[field].strip()
+            if field in data:
+                value = data[field]
                 if field == "email":
                     value = value.lower()
                 setattr(user, field, value)
-        if "password" in request.data:
-            new_password = request.data["password"].strip()
-            if len(new_password) < 8:
-                return Response({"detail": "Password must be at least 8 characters."}, status=status.HTTP_400_BAD_REQUEST)
-            user.set_password(new_password)
+        if "password" in data:
+            user.set_password(data["password"])
         user.save()
         return Response(serialize_user(user))
 

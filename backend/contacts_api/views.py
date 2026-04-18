@@ -46,17 +46,17 @@ def contact_list(request):
         page = paginator.paginate_queryset(contacts, request)
         return paginator.get_paginated_response([serialize_contact(c) for c in page])
 
-    required = ["first_name", "last_name", "email"]
-    for field in required:
-        if not request.data.get(field, "").strip():
-            return Response({"detail": f"{field} is required."}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = ContactCreateSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    data = serializer.validated_data
 
     contact = Contact.objects.create(
         owner=request.user,
-        first_name=request.data["first_name"].strip(),
-        last_name=request.data["last_name"].strip(),
-        email=request.data["email"].strip().lower(),
-        phone=request.data.get("phone", "").strip(),
+        first_name=data["first_name"],
+        last_name=data["last_name"],
+        email=data["email"].lower(),
+        phone=data.get("phone", ""),
     )
     return Response(serialize_contact(contact), status=status.HTTP_201_CREATED)
 
@@ -78,9 +78,13 @@ def contact_detail(request, pk):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PATCH":
+        serializer = ContactUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = serializer.validated_data
         for field in ["first_name", "last_name", "email", "phone"]:
-            if field in request.data:
-                value = request.data[field].strip()
+            if field in data:
+                value = data[field]
                 if field == "email":
                     value = value.lower()
                 setattr(contact, field, value)

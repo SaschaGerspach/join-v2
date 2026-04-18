@@ -189,29 +189,30 @@ def task_list(request):
         )
         return Response([serialize_task(t) for t in tasks])
 
-    title = request.data.get("title", "").strip()
-    if not title:
-        return Response({"detail": "Title is required."}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = TaskCreateSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    data = serializer.validated_data
 
-    column_id = request.data.get("column")
+    column_id = data.get("column")
     if not column_id:
         first_column = board.columns.order_by("order").first()
         column_id = first_column.pk if first_column else None
     elif not Column.objects.filter(pk=column_id, board=board).exists():
         return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
 
-    assigned_to_id = request.data.get("assigned_to")
+    assigned_to_id = data.get("assigned_to")
     if assigned_to_id and not Contact.objects.filter(pk=assigned_to_id, owner=request.user).exists():
         return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
 
     task = Task.objects.create(
         board=board,
-        title=title,
-        description=request.data.get("description", ""),
-        priority=request.data.get("priority", Task.Priority.MEDIUM),
+        title=data["title"],
+        description=data.get("description", ""),
+        priority=data.get("priority", Task.Priority.MEDIUM),
         column_id=column_id,
         assigned_to_id=assigned_to_id,
-        due_date=request.data.get("due_date"),
+        due_date=data.get("due_date"),
     )
     _notify_assignment(task, request.user)
     data = serialize_task(task)
@@ -246,20 +247,24 @@ def task_detail(request, pk):
         return Response(serialize_task(task))
 
     if request.method == "PATCH":
-        if "assigned_to" in request.data and request.data["assigned_to"]:
-            if not Contact.objects.filter(pk=request.data["assigned_to"], owner=request.user).exists():
+        serializer = TaskUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = serializer.validated_data
+        if "assigned_to" in data and data["assigned_to"]:
+            if not Contact.objects.filter(pk=data["assigned_to"], owner=request.user).exists():
                 return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
-        if "column" in request.data and request.data["column"]:
-            if not Column.objects.filter(pk=request.data["column"], board=task.board).exists():
+        if "column" in data and data["column"]:
+            if not Column.objects.filter(pk=data["column"], board=task.board).exists():
                 return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
         previous_assignee_id = task.assigned_to_id
         for field in ["title", "description", "priority", "column", "assigned_to", "due_date", "order"]:
             key = field if field not in ["column", "assigned_to"] else f"{field}_id"
-            if field in request.data:
-                setattr(task, key, request.data[field])
+            if field in data:
+                setattr(task, key, data[field])
         task.save()
-        if "label_ids" in request.data:
-            task.labels.set(Label.objects.filter(pk__in=request.data["label_ids"], board=task.board))
+        if "label_ids" in data:
+            task.labels.set(Label.objects.filter(pk__in=data["label_ids"], board=task.board))
         if task.assigned_to_id and task.assigned_to_id != previous_assignee_id:
             _notify_assignment(task, request.user)
         data = serialize_task(task)
@@ -304,11 +309,11 @@ def subtask_list(request, task_pk):
     if request.method == "GET":
         return Response([serialize_subtask(s) for s in task.subtasks.all()])
 
-    title = request.data.get("title", "").strip()
-    if not title:
-        return Response({"detail": "Title is required."}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = SubtaskCreateSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    subtask = Subtask.objects.create(task=task, title=title)
+    subtask = Subtask.objects.create(task=task, title=serializer.validated_data["title"])
     return Response(serialize_subtask(subtask), status=status.HTTP_201_CREATED)
 
 
@@ -332,10 +337,14 @@ def subtask_detail(request, task_pk, pk):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PATCH":
-        if "title" in request.data:
-            subtask.title = request.data["title"].strip()
-        if "done" in request.data:
-            subtask.done = request.data["done"]
+        serializer = SubtaskUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = serializer.validated_data
+        if "title" in data:
+            subtask.title = data["title"]
+        if "done" in data:
+            subtask.done = data["done"]
         subtask.save()
         return Response(serialize_subtask(subtask))
 
@@ -349,11 +358,12 @@ def subtask_detail(request, task_pk, pk):
 )
 @api_view(["POST"])
 def task_reorder(request):
-    items = request.data
-    if not isinstance(items, list):
-        return Response({"detail": "Expected a list."}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = TaskReorderItemSerializer(data=request.data, many=True)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    items = serializer.validated_data
 
-    task_ids = [item["id"] for item in items if "id" in item]
+    task_ids = [item["id"] for item in items]
     fetched = list(Task.objects.filter(pk__in=task_ids).select_related("board"))
     if len(fetched) != len(set(task_ids)):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -427,11 +437,11 @@ def comment_list(request, task_pk):
     if request.method == "GET":
         return Response([serialize_comment(c) for c in task.comments.select_related("author").all()])
 
-    text = request.data.get("text", "").strip()
-    if not text:
-        return Response({"detail": "Text is required."}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = CommentCreateSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    comment = Comment.objects.create(task=task, author=request.user, text=text)
+    comment = Comment.objects.create(task=task, author=request.user, text=serializer.validated_data["text"])
     _notify_comment(comment, request.user)
     return Response(serialize_comment(comment), status=status.HTTP_201_CREATED)
 
@@ -456,10 +466,10 @@ def comment_detail(request, task_pk, pk):
         return Response({"detail": "You can only edit your own comments."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":
-        text = request.data.get("text", "").strip()
-        if not text:
-            return Response({"detail": "Text is required."}, status=status.HTTP_400_BAD_REQUEST)
-        comment.text = text
+        serializer = CommentCreateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        comment.text = serializer.validated_data["text"]
         comment.save(update_fields=["text", "updated_at"])
         return Response(serialize_comment(comment))
 
@@ -489,14 +499,14 @@ def label_list(request, board_pk):
     if request.method == "GET":
         return Response([serialize_label(label) for label in board.labels.all()])
 
-    name = request.data.get("name", "").strip()
-    color = request.data.get("color", "#29abe2").strip()
-    if not name:
-        return Response({"detail": "Name is required."}, status=status.HTTP_400_BAD_REQUEST)
-    if not re.fullmatch(r'#[0-9a-fA-F]{6}', color):
-        return Response({"detail": "Invalid color."}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = LabelCreateSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    label, created = Label.objects.get_or_create(board=board, name=name, defaults={"color": color})
+    label, created = Label.objects.get_or_create(
+        board=board, name=serializer.validated_data["name"],
+        defaults={"color": serializer.validated_data["color"]},
+    )
     if not created:
         return Response({"detail": "Label already exists."}, status=status.HTTP_400_BAD_REQUEST)
     return Response(serialize_label(label), status=status.HTTP_201_CREATED)
@@ -522,13 +532,14 @@ def label_detail(request, board_pk, pk):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PATCH":
-        if "name" in request.data:
-            label.name = request.data["name"].strip()
-        if "color" in request.data:
-            color = request.data["color"].strip()
-            if not re.fullmatch(r'#[0-9a-fA-F]{6}', color):
-                return Response({"detail": "Invalid color."}, status=status.HTTP_400_BAD_REQUEST)
-            label.color = color
+        serializer = LabelUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = serializer.validated_data
+        if "name" in data:
+            label.name = data["name"]
+        if "color" in data:
+            label.color = data["color"]
         label.save()
         return Response(serialize_label(label))
 

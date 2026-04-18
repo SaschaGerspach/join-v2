@@ -71,22 +71,15 @@ User = get_user_model()
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
 def register(request):
-    email = request.data.get("email", "").strip().lower()
-    password = request.data.get("password", "")
-    first_name = request.data.get("first_name", "").strip()
-    last_name = request.data.get("last_name", "").strip()
-
-    if not email or not password:
-        return Response(
-            {"detail": "Email and password are required."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    if len(password) < 8:
-        return Response(
-            {"detail": "Password must be at least 8 characters."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    from .serializers import RegisterSerializer
+    serializer = RegisterSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    data = serializer.validated_data
+    email = data["email"].strip().lower()
+    password = data["password"]
+    first_name = data.get("first_name", "").strip()
+    last_name = data.get("last_name", "").strip()
 
     if User.objects.filter(email=email).exists():
         return Response(
@@ -122,14 +115,13 @@ def register(request):
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
 def login_view(request):
-    email = request.data.get("email", "").strip().lower()
-    password = request.data.get("password", "")
-
-    if not email or not password:
-        return Response(
-            {"detail": "Email and password are required."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    from .serializers import LoginSerializer
+    serializer = LoginSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    data = serializer.validated_data
+    email = data["email"].strip().lower()
+    password = data["password"]
 
     user = authenticate(request, username=email, password=password)
 
@@ -226,11 +218,12 @@ def _send_verification_email(user):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def verify_email(request):
-    uid = request.data.get("uid", "")
-    token = request.data.get("token", "")
-
-    if not uid or not token:
-        return Response({"detail": "uid and token are required."}, status=status.HTTP_400_BAD_REQUEST)
+    from .serializers import VerifyEmailSerializer
+    serializer = VerifyEmailSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    uid = serializer.validated_data["uid"]
+    token = serializer.validated_data["token"]
 
     try:
         pk = force_str(urlsafe_base64_decode(uid))
@@ -254,9 +247,11 @@ def verify_email(request):
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
 def resend_verification(request):
-    email = request.data.get("email", "").strip().lower()
-    if not email:
-        return Response({"detail": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+    from .serializers import EmailSerializer
+    serializer = EmailSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    email = serializer.validated_data["email"].strip().lower()
 
     try:
         user = User.objects.get(email=email)
@@ -277,9 +272,11 @@ def resend_verification(request):
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
 def password_reset_request(request):
-    email = request.data.get("email", "").strip().lower()
-    if not email:
-        return Response({"detail": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+    from .serializers import EmailSerializer
+    serializer = EmailSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    email = serializer.validated_data["email"].strip().lower()
 
     try:
         user = User.objects.get(email=email)
@@ -307,12 +304,13 @@ def password_reset_request(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def password_reset_confirm(request):
-    uid = request.data.get("uid", "")
-    token = request.data.get("token", "")
-    password = request.data.get("password", "")
-
-    if not uid or not token or not password:
-        return Response({"detail": "uid, token and password are required."}, status=status.HTTP_400_BAD_REQUEST)
+    from .serializers import PasswordResetConfirmSerializer
+    serializer = PasswordResetConfirmSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    uid = serializer.validated_data["uid"]
+    token = serializer.validated_data["token"]
+    password = serializer.validated_data["password"]
 
     try:
         pk = force_str(urlsafe_base64_decode(uid))

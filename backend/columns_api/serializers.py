@@ -9,9 +9,9 @@ class ColumnSerializer(serializers.Serializer):
 
 
 class ColumnCreateSerializer(serializers.Serializer):
-    title = serializers.CharField()
+    title = serializers.CharField(max_length=255)
 
 
 class ColumnUpdateSerializer(serializers.Serializer):
-    title = serializers.CharField(required=False)
-    order = serializers.IntegerField(required=False)
+    title = serializers.CharField(required=False, max_length=255)
+    order = serializers.IntegerField(required=False, min_value=0)

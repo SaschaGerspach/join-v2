@@ -54,12 +54,12 @@ def column_list(request):
         columns = board.columns.all().order_by("order")
         return Response([serialize_column(c) for c in columns])
 
-    title = request.data.get("title", "").strip()
-    if not title:
-        return Response({"detail": "Title is required."}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = ColumnCreateSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     order = board.columns.count()
-    column = Column.objects.create(board=board, title=title, order=order)
+    column = Column.objects.create(board=board, title=serializer.validated_data["title"], order=order)
     data = serialize_column(column)
     send_board_event(board.pk, "column_created", data)
     return Response(data, status=status.HTTP_201_CREATED)
@@ -85,10 +85,14 @@ def column_detail(request, pk):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PATCH":
-        if "title" in request.data:
-            column.title = request.data["title"].strip()
-        if "order" in request.data:
-            column.order = request.data["order"]
+        serializer = ColumnUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = serializer.validated_data
+        if "title" in data:
+            column.title = data["title"]
+        if "order" in data:
+            column.order = data["order"]
         column.save()
         data = serialize_column(column)
         send_board_event(column.board_id, "column_updated", data)

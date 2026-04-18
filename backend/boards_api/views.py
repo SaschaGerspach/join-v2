@@ -1,5 +1,4 @@
 import logging
-import re
 
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -76,11 +75,11 @@ def board_list(request):
         page = paginator.paginate_queryset(boards, request)
         return paginator.get_paginated_response([serialize_shared_board(b, request.user) for b in page])
 
-    title = request.data.get("title", "").strip()
-    if not title:
-        return Response({"detail": "Title is required."}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = BoardCreateSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    board = Board.objects.create(title=title, created_by=request.user)
+    board = Board.objects.create(title=serializer.validated_data["title"], created_by=request.user)
     Column.objects.bulk_create([
         Column(board=board, title=t, order=i) for i, t in enumerate(DEFAULT_COLUMNS)
     ])
@@ -117,12 +116,14 @@ def board_detail(request, pk):
         return Response({"detail": "Only the owner can modify this board."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":
-        if "title" in request.data:
-            board.title = request.data["title"].strip()
-        if "color" in request.data:
-            color = request.data["color"].strip()
-            if re.fullmatch(r'#[0-9a-fA-F]{6}', color):
-                board.color = color
+        serializer = BoardUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = serializer.validated_data
+        if "title" in data:
+            board.title = data["title"]
+        if "color" in data:
+            board.color = data["color"]
         board.save()
         return Response(serialize_shared_board(board, request.user))
 
@@ -167,9 +168,10 @@ def board_members(request, pk):
     if board.created_by != request.user:
         return Response({"detail": "Only the owner can invite members."}, status=status.HTTP_403_FORBIDDEN)
 
-    email = request.data.get("email", "").strip().lower()
-    if not email:
-        return Response({"detail": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = BoardMemberInviteSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    email = serializer.validated_data["email"].lower()
 
     if email == request.user.email:
         return Response({"detail": "You cannot invite yourself."}, status=status.HTTP_400_BAD_REQUEST)
