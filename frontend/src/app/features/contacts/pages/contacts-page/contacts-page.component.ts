@@ -75,16 +75,22 @@ export class ContactsPageComponent implements OnInit {
     if (!this.form.first_name.trim() || !this.form.last_name.trim() || !this.form.email.trim()) return;
 
     if (this.editMode() && this.selectedContact()) {
-      this.api.patch(this.selectedContact()!.id, this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(updated => {
-        this.contacts.update(c => c.map(x => x.id === updated.id ? updated : x));
-        this.selectedContact.set(updated);
-        this.showForm.set(false);
+      this.api.patch(this.selectedContact()!.id, this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: updated => {
+          this.contacts.update(c => c.map(x => x.id === updated.id ? updated : x));
+          this.selectedContact.set(updated);
+          this.showForm.set(false);
+        },
+        error: () => this.toast.show('Failed to update contact.', 'error'),
       });
     } else {
-      this.api.create(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(created => {
-        this.contacts.update(c => [...c, created]);
-        this.selectedContact.set(created);
-        this.showForm.set(false);
+      this.api.create(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: created => {
+          this.contacts.update(c => [...c, created]);
+          this.selectedContact.set(created);
+          this.showForm.set(false);
+        },
+        error: () => this.toast.show('Failed to create contact.', 'error'),
       });
     }
   }
@@ -96,13 +102,19 @@ export class ContactsPageComponent implements OnInit {
   confirmDeleteContact(): void {
     const id = this.pendingDeleteId();
     if (id === null) return;
-    this.api.delete(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.contacts.update(c => c.filter(x => x.id !== id));
-      if (this.selectedContact()?.id === id) {
-        this.selectedContact.set(null);
-        this.showForm.set(false);
-      }
-      this.pendingDeleteId.set(null);
+    this.api.delete(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.contacts.update(c => c.filter(x => x.id !== id));
+        if (this.selectedContact()?.id === id) {
+          this.selectedContact.set(null);
+          this.showForm.set(false);
+        }
+        this.pendingDeleteId.set(null);
+      },
+      error: () => {
+        this.pendingDeleteId.set(null);
+        this.toast.show('Failed to delete contact.', 'error');
+      },
     });
   }
 
