@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -51,13 +52,16 @@ def contact_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     data = serializer.validated_data
 
-    contact = Contact.objects.create(
-        owner=request.user,
-        first_name=data["first_name"],
-        last_name=data["last_name"],
-        email=data["email"].lower(),
-        phone=data.get("phone", ""),
-    )
+    try:
+        contact = Contact.objects.create(
+            owner=request.user,
+            first_name=data["first_name"],
+            last_name=data["last_name"],
+            email=data["email"].lower(),
+            phone=data.get("phone", ""),
+        )
+    except IntegrityError:
+        return Response({"detail": "A contact with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
     return Response(serialize_contact(contact), status=status.HTTP_201_CREATED)
 
 

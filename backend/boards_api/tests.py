@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from columns_api.models import Column
 from .models import Board
 
 User = get_user_model()
@@ -28,6 +30,12 @@ class BoardListTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["title"], "New Board")
         self.assertEqual(Board.objects.count(), 1)
+
+    def test_create_board_creates_default_columns(self):
+        self.client.post(self.url, {"title": "New Board"}, format="json")
+        board = Board.objects.first()
+        columns = list(Column.objects.filter(board=board).order_by("order").values_list("title", flat=True))
+        self.assertEqual(columns, settings.DEFAULT_BOARD_COLUMNS)
 
     def test_create_board_missing_title(self):
         response = self.client.post(self.url, {}, format="json")

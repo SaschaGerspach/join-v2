@@ -33,6 +33,13 @@ class ContactListTests(APITestCase):
         response = self.client.post(self.url, {"first_name": "Max"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_duplicate_contact_email(self):
+        Contact.objects.create(owner=self.user, first_name="Anna", last_name="A", email="anna@example.com")
+        response = self.client.post(self.url, {
+            "first_name": "Anna", "last_name": "B", "email": "anna@example.com"
+        }, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_list_unauthenticated(self):
         self.client.force_authenticate(user=None)
         response = self.client.get(self.url)
