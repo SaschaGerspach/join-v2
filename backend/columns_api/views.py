@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.models import Board
-from boards_api.permissions import can_access_board
+from boards_api.permissions import can_access_board, is_board_owner
 from boards_api.ws_events import send_board_event
 from config.serializers import DetailSerializer
 from .models import Column
@@ -54,6 +54,9 @@ def column_list(request):
         columns = board.columns.all().order_by("order")
         return Response([serialize_column(c) for c in columns])
 
+    if not is_board_owner(board, request.user):
+        return Response({"detail": "Only the board owner can create columns."}, status=status.HTTP_403_FORBIDDEN)
+
     serializer = ColumnCreateSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -97,6 +100,9 @@ def column_detail(request, pk):
         data = serialize_column(column)
         send_board_event(column.board_id, "column_updated", data)
         return Response(data)
+
+    if not is_board_owner(column.board, request.user):
+        return Response({"detail": "Only the board owner can delete columns."}, status=status.HTTP_403_FORBIDDEN)
 
     board_id = column.board_id
     col_id = column.pk
