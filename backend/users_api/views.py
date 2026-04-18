@@ -66,6 +66,10 @@ def user_detail(request, pk):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         data = serializer.validated_data
+        if "email" in data:
+            new_email = data["email"].lower()
+            if User.objects.filter(email=new_email, is_active=True).exclude(pk=pk).exists():
+                return Response({"detail": "A user with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
         for field in ["first_name", "last_name", "email"]:
             if field in data:
                 value = data[field]

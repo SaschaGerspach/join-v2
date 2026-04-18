@@ -53,6 +53,12 @@ class UserDetailTests(APITestCase):
         response = self.client.patch(self.url(self.other.pk), {"first_name": "Hacked"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_patch_email_duplicate_rejected(self):
+        response = self.client.patch(self.url(self.user.pk), {"email": "b@example.com"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, "a@example.com")
+
     def test_delete_own_account(self):
         response = self.client.delete(self.url(self.user.pk))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
