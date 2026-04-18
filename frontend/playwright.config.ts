@@ -1,19 +1,30 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
-  timeout: 30000,
+  fullyParallel: false,
+  workers: 1,
+  retries: 0,
+  timeout: 30_000,
+  reporter: [['list']],
+  globalSetup: './e2e/global-setup.ts',
   use: {
     baseURL: 'http://localhost:4200',
-    headless: true,
+    storageState: 'e2e/.auth/user.json',
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
   projects: [
-    { name: 'chromium', use: { browserName: 'chromium' } },
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
   ],
   webServer: {
     command: 'npx ng serve --port 4200',
     url: 'http://localhost:4200',
     reuseExistingServer: true,
-    timeout: 60000,
+    timeout: 120_000,
   },
 });
