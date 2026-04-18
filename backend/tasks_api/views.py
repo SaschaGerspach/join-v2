@@ -420,7 +420,7 @@ def serialize_comment(comment):
 @api_view(["GET", "POST"])
 def comment_list(request, task_pk):
     try:
-        task = Task.objects.get(pk=task_pk)
+        task = Task.objects.select_related("board__created_by").get(pk=task_pk)
     except Task.DoesNotExist:
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
