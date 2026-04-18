@@ -28,6 +28,7 @@ export class CreateTaskModalComponent implements OnInit, AfterViewInit {
   dueDate = '';
   assignedTo: number | null = null;
   selectedColumnId: number | null = null;
+  submitted = false;
 
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
 
@@ -45,6 +46,7 @@ export class CreateTaskModalComponent implements OnInit, AfterViewInit {
   }
 
   submit(): void {
+    this.submitted = true;
     const t = this.title.trim();
     if (!t) return;
     this.confirmed.emit({

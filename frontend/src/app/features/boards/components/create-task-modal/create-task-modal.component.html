@@ -16,8 +16,12 @@
           type="text"
           [(ngModel)]="title"
           placeholder="Task title"
+          [class.field-error]="submitted && !title.trim()"
           (keyup.enter)="submit()"
         />
+        @if (submitted && !title.trim()) {
+          <span class="error-text">Title is required.</span>
+        }
       </div>
 
       <div class="field-group">

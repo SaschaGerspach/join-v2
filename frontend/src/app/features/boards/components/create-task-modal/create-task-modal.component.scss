@@ -104,6 +104,13 @@ $priority-urgent: #ff3d00;
 
 .field-textarea { resize: none; }
 
+.field-error { border-color: $color-error; }
+
+.error-text {
+  font-size: 0.75rem;
+  color: $color-error;
+}
+
 .priority-options {
   display: flex;
   gap: 0.4rem;
