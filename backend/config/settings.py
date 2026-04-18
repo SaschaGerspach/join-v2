@@ -275,7 +275,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "100/day",
-        "auth_attempts": "10/minute",
+        "auth_attempts": "1000/minute" if os.environ.get("DJANGO_DISABLE_THROTTLE") == "true" else "10/minute",
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
