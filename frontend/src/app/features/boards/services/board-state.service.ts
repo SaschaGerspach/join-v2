@@ -2,7 +2,8 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { BoardsApiService, Board } from '../../../core/boards/boards-api.service';
 import { ColumnsApiService, Column } from '../../../core/columns/columns-api.service';
 import { TasksApiService, Task, CreateTaskPayload } from '../../../core/tasks/tasks-api.service';
@@ -345,15 +346,24 @@ export class BoardStateService {
     this.pendingBulkDelete.set(false);
     if (ids.length === 0) return;
 
-    forkJoin(ids.map(id => this.tasksApi.delete(id)))
+    forkJoin(ids.map((id, i) => this.tasksApi.delete(id).pipe(
+      catchError(() => of({ failed: true, index: i })),
+    )))
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.tasks.update(t => t.filter(task => !ids.includes(task.id)));
-          this.clearSelection();
+      .subscribe(results => {
+        const failedIds = new Set(results.filter(r => r && typeof r === 'object' && 'failed' in r).map(r => ids[(r as { index: number }).index]));
+        const deletedIds = ids.filter(id => !failedIds.has(id));
+        if (deletedIds.length > 0) {
+          this.tasks.update(t => t.filter(task => !deletedIds.includes(task.id)));
+        }
+        this.clearSelection();
+        if (failedIds.size === 0) {
           this.toast.show(`Deleted ${ids.length} task(s)`);
-        },
-        error: () => this.toast.show(`Failed to delete ${ids.length} task(s).`, 'error'),
+        } else if (deletedIds.length === 0) {
+          this.toast.show(`Failed to delete ${ids.length} task(s).`, 'error');
+        } else {
+          this.toast.show(`Deleted ${deletedIds.length}, failed ${failedIds.size} task(s).`, 'error');
+        }
       });
   }
 
