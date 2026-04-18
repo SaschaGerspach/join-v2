@@ -87,6 +87,9 @@ def column_detail(request, pk):
     if not can_access_board(column.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    if not is_board_owner(column.board, request.user):
+        return Response({"detail": "Only the board owner can modify columns."}, status=status.HTTP_403_FORBIDDEN)
+
     if request.method == "PATCH":
         serializer = ColumnUpdateSerializer(data=request.data)
         if not serializer.is_valid():
@@ -100,9 +103,6 @@ def column_detail(request, pk):
         data = serialize_column(column)
         send_board_event(column.board_id, "column_updated", data)
         return Response(data)
-
-    if not is_board_owner(column.board, request.user):
-        return Response({"detail": "Only the board owner can delete columns."}, status=status.HTTP_403_FORBIDDEN)
 
     board_id = column.board_id
     col_id = column.pk

@@ -96,10 +96,9 @@ class ColumnDetailTests(APITestCase):
         response = self.client.delete(self.url(self.column.pk))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_patch_column_as_member(self):
+    def test_patch_column_member_forbidden(self):
         member = User.objects.create_user(email="member@example.com", password="pass")
         BoardMember.objects.create(board=self.board, user=member)
         self.client.force_authenticate(user=member)
         response = self.client.patch(self.url(self.column.pk), {"title": "Renamed"}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["title"], "Renamed")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
