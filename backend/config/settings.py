@@ -274,7 +274,7 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.AnonRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "100/day",
+        "anon": "10000/day" if os.environ.get("DJANGO_DISABLE_THROTTLE") == "true" else "100/day",
         "auth_attempts": "1000/minute" if os.environ.get("DJANGO_DISABLE_THROTTLE") == "true" else "10/minute",
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
