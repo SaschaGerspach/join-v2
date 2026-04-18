@@ -2,14 +2,15 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 import { BoardsApiService, Board } from '../../../core/boards/boards-api.service';
 import { ColumnsApiService, Column } from '../../../core/columns/columns-api.service';
 import { TasksApiService, Task, CreateTaskPayload } from '../../../core/tasks/tasks-api.service';
 import { ContactsApiService, Contact } from '../../../core/contacts/contacts-api.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { BoardWsService } from '../../../core/websocket/board-ws.service';
+import { connectBoardWebSocket } from './_board-ws-handler';
+import { handleColumnDrop, handleTaskDrop } from './_board-drag-drop';
+import { bulkMoveTasks, bulkDeleteTasks } from './_board-bulk-ops';
 
 @Injectable()
 export class BoardStateService {
@@ -72,7 +73,7 @@ export class BoardStateService {
   init(boardId: number): void {
     this.boardId.set(boardId);
     this.loadData(boardId);
-    this.connectWebSocket(boardId);
+    connectBoardWebSocket(boardId, this.boardWs, this.tasks, this.columns, this.destroyRef);
   }
 
   cleanup(): void {
@@ -102,62 +103,9 @@ export class BoardStateService {
     return this.filteredTasks().filter(t => t.column === columnId);
   }
 
-  private loadData(boardId: number): void {
-    this.loading.set(true);
-    this.boardsApi.getById(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: board => {
-        this.board.set(board);
-        this.titleService.setTitle(`${board.title} | Join`);
-      },
-      error: () => { this.toast.show('Failed to load board.', 'error'); this.loading.set(false); },
-    });
-    this.columnsApi.getByBoard(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(cols => this.columns.set(cols));
-    this.tasksApi.getByBoard(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(tasks => {
-      this.tasks.set(tasks);
-      this.loading.set(false);
-    });
-    this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(contacts => this.contacts.set(contacts));
-  }
-
-  private connectWebSocket(boardId: number): void {
-    this.boardWs.connect(boardId);
-    this.boardWs.events$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(evt => {
-      switch (evt.event) {
-        case 'task_created':
-          this.tasks.update(t => t.some(x => x.id === evt.data.id) ? t : [...t, evt.data]);
-          break;
-        case 'task_updated':
-          this.tasks.update(t => t.map(x => x.id === evt.data.id ? evt.data : x));
-          break;
-        case 'task_deleted':
-          this.tasks.update(t => t.filter(x => x.id !== evt.data.id));
-          break;
-        case 'tasks_reordered':
-          this.tasks.update(tasks => {
-            const updated = evt.data;
-            return tasks.map(t => {
-              const u = updated.find(x => x.id === t.id);
-              return u ?? t;
-            });
-          });
-          break;
-        case 'column_created':
-          this.columns.update(c => c.some(x => x.id === evt.data.id) ? c : [...c, evt.data]);
-          break;
-        case 'column_updated':
-          this.columns.update(c => c.map(x => x.id === evt.data.id ? evt.data : x));
-          break;
-        case 'column_deleted':
-          this.columns.update(c => c.filter(x => x.id !== evt.data.id));
-          break;
-      }
-    });
-  }
-
   createColumn(title: string): void {
     const trimmed = title.trim();
     if (!trimmed) return;
-
     this.columnsApi.create(this.boardId(), trimmed).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: col => this.columns.update(c => c.some(x => x.id === col.id) ? c : [...c, col]),
       error: () => this.toast.show('Failed to create column.', 'error'),
@@ -168,10 +116,7 @@ export class BoardStateService {
     const trimmed = title.trim();
     if (!trimmed) { this.editingBoardTitle.set(false); return; }
     this.boardsApi.patch(this.boardId(), { title: trimmed }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: updated => {
-        this.board.set(updated);
-        this.editingBoardTitle.set(false);
-      },
+      next: updated => { this.board.set(updated); this.editingBoardTitle.set(false); },
       error: () => this.toast.show('Failed to rename board.', 'error'),
     });
   }
@@ -180,10 +125,7 @@ export class BoardStateService {
     const trimmed = title.trim();
     if (!trimmed) { this.editingColumnId.set(null); return; }
     this.columnsApi.patch(id, { title: trimmed }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: updated => {
-        this.columns.update(cols => cols.map(c => c.id === id ? updated : c));
-        this.editingColumnId.set(null);
-      },
+      next: updated => { this.columns.update(cols => cols.map(c => c.id === id ? updated : c)); this.editingColumnId.set(null); },
       error: () => this.toast.show('Failed to rename column.', 'error'),
     });
   }
@@ -235,71 +177,11 @@ export class BoardStateService {
   }
 
   dropColumn(event: CdkDragDrop<Column[]>): void {
-    if (event.previousIndex === event.currentIndex) return;
-    const snapshot = this.columns();
-    const reordered = [...snapshot];
-    const [moved] = reordered.splice(event.previousIndex, 1);
-    reordered.splice(event.currentIndex, 0, moved);
-    const updated = reordered.map((c, i) => ({ ...c, order: i }));
-    this.columns.set(updated);
-
-    forkJoin(updated.map(col => this.columnsApi.patch(col.id, { order: col.order })))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        error: () => {
-          this.columns.set(snapshot);
-          this.toast.show('Failed to reorder columns.', 'error');
-        },
-      });
+    handleColumnDrop(this.columns, this.columnsApi, this.toast, this.destroyRef, event);
   }
 
   drop(event: CdkDragDrop<Task[]>, targetColumnId: number): void {
-    const task: Task = event.item.data;
-    const isSameColumn = event.previousContainer === event.container;
-    const snapshot = this.tasks();
-
-    if (isSameColumn) {
-      const colTasks = this.tasksForColumn(targetColumnId);
-      const reordered = [...colTasks];
-      const [moved] = reordered.splice(event.previousIndex, 1);
-      reordered.splice(event.currentIndex, 0, moved);
-      const updated = reordered.map((t, i) => ({ ...t, order: i }));
-      this.tasks.update(tasks =>
-        tasks.map(t => updated.find(u => u.id === t.id) ?? t)
-      );
-      this.tasksApi.reorder(updated.map(t => ({ id: t.id, order: t.order, column: t.column })))
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          error: () => {
-            this.tasks.set(snapshot);
-            this.toast.show('Failed to reorder tasks.', 'error');
-          },
-        });
-    } else {
-      const prevTasks = this.tasksForColumn(task.column!).filter(t => t.id !== task.id)
-        .map((t, i) => ({ ...t, order: i }));
-      const targetTasks = [...this.tasksForColumn(targetColumnId)];
-      targetTasks.splice(event.currentIndex, 0, { ...task, column: targetColumnId });
-      const updatedTarget = targetTasks.map((t, i) => ({ ...t, order: i, column: targetColumnId }));
-
-      this.tasks.update(tasks =>
-        tasks.map(t => {
-          const inPrev = prevTasks.find(u => u.id === t.id);
-          const inTarget = updatedTarget.find(u => u.id === t.id);
-          return inTarget ?? inPrev ?? t;
-        })
-      );
-
-      this.tasksApi.reorder([
-        ...prevTasks.map(t => ({ id: t.id, order: t.order, column: t.column })),
-        ...updatedTarget.map(t => ({ id: t.id, order: t.order, column: t.column })),
-      ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        error: () => {
-          this.tasks.set(snapshot);
-          this.toast.show('Failed to move task.', 'error');
-        },
-      });
-    }
+    handleTaskDrop(this.tasks, col => this.tasksForColumn(col), this.tasksApi, this.toast, this.destroyRef, event, targetColumnId);
   }
 
   toggleTaskSelection(taskId: number, event: Event): void {
@@ -321,50 +203,11 @@ export class BoardStateService {
   }
 
   bulkMove(): void {
-    const targetCol = this.bulkMoveTarget();
-    if (targetCol === null) return;
-    const ids = [...this.selectedTaskIds()];
-    const items = ids.map((id, i) => ({ id, order: i, column: targetCol }));
-    const snapshot = this.tasks();
-
-    this.tasks.update(tasks =>
-      tasks.map(t => ids.includes(t.id) ? { ...t, column: targetCol } : t)
-    );
-    this.clearSelection();
-
-    this.tasksApi.reorder(items).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => this.toast.show(`Moved ${ids.length} task(s)`),
-      error: () => {
-        this.tasks.set(snapshot);
-        this.toast.show('Failed to move tasks.', 'error');
-      },
-    });
+    bulkMoveTasks(this.selectedTaskIds, this.bulkMoveTarget, this.tasks, this.tasksApi, this.toast, this.destroyRef);
   }
 
   confirmBulkDelete(): void {
-    const ids = [...this.selectedTaskIds()];
-    this.pendingBulkDelete.set(false);
-    if (ids.length === 0) return;
-
-    forkJoin(ids.map((id, i) => this.tasksApi.delete(id).pipe(
-      catchError(() => of({ failed: true, index: i })),
-    )))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(results => {
-        const failedIds = new Set(results.filter(r => r && typeof r === 'object' && 'failed' in r).map(r => ids[(r as { index: number }).index]));
-        const deletedIds = ids.filter(id => !failedIds.has(id));
-        if (deletedIds.length > 0) {
-          this.tasks.update(t => t.filter(task => !deletedIds.includes(task.id)));
-        }
-        this.clearSelection();
-        if (failedIds.size === 0) {
-          this.toast.show(`Deleted ${ids.length} task(s)`);
-        } else if (deletedIds.length === 0) {
-          this.toast.show(`Failed to delete ${ids.length} task(s).`, 'error');
-        } else {
-          this.toast.show(`Deleted ${deletedIds.length}, failed ${failedIds.size} task(s).`, 'error');
-        }
-      });
+    bulkDeleteTasks(this.selectedTaskIds, this.pendingBulkDelete, this.tasks, this.tasksApi, this.toast, this.destroyRef);
   }
 
   priorityClass(priority: string): string {
@@ -382,5 +225,19 @@ export class BoardStateService {
     const due = new Date(dueDate);
     const diff = (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
     return diff >= 0 && diff <= 3;
+  }
+
+  private loadData(boardId: number): void {
+    this.loading.set(true);
+    this.boardsApi.getById(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: board => { this.board.set(board); this.titleService.setTitle(`${board.title} | Join`); },
+      error: () => { this.toast.show('Failed to load board.', 'error'); this.loading.set(false); },
+    });
+    this.columnsApi.getByBoard(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(cols => this.columns.set(cols));
+    this.tasksApi.getByBoard(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(tasks => {
+      this.tasks.set(tasks);
+      this.loading.set(false);
+    });
+    this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(contacts => this.contacts.set(contacts));
   }
 }
