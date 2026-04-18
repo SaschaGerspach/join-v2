@@ -2,8 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from boards_api.models import Board
-from .models import Task, Subtask, Label
+from boards_api.models import Board, BoardMember
+from .models import Task, Subtask, Label, Comment
 
 User = get_user_model()
 
@@ -192,4 +192,61 @@ class LabelTests(APITestCase):
     def test_labels_forbidden_for_non_member(self):
         self.client.force_authenticate(user=self.other)
         response = self.client.get(self.list_url())
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class CommentTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.member = User.objects.create_user(email="m@example.com", password="pass")
+        self.outsider = User.objects.create_user(email="x@example.com", password="pass")
+        self.board = Board.objects.create(title="Board", created_by=self.user)
+        BoardMember.objects.create(board=self.board, user=self.member)
+        self.task = Task.objects.create(board=self.board, title="Task")
+        self.client.force_authenticate(user=self.user)
+
+    def list_url(self):
+        return f"/tasks/{self.task.pk}/comments/"
+
+    def detail_url(self, pk):
+        return f"/tasks/{self.task.pk}/comments/{pk}/"
+
+    def test_create_comment(self):
+        response = self.client.post(self.list_url(), {"text": "Hello"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["text"], "Hello")
+
+    def test_list_comments(self):
+        Comment.objects.create(task=self.task, author=self.user, text="A")
+        Comment.objects.create(task=self.task, author=self.member, text="B")
+        response = self.client.get(self.list_url())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+
+    def test_edit_own_comment(self):
+        comment = Comment.objects.create(task=self.task, author=self.user, text="Old")
+        response = self.client.patch(self.detail_url(comment.pk), {"text": "New"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["text"], "New")
+
+    def test_cannot_edit_others_comment(self):
+        comment = Comment.objects.create(task=self.task, author=self.member, text="X")
+        response = self.client.patch(self.detail_url(comment.pk), {"text": "Y"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_own_comment(self):
+        comment = Comment.objects.create(task=self.task, author=self.user, text="X")
+        response = self.client.delete(self.detail_url(comment.pk))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_outsider_cannot_access_comments(self):
+        self.client.force_authenticate(user=self.outsider)
+        response = self.client.get(self.list_url())
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_outsider_cannot_edit_own_comment_after_removal(self):
+        comment = Comment.objects.create(task=self.task, author=self.member, text="X")
+        BoardMember.objects.filter(board=self.board, user=self.member).delete()
+        self.client.force_authenticate(user=self.member)
+        response = self.client.patch(self.detail_url(comment.pk), {"text": "Y"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

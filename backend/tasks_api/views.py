@@ -451,8 +451,11 @@ def comment_list(request, task_pk):
 @api_view(["PATCH", "DELETE"])
 def comment_detail(request, task_pk, pk):
     try:
-        comment = Comment.objects.select_related("author").get(pk=pk, task_id=task_pk)
+        comment = Comment.objects.select_related("author", "task__board").get(pk=pk, task_id=task_pk)
     except Comment.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not can_access_board(comment.task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if comment.author != request.user:
