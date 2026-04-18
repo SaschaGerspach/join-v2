@@ -58,7 +58,9 @@ export class BoardWsService {
     this.ws.onmessage = (msg) => {
       try {
         this.events$.next(JSON.parse(msg.data));
-      } catch {}
+      } catch (e) {
+        console.error('WebSocket: failed to parse message', e);
+      }
     };
 
     this.ws.onclose = () => {
