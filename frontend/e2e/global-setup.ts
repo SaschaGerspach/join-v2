@@ -1,5 +1,5 @@
 import { request, FullConfig } from '@playwright/test';
-import * as fs from 'fs';
+import { execSync } from 'child_process';
 import * as path from 'path';
 
 const API_URL = process.env.E2E_API_URL ?? 'http://localhost:8000';
@@ -11,10 +11,6 @@ const TEST_USER = {
 };
 
 export default async function globalSetup(_config: FullConfig): Promise<void> {
-  const storageDir = path.resolve(__dirname, '.auth');
-  const storagePath = path.join(storageDir, 'user.json');
-  fs.mkdirSync(storageDir, { recursive: true });
-
   const ctx = await request.newContext({ baseURL: API_URL });
 
   const register = await ctx.post('/auth/register', { data: TEST_USER });
@@ -22,15 +18,23 @@ export default async function globalSetup(_config: FullConfig): Promise<void> {
     throw new Error(`Registration failed: ${register.status()} ${await register.text()}`);
   }
 
-  const login = await ctx.post('/auth/login', {
-    data: { email: TEST_USER.email, password: TEST_USER.password },
-  });
-  if (!login.ok()) {
-    throw new Error(`Login failed: ${login.status()} ${await login.text()}`);
-  }
-
-  await ctx.storageState({ path: storagePath });
+  verifyUserInBackend(TEST_USER.email);
   await ctx.dispose();
+}
+
+function verifyUserInBackend(email: string): void {
+  const backendDir = path.resolve(__dirname, '..', '..', 'backend');
+  const python = process.env.E2E_PYTHON ?? 'python';
+  const code = `from auth_api.models import User; User.objects.filter(email='${email}').update(is_verified=True)`;
+  execSync(`${python} manage.py shell -c "${code}"`, {
+    cwd: backendDir,
+    env: {
+      ...process.env,
+      DJANGO_SECRET_KEY: process.env.DJANGO_SECRET_KEY ?? 'dev-test',
+      DJANGO_DEBUG: process.env.DJANGO_DEBUG ?? 'true',
+    },
+    stdio: 'inherit',
+  });
 }
 
 export { TEST_USER };

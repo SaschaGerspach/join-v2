@@ -1,15 +1,15 @@
 import { test, expect } from '@playwright/test';
 import { createBoard, deleteBoard, createColumn } from './api';
+import { login } from './helpers';
 
 let boardId: number;
-let todoColumnId: number;
-let doneColumnId: number;
 
-test.beforeEach(async () => {
+test.beforeEach(async ({ page }) => {
   const board = await createBoard(`Tasks ${Date.now()}`);
   boardId = board.id;
-  todoColumnId = (await createColumn(boardId, 'To Do')).id;
-  doneColumnId = (await createColumn(boardId, 'Done')).id;
+  await createColumn(boardId, 'To Do');
+  await createColumn(boardId, 'Done');
+  await login(page);
 });
 
 test.afterEach(async () => {
@@ -18,7 +18,7 @@ test.afterEach(async () => {
 
 test('create a task in a column', async ({ page }) => {
   await page.goto(`/boards/${boardId}`);
-  const todoCol = page.locator('.kanban-column', { hasText: 'To Do' });
+  const todoCol = page.locator('.kanban-column').filter({ has: page.locator('.column-title', { hasText: /^To Do$/ }) });
 
   await todoCol.getByRole('button', { name: '+ Add Task' }).click();
   await page.locator('input.field-input[placeholder="Task title"]').fill('My first task');
@@ -27,28 +27,27 @@ test('create a task in a column', async ({ page }) => {
   await expect(todoCol.locator('.task-card', { hasText: 'My first task' })).toBeVisible();
 });
 
-test('drag task from one column to another', async ({ page }) => {
+test('move task between columns via bulk-move', async ({ page }) => {
   await page.goto(`/boards/${boardId}`);
-  const todoCol = page.locator('.kanban-column', { hasText: 'To Do' });
-  const doneCol = page.locator('.kanban-column', { hasText: 'Done' });
+  const todoCol = page.locator('.kanban-column').filter({ has: page.locator('.column-title', { hasText: /^To Do$/ }) });
+  const doneCol = page.locator('.kanban-column').filter({ has: page.locator('.column-title', { hasText: /^Done$/ }) });
 
   await todoCol.getByRole('button', { name: '+ Add Task' }).click();
-  await page.locator('input.field-input[placeholder="Task title"]').fill('Drag me');
+  await page.locator('input.field-input[placeholder="Task title"]').fill('Movable');
   await page.getByRole('button', { name: 'Create Task' }).click();
+  await expect(todoCol.locator('.task-card', { hasText: 'Movable' })).toBeVisible();
 
-  const card = todoCol.locator('.task-card', { hasText: 'Drag me' });
-  await expect(card).toBeVisible();
+  await todoCol.locator('.task-card', { hasText: 'Movable' }).locator('.task-select-checkbox').click();
+  await page.locator('.bulk-toolbar select.filter-select').selectOption({ label: 'Done' });
+  await page.locator('.bulk-toolbar .btn-bulk-move').click();
 
-  const target = doneCol.locator('.task-list');
-  await card.dragTo(target);
-
-  await expect(doneCol.locator('.task-card', { hasText: 'Drag me' })).toBeVisible();
-  await expect(todoCol.locator('.task-card', { hasText: 'Drag me' })).toHaveCount(0);
+  await expect(doneCol.locator('.task-card', { hasText: 'Movable' })).toBeVisible();
+  await expect(todoCol.locator('.task-card', { hasText: 'Movable' })).toHaveCount(0);
 });
 
 test('bulk-select and bulk-delete tasks', async ({ page }) => {
   await page.goto(`/boards/${boardId}`);
-  const todoCol = page.locator('.kanban-column', { hasText: 'To Do' });
+  const todoCol = page.locator('.kanban-column').filter({ has: page.locator('.column-title', { hasText: /^To Do$/ }) });
 
   for (const title of ['Task A', 'Task B', 'Task C']) {
     await todoCol.getByRole('button', { name: '+ Add Task' }).click();

@@ -10,7 +10,6 @@ export default defineConfig({
   globalSetup: './e2e/global-setup.ts',
   use: {
     baseURL: 'http://localhost:4200',
-    storageState: 'e2e/.auth/user.json',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

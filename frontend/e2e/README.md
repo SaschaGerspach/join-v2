@@ -11,8 +11,10 @@
 cd backend
 rm -f db.sqlite3
 DJANGO_SECRET_KEY=dev-secret DJANGO_DEBUG=true python manage.py migrate
-DJANGO_SECRET_KEY=dev-secret DJANGO_DEBUG=true python manage.py runserver 0.0.0.0:8000
+DJANGO_SECRET_KEY=dev-secret DJANGO_DEBUG=true DJANGO_DISABLE_THROTTLE=true python manage.py runserver 0.0.0.0:8000
 ```
+
+`DJANGO_DISABLE_THROTTLE=true` setzt die Auth-Throttle-Rate hoch, damit die Login-Requests der Tests nicht gedrosselt werden. In Production niemals setzen.
 
 ## Tests ausführen
 

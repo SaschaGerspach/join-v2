@@ -1,27 +1,26 @@
 import { APIRequestContext, request as pwRequest } from '@playwright/test';
+import { TEST_USER } from './global-setup';
 
 const API_URL = process.env.E2E_API_URL ?? 'http://localhost:8000';
 
 async function getAccessToken(): Promise<string> {
-  const ctx = await pwRequest.newContext({
-    baseURL: API_URL,
-    storageState: 'e2e/.auth/user.json',
+  const ctx = await pwRequest.newContext({ baseURL: API_URL });
+  const res = await ctx.post('/auth/login', {
+    data: { email: TEST_USER.email, password: TEST_USER.password },
   });
-  const res = await ctx.post('/auth/token/refresh', { data: {} });
   if (!res.ok()) {
-    throw new Error(`Token refresh failed: ${res.status()} ${await res.text()}`);
+    throw new Error(`Login failed: ${res.status()} ${await res.text()}`);
   }
   const body = await res.json();
   await ctx.dispose();
   return body.access;
 }
 
-export async function apiContext(): Promise<APIRequestContext> {
+async function apiContext(): Promise<APIRequestContext> {
   const token = await getAccessToken();
   return pwRequest.newContext({
     baseURL: API_URL,
     extraHTTPHeaders: { Authorization: `Bearer ${token}` },
-    storageState: 'e2e/.auth/user.json',
   });
 }
 

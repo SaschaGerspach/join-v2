@@ -1,11 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { createBoard, deleteBoard } from './api';
+import { login } from './helpers';
 
 let boardId: number;
 
-test.beforeEach(async () => {
+test.beforeEach(async ({ page }) => {
   const board = await createBoard(`Columns ${Date.now()}`);
   boardId = board.id;
+  await login(page);
 });
 
 test.afterEach(async () => {

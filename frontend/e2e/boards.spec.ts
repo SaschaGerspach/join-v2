@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { login } from './helpers';
 
 test('create, open and delete a board via UI', async ({ page }) => {
   const title = `Board ${Date.now()}`;
 
+  await login(page);
   await page.goto('/boards');
   await page.getByRole('button', { name: '+ New Board' }).click();
   await page.locator('.board-form input.form-input').fill(title);
