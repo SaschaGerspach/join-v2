@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from boards_api.models import Board, BoardMember
+
 User = get_user_model()
 
 
@@ -59,3 +61,23 @@ class UserDetailTests(APITestCase):
     def test_delete_other_account_forbidden(self):
         response = self.client.delete(self.url(self.other.pk))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_transfers_board_to_member(self):
+        board = Board.objects.create(title="Team", created_by=self.user)
+        BoardMember.objects.create(board=board, user=self.other)
+        self.client.delete(self.url(self.user.pk))
+        board.refresh_from_db()
+        self.assertEqual(board.created_by, self.other)
+        self.assertFalse(BoardMember.objects.filter(board=board, user=self.other).exists())
+
+    def test_delete_removes_board_without_members(self):
+        board = Board.objects.create(title="Solo", created_by=self.user)
+        board_id = board.pk
+        self.client.delete(self.url(self.user.pk))
+        self.assertFalse(Board.objects.filter(pk=board_id).exists())
+
+    def test_delete_removes_memberships(self):
+        board = Board.objects.create(title="Other", created_by=self.other)
+        BoardMember.objects.create(board=board, user=self.user)
+        self.client.delete(self.url(self.user.pk))
+        self.assertFalse(BoardMember.objects.filter(user=self.user).exists())

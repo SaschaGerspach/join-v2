@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from boards_api.models import Board, BoardMember
 from config.serializers import DetailSerializer
 from .serializers import PublicUserSerializer, UserUpdateSerializer
 
@@ -79,6 +80,15 @@ def user_detail(request, pk):
     if request.method == "DELETE":
         if request.user.pk != pk:
             return Response({"detail": "You can only delete your own account."}, status=status.HTTP_403_FORBIDDEN)
+        for board in Board.objects.filter(created_by=user):
+            successor = BoardMember.objects.filter(board=board).order_by("invited_at").first()
+            if successor:
+                board.created_by = successor.user
+                board.save(update_fields=["created_by"])
+                successor.delete()
+            else:
+                board.delete()
+        BoardMember.objects.filter(user=user).delete()
         user.is_active = False
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
