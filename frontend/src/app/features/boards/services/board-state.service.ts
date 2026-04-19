@@ -36,6 +36,7 @@ export class BoardStateService {
   readonly filterPriority = signal<string>('');
   readonly filterAssignee = signal<number | ''>('');
   readonly filterDue = signal<'overdue' | 'soon' | ''>('');
+  readonly groupBy = signal<'none' | 'priority' | 'assignee'>('none');
 
   readonly addingTaskForColumn = signal<number | null>(null);
   readonly editingColumnId = signal<number | null>(null);
@@ -109,6 +110,46 @@ export class BoardStateService {
 
   tasksForColumn(columnId: number): Task[] {
     return this.filteredTasks().filter(t => t.column === columnId);
+  }
+
+  groupedTasksForColumn(columnId: number): { label: string; tasks: Task[] }[] {
+    const tasks = this.tasksForColumn(columnId);
+    const mode = this.groupBy();
+    if (mode === 'none') return [{ label: '', tasks }];
+
+    const groups = new Map<string, Task[]>();
+    const order: string[] = [];
+
+    if (mode === 'priority') {
+      for (const p of ['urgent', 'high', 'medium', 'low']) {
+        groups.set(p, []);
+        order.push(p);
+      }
+      for (const t of tasks) {
+        groups.get(t.priority)!.push(t);
+      }
+    } else if (mode === 'assignee') {
+      groups.set('Unassigned', []);
+      order.push('Unassigned');
+      for (const t of tasks) {
+        if (t.assigned_to.length === 0) {
+          groups.get('Unassigned')!.push(t);
+        } else {
+          for (const id of t.assigned_to) {
+            const name = this.contactName(id) || 'Unknown';
+            if (!groups.has(name)) {
+              groups.set(name, []);
+              order.push(name);
+            }
+            groups.get(name)!.push(t);
+          }
+        }
+      }
+    }
+
+    return order
+      .filter(label => (groups.get(label)?.length ?? 0) > 0)
+      .map(label => ({ label, tasks: groups.get(label)! }));
   }
 
   createColumn(title: string): void {

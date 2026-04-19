@@ -44,6 +44,11 @@
       <option value="overdue">Overdue</option>
       <option value="soon">Due soon</option>
     </select>
+    <select class="filter-select" aria-label="Group by" [ngModel]="state.groupBy()" (ngModelChange)="state.groupBy.set($event)">
+      <option value="none">No grouping</option>
+      <option value="priority">Group by Priority</option>
+      <option value="assignee">Group by Assignee</option>
+    </select>
     @if (state.hasActiveFilter()) {
       <button class="btn-clear-filter" (click)="state.clearFilters()">&#10005; Clear</button>
     }
@@ -140,64 +145,69 @@
           [cdkDropListDisabled]="state.hasActiveFilter()"
           (cdkDropListDropped)="state.drop($event, column.id)"
         >
-          @for (task of state.tasksForColumn(column.id); track task.id) {
-            <div class="task-card" [class.selected]="state.isTaskSelected(task.id)" cdkDrag [cdkDragData]="task" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }" (click)="state.selectedTask.set(task)">
-              <div class="task-card-top">
-                <input
-                  type="checkbox"
-                  class="task-select-checkbox"
-                  aria-label="Select task"
-                  [checked]="state.isTaskSelected(task.id)"
-                  (click)="state.toggleTaskSelection(task.id, $event)"
-                />
-                <span class="task-priority" [class]="state.priorityClass(task.priority)">
-                  {{ task.priority }}
-                </span>
-                <button class="btn-icon small" aria-label="Delete task" (click)="$event.stopPropagation(); state.pendingDeleteTaskId.set(task.id)">&#10005;</button>
-              </div>
-              <p class="task-title">{{ task.title }}</p>
-              @if (task.labels && task.labels.length > 0) {
-                <div class="task-labels">
-                  @for (label of task.labels; track label.id) {
-                    <span class="label-chip" [style.background]="label.color">{{ label.name }}</span>
-                  }
+          @for (group of state.groupedTasksForColumn(column.id); track group.label) {
+            @if (group.label) {
+              <div class="swimlane-header">{{ group.label }}</div>
+            }
+            @for (task of group.tasks; track task.id) {
+              <div class="task-card" [class.selected]="state.isTaskSelected(task.id)" cdkDrag [cdkDragData]="task" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }" (click)="state.selectedTask.set(task)">
+                <div class="task-card-top">
+                  <input
+                    type="checkbox"
+                    class="task-select-checkbox"
+                    aria-label="Select task"
+                    [checked]="state.isTaskSelected(task.id)"
+                    (click)="state.toggleTaskSelection(task.id, $event)"
+                  />
+                  <span class="task-priority" [class]="state.priorityClass(task.priority)">
+                    {{ task.priority }}
+                  </span>
+                  <button class="btn-icon small" aria-label="Delete task" (click)="$event.stopPropagation(); state.pendingDeleteTaskId.set(task.id)">&#10005;</button>
                 </div>
-              }
-              @if (task.description) {
-                <div class="task-description markdown-content" [innerHTML]="task.description | markdown"></div>
-              }
-              @if (task.due_date) {
-                <div class="task-due-date"
-                     [class.overdue]="state.isOverdue(task.due_date)"
-                     [class.due-soon]="!state.isOverdue(task.due_date) && state.isSoon(task.due_date)">
-                  <span class="due-icon">&#128197;</span>
-                  <span>{{ task.due_date | slice:0:10 }}</span>
-                </div>
-              }
-              @if (task.assigned_to.length > 0) {
-                <div class="task-assignees">
-                  @for (aId of task.assigned_to; track aId) {
-                    @if (state.contactName(aId)) {
-                      <span class="assignee-avatar" [title]="state.contactName(aId)">{{ state.contactInitials(aId) }}</span>
+                <p class="task-title">{{ task.title }}</p>
+                @if (task.labels && task.labels.length > 0) {
+                  <div class="task-labels">
+                    @for (label of task.labels; track label.id) {
+                      <span class="label-chip" [style.background]="label.color">{{ label.name }}</span>
                     }
-                  }
-                </div>
-              }
-              @if (task.subtask_count > 0) {
-                <div class="subtask-progress">
-                  <div class="subtask-progress-bar">
-                    <div
-                      class="subtask-progress-fill"
-                      [style.width.%]="(task.subtask_done_count / task.subtask_count) * 100"
-                    ></div>
                   </div>
-                  <span class="subtask-progress-label">{{ task.subtask_done_count }}/{{ task.subtask_count }}</span>
-                </div>
-              }
-              @if (task.attachment_count > 0) {
-                <span class="attachment-badge" title="Attachments">📎 {{ task.attachment_count }}</span>
-              }
-            </div>
+                }
+                @if (task.description) {
+                  <div class="task-description markdown-content" [innerHTML]="task.description | markdown"></div>
+                }
+                @if (task.due_date) {
+                  <div class="task-due-date"
+                       [class.overdue]="state.isOverdue(task.due_date)"
+                       [class.due-soon]="!state.isOverdue(task.due_date) && state.isSoon(task.due_date)">
+                    <span class="due-icon">&#128197;</span>
+                    <span>{{ task.due_date | slice:0:10 }}</span>
+                  </div>
+                }
+                @if (task.assigned_to.length > 0) {
+                  <div class="task-assignees">
+                    @for (aId of task.assigned_to; track aId) {
+                      @if (state.contactName(aId)) {
+                        <span class="assignee-avatar" [title]="state.contactName(aId)">{{ state.contactInitials(aId) }}</span>
+                      }
+                    }
+                  </div>
+                }
+                @if (task.subtask_count > 0) {
+                  <div class="subtask-progress">
+                    <div class="subtask-progress-bar">
+                      <div
+                        class="subtask-progress-fill"
+                        [style.width.%]="(task.subtask_done_count / task.subtask_count) * 100"
+                      ></div>
+                    </div>
+                    <span class="subtask-progress-label">{{ task.subtask_done_count }}/{{ task.subtask_count }}</span>
+                  </div>
+                }
+                @if (task.attachment_count > 0) {
+                  <span class="attachment-badge" title="Attachments">📎 {{ task.attachment_count }}</span>
+                }
+              </div>
+            }
           }
 
           @if (state.tasksForColumn(column.id).length === 0) {
