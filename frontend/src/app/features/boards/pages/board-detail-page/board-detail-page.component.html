@@ -96,7 +96,7 @@
     (cdkDropListDropped)="state.dropColumn($event)"
   >
     @for (column of state.columns(); track column.id) {
-      <div class="kanban-column" [class.wip-exceeded]="state.isOverWipLimit(column)" cdkDrag [cdkDragData]="column">
+      <div class="kanban-column" [class.wip-exceeded]="state.isOverWipLimit(column)" cdkDrag [cdkDragData]="column" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }">
 
         <div class="column-header" cdkDragHandle>
           @if (state.editingColumnId() === column.id) {
@@ -141,7 +141,7 @@
           (cdkDropListDropped)="state.drop($event, column.id)"
         >
           @for (task of state.tasksForColumn(column.id); track task.id) {
-            <div class="task-card" [class.selected]="state.isTaskSelected(task.id)" cdkDrag [cdkDragData]="task" (click)="state.selectedTask.set(task)">
+            <div class="task-card" [class.selected]="state.isTaskSelected(task.id)" cdkDrag [cdkDragData]="task" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }" (click)="state.selectedTask.set(task)">
               <div class="task-card-top">
                 <input
                   type="checkbox"
