@@ -17,6 +17,7 @@ from ..serializers import (
     TaskSerializer,
     TaskUpdateSerializer,
 )
+from activity_api.helpers import log_activity
 from ._helpers import serialize_label, serialize_task
 from ._notifications import _notify_assignment
 
@@ -81,6 +82,7 @@ def task_list(request):
         due_date=data.get("due_date"),
     )
     _notify_assignment(task, request.user)
+    log_activity(board, request.user, "created", "task", task.title)
     data = serialize_task(task)
     send_board_event(board.pk, "task_created", data)
     return Response(data, status=status.HTTP_201_CREATED)
@@ -124,6 +126,7 @@ def task_detail(request, pk):
             if not Column.objects.filter(pk=data["column"], board=task.board).exists():
                 return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
         previous_assignee_id = task.assigned_to_id
+        previous_column_id = task.column_id
         for field in ["title", "description", "priority", "column", "assigned_to", "due_date", "order"]:
             key = field if field not in ["column", "assigned_to"] else f"{field}_id"
             if field in data:
@@ -133,13 +136,20 @@ def task_detail(request, pk):
             task.labels.set(Label.objects.filter(pk__in=data["label_ids"], board=task.board))
         if task.assigned_to_id and task.assigned_to_id != previous_assignee_id:
             _notify_assignment(task, request.user)
+        if task.column_id != previous_column_id:
+            log_activity(task.board, request.user, "moved", "task", task.title)
+        else:
+            log_activity(task.board, request.user, "updated", "task", task.title)
         data = serialize_task(task)
         send_board_event(task.board_id, "task_updated", data)
         return Response(data)
 
     board_id = task.board_id
     task_id = task.pk
+    task_title = task.title
+    board = task.board
     task.delete()
+    log_activity(board, request.user, "deleted", "task", task_title)
     send_board_event(board_id, "task_deleted", {"id": task_id})
     return Response(status=status.HTTP_204_NO_CONTENT)
 

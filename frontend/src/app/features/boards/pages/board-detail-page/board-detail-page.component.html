@@ -48,6 +48,7 @@
       <button class="btn-clear-filter" (click)="state.clearFilters()">&#10005; Clear</button>
     }
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'stats']">Stats</a>
+    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'activity']">Activity</a>
     <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>
   </div>
 

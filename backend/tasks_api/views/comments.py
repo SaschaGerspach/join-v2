@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from activity_api.helpers import log_activity
 from boards_api.permissions import can_access_board
 from config.serializers import DetailSerializer
 from ..models import Task, Comment
@@ -50,6 +51,7 @@ def comment_list(request, task_pk):
 
     comment = Comment.objects.create(task=task, author=request.user, text=serializer.validated_data["text"])
     _notify_comment(comment, request.user)
+    log_activity(task.board, request.user, "created", "comment", task.title)
     return Response(serialize_comment(comment), status=status.HTTP_201_CREATED)
 
 

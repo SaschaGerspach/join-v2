@@ -1,0 +1,32 @@
+<div class="activity-page">
+  <div class="activity-header">
+    <a [routerLink]="['/boards', boardId]" class="back-link">&larr; Back to board</a>
+    <h1>{{ boardTitle() }} — Activity</h1>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-hint">Loading…</p>
+  } @else if (entries().length === 0) {
+    <p class="empty-hint">No activity yet.</p>
+  } @else {
+    <div class="activity-list">
+      @for (entry of entries(); track entry.id) {
+        <div class="activity-entry">
+          <span class="entry-icon">{{ entityIcon(entry) }}</span>
+          <div class="entry-content">
+            <p class="entry-message">
+              <strong>{{ entry.user_name }}</strong>
+              {{ actionLabel(entry) }}
+              <span class="entry-entity-type">{{ entry.entity_type }}</span>
+              <strong>"{{ entry.entity_title }}"</strong>
+            </p>
+            @if (entry.details) {
+              <p class="entry-details">{{ entry.details }}</p>
+            }
+            <span class="entry-time">{{ entry.created_at | date:'medium' }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

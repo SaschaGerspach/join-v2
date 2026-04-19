@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'tasks_api',
     'contacts_api',
     'notifications_api',
+    'activity_api',
 ]
 
 MIDDLEWARE = [
