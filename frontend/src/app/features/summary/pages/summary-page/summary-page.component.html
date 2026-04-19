@@ -1,5 +1,9 @@
 <div class="summary-page">
 
+  @if (loading()) {
+    <app-loading-spinner />
+  }
+
   <div class="greeting-section">
     <h1 class="greeting">{{ greeting() }}, <span class="greeting-name">{{ userName() }}</span>!</h1>
   </div>

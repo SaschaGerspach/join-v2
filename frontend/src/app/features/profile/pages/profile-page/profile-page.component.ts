@@ -6,11 +6,12 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { UsersApiService } from '../../../../core/users/users-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [FormsModule, ConfirmDialogComponent],
+  imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,6 +23,7 @@ export class ProfilePageComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
 
+  loading = signal(true);
   firstName = signal('');
   lastName = signal('');
   email = signal('');
@@ -50,8 +52,9 @@ export class ProfilePageComponent implements OnInit {
         this.firstName.set(profile.first_name);
         this.lastName.set(profile.last_name);
         this.email.set(profile.email);
+        this.loading.set(false);
       },
-      error: () => this.toast.show('Failed to load profile.', 'error'),
+      error: () => { this.toast.show('Failed to load profile.', 'error'); this.loading.set(false); },
     });
   }
 

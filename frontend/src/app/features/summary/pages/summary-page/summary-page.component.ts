@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, compute
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { SlicePipe } from '@angular/common';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
@@ -10,7 +11,7 @@ import { forkJoin, of, switchMap } from 'rxjs';
 @Component({
   selector: 'app-summary-page',
   standalone: true,
-  imports: [SlicePipe],
+  imports: [SlicePipe, LoadingSpinnerComponent],
   templateUrl: './summary-page.component.html',
   styleUrl: './summary-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,6 +23,7 @@ export class SummaryPageComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
+  loading = signal(true);
   boards = signal<Board[]>([]);
   tasks = signal<Task[]>([]);
 
@@ -65,8 +67,8 @@ export class SummaryPageComponent implements OnInit {
       }),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
-      next: taskArrays => this.tasks.set(taskArrays.flat()),
-      error: () => this.tasks.set([]),
+      next: taskArrays => { this.tasks.set(taskArrays.flat()); this.loading.set(false); },
+      error: () => { this.tasks.set([]); this.loading.set(false); },
     });
   }
 
