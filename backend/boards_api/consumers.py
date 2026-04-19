@@ -58,8 +58,9 @@ class BoardConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def _has_access(self, user, board_id):
         from .models import Board
+        from .permissions import can_access_board
         try:
             board = Board.objects.get(pk=board_id)
         except Board.DoesNotExist:
             return False
-        return board.created_by_id == user.id or board.members.filter(user=user).exists()
+        return can_access_board(board, user)

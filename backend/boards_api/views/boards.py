@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from columns_api.models import Column
 from config.serializers import DetailSerializer
 from ..models import Board
-from ..permissions import can_access_board
+from ..permissions import can_access_board, is_board_owner
 from ..serializers import (
     BoardCreateSerializer,
     BoardSerializer,
@@ -56,9 +56,12 @@ def serialize_shared_board(board, user):
 @api_view(["GET", "POST"])
 def board_list(request):
     if request.method == "GET":
-        owned = Board.objects.filter(created_by=request.user)
-        shared = Board.objects.filter(members__user=request.user)
-        boards = (owned | shared).distinct().order_by("-created_at")
+        if request.user.is_staff:
+            boards = Board.objects.all().order_by("-created_at")
+        else:
+            owned = Board.objects.filter(created_by=request.user)
+            shared = Board.objects.filter(members__user=request.user)
+            boards = (owned | shared).distinct().order_by("-created_at")
         paginator = _BoardPagination()
         page = paginator.paginate_queryset(boards, request)
         return paginator.get_paginated_response([serialize_shared_board(b, request.user) for b in page])
@@ -100,7 +103,7 @@ def board_detail(request, pk):
     if request.method == "GET":
         return Response(serialize_shared_board(board, request.user))
 
-    if board.created_by != request.user:
+    if not is_board_owner(board, request.user):
         return Response({"detail": "Only the owner can modify this board."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":

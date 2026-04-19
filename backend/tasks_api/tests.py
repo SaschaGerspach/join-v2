@@ -253,6 +253,21 @@ class CommentTests(APITestCase):
         response = self.client.patch(self.detail_url(comment.pk), {"text": "Y"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_admin_can_edit_others_comment(self):
+        admin = User.objects.create_user(email="admin@example.com", password="pass", is_staff=True)
+        comment = Comment.objects.create(task=self.task, author=self.user, text="Original")
+        self.client.force_authenticate(user=admin)
+        response = self.client.patch(self.detail_url(comment.pk), {"text": "Admin Edit"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["text"], "Admin Edit")
+
+    def test_admin_can_delete_others_comment(self):
+        admin = User.objects.create_user(email="admin2@example.com", password="pass", is_staff=True)
+        comment = Comment.objects.create(task=self.task, author=self.user, text="To Delete")
+        self.client.force_authenticate(user=admin)
+        response = self.client.delete(self.detail_url(comment.pk))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
 
 class TaskArchiveTests(APITestCase):
     archive_url = "/tasks/archive/"

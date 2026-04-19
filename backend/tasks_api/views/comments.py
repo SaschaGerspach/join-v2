@@ -74,7 +74,7 @@ def comment_detail(request, task_pk, pk):
     if not can_access_board(comment.task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if comment.author != request.user:
+    if comment.author != request.user and not request.user.is_staff:
         return Response({"detail": "You can only edit your own comments."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":

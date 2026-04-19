@@ -94,3 +94,27 @@ class BoardDetailTests(APITestCase):
         response = self.client.patch(self.url(self.board.pk), {"color": "#ff5733"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["color"], "#ff5733")
+
+
+class AdminBoardAccessTests(APITestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(email="owner@example.com", password="pass")
+        self.admin = User.objects.create_user(email="admin@example.com", password="pass", is_staff=True)
+        self.board = Board.objects.create(title="Owner Board", created_by=self.owner)
+        self.client.force_authenticate(user=self.admin)
+
+    def test_admin_sees_all_boards(self):
+        response = self.client.get("/boards/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["title"], "Owner Board")
+
+    def test_admin_can_patch_any_board(self):
+        response = self.client.patch(f"/boards/{self.board.pk}/", {"title": "Admin Edit"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["title"], "Admin Edit")
+
+    def test_admin_can_delete_any_board(self):
+        response = self.client.delete(f"/boards/{self.board.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Board.objects.count(), 0)
