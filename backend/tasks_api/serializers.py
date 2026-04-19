@@ -85,11 +85,11 @@ class SubtaskSerializer(serializers.Serializer):
 
 
 class SubtaskCreateSerializer(serializers.Serializer):
-    title = serializers.CharField()
+    title = serializers.CharField(max_length=255)
 
 
 class SubtaskUpdateSerializer(serializers.Serializer):
-    title = serializers.CharField(required=False)
+    title = serializers.CharField(required=False, max_length=255)
     done = serializers.BooleanField(required=False)
 
 
@@ -104,7 +104,7 @@ class CommentSerializer(serializers.Serializer):
 
 
 class CommentCreateSerializer(serializers.Serializer):
-    text = serializers.CharField()
+    text = serializers.CharField(max_length=5000)
 
 
 class AttachmentSerializer(serializers.Serializer):
