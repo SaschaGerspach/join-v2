@@ -9,7 +9,7 @@
   justify-content: center;
   align-items: center;
 
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--color-overlay, rgba(255, 255, 255, 0.75));
   backdrop-filter: blur(2px);
 
   z-index: 9999;
@@ -17,9 +17,10 @@
 
 .app-loading-overlay p {
   padding: 18px 28px;
-  background: white;
+  background: var(--color-surface, white);
+  color: var(--color-text, #2a3647);
   border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-card, 0 10px 25px rgba(0, 0, 0, 0.12));
   font-size: 18px;
   font-weight: 500;
 }

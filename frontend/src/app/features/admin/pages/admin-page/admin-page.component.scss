@@ -26,8 +26,8 @@ $color-error: #ff8190;
 
 .btn-django-admin {
   padding: 0.6rem 1.25rem;
-  background: $color-dark;
-  color: $color-white;
+  background: var(--color-sidebar-bg, $color-dark);
+  color: var(--color-sidebar-text, $color-white);
   border-radius: 10px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -65,7 +65,7 @@ $color-error: #ff8190;
 
 .stat-label {
   font-size: 0.85rem;
-  color: #6b7a8d;
+  color: var(--color-muted, #6b7a8d);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
