@@ -10,6 +10,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((err: HttpErrorResponse) => {
       if (err.status === 0) {
         toast.show('Network error — please check your connection.', 'error');
+      } else if (err.status === 403) {
+        toast.show('You don\'t have permission for this action.', 'error');
       } else if (err.status >= 500) {
         toast.show('Server error — please try again later.', 'error');
       }
