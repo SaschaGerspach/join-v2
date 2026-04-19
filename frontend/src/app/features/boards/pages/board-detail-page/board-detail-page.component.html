@@ -49,6 +49,9 @@
     }
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'stats']">Stats</a>
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'activity']">Activity</a>
+    @if (state.canViewArchive()) {
+      <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'archive']">Archive</a>
+    }
     <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>
   </div>
 

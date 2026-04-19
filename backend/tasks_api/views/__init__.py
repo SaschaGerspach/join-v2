@@ -1,4 +1,5 @@
 from .tasks import task_list, task_detail, task_reorder
+from .archive import task_archive, task_restore
 from .subtasks import subtask_list, subtask_detail
 from .comments import comment_list, comment_detail
 from .labels import label_list, label_detail

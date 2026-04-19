@@ -22,6 +22,7 @@ export const routes: Routes = [
                 {path: 'boards/:id', title: 'Board | Join', loadComponent: () => import('./features/boards/pages/board-detail-page/board-detail-page.component').then(m => m.BoardDetailPageComponent)},
                 {path: 'boards/:id/stats', title: 'Board Stats | Join', loadComponent: () => import('./features/boards/pages/board-stats-page/board-stats-page.component').then(m => m.BoardStatsPageComponent)},
                 {path: 'boards/:id/activity', title: 'Activity | Join', loadComponent: () => import('./features/boards/pages/board-activity-page/board-activity-page.component').then(m => m.BoardActivityPageComponent)},
+                {path: 'boards/:id/archive', title: 'Archive | Join', loadComponent: () => import('./features/boards/pages/board-archive-page/board-archive-page.component').then(m => m.BoardArchivePageComponent)},
                 {path: 'contacts', title: 'Contacts | Join', loadComponent: () => import('./features/contacts/pages/contacts-page/contacts-page.component').then(m => m.ContactsPageComponent)},
                 {path: 'profile', title: 'Profile | Join', loadComponent: () => import('./features/profile/pages/profile-page/profile-page.component').then(m => m.ProfilePageComponent)},
                 {path: 'calendar', title: 'Calendar | Join', loadComponent: () => import('./features/calendar/pages/calendar-page/calendar-page.component').then(m => m.CalendarPageComponent)},

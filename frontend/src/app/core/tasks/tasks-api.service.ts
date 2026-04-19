@@ -65,4 +65,15 @@ export class TasksApiService {
   reorder(items: { id: number; order: number; column: number | null }[]): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/tasks/reorder/`, items, { withCredentials: true });
   }
+
+  getArchive(boardId: number): Observable<Task[]> {
+    return this.http.get<Task[]>(`${this.baseUrl}/tasks/archive/`, {
+      params: { board: boardId },
+      withCredentials: true,
+    });
+  }
+
+  restore(id: number): Observable<Task> {
+    return this.http.post<Task>(`${this.baseUrl}/tasks/${id}/restore/`, {}, { withCredentials: true });
+  }
 }

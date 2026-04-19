@@ -2,6 +2,7 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { AuthService } from '../../../core/auth/auth.service';
 import { BoardsApiService, Board } from '../../../core/boards/boards-api.service';
 import { ColumnsApiService, Column } from '../../../core/columns/columns-api.service';
 import { TasksApiService, Task, CreateTaskPayload } from '../../../core/tasks/tasks-api.service';
@@ -14,6 +15,7 @@ import { bulkMoveTasks, bulkDeleteTasks } from './_board-bulk-ops';
 
 @Injectable()
 export class BoardStateService {
+  private readonly auth = inject(AuthService);
   private readonly boardsApi = inject(BoardsApiService);
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly tasksApi = inject(TasksApiService);
@@ -49,6 +51,12 @@ export class BoardStateService {
 
   readonly columnListIds = computed(() => this.columns().map(c => `col-${c.id}`));
   readonly bulkMode = computed(() => this.selectedTaskIds().size > 0);
+  readonly canViewArchive = computed(() => {
+    const board = this.board();
+    const user = this.auth.user();
+    if (!board || !user) return false;
+    return board.is_owner || user.is_staff;
+  });
 
   readonly filteredTasks = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();

@@ -1,0 +1,28 @@
+<div class="archive-page">
+  <div class="archive-header">
+    <a [routerLink]="['/boards', boardId]" class="back-link">&larr; Back to board</a>
+    <h1>{{ boardTitle() }} — Archive</h1>
+    <p class="archive-hint">Deleted tasks are kept for 30 days before being permanently removed.</p>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-hint">Loading…</p>
+  } @else if (tasks().length === 0) {
+    <p class="empty-hint">No archived tasks.</p>
+  } @else {
+    <div class="archive-list">
+      @for (task of tasks(); track task.id) {
+        <div class="archive-card">
+          <div class="archive-card-info">
+            <span class="task-priority" [class]="'priority-' + task.priority">{{ task.priority }}</span>
+            <strong class="task-title">{{ task.title }}</strong>
+            @if (task.description) {
+              <p class="task-description">{{ task.description }}</p>
+            }
+          </div>
+          <button class="btn-restore" (click)="restore(task)">Restore</button>
+        </div>
+      }
+    </div>
+  }
+</div>

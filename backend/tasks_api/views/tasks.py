@@ -1,11 +1,12 @@
 from django.db import transaction
+from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.models import Board
-from boards_api.permissions import can_access_board
+from boards_api.permissions import can_access_board, is_board_owner
 from boards_api.ws_events import send_board_event
 from columns_api.models import Column
 from config.serializers import DetailSerializer
@@ -50,7 +51,7 @@ def task_list(request):
 
     if request.method == "GET":
         tasks = (
-            board.tasks
+            board.tasks.filter(archived_at__isnull=True)
             .prefetch_related("subtasks", "attachments", "labels")
             .order_by("order", "created_at")
         )
@@ -104,7 +105,7 @@ def task_list(request):
 @api_view(["GET", "PATCH", "DELETE"])
 def task_detail(request, pk):
     try:
-        task = Task.objects.get(pk=pk)
+        task = Task.objects.get(pk=pk, archived_at__isnull=True)
     except Task.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -144,13 +145,10 @@ def task_detail(request, pk):
         send_board_event(task.board_id, "task_updated", data)
         return Response(data)
 
-    board_id = task.board_id
-    task_id = task.pk
-    task_title = task.title
-    board = task.board
-    task.delete()
-    log_activity(board, request.user, "deleted", "task", task_title)
-    send_board_event(board_id, "task_deleted", {"id": task_id})
+    task.archived_at = timezone.now()
+    task.save(update_fields=["archived_at"])
+    log_activity(task.board, request.user, "deleted", "task", task.title)
+    send_board_event(task.board_id, "task_deleted", {"id": task.pk})
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -166,7 +164,7 @@ def task_reorder(request):
     items = serializer.validated_data
 
     task_ids = [item["id"] for item in items]
-    fetched = list(Task.objects.filter(pk__in=task_ids).select_related("board"))
+    fetched = list(Task.objects.filter(pk__in=task_ids, archived_at__isnull=True).select_related("board"))
     if len(fetched) != len(set(task_ids)):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
     for t in fetched:

@@ -33,6 +33,7 @@ class Task(models.Model):
     labels = models.ManyToManyField('Label', blank=True, related_name="tasks")
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    archived_at = models.DateTimeField(null=True, blank=True, default=None)
 
     class Meta:
         ordering = ["order", "created_at"]

@@ -5,8 +5,10 @@ app_name = "tasks_api"
 
 urlpatterns = [
     path("", views.task_list, name="task-list"),
+    path("archive/", views.task_archive, name="task-archive"),
     path("reorder/", views.task_reorder, name="task-reorder"),
     path("<int:pk>/", views.task_detail, name="task-detail"),
+    path("<int:pk>/restore/", views.task_restore, name="task-restore"),
     path("<int:task_pk>/subtasks/", views.subtask_list, name="subtask-list"),
     path("<int:task_pk>/subtasks/<int:pk>/", views.subtask_detail, name="subtask-detail"),
     path("<int:task_pk>/comments/", views.comment_list, name="comment-list"),
