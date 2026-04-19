@@ -186,3 +186,52 @@ input, textarea, select {
   color: $color-error;
   margin-top: 4px;
 }
+
+// ─── Markdown Content ───────────────────────────────────────────────────────
+
+.markdown-content {
+  line-height: 1.5;
+  word-break: break-word;
+
+  p { margin-bottom: 0.5em; }
+  p:last-child { margin-bottom: 0; }
+
+  strong { font-weight: 700; }
+
+  code {
+    background: var(--color-bg, #f6f7f8);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  pre {
+    background: var(--color-bg, #f6f7f8);
+    padding: 0.75em 1em;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 0.5em 0;
+
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+
+  ul, ol {
+    margin: 0.5em 0;
+    padding-left: 1.5em;
+  }
+
+  blockquote {
+    border-left: 3px solid var(--color-primary, #29abe2);
+    padding-left: 0.75em;
+    margin: 0.5em 0;
+    color: var(--color-muted, #a8a8a8);
+  }
+
+  a {
+    color: $color-link;
+    text-decoration: underline;
+  }
+}

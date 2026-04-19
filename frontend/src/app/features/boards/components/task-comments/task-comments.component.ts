@@ -5,11 +5,12 @@ import { SlicePipe } from '@angular/common';
 import { Comment, CommentsApiService } from '../../../../core/tasks/comments-api.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 
 @Component({
   selector: 'app-task-comments',
   standalone: true,
-  imports: [FormsModule, SlicePipe],
+  imports: [FormsModule, SlicePipe, MarkdownPipe],
   templateUrl: './task-comments.component.html',
   styleUrl: './task-comments.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

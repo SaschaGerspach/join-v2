@@ -164,7 +164,7 @@
                 </div>
               }
               @if (task.description) {
-                <p class="task-description">{{ task.description }}</p>
+                <div class="task-description markdown-content" [innerHTML]="task.description | markdown"></div>
               }
               @if (task.due_date) {
                 <div class="task-due-date"

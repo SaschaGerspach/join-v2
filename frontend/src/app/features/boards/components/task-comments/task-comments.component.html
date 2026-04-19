@@ -15,7 +15,7 @@
         @if (editingCommentId() === c.id) {
           <textarea class="comment-textarea" [(ngModel)]="editingCommentText" rows="2" (blur)="confirmEditComment(c)"></textarea>
         } @else {
-          <p class="comment-text">{{ c.text }}</p>
+          <div class="comment-text markdown-content" [innerHTML]="c.text | markdown"></div>
         }
       </div>
     }

@@ -9,11 +9,12 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { BoardStateService } from '../../services/board-state.service';
 import { Column } from '../../../../core/columns/columns-api.service';
+import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule, DragDropModule, SlicePipe, RouterModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent],
+  imports: [FormsModule, DragDropModule, SlicePipe, RouterModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
   providers: [BoardStateService],
