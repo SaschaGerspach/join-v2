@@ -40,7 +40,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   priority = signal<'low' | 'medium' | 'high' | 'urgent'>('medium');
   dueDate = signal('');
   columnId = signal<number | null>(null);
-  assignedTo = signal<number | null>(null);
+  assignedTo = signal<number[]>([]);
   selectedLabelIds = signal<Set<number>>(new Set());
   showDeleteConfirm = signal(false);
 
@@ -57,7 +57,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.priority.set(t.priority);
     this.dueDate.set(t.due_date ?? '');
     this.columnId.set(t.column);
-    this.assignedTo.set(t.assigned_to);
+    this.assignedTo.set(t.assigned_to ?? []);
     this.selectedLabelIds.set(new Set(t.labels?.map(l => l.id) ?? []));
 
     this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(contacts => this.contacts.set(contacts));
@@ -82,6 +82,15 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       },
       error: () => this.toast.show('Failed to save task.', 'error'),
     });
+  }
+
+  toggleAssignee(id: number): void {
+    const current = this.assignedTo();
+    if (current.includes(id)) {
+      this.assignedTo.set(current.filter(x => x !== id));
+    } else {
+      this.assignedTo.set([...current, id]);
+    }
   }
 
   deleteTask(): void {

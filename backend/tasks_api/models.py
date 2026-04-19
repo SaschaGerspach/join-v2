@@ -22,10 +22,8 @@ class Task(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     priority = models.CharField(max_length=10, choices=Priority.choices, default=Priority.MEDIUM)
-    assigned_to = models.ForeignKey(
+    assignees = models.ManyToManyField(
         "contacts_api.Contact",
-        on_delete=models.SET_NULL,
-        null=True,
         blank=True,
         related_name="assigned_tasks",
     )

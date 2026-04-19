@@ -45,16 +45,12 @@ def _notify_comment(comment, actor):
     recipients = set()
     in_app_recipients = set()
 
-    if task.assigned_to_id:
-        try:
-            contact = Contact.objects.get(pk=task.assigned_to_id)
-            if contact.email:
-                recipients.add(contact.email.lower())
-                user = _find_user_by_email(contact.email)
-                if user and user.pk != actor.pk:
-                    in_app_recipients.add(user.pk)
-        except Contact.DoesNotExist:
-            pass
+    for contact in task.assignees.all():
+        if contact.email:
+            recipients.add(contact.email.lower())
+            user = _find_user_by_email(contact.email)
+            if user and user.pk != actor.pk:
+                in_app_recipients.add(user.pk)
 
     if task.board.created_by_id != actor.id and task.board.created_by.email:
         recipients.add(task.board.created_by.email.lower())
@@ -119,33 +115,30 @@ def _notify_mentions(comment, actor):
             )
 
 
-def _notify_assignment(task, actor):
-    if not task.assigned_to_id:
+def _notify_assignments(task, old_ids, new_ids, actor):
+    added_ids = new_ids - old_ids
+    if not added_ids:
         return
-    try:
-        contact = Contact.objects.get(pk=task.assigned_to_id)
-    except Contact.DoesNotExist:
-        return
+    for contact in Contact.objects.filter(pk__in=added_ids):
+        is_self = contact.email and contact.email.lower() == actor.email.lower()
 
-    is_self = contact.email and contact.email.lower() == actor.email.lower()
+        if contact.email and not is_self:
+            _notify(
+                subject="You were assigned to a task — Join",
+                body=(
+                    f'{_actor_name(actor)} assigned you to "{_sanitize(task.title)}" '
+                    f'on board "{_sanitize(task.board.title)}".\n\n'
+                    f"Open: {settings.FRONTEND_URL}/boards/{task.board_id}"
+                ),
+                recipients=[contact.email],
+            )
 
-    if contact.email and not is_self:
-        _notify(
-            subject="You were assigned to a task — Join",
-            body=(
-                f'{_actor_name(actor)} assigned you to "{_sanitize(task.title)}" '
-                f'on board "{_sanitize(task.board.title)}".\n\n'
-                f"Open: {settings.FRONTEND_URL}/boards/{task.board_id}"
-            ),
-            recipients=[contact.email],
-        )
-
-    user = _find_user_by_email(contact.email)
-    if user and user.pk != actor.pk:
-        create_notification(
-            recipient=user,
-            notification_type=Notification.Type.ASSIGNMENT,
-            message=f'{_actor_name(actor)} assigned you to "{_sanitize(task.title)}"',
-            board_id=task.board_id,
-            task_id=task.pk,
-        )
+        user = _find_user_by_email(contact.email)
+        if user and user.pk != actor.pk:
+            create_notification(
+                recipient=user,
+                notification_type=Notification.Type.ASSIGNMENT,
+                message=f'{_actor_name(actor)} assigned you to "{_sanitize(task.title)}"',
+                board_id=task.board_id,
+                task_id=task.pk,
+            )

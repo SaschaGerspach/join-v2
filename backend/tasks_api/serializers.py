@@ -41,7 +41,7 @@ class TaskSerializer(serializers.Serializer):
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
     priority = serializers.CharField()
-    assigned_to = serializers.IntegerField(allow_null=True)
+    assigned_to = serializers.ListField(child=serializers.IntegerField())
     due_date = serializers.DateField(allow_null=True)
     created_at = serializers.DateTimeField()
     order = serializers.IntegerField()
@@ -56,7 +56,7 @@ class TaskCreateSerializer(serializers.Serializer):
     description = serializers.CharField(required=False, allow_blank=True, default="")
     priority = serializers.ChoiceField(choices=PRIORITY_CHOICES, required=False, default=Task.Priority.MEDIUM)
     column = serializers.IntegerField(required=False, allow_null=True)
-    assigned_to = serializers.IntegerField(required=False, allow_null=True)
+    assigned_to = serializers.ListField(child=serializers.IntegerField(), required=False, default=list)
     due_date = serializers.DateField(required=False, allow_null=True)
 
 
@@ -65,7 +65,7 @@ class TaskUpdateSerializer(serializers.Serializer):
     description = serializers.CharField(required=False, allow_blank=True)
     priority = serializers.ChoiceField(choices=PRIORITY_CHOICES, required=False)
     column = serializers.IntegerField(required=False, allow_null=True)
-    assigned_to = serializers.IntegerField(required=False, allow_null=True)
+    assigned_to = serializers.ListField(child=serializers.IntegerField(), required=False)
     due_date = serializers.DateField(required=False, allow_null=True)
     order = serializers.IntegerField(required=False, min_value=0)
     label_ids = serializers.ListField(child=serializers.IntegerField(), required=False)

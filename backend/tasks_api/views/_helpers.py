@@ -21,7 +21,7 @@ def serialize_task(task):
         "title": task.title,
         "description": task.description,
         "priority": task.priority,
-        "assigned_to": task.assigned_to_id,
+        "assigned_to": list(task.assignees.values_list("pk", flat=True)),
         "due_date": task.due_date,
         "created_at": task.created_at,
         "order": task.order,

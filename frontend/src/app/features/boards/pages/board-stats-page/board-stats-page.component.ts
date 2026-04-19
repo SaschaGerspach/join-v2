@@ -170,8 +170,14 @@ export class BoardStatsPageComponent implements OnInit {
     const contactMap = new Map(contacts.map(c => [c.id, `${c.first_name} ${c.last_name}`]));
     const assigneeCounts = new Map<string, number>();
     for (const t of tasks) {
-      const name = t.assigned_to ? (contactMap.get(t.assigned_to) ?? 'Unknown') : 'Unassigned';
-      assigneeCounts.set(name, (assigneeCounts.get(name) ?? 0) + 1);
+      if (t.assigned_to.length === 0) {
+        assigneeCounts.set('Unassigned', (assigneeCounts.get('Unassigned') ?? 0) + 1);
+      } else {
+        for (const id of t.assigned_to) {
+          const name = contactMap.get(id) ?? 'Unknown';
+          assigneeCounts.set(name, (assigneeCounts.get(name) ?? 0) + 1);
+        }
+      }
     }
     const sorted = [...assigneeCounts.entries()].sort((a, b) => b[1] - a[1]);
     this.assigneeChartData.set({

@@ -10,10 +10,11 @@ class SubtaskInline(admin.TabularInline):
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('title', 'board', 'column', 'priority', 'assigned_to', 'due_date', 'created_at')
+    list_display = ('title', 'board', 'column', 'priority', 'due_date', 'created_at')
     list_filter = ('priority', 'due_date', 'board')
     search_fields = ('title', 'description', 'board__title')
-    raw_id_fields = ('board', 'column', 'assigned_to')
+    raw_id_fields = ('board', 'column')
+    filter_horizontal = ('assignees',)
     date_hierarchy = 'created_at'
     inlines = [SubtaskInline]
 

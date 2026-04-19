@@ -10,7 +10,7 @@ export type Task = {
   title: string;
   description: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  assigned_to: number | null;
+  assigned_to: number[];
   due_date: string | null;
   order: number;
   created_at: string;
@@ -26,7 +26,7 @@ export type CreateTaskPayload = {
   priority?: string;
   column?: number | null;
   due_date?: string | null;
-  assigned_to?: number | null;
+  assigned_to?: number[];
 };
 
 export type UpdateTaskPayload = Partial<CreateTaskPayload> & {

@@ -235,3 +235,38 @@ input, textarea, select {
     text-decoration: underline;
   }
 }
+
+// ─── Assignee Checklist ─────────────────────────────────────────────────────
+
+.assignee-checklist {
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border, $color-border);
+  border-radius: 8px;
+  padding: 0.25rem 0;
+}
+
+.assignee-check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--color-text);
+
+  &:hover {
+    background: var(--color-bg, #f6f7f8);
+  }
+
+  input[type="checkbox"] {
+    accent-color: $color-primary;
+  }
+}
+
+.no-contacts {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  color: var(--color-muted, $color-text-muted);
+  font-size: 0.85rem;
+}

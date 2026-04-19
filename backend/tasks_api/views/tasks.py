@@ -20,7 +20,7 @@ from ..serializers import (
 )
 from activity_api.helpers import log_activity
 from ._helpers import serialize_label, serialize_task
-from ._notifications import _notify_assignment
+from ._notifications import _notify_assignments
 
 
 @extend_schema(
@@ -52,7 +52,7 @@ def task_list(request):
     if request.method == "GET":
         tasks = (
             board.tasks.filter(archived_at__isnull=True)
-            .prefetch_related("subtasks", "attachments", "labels")
+            .prefetch_related("subtasks", "attachments", "labels", "assignees")
             .order_by("order", "created_at")
         )
         return Response([serialize_task(t) for t in tasks])
@@ -69,9 +69,11 @@ def task_list(request):
     elif not Column.objects.filter(pk=column_id, board=board).exists():
         return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
 
-    assigned_to_id = data.get("assigned_to")
-    if assigned_to_id and not Contact.objects.filter(pk=assigned_to_id, owner=request.user).exists():
-        return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
+    assignee_ids = data.get("assigned_to", [])
+    if assignee_ids:
+        valid = Contact.objects.filter(pk__in=assignee_ids, owner=request.user).values_list("pk", flat=True)
+        if len(set(assignee_ids)) != len(valid):
+            return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
 
     task = Task.objects.create(
         board=board,
@@ -79,10 +81,11 @@ def task_list(request):
         description=data.get("description", ""),
         priority=data.get("priority", Task.Priority.MEDIUM),
         column_id=column_id,
-        assigned_to_id=assigned_to_id,
         due_date=data.get("due_date"),
     )
-    _notify_assignment(task, request.user)
+    if assignee_ids:
+        task.assignees.set(assignee_ids)
+    _notify_assignments(task, set(), set(assignee_ids), request.user)
     log_activity(board, request.user, "created", "task", task.title)
     data = serialize_task(task)
     send_board_event(board.pk, "task_created", data)
@@ -120,23 +123,28 @@ def task_detail(request, pk):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         data = serializer.validated_data
-        if "assigned_to" in data and data["assigned_to"]:
-            if not Contact.objects.filter(pk=data["assigned_to"], owner=request.user).exists():
-                return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
+        if "assigned_to" in data:
+            assignee_ids = data["assigned_to"]
+            if assignee_ids:
+                valid = Contact.objects.filter(pk__in=assignee_ids, owner=request.user).values_list("pk", flat=True)
+                if len(set(assignee_ids)) != len(valid):
+                    return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
         if "column" in data and data["column"]:
             if not Column.objects.filter(pk=data["column"], board=task.board).exists():
                 return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
-        previous_assignee_id = task.assigned_to_id
+        previous_assignee_ids = set(task.assignees.values_list("pk", flat=True))
         previous_column_id = task.column_id
-        for field in ["title", "description", "priority", "column", "assigned_to", "due_date", "order"]:
-            key = field if field not in ["column", "assigned_to"] else f"{field}_id"
+        for field in ["title", "description", "priority", "column", "due_date", "order"]:
+            key = f"{field}_id" if field == "column" else field
             if field in data:
                 setattr(task, key, data[field])
         task.save()
+        if "assigned_to" in data:
+            new_assignee_ids = set(data["assigned_to"])
+            task.assignees.set(new_assignee_ids)
+            _notify_assignments(task, previous_assignee_ids, new_assignee_ids, request.user)
         if "label_ids" in data:
             task.labels.set(Label.objects.filter(pk__in=data["label_ids"], board=task.board))
-        if task.assigned_to_id and task.assigned_to_id != previous_assignee_id:
-            _notify_assignment(task, request.user)
         if task.column_id != previous_column_id:
             log_activity(task.board, request.user, "moved", "task", task.title)
         else:
@@ -194,7 +202,7 @@ def task_reorder(request):
         t.pk: t
         for t in Task.objects
         .filter(pk__in=tasks.keys())
-        .prefetch_related("subtasks", "attachments", "labels")
+        .prefetch_related("subtasks", "attachments", "labels", "assignees")
     }
     for bid in board_ids:
         board_tasks = [serialize_task(refreshed[pk]) for pk in tasks if refreshed[pk].board_id == bid]

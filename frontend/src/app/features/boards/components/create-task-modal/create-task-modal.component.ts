@@ -27,7 +27,7 @@ export class CreateTaskModalComponent implements OnInit, AfterViewInit {
   description = '';
   priority: 'low' | 'medium' | 'high' | 'urgent' = 'medium';
   dueDate = '';
-  assignedTo: number | null = null;
+  assignedTo: number[] = [];
   selectedColumnId: number | null = null;
   submitted = false;
 
@@ -46,6 +46,15 @@ export class CreateTaskModalComponent implements OnInit, AfterViewInit {
     this.cancelled.emit();
   }
 
+  toggleAssignee(id: number): void {
+    const idx = this.assignedTo.indexOf(id);
+    if (idx >= 0) {
+      this.assignedTo = this.assignedTo.filter(x => x !== id);
+    } else {
+      this.assignedTo = [...this.assignedTo, id];
+    }
+  }
+
   submit(): void {
     this.submitted = true;
     const t = this.title.trim();
@@ -57,6 +66,6 @@ export class CreateTaskModalComponent implements OnInit, AfterViewInit {
       due_date: this.dueDate || null,
       column: this.selectedColumnId,
       assigned_to: this.assignedTo,
-    } as CreateTaskPayload);
+    });
   }
 }

@@ -67,7 +67,7 @@ export class BoardStateService {
     return this.tasks().filter(t => {
       if (q && !t.title.toLowerCase().includes(q)) return false;
       if (priority && t.priority !== priority) return false;
-      if (assignee !== '' && t.assigned_to !== assignee) return false;
+      if (assignee !== '' && !t.assigned_to.includes(assignee as number)) return false;
       if (due === 'overdue' && !this.isOverdue(t.due_date)) return false;
       if (due === 'soon' && !(this.isSoon(t.due_date) && !this.isOverdue(t.due_date))) return false;
       return true;

@@ -174,10 +174,13 @@
                   <span>{{ task.due_date | slice:0:10 }}</span>
                 </div>
               }
-              @if (task.assigned_to && state.contactName(task.assigned_to)) {
-                <div class="task-assignee">
-                  <span class="assignee-avatar">{{ state.contactInitials(task.assigned_to) }}</span>
-                  <span class="assignee-name">{{ state.contactName(task.assigned_to) }}</span>
+              @if (task.assigned_to.length > 0) {
+                <div class="task-assignees">
+                  @for (aId of task.assigned_to; track aId) {
+                    @if (state.contactName(aId)) {
+                      <span class="assignee-avatar" [title]="state.contactName(aId)">{{ state.contactInitials(aId) }}</span>
+                    }
+                  }
                 </div>
               }
               @if (task.subtask_count > 0) {

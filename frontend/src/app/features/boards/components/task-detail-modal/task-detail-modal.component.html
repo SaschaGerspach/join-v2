@@ -68,16 +68,17 @@
 
         <div class="field-group">
           <label class="field-label">Assigned to</label>
-          <select
-            class="field-select"
-            [ngModel]="assignedTo()"
-            (ngModelChange)="assignedTo.set($event === 'null' ? null : +$event)"
-          >
-            <option [ngValue]="null">— Unassigned —</option>
+          <div class="assignee-checklist">
             @for (contact of contacts(); track contact.id) {
-              <option [ngValue]="contact.id">{{ contact.first_name }} {{ contact.last_name }}</option>
+              <label class="assignee-check-item">
+                <input type="checkbox" [checked]="assignedTo().includes(contact.id)" (change)="toggleAssignee(contact.id)" />
+                {{ contact.first_name }} {{ contact.last_name }}
+              </label>
             }
-          </select>
+            @if (contacts().length === 0) {
+              <span class="no-contacts">No contacts available</span>
+            }
+          </div>
         </div>
       </div>
 

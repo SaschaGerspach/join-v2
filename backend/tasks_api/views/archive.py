@@ -37,7 +37,7 @@ def task_archive(request):
 
     tasks = (
         board.tasks.filter(archived_at__isnull=False)
-        .prefetch_related("subtasks", "attachments", "labels")
+        .prefetch_related("subtasks", "attachments", "labels", "assignees")
         .order_by("-archived_at")
     )
     return Response([serialize_task(t) for t in tasks])
