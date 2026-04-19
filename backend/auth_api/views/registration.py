@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from config.serializers import DetailSerializer
 from ..serializers import RegisterResponseSerializer, RegisterSerializer
 from ._helpers import AuthRateThrottle, User
+from ._demo_data import create_demo_data
 from .verification import send_verification_email
 
 
@@ -40,6 +41,7 @@ def register(request):
         last_name=last_name,
     )
 
+    create_demo_data(user)
     send_verification_email(user)
 
     return Response(
