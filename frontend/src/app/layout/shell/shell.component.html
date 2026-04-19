@@ -68,7 +68,7 @@
               <div class="notification-panel-list">
                 @for (n of notificationService.notifications(); track n.id) {
                   <div class="notification-item" [class.unread]="!n.is_read" (click)="openNotification(n)">
-                    <span class="notification-icon">{{ n.type === 'assignment' ? '&#128100;' : '&#128172;' }}</span>
+                    <span class="notification-icon">{{ n.type === 'assignment' ? '&#128100;' : n.type === 'mention' ? '&#64;' : '&#128172;' }}</span>
                     <div class="notification-content">
                       <p class="notification-message">{{ n.message }}</p>
                       <span class="notification-time">{{ n.created_at | date:'short' }}</span>

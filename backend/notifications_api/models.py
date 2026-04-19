@@ -6,6 +6,7 @@ class Notification(models.Model):
     class Type(models.TextChoices):
         ASSIGNMENT = "assignment"
         COMMENT = "comment"
+        MENTION = "mention"
 
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL,

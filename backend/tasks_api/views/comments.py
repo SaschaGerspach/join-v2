@@ -8,7 +8,7 @@ from boards_api.permissions import can_access_board
 from config.serializers import DetailSerializer
 from ..models import Task, Comment
 from ..serializers import CommentCreateSerializer, CommentSerializer
-from ._notifications import _notify_comment
+from ._notifications import _notify_comment, _notify_mentions
 
 
 def serialize_comment(comment):
@@ -51,6 +51,7 @@ def comment_list(request, task_pk):
 
     comment = Comment.objects.create(task=task, author=request.user, text=serializer.validated_data["text"])
     _notify_comment(comment, request.user)
+    _notify_mentions(comment, request.user)
     log_activity(task.board, request.user, "created", "comment", task.title)
     return Response(serialize_comment(comment), status=status.HTTP_201_CREATED)
 

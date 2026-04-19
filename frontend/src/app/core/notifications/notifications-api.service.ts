@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 
 export type AppNotification = {
   id: number;
-  type: 'assignment' | 'comment';
+  type: 'assignment' | 'comment' | 'mention';
   message: string;
   board_id: number | null;
   task_id: number | null;

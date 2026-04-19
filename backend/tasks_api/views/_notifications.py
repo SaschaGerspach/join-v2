@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
@@ -97,6 +99,24 @@ def _notify_comment(comment, actor):
             )
         except User.DoesNotExist:
             pass
+
+
+def _notify_mentions(comment, actor):
+    mentioned_emails = re.findall(r'@([\w.+-]+@[\w-]+\.[\w.-]+)', comment.text)
+    if not mentioned_emails:
+        return
+    User = get_user_model()
+    task = comment.task
+    for email in set(mentioned_emails):
+        user = _find_user_by_email(email)
+        if user and user.pk != actor.pk:
+            create_notification(
+                recipient=user,
+                notification_type=Notification.Type.MENTION,
+                message=f'{_actor_name(actor)} mentioned you in "{_sanitize(task.title)}"',
+                board_id=task.board_id,
+                task_id=task.pk,
+            )
 
 
 def _notify_assignment(task, actor):
