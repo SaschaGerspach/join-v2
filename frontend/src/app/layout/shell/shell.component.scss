@@ -8,8 +8,9 @@ $color-bg:          #f6f7f8;
 $color-text-muted:  #cdcdcd;
 $sidebar-width:     248px;
 $header-height:     6rem;
-$mobile-footer:     80px;
-$bp-mobile:         800px;
+$mobile-footer:     64px;
+$bp-mobile:         768px;
+$bp-tablet:         1024px;
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 
@@ -20,6 +21,18 @@ $bp-mobile:         800px;
 }
 
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
+
+.sidebar-overlay {
+  display: none;
+
+  @media (max-width: $bp-mobile) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+}
 
 .sidebar {
   width: $sidebar-width;
@@ -32,7 +45,16 @@ $bp-mobile:         800px;
   top: 0;
 
   @media (max-width: $bp-mobile) {
-    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+
+    &.open {
+      transform: translateX(0);
+    }
   }
 }
 
@@ -128,6 +150,33 @@ $bp-mobile:         800px;
   flex-shrink: 0;
   position: relative;
   z-index: 100;
+
+  @media (max-width: $bp-mobile) {
+    padding: 0 1rem;
+    height: 4rem;
+  }
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--color-text, $color-dark);
+  padding: 0.25rem;
+
+  @media (max-width: $bp-mobile) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .topbar-title {

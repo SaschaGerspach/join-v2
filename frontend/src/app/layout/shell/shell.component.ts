@@ -24,6 +24,7 @@ export class ShellComponent implements OnInit, OnDestroy {
   menuOpen = signal(false);
   showShortcuts = signal(false);
   notificationsOpen = signal(false);
+  sidebarOpen = signal(false);
 
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
@@ -51,6 +52,14 @@ export class ShellComponent implements OnInit, OnDestroy {
 
   toggleMenu(): void {
     this.menuOpen.update(v => !v);
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update(v => !v);
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen.set(false);
   }
 
   toggleNotifications(): void {

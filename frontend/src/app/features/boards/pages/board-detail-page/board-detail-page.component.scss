@@ -1,4 +1,5 @@
-$bp-mobile: 800px;
+$bp-mobile: 768px;
+$bp-tablet: 1024px;
 
 $color-dark:    #2a3647;
 $color-primary: #29abe2;
@@ -23,9 +24,14 @@ $priority-urgent: #ff3d00;
   flex-direction: column;
   gap: 4rem;
 
+  @media (max-width: $bp-tablet) {
+    gap: 2rem;
+  }
+
   @media (max-width: $bp-mobile) {
     height: auto;
     min-height: 100%;
+    gap: 1rem;
   }
 }
 
@@ -96,6 +102,10 @@ $priority-urgent: #ff3d00;
     font-weight: 700;
     color: var(--color-text);
     cursor: text;
+
+    @media (max-width: $bp-mobile) {
+      font-size: 1.4rem;
+    }
   }
 
   .board-title-input {
@@ -149,6 +159,13 @@ $priority-urgent: #ff3d00;
 
   &:hover {
     background-color: $color-primary;
+  }
+
+  @media (max-width: $bp-mobile) {
+    margin-left: 0;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
   }
 }
 
@@ -320,6 +337,12 @@ $priority-urgent: #ff3d00;
   &.selected {
     outline: 2px solid $color-primary;
     outline-offset: -2px;
+  }
+
+  @media (max-width: $bp-mobile) {
+    border-radius: 16px;
+    padding: 0.75rem;
+    gap: 0.35rem;
   }
 }
 
