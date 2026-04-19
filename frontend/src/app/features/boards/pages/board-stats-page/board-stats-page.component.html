@@ -12,9 +12,17 @@
         <span class="stat-value">{{ totalTasks() }}</span>
         <span class="stat-label">Total Tasks</span>
       </div>
+      <div class="stat-card done">
+        <span class="stat-value">{{ doneTasks() }}</span>
+        <span class="stat-label">Done</span>
+      </div>
       <div class="stat-card overdue">
         <span class="stat-value">{{ overdueTasks() }}</span>
         <span class="stat-label">Overdue</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ avgSubtaskCompletion() }}%</span>
+        <span class="stat-label">Subtask Completion</span>
       </div>
     </div>
 
@@ -26,6 +34,24 @@
       <div class="chart-card">
         <h3>Tasks by Priority</h3>
         <canvas baseChart [data]="priorityChartData()" type="doughnut" [options]="doughnutOptions"></canvas>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>Tasks Created Over Time</h3>
+        <canvas baseChart [data]="creationChartData()" type="line" [options]="lineOptions"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Activity Over Time</h3>
+        <canvas baseChart [data]="activityChartData()" type="bar" [options]="barOptions"></canvas>
+      </div>
+    </div>
+
+    <div class="charts-grid single">
+      <div class="chart-card">
+        <h3>Workload by Assignee</h3>
+        <canvas baseChart [data]="assigneeChartData()" type="bar" [options]="horizontalBarOptions"></canvas>
       </div>
     </div>
   }
