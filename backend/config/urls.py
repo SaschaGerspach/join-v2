@@ -70,6 +70,7 @@ urlpatterns = [
     path("columns/", include("columns_api.urls")),
     path("tasks/", include("tasks_api.urls")),
     path("contacts/", include("contacts_api.urls")),
+    path("notifications/", include("notifications_api.urls")),
 ]
 
 if settings.DEBUG:

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'columns_api',
     'tasks_api',
     'contacts_api',
+    'notifications_api',
 ]
 
 MIDDLEWARE = [
