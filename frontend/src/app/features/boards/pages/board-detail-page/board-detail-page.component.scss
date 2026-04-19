@@ -248,6 +248,47 @@ $priority-urgent: #ff3d00;
     background: transparent;
     padding: 0;
   }
+
+  .wip-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $color-muted;
+    background: $color-bg;
+    padding: 1px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &.wip-exceeded-badge {
+      color: $color-white;
+      background: $color-error;
+    }
+  }
+
+  .wip-limit-input {
+    width: 42px;
+    padding: 2px 4px;
+    border: 1px solid $color-border;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    text-align: center;
+    color: var(--color-text);
+    background: var(--color-surface);
+    outline: none;
+    flex-shrink: 0;
+
+    &:focus { border-color: $color-primary; }
+
+    &::placeholder { color: $color-muted; font-size: 0.7rem; }
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    -moz-appearance: textfield;
+  }
+}
+
+.kanban-column.wip-exceeded {
+  .column-header { border-left: 3px solid $color-error; padding-left: 0.5rem; }
 }
 
 // ─── Task List ────────────────────────────────────────────────────────────────

@@ -21,6 +21,7 @@ def serialize_column(col):
         "board": col.board_id,
         "title": col.title,
         "order": col.order,
+        "wip_limit": col.wip_limit,
     }
 
 
@@ -99,6 +100,8 @@ def column_detail(request, pk):
             column.title = data["title"]
         if "order" in data:
             column.order = data["order"]
+        if "wip_limit" in data:
+            column.wip_limit = data["wip_limit"]
         column.save()
         data = serialize_column(column)
         send_board_event(column.board_id, "column_updated", data)

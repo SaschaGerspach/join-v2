@@ -60,6 +60,11 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
     this.state.renameColumn(id, this.editingColumnTitle);
   }
 
+  onWipLimitChange(columnId: number, event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    this.state.setWipLimit(columnId, val ? parseInt(val, 10) : null);
+  }
+
   inputValue(event: Event): string {
     return (event.target as HTMLInputElement).value;
   }

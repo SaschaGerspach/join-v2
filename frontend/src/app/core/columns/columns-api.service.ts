@@ -8,6 +8,7 @@ export type Column = {
   board: number;
   title: string;
   order: number;
+  wip_limit: number | null;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -30,7 +31,7 @@ export class ColumnsApiService {
     );
   }
 
-  patch(id: number, payload: Partial<{ title: string; order: number }>): Observable<Column> {
+  patch(id: number, payload: Partial<{ title: string; order: number; wip_limit: number | null }>): Observable<Column> {
     return this.http.patch<Column>(`${this.baseUrl}/columns/${id}/`, payload, { withCredentials: true });
   }
 

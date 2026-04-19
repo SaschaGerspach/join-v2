@@ -92,7 +92,7 @@
     (cdkDropListDropped)="state.dropColumn($event)"
   >
     @for (column of state.columns(); track column.id) {
-      <div class="kanban-column" cdkDrag [cdkDragData]="column">
+      <div class="kanban-column" [class.wip-exceeded]="state.isOverWipLimit(column)" cdkDrag [cdkDragData]="column">
 
         <div class="column-header" cdkDragHandle>
           @if (state.editingColumnId() === column.id) {
@@ -108,6 +108,22 @@
           } @else {
             <span class="column-title" (dblclick)="startRenameColumn(column)">{{ column.title }}</span>
           }
+          @if (column.wip_limit !== null) {
+            <span class="wip-badge" [class.wip-exceeded-badge]="state.isOverWipLimit(column)">
+              {{ state.taskCountForColumn(column.id) }}/{{ column.wip_limit }}
+            </span>
+          }
+          <input
+            class="wip-limit-input"
+            type="number"
+            min="1"
+            aria-label="WIP limit"
+            title="WIP limit"
+            [value]="column.wip_limit ?? ''"
+            placeholder="WIP"
+            (change)="onWipLimitChange(column.id, $event)"
+            (click)="$event.stopPropagation()"
+          />
           <button class="btn-icon" (click)="state.pendingDeleteColumnId.set(column.id)" title="Delete column" aria-label="Delete column">&#10005;</button>
         </div>
 

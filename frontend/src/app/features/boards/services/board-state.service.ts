@@ -121,6 +121,21 @@ export class BoardStateService {
     });
   }
 
+  taskCountForColumn(columnId: number): number {
+    return this.tasks().filter(t => t.column === columnId).length;
+  }
+
+  isOverWipLimit(column: Column): boolean {
+    return column.wip_limit !== null && this.taskCountForColumn(column.id) > column.wip_limit;
+  }
+
+  setWipLimit(id: number, value: number | null): void {
+    this.columnsApi.patch(id, { wip_limit: value }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: updated => this.columns.update(cols => cols.map(c => c.id === id ? updated : c)),
+      error: () => this.toast.show('Failed to update WIP limit.', 'error'),
+    });
+  }
+
   renameColumn(id: number, title: string): void {
     const trimmed = title.trim();
     if (!trimmed) { this.editingColumnId.set(null); return; }

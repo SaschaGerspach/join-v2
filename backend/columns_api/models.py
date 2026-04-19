@@ -6,6 +6,7 @@ class Column(models.Model):
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="columns")
     title = models.CharField(max_length=255)
     order = models.PositiveIntegerField(default=0)
+    wip_limit = models.PositiveIntegerField(null=True, blank=True, default=None)
 
     class Meta:
         ordering = ["order"]
