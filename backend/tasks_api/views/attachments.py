@@ -107,4 +107,7 @@ def attachment_download(request, task_pk, pk):
     if not can_access_board(att.task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    return FileResponse(att.file.open("rb"), as_attachment=True, filename=att.filename)
+    try:
+        return FileResponse(att.file.open("rb"), as_attachment=True, filename=att.filename)
+    except (FileNotFoundError, OSError):
+        return Response({"detail": "File not found."}, status=status.HTTP_404_NOT_FOUND)

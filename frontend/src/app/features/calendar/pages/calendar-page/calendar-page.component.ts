@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
@@ -60,9 +60,9 @@ export class CalendarPageComponent implements OnInit {
         const taskRequests = boards.map(b => this.tasksApi.getByBoard(b.id));
         const colRequests = boards.map(b => this.columnsApi.getByBoard(b.id).pipe());
         return forkJoin({
-          allTasks: forkJoin(taskRequests.length ? taskRequests : [Promise.resolve([])]),
-          allCols: forkJoin(colRequests.length ? colRequests : [Promise.resolve([])]),
-          boards: Promise.resolve(boards),
+          allTasks: forkJoin(taskRequests.length ? taskRequests : [of([])]),
+          allCols: forkJoin(colRequests.length ? colRequests : [of([])]),
+          boards: of(boards),
         });
       })
     ).subscribe({

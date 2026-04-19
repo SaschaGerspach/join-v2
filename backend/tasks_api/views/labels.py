@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -78,7 +79,10 @@ def label_detail(request, board_pk, pk):
             label.name = data["name"]
         if "color" in data:
             label.color = data["color"]
-        label.save()
+        try:
+            label.save()
+        except IntegrityError:
+            return Response({"detail": "Label name already exists."}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serialize_label(label))
 
     label.delete()

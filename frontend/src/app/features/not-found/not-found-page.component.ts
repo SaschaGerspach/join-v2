@@ -23,9 +23,9 @@ import { RouterLink } from '@angular/router';
       font-family: sans-serif;
       text-align: center;
     }
-    h1 { font-size: 6rem; margin: 0; color: #ccc; }
-    p { font-size: 1.2rem; color: #666; margin: 0; }
-    a { color: #2a9d8f; text-decoration: none; font-weight: 500; }
+    h1 { font-size: 6rem; margin: 0; color: var(--color-border, #ccc); }
+    p { font-size: 1.2rem; color: var(--color-muted, #666); margin: 0; }
+    a { color: var(--color-primary, #2a9d8f); text-decoration: none; font-weight: 500; }
     a:hover { text-decoration: underline; }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,

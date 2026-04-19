@@ -50,9 +50,12 @@ export class TaskSubtasksComponent implements OnInit {
   toggleSubtask(sub: Subtask): void {
     this.subtasksApi.patch(this.taskId(), sub.id, { done: !sub.done })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(updated => {
-        this.subtasks.update(s => s.map(x => x.id === updated.id ? updated : x));
-        this.emitCounts();
+      .subscribe({
+        next: updated => {
+          this.subtasks.update(s => s.map(x => x.id === updated.id ? updated : x));
+          this.emitCounts();
+        },
+        error: () => this.toast.show('Failed to update subtask.', 'error'),
       });
   }
 

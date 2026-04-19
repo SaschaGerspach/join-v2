@@ -181,7 +181,9 @@ def task_reorder(request):
     tasks = {t.pk: t for t in fetched}
 
     board_ids = {t.board_id for t in fetched}
-    valid_columns = set(Column.objects.filter(board_id__in=board_ids).values_list("pk", flat=True))
+    columns_by_board = {}
+    for col_id, bid in Column.objects.filter(board_id__in=board_ids).values_list("pk", "board_id"):
+        columns_by_board.setdefault(bid, set()).add(col_id)
 
     for item in items:
         task = tasks.get(item.get("id"))
@@ -190,7 +192,7 @@ def task_reorder(request):
         if "order" in item:
             task.order = item["order"]
         if "column" in item:
-            if item["column"] not in valid_columns:
+            if item["column"] not in columns_by_board.get(task.board_id, set()):
                 return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
             task.column_id = item["column"]
 
