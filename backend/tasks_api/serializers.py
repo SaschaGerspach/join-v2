@@ -53,7 +53,7 @@ class TaskSerializer(serializers.Serializer):
 
 class TaskCreateSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=255)
-    description = serializers.CharField(required=False, allow_blank=True, default="")
+    description = serializers.CharField(required=False, allow_blank=True, default="", max_length=5000)
     priority = serializers.ChoiceField(choices=PRIORITY_CHOICES, required=False, default=Task.Priority.MEDIUM)
     column = serializers.IntegerField(required=False, allow_null=True)
     assigned_to = serializers.ListField(child=serializers.IntegerField(), required=False, default=list)
@@ -62,7 +62,7 @@ class TaskCreateSerializer(serializers.Serializer):
 
 class TaskUpdateSerializer(serializers.Serializer):
     title = serializers.CharField(required=False, max_length=255)
-    description = serializers.CharField(required=False, allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True, max_length=5000)
     priority = serializers.ChoiceField(choices=PRIORITY_CHOICES, required=False)
     column = serializers.IntegerField(required=False, allow_null=True)
     assigned_to = serializers.ListField(child=serializers.IntegerField(), required=False)

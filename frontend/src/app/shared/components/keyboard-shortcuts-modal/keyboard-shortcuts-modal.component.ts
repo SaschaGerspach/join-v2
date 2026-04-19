@@ -40,7 +40,7 @@ export type Shortcut = { key: string; description: string };
     .btn-close {
       background: none; border: none; font-size: 1rem; cursor: pointer;
       color: var(--color-muted, #a8a8a8);
-      &:hover { color: #ff8190; }
+      &:hover { color: var(--color-error, #ff8190); }
     }
     .modal-body { padding: 1rem 1.5rem; }
     .shortcut-row {

@@ -41,7 +41,7 @@ export class TaskAttachmentsComponent implements OnInit {
       input.value = '';
       return;
     }
-    const ext = file.name.includes('.') ? file.name.split('.').pop()!.toLowerCase() : '';
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
     if (!this.allowedExtensions.has(ext)) {
       this.toast.show('File type not allowed.', 'error');
       input.value = '';

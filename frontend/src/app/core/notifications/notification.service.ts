@@ -36,18 +36,21 @@ export class NotificationService {
   markAsRead(id: number): void {
     this.api.markAsRead(id).subscribe({
       next: updated => this.notifications.update(list => list.map(n => n.id === id ? updated : n)),
+      error: () => {},
     });
   }
 
   markAllAsRead(): void {
     this.api.markAllAsRead().subscribe({
       next: () => this.notifications.update(list => list.map(n => ({ ...n, is_read: true }))),
+      error: () => {},
     });
   }
 
   private loadNotifications(): void {
     this.api.getAll().subscribe({
       next: list => this.notifications.set(list),
+      error: () => {},
     });
   }
 

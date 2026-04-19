@@ -61,7 +61,7 @@ def task_restore(request, pk):
 
     task.archived_at = None
     task.save(update_fields=["archived_at"])
-    log_activity(task.board, request.user, "created", "task", task.title, "Restored from archive")
+    log_activity(task.board, request.user, "updated", "task", task.title, "Restored from archive")
     data = serialize_task(task)
     send_board_event(task.board_id, "task_created", data)
     return Response(data)
