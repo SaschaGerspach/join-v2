@@ -10,8 +10,20 @@ class BoardSerializer(serializers.Serializer):
     is_owner = serializers.BooleanField()
 
 
+BOARD_TEMPLATES = {
+    "kanban": ["To do", "In progress", "Await feedback", "Done"],
+    "scrum": ["Backlog", "Sprint", "In progress", "Review", "Done"],
+    "bug_tracking": ["New", "Confirmed", "In progress", "Fixed", "Closed"],
+}
+
+
 class BoardCreateSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=255)
+    template = serializers.ChoiceField(
+        choices=list(BOARD_TEMPLATES.keys()),
+        required=False,
+        default="kanban",
+    )
 
 
 class BoardUpdateSerializer(serializers.Serializer):

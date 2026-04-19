@@ -35,8 +35,8 @@ export class BoardsApiService {
     return this.http.get<Board>(`${this.baseUrl}/boards/${id}/`, { withCredentials: true });
   }
 
-  create(title: string): Observable<Board> {
-    return this.http.post<Board>(`${this.baseUrl}/boards/`, { title }, { withCredentials: true });
+  create(title: string, template: string = 'kanban'): Observable<Board> {
+    return this.http.post<Board>(`${this.baseUrl}/boards/`, { title, template }, { withCredentials: true });
   }
 
   patch(id: number, payload: Partial<{ title: string; color: string }>): Observable<Board> {

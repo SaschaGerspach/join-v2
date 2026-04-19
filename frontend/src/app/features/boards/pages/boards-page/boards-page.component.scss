@@ -80,6 +80,22 @@ $color-error:   #ff8190;
   }
 }
 
+.form-select {
+  width: 100%;
+  border: 1px solid $color-border;
+  border-radius: 10px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  cursor: pointer;
+
+  &:focus {
+    border-color: $color-primary;
+    outline: none;
+  }
+}
+
 .board-form-actions {
   display: flex;
   gap: 0.75rem;

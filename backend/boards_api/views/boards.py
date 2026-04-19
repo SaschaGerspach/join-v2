@@ -10,6 +10,7 @@ from config.serializers import DetailSerializer
 from ..models import Board
 from ..permissions import can_access_board, is_board_owner
 from ..serializers import (
+    BOARD_TEMPLATES,
     BoardCreateSerializer,
     BoardSerializer,
     BoardUpdateSerializer,
@@ -71,8 +72,10 @@ def board_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     board = Board.objects.create(title=serializer.validated_data["title"], created_by=request.user)
+    template = serializer.validated_data.get("template", "kanban")
+    columns = BOARD_TEMPLATES.get(template, BOARD_TEMPLATES["kanban"])
     Column.objects.bulk_create([
-        Column(board=board, title=t, order=i) for i, t in enumerate(settings.DEFAULT_BOARD_COLUMNS)
+        Column(board=board, title=t, order=i) for i, t in enumerate(columns)
     ])
     return Response(serialize_board(board), status=status.HTTP_201_CREATED)
 

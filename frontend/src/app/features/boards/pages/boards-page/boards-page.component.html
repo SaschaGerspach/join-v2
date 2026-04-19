@@ -15,6 +15,11 @@
         (keyup.enter)="createBoard()"
         autofocus
       />
+      <select class="form-select" aria-label="Board template" [(ngModel)]="newTemplate">
+        <option value="kanban">Kanban</option>
+        <option value="scrum">Scrum</option>
+        <option value="bug_tracking">Bug Tracking</option>
+      </select>
       <div class="board-form-actions">
         <button class="btn-secondary" (click)="showForm.set(false)">Cancel</button>
         <button class="btn-primary" (click)="createBoard()">Create</button>

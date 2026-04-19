@@ -23,6 +23,7 @@ export class BoardsPageComponent implements OnInit {
 
   boards = signal<Board[]>([]);
   newTitle = '';
+  newTemplate = 'kanban';
   showForm = signal(false);
   loading = signal(true);
   pendingDeleteId = signal<number | null>(null);
@@ -48,10 +49,11 @@ export class BoardsPageComponent implements OnInit {
     const title = this.newTitle.trim();
     if (!title) return;
 
-    this.api.create(title).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.api.create(title, this.newTemplate).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: board => {
         this.boards.update(b => [...b, board]);
         this.newTitle = '';
+        this.newTemplate = 'kanban';
         this.showForm.set(false);
         this.toast.show('Board created');
       },
