@@ -5,13 +5,14 @@ import { SlicePipe } from '@angular/common';
 import { Comment, CommentsApiService } from '../../../../core/tasks/comments-api.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { Contact } from '../../../../core/contacts/contacts-api.service';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 
 @Component({
   selector: 'app-task-comments',
   standalone: true,
-  imports: [FormsModule, SlicePipe, MarkdownPipe],
+  imports: [FormsModule, SlicePipe, MarkdownPipe, ConfirmDialogComponent],
   templateUrl: './task-comments.component.html',
   styleUrl: './task-comments.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,6 +31,7 @@ export class TaskCommentsComponent implements OnInit {
   newCommentText = signal('');
   editingCommentId = signal<number | null>(null);
   editingCommentText = '';
+  pendingDeleteCommentId = signal<number | null>(null);
 
   mentionQuery = signal('');
   mentionActive = signal(false);
@@ -90,6 +92,13 @@ export class TaskCommentsComponent implements OnInit {
   }
 
   deleteComment(id: number): void {
+    this.pendingDeleteCommentId.set(id);
+  }
+
+  confirmDeleteComment(): void {
+    const id = this.pendingDeleteCommentId();
+    if (id === null) return;
+    this.pendingDeleteCommentId.set(null);
     this.commentsApi.delete(this.taskId(), id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

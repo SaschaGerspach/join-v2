@@ -79,6 +79,14 @@
   />
 }
 
+@if (pendingRemoveMemberId() !== null) {
+  <app-confirm-dialog
+    message="Remove this member from the board?"
+    (confirmed)="confirmRemoveMember()"
+    (cancelled)="pendingRemoveMemberId.set(null)"
+  />
+}
+
 @if (managingBoard()) {
   <div class="modal-overlay" (click)="managingBoard.set(null)">
     <div class="members-modal" (click)="$event.stopPropagation()">

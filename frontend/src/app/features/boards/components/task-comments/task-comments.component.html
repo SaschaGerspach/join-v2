@@ -54,3 +54,11 @@
     <button class="btn-add-comment" (click)="addComment()">Post</button>
   </div>
 </div>
+
+@if (pendingDeleteCommentId() !== null) {
+  <app-confirm-dialog
+    message="Delete this comment?"
+    (confirmed)="confirmDeleteComment()"
+    (cancelled)="pendingDeleteCommentId.set(null)"
+  />
+}

@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, output, 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api.service';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-subtasks',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ConfirmDialogComponent],
   templateUrl: './task-subtasks.component.html',
   styleUrl: './task-subtasks.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,6 +26,7 @@ export class TaskSubtasksComponent implements OnInit {
   newSubtaskTitle = signal('');
   editingSubtaskId = signal<number | null>(null);
   editingSubtaskTitle = '';
+  pendingDeleteSubtask = signal<Subtask | null>(null);
 
   ngOnInit(): void {
     this.subtasksApi.getByTask(this.taskId())
@@ -60,6 +62,13 @@ export class TaskSubtasksComponent implements OnInit {
   }
 
   deleteSubtask(sub: Subtask): void {
+    this.pendingDeleteSubtask.set(sub);
+  }
+
+  confirmDeleteSubtask(): void {
+    const sub = this.pendingDeleteSubtask();
+    if (!sub) return;
+    this.pendingDeleteSubtask.set(null);
     this.subtasksApi.delete(this.taskId(), sub.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

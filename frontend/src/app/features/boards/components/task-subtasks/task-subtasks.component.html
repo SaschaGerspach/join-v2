@@ -38,3 +38,11 @@
     <button class="btn-add-sub" aria-label="Add subtask" (click)="addSubtask()">+</button>
   </div>
 </div>
+
+@if (pendingDeleteSubtask()) {
+  <app-confirm-dialog
+    message="Delete this subtask?"
+    (confirmed)="confirmDeleteSubtask()"
+    (cancelled)="pendingDeleteSubtask.set(null)"
+  />
+}

@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Task, TaskDependency, TasksApiService } from '../../../../core/tasks/tasks-api.service';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-dependencies',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ConfirmDialogComponent],
   templateUrl: './task-dependencies.component.html',
   styleUrl: './task-dependencies.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,6 +23,7 @@ export class TaskDependenciesComponent implements OnInit {
 
   dependencies = signal<TaskDependency[]>([]);
   selectedTaskId = signal<number | null>(null);
+  pendingRemoveDep = signal<TaskDependency | null>(null);
 
   availableTasks = signal<Task[]>([]);
 
@@ -50,6 +52,13 @@ export class TaskDependenciesComponent implements OnInit {
   }
 
   removeDependency(dep: TaskDependency): void {
+    this.pendingRemoveDep.set(dep);
+  }
+
+  confirmRemoveDependency(): void {
+    const dep = this.pendingRemoveDep();
+    if (!dep) return;
+    this.pendingRemoveDep.set(null);
     this.tasksApi.removeDependency(this.taskId(), dep.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

@@ -1,11 +1,13 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Attachment, AttachmentsApiService } from '../../../../core/tasks/attachments-api.service';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-attachments',
   standalone: true,
+  imports: [ConfirmDialogComponent],
   templateUrl: './task-attachments.component.html',
   styleUrl: './task-attachments.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,6 +20,7 @@ export class TaskAttachmentsComponent implements OnInit {
   taskId = input.required<number>();
 
   attachments = signal<Attachment[]>([]);
+  pendingDeleteAttachment = signal<Attachment | null>(null);
 
   private readonly allowedExtensions = new Set([
     'png', 'jpg', 'jpeg', 'gif', 'webp',
@@ -57,6 +60,13 @@ export class TaskAttachmentsComponent implements OnInit {
   }
 
   deleteAttachment(att: Attachment): void {
+    this.pendingDeleteAttachment.set(att);
+  }
+
+  confirmDeleteAttachment(): void {
+    const att = this.pendingDeleteAttachment();
+    if (!att) return;
+    this.pendingDeleteAttachment.set(null);
     this.attachmentsApi.delete(this.taskId(), att.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

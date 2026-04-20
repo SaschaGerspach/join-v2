@@ -22,3 +22,11 @@
     <button class="btn-add" [disabled]="!selectedTaskId()" (click)="addDependency()">Add</button>
   </div>
 </div>
+
+@if (pendingRemoveDep()) {
+  <app-confirm-dialog
+    message="Remove this dependency?"
+    (confirmed)="confirmRemoveDependency()"
+    (cancelled)="pendingRemoveDep.set(null)"
+  />
+}

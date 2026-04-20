@@ -20,3 +20,11 @@
     (change)="onFileSelected($event)"
   />
 </div>
+
+@if (pendingDeleteAttachment()) {
+  <app-confirm-dialog
+    message="Delete this attachment? The file will be permanently removed."
+    (confirmed)="confirmDeleteAttachment()"
+    (cancelled)="pendingDeleteAttachment.set(null)"
+  />
+}

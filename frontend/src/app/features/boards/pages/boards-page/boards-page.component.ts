@@ -32,6 +32,7 @@ export class BoardsPageComponent implements OnInit {
   members = signal<BoardMember[]>([]);
   inviteEmail = '';
   inviteError = signal('');
+  pendingRemoveMemberId = signal<number | null>(null);
 
   ngOnInit(): void {
     this.loadBoards();
@@ -112,8 +113,14 @@ export class BoardsPageComponent implements OnInit {
   }
 
   removeMember(userId: number): void {
+    this.pendingRemoveMemberId.set(userId);
+  }
+
+  confirmRemoveMember(): void {
+    const userId = this.pendingRemoveMemberId();
     const board = this.managingBoard();
-    if (!board) return;
+    if (!board || userId === null) return;
+    this.pendingRemoveMemberId.set(null);
     this.api.removeMember(board.id, userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.members.update(list => list.filter(m => m.user_id !== userId)),
       error: () => this.toast.show('Failed to remove member.', 'error'),
