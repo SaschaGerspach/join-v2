@@ -17,12 +17,18 @@ class Board(models.Model):
 
 
 class BoardMember(models.Model):
+    class Role(models.TextChoices):
+        ADMIN = "admin", "Admin"
+        EDITOR = "editor", "Editor"
+        VIEWER = "viewer", "Viewer"
+
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="members")
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="board_memberships",
     )
+    role = models.CharField(max_length=10, choices=Role.choices, default=Role.EDITOR)
     invited_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

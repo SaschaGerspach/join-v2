@@ -107,6 +107,11 @@
           <li class="member-item">
             <span class="member-name">{{ m.first_name }} {{ m.last_name }}</span>
             <span class="member-email">{{ m.email }}</span>
+            <select class="role-select" [ngModel]="m.role" (ngModelChange)="changeRole(m.user_id, $event)">
+              <option value="admin">Admin</option>
+              <option value="editor">Editor</option>
+              <option value="viewer">Viewer</option>
+            </select>
             <button class="btn-icon small" aria-label="Remove member" (click)="removeMember(m.user_id)" title="Remove">&#10005;</button>
           </li>
         }

@@ -8,8 +8,8 @@ from rest_framework.response import Response
 
 from config.serializers import DetailSerializer
 from ..models import Board, BoardMember
-from ..permissions import get_board_or_404
-from ..serializers import BoardMemberInviteSerializer, BoardMemberSerializer
+from ..permissions import get_board_or_404, can_manage_members
+from ..serializers import BoardMemberInviteSerializer, BoardMemberSerializer, BoardMemberRoleSerializer
 
 User = get_user_model()
 
@@ -41,11 +41,12 @@ def board_members(request, pk):
             "email": m.user.email,
             "first_name": m.user.first_name,
             "last_name": m.user.last_name,
+            "role": m.role,
             "invited_at": m.invited_at,
         } for m in members])
 
-    if board.created_by != request.user:
-        return Response({"detail": "Only the owner can invite members."}, status=status.HTTP_403_FORBIDDEN)
+    if not can_manage_members(board, request.user):
+        return Response({"detail": "You do not have permission to invite members."}, status=status.HTTP_403_FORBIDDEN)
 
     serializer = BoardMemberInviteSerializer(data=request.data)
     if not serializer.is_valid():
@@ -102,18 +103,42 @@ def board_leave(request, pk):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@extend_schema(responses={204: None, 404: DetailSerializer})
-@api_view(["DELETE"])
+@extend_schema(
+    methods=["PATCH"],
+    request=BoardMemberRoleSerializer,
+    responses={200: BoardMemberSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={204: None, 404: DetailSerializer},
+)
+@api_view(["PATCH", "DELETE"])
 def board_member_detail(request, pk, user_pk):
-    try:
-        board = Board.objects.get(pk=pk, created_by=request.user)
-    except Board.DoesNotExist:
+    board, err = get_board_or_404(pk, request.user)
+    if err:
+        return err
+
+    if not can_manage_members(board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     try:
         member = BoardMember.objects.get(board=board, user_id=user_pk)
     except BoardMember.DoesNotExist:
         return Response({"detail": "Member not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "PATCH":
+        serializer = BoardMemberRoleSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        member.role = serializer.validated_data["role"]
+        member.save(update_fields=["role"])
+        return Response({
+            "user_id": member.user_id,
+            "email": member.user.email,
+            "first_name": member.user.first_name,
+            "last_name": member.user.last_name,
+            "role": member.role,
+        })
 
     member.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

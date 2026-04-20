@@ -248,3 +248,99 @@ class BoardExportCSVTests(APITestCase):
     def test_nonexistent_board_404(self):
         response = self.client.get(self.url(9999))
         self.assertEqual(response.status_code, 404)
+
+
+class BoardMemberRoleTests(APITestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(email="owner@example.com", password="pass")
+        self.admin_user = User.objects.create_user(email="admin@example.com", password="pass")
+        self.editor_user = User.objects.create_user(email="editor@example.com", password="pass")
+        self.viewer_user = User.objects.create_user(email="viewer@example.com", password="pass")
+        self.board = Board.objects.create(title="Team Board", created_by=self.owner)
+        BoardMember.objects.create(board=self.board, user=self.admin_user, role="admin")
+        BoardMember.objects.create(board=self.board, user=self.editor_user, role="editor")
+        BoardMember.objects.create(board=self.board, user=self.viewer_user, role="viewer")
+        self.col = Column.objects.create(board=self.board, title="Todo", order=0)
+
+    def test_members_list_includes_role(self):
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.get(f"/boards/{self.board.pk}/members/")
+        self.assertEqual(response.status_code, 200)
+        roles = {m["email"]: m["role"] for m in response.data}
+        self.assertEqual(roles["admin@example.com"], "admin")
+        self.assertEqual(roles["editor@example.com"], "editor")
+        self.assertEqual(roles["viewer@example.com"], "viewer")
+
+    def test_owner_can_change_role(self):
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.patch(
+            f"/boards/{self.board.pk}/members/{self.editor_user.pk}/",
+            {"role": "admin"}, format="json"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["role"], "admin")
+
+    def test_admin_can_change_role(self):
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.patch(
+            f"/boards/{self.board.pk}/members/{self.editor_user.pk}/",
+            {"role": "viewer"}, format="json"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["role"], "viewer")
+
+    def test_editor_cannot_change_role(self):
+        self.client.force_authenticate(user=self.editor_user)
+        response = self.client.patch(
+            f"/boards/{self.board.pk}/members/{self.viewer_user.pk}/",
+            {"role": "admin"}, format="json"
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_admin_can_invite(self):
+        new_user = User.objects.create_user(email="new@example.com", password="pass")
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.post(
+            f"/boards/{self.board.pk}/members/",
+            {"email": "new@example.com"}, format="json"
+        )
+        self.assertEqual(response.status_code, 201)
+
+    def test_editor_cannot_invite(self):
+        User.objects.create_user(email="new2@example.com", password="pass")
+        self.client.force_authenticate(user=self.editor_user)
+        response = self.client.post(
+            f"/boards/{self.board.pk}/members/",
+            {"email": "new2@example.com"}, format="json"
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_viewer_cannot_create_task(self):
+        self.client.force_authenticate(user=self.viewer_user)
+        response = self.client.post(
+            f"/tasks/?board={self.board.pk}",
+            {"title": "New task"}, format="json"
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_editor_can_create_task(self):
+        self.client.force_authenticate(user=self.editor_user)
+        response = self.client.post(
+            f"/tasks/?board={self.board.pk}",
+            {"title": "New task"}, format="json"
+        )
+        self.assertEqual(response.status_code, 201)
+
+    def test_viewer_cannot_edit_task(self):
+        self.client.force_authenticate(user=self.viewer_user)
+        task = Task.objects.create(board=self.board, column=self.col, title="Task")
+        response = self.client.patch(f"/tasks/{task.pk}/", {"title": "Changed"}, format="json")
+        self.assertEqual(response.status_code, 403)
+
+    def test_invalid_role_rejected(self):
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.patch(
+            f"/boards/{self.board.pk}/members/{self.editor_user.pk}/",
+            {"role": "superadmin"}, format="json"
+        )
+        self.assertEqual(response.status_code, 400)

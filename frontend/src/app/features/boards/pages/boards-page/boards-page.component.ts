@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { BoardsApiService, Board, BoardMember } from '../../../../core/boards/boards-api.service';
+import { BoardsApiService, Board, BoardMember, BoardMemberRole } from '../../../../core/boards/boards-api.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -117,6 +117,15 @@ export class BoardsPageComponent implements OnInit {
     this.api.removeMember(board.id, userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.members.update(list => list.filter(m => m.user_id !== userId)),
       error: () => this.toast.show('Failed to remove member.', 'error'),
+    });
+  }
+
+  changeRole(userId: number, role: BoardMemberRole): void {
+    const board = this.managingBoard();
+    if (!board) return;
+    this.api.patchMemberRole(board.id, userId, role).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: updated => this.members.update(list => list.map(m => m.user_id === userId ? { ...m, role: updated.role } : m)),
+      error: () => this.toast.show('Failed to change role.', 'error'),
     });
   }
 

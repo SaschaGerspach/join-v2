@@ -14,11 +14,14 @@ export type Board = {
   is_favorite: boolean;
 };
 
+export type BoardMemberRole = 'admin' | 'editor' | 'viewer';
+
 export type BoardMember = {
   user_id: number;
   email: string;
   first_name: string;
   last_name: string;
+  role: BoardMemberRole;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -58,6 +61,10 @@ export class BoardsApiService {
 
   removeMember(boardId: number, userId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/boards/${boardId}/members/${userId}/`, { withCredentials: true });
+  }
+
+  patchMemberRole(boardId: number, userId: number, role: BoardMemberRole): Observable<BoardMember> {
+    return this.http.patch<BoardMember>(`${this.baseUrl}/boards/${boardId}/members/${userId}/`, { role }, { withCredentials: true });
   }
 
   favorite(boardId: number): Observable<void> {

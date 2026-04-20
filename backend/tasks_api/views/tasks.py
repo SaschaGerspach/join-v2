@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.models import Board
-from boards_api.permissions import can_access_board, get_board_or_404
+from boards_api.permissions import can_access_board, can_edit_board, get_board_or_404
 from boards_api.ws_events import send_board_event
 from columns_api.models import Column
 from config.serializers import DetailSerializer
@@ -53,6 +53,9 @@ def task_list(request):
             .order_by("order", "created_at")[:500]
         )
         return Response([serialize_task(t) for t in tasks])
+
+    if not can_edit_board(board, request.user):
+        return Response({"detail": "You do not have permission to edit this board."}, status=status.HTTP_403_FORBIDDEN)
 
     serializer = TaskCreateSerializer(data=request.data)
     if not serializer.is_valid():
@@ -115,6 +118,9 @@ def task_detail(request, pk):
 
     if request.method == "GET":
         return Response(serialize_task(task))
+
+    if not can_edit_board(task.board, request.user):
+        return Response({"detail": "You do not have permission to edit this board."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":
         serializer = TaskUpdateSerializer(data=request.data)

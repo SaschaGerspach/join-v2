@@ -37,8 +37,16 @@ class BoardMemberSerializer(serializers.Serializer):
     email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
+    role = serializers.CharField(required=False)
     invited_at = serializers.DateTimeField(required=False)
 
 
 class BoardMemberInviteSerializer(serializers.Serializer):
     email = serializers.EmailField()
+
+
+ROLE_CHOICES = [("admin", "Admin"), ("editor", "Editor"), ("viewer", "Viewer")]
+
+
+class BoardMemberRoleSerializer(serializers.Serializer):
+    role = serializers.ChoiceField(choices=ROLE_CHOICES)
