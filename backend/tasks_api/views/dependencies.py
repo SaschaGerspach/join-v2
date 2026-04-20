@@ -9,7 +9,8 @@ from ..serializers import DependencySerializer, DependencyCreateSerializer
 
 
 def _would_create_cycle(task, new_dependency):
-    """Check if adding task→new_dependency would create a cycle (DFS from new_dependency back to task)."""
+    # DFS: walk the dependency graph starting from new_dependency; if we reach task, adding the edge would form a cycle.
+
     visited = set()
     stack = [new_dependency.pk]
     while stack:

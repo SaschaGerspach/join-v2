@@ -13,6 +13,7 @@ def _get_member_role(board, user):
         return None
 
 
+# Board owner (created_by) has implicit full control — not stored as a BoardMember role.
 def can_access_board(board, user):
     if user.is_staff:
         return True

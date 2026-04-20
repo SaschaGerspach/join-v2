@@ -321,6 +321,7 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
+# 'task' must match the dotted import path exactly — Celery uses it to locate the function at runtime.
 CELERY_BEAT_SCHEDULE = {
     'check-due-date-reminders': {
         'task': 'tasks_api.tasks.send_due_date_reminders',

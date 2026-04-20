@@ -40,6 +40,7 @@ def send_due_date_reminders():
                 recipients.add(user)
 
         for user in recipients:
+            # Deduplicate: skip if a due-date reminder (identified by "due" in message) was already sent within the reminder window.
             already_notified = Notification.objects.filter(
                 recipient=user,
                 task_id=task.pk,

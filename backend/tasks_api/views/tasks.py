@@ -160,11 +160,13 @@ def task_detail(request, pk):
         send_board_event(task.board_id, "task_updated", data)
         return Response(data)
 
+    # Soft-delete: archive instead of destroying so tasks can be restored.
     task.archived_at = timezone.now()
     task.save(update_fields=["archived_at"])
     log_activity(task.board, request.user, "deleted", "task", task.title)
     send_board_event(task.board_id, "task_deleted", {"id": task.pk})
 
+    # If task is recurring, archiving triggers creation of the next instance.
     new_task = create_next_recurring_task(task)
     if new_task:
         log_activity(task.board, request.user, "created", "task", new_task.title, "Recurring")

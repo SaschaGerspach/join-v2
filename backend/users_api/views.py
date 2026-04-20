@@ -110,6 +110,7 @@ def user_detail(request, pk):
         if request.user.pk != pk:
             return Response({"detail": "You can only delete your own account."}, status=status.HTTP_403_FORBIDDEN)
 
+        # Transfer ownership to the longest-standing member; if no members exist, delete the board entirely.
         with transaction.atomic():
             for board in Board.objects.select_for_update().filter(created_by=user):
                 successor = (
@@ -121,6 +122,7 @@ def user_detail(request, pk):
                 if successor:
                     board.created_by = successor.user
                     board.save(update_fields=["created_by"])
+                    # Remove membership row since the successor is now the owner (implicit role).
                     successor.delete()
                 else:
                     board.delete()

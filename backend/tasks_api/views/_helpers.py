@@ -57,6 +57,7 @@ def create_next_recurring_task(task):
     new_due = next_due_date(task.due_date, task.recurrence)
     if not new_due:
         return None
+    # Place new instance in the first column to restart the workflow from the beginning.
     first_column = task.board.columns.order_by("order").first()
     new_task = Task.objects.create(
         board=task.board,
