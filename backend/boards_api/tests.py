@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from columns_api.models import Column
-from .models import Board
+from .models import Board, BoardMember
 
 User = get_user_model()
 
@@ -118,3 +118,36 @@ class AdminBoardAccessTests(APITestCase):
         response = self.client.delete(f"/boards/{self.board.pk}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Board.objects.count(), 0)
+
+
+class BoardLeaveTests(APITestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(email="owner@example.com", password="pass")
+        self.member = User.objects.create_user(email="member@example.com", password="pass")
+        self.outsider = User.objects.create_user(email="outsider@example.com", password="pass")
+        self.board = Board.objects.create(title="Team Board", created_by=self.owner)
+        BoardMember.objects.create(board=self.board, user=self.member)
+
+    def url(self, pk):
+        return f"/boards/{pk}/members/leave/"
+
+    def test_member_can_leave(self):
+        self.client.force_authenticate(user=self.member)
+        response = self.client.delete(self.url(self.board.pk))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(BoardMember.objects.filter(board=self.board, user=self.member).exists())
+
+    def test_owner_cannot_leave(self):
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.delete(self.url(self.board.pk))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_outsider_gets_404(self):
+        self.client.force_authenticate(user=self.outsider)
+        response = self.client.delete(self.url(self.board.pk))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_nonexistent_board_gets_404(self):
+        self.client.force_authenticate(user=self.member)
+        response = self.client.delete(self.url(9999))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
