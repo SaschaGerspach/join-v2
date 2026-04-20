@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { UsersApiService } from '../../../../core/users/users-api.service';
+import { NotificationsApiService } from '../../../../core/notifications/notifications-api.service';
+import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
@@ -20,6 +22,8 @@ export class ProfilePageComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly usersApi = inject(UsersApiService);
+  private readonly notificationsApi = inject(NotificationsApiService);
+  private readonly boardsApi = inject(BoardsApiService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
 
@@ -33,6 +37,10 @@ export class ProfilePageComponent implements OnInit {
   saving = signal(false);
   errorMessage = signal('');
   showDeleteConfirm = signal(false);
+
+  boards = signal<Board[]>([]);
+  disabledTypes = signal<Set<string>>(new Set());
+  mutedBoardIds = signal<Set<number>>(new Set());
 
   initials = computed(() => {
     const f = this.firstName()[0] ?? '';
@@ -55,6 +63,19 @@ export class ProfilePageComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => { this.toast.show('Failed to load profile.', 'error'); this.loading.set(false); },
+    });
+
+    this.notificationsApi.getPreferences().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: prefs => {
+        this.disabledTypes.set(new Set(prefs.disabled_types));
+        this.mutedBoardIds.set(new Set(prefs.muted_boards));
+      },
+      error: () => {},
+    });
+
+    this.boardsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: boards => this.boards.set(boards),
+      error: () => {},
     });
   }
 
@@ -103,6 +124,37 @@ export class ProfilePageComponent implements OnInit {
         this.router.navigate(['/login']);
       },
       error: () => this.toast.show('Failed to delete account.', 'error'),
+    });
+  }
+
+  toggleType(type: string): void {
+    const types = new Set(this.disabledTypes());
+    if (types.has(type)) {
+      types.delete(type);
+    } else {
+      types.add(type);
+    }
+    this.disabledTypes.set(types);
+    this.savePreferences();
+  }
+
+  toggleMuteBoard(boardId: number): void {
+    const muted = new Set(this.mutedBoardIds());
+    if (muted.has(boardId)) {
+      muted.delete(boardId);
+    } else {
+      muted.add(boardId);
+    }
+    this.mutedBoardIds.set(muted);
+    this.savePreferences();
+  }
+
+  private savePreferences(): void {
+    this.notificationsApi.updatePreferences({
+      disabled_types: [...this.disabledTypes()],
+      muted_boards: [...this.mutedBoardIds()],
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      error: () => this.toast.show('Failed to save notification settings.', 'error'),
     });
   }
 }

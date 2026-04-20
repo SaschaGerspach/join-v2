@@ -48,6 +48,35 @@
       </div>
     </div>
 
+    <div class="form-section">
+      <h2 class="section-title">Notification Settings</h2>
+      <div class="notification-prefs">
+        <label class="pref-label">
+          <input type="checkbox" [checked]="!disabledTypes().has('assignment')" (change)="toggleType('assignment')" />
+          Assignment notifications
+        </label>
+        <label class="pref-label">
+          <input type="checkbox" [checked]="!disabledTypes().has('comment')" (change)="toggleType('comment')" />
+          Comment notifications
+        </label>
+        <label class="pref-label">
+          <input type="checkbox" [checked]="!disabledTypes().has('mention')" (change)="toggleType('mention')" />
+          Mention notifications
+        </label>
+      </div>
+      @if (boards().length > 0) {
+        <h3 class="subsection-title">Muted Boards</h3>
+        <div class="muted-boards">
+          @for (board of boards(); track board.id) {
+            <label class="pref-label">
+              <input type="checkbox" [checked]="mutedBoardIds().has(board.id)" (change)="toggleMuteBoard(board.id)" />
+              {{ board.title }}
+            </label>
+          }
+        </div>
+      }
+    </div>
+
     @if (errorMessage()) {
       <p class="msg msg-error">{{ errorMessage() }}</p>
     }

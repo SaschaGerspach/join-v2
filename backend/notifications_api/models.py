@@ -34,3 +34,17 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class NotificationPreference(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="notification_preferences",
+    )
+    disabled_types = models.JSONField(default=list, blank=True)
+    muted_boards = models.ManyToManyField(
+        "boards_api.Board",
+        blank=True,
+        related_name="+",
+    )
