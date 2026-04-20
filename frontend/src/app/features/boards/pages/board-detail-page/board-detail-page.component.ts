@@ -94,6 +94,21 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
     window.open(this.boardsApi.exportCsvUrl(this.state.boardId()), '_blank');
   }
 
+  saveFilter(): void {
+    const name = prompt('Filter name:');
+    if (name?.trim()) {
+      this.state.saveCurrentFilter(name.trim());
+    }
+  }
+
+  applySavedFilter(event: Event): void {
+    const name = (event.target as HTMLSelectElement).value;
+    if (!name) return;
+    const filter = this.state.savedFilters().find(f => f.name === name);
+    if (filter) this.state.applySavedFilter(filter);
+    (event.target as HTMLSelectElement).value = '';
+  }
+
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) return;

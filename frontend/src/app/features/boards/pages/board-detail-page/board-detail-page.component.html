@@ -52,6 +52,15 @@
     </select>
     @if (state.hasActiveFilter()) {
       <button class="btn-clear-filter" (click)="state.clearFilters()">&#10005; Clear</button>
+      <button class="btn-save-filter" (click)="saveFilter()">Save filter</button>
+    }
+    @if (state.savedFilters().length > 0) {
+      <select class="filter-select" aria-label="Saved filters" (change)="applySavedFilter($event)">
+        <option value="">Saved filters…</option>
+        @for (f of state.savedFilters(); track f.name) {
+          <option [value]="f.name">{{ f.name }}</option>
+        }
+      </select>
     }
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'stats']">Stats</a>
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'activity']">Activity</a>

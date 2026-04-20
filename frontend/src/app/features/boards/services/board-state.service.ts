@@ -14,6 +14,14 @@ import { connectBoardWebSocket } from './_board-ws-handler';
 import { handleColumnDrop, handleTaskDrop } from './_board-drag-drop';
 import { bulkMoveTasks, bulkDeleteTasks } from './_board-bulk-ops';
 
+export type SavedFilter = {
+  name: string;
+  priority: string;
+  assignee: number | '';
+  due: 'overdue' | 'soon' | '';
+  search: string;
+};
+
 @Injectable()
 export class BoardStateService {
   private readonly auth = inject(AuthService);
@@ -50,6 +58,7 @@ export class BoardStateService {
   readonly selectedTaskIds = signal<Set<number>>(new Set());
   readonly bulkMoveTarget = signal<number | null>(null);
   readonly pendingBulkDelete = signal(false);
+  readonly savedFilters = signal<SavedFilter[]>([]);
 
   readonly columnListIds = computed(() => this.columns().map(c => `col-${c.id}`));
   readonly bulkMode = computed(() => this.selectedTaskIds().size > 0);
@@ -105,6 +114,7 @@ export class BoardStateService {
   init(boardId: number): void {
     this.boardId.set(boardId);
     this.loadData(boardId);
+    this.loadSavedFilters();
     connectBoardWebSocket(boardId, this.boardWs, this.tasks, this.columns, this.destroyRef);
   }
 
@@ -117,6 +127,37 @@ export class BoardStateService {
     this.filterPriority.set('');
     this.filterAssignee.set('');
     this.filterDue.set('');
+  }
+
+  loadSavedFilters(): void {
+    const raw = localStorage.getItem(`board-filters-${this.boardId()}`);
+    this.savedFilters.set(raw ? JSON.parse(raw) : []);
+  }
+
+  saveCurrentFilter(name: string): void {
+    const filter: SavedFilter = {
+      name,
+      priority: this.filterPriority(),
+      assignee: this.filterAssignee(),
+      due: this.filterDue(),
+      search: this.searchQuery(),
+    };
+    const filters = [...this.savedFilters(), filter];
+    this.savedFilters.set(filters);
+    localStorage.setItem(`board-filters-${this.boardId()}`, JSON.stringify(filters));
+  }
+
+  applySavedFilter(filter: SavedFilter): void {
+    this.searchQuery.set(filter.search);
+    this.filterPriority.set(filter.priority);
+    this.filterAssignee.set(filter.assignee);
+    this.filterDue.set(filter.due);
+  }
+
+  deleteSavedFilter(name: string): void {
+    const filters = this.savedFilters().filter(f => f.name !== name);
+    this.savedFilters.set(filters);
+    localStorage.setItem(`board-filters-${this.boardId()}`, JSON.stringify(filters));
   }
 
   contactName(id: number | null): string {

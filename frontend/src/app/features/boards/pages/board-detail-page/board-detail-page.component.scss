@@ -85,6 +85,23 @@ $bp-tablet: 1024px;
     }
   }
 
+  .btn-save-filter {
+    padding: 0.4rem 0.75rem;
+    border: 1px solid $color-primary;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $color-primary;
+    background: transparent;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+      background: $color-primary;
+      color: $color-white;
+    }
+  }
+
   h1 {
     font-size: 2rem;
     font-weight: 700;
