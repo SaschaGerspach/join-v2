@@ -60,7 +60,6 @@ export class CalendarPageComponent implements OnInit {
       next: ({ tasks, boards }) => {
         this.tasks.set(tasks.filter(t => !!t.due_date));
 
-        const boardIds = new Set(boards.map(b => b.id));
         const colRequests = boards.map(b => this.columnsApi.getByBoard(b.id));
         if (colRequests.length === 0) {
           this.loading.set(false);
