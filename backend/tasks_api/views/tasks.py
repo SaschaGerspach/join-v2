@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.models import Board
-from boards_api.permissions import can_access_board, get_board_or_404, is_board_owner
+from boards_api.permissions import can_access_board, get_board_or_404
 from boards_api.ws_events import send_board_event
 from columns_api.models import Column
 from config.serializers import DetailSerializer
@@ -20,7 +20,7 @@ from ..serializers import (
     TaskUpdateSerializer,
 )
 from activity_api.helpers import log_activity
-from ._helpers import serialize_label, serialize_task
+from ._helpers import serialize_task
 from ._notifications import _notify_assignments
 
 

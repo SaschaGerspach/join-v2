@@ -1,4 +1,3 @@
-from django.conf import settings
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -8,7 +7,7 @@ from rest_framework.response import Response
 from columns_api.models import Column
 from config.serializers import DetailSerializer
 from ..models import Board
-from ..permissions import can_access_board, get_board_or_404, is_board_owner
+from ..permissions import get_board_or_404, is_board_owner
 from ..serializers import (
     BOARD_TEMPLATES,
     BoardCreateSerializer,

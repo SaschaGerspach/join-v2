@@ -4,7 +4,6 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from boards_api.models import Board
 from boards_api.permissions import can_access_board, get_board_or_404
 from config.serializers import DetailSerializer
 from ..models import Label

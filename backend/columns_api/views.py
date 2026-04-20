@@ -4,7 +4,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from activity_api.helpers import log_activity
-from boards_api.models import Board
 from boards_api.permissions import can_access_board, get_board_or_404, is_board_owner
 from boards_api.ws_events import send_board_event
 from config.serializers import DetailSerializer

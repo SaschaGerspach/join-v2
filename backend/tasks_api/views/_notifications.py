@@ -101,7 +101,6 @@ def _notify_mentions(comment, actor):
     mentioned_emails = re.findall(r'@([\w.+-]+@[\w-]+\.[\w.-]+)', comment.text)
     if not mentioned_emails:
         return
-    User = get_user_model()
     task = comment.task
     for email in set(mentioned_emails):
         user = _find_user_by_email(email)
