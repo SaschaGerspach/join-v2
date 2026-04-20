@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def send_due_date_reminders():
-    from contacts_api.models import Contact
     from tasks_api.models import Task
     from tasks_api.views._notifications import _find_user_by_email
 
