@@ -10,3 +10,6 @@ frontend/node_modules/
 backend/logs/
 .venv/
 venv/
+*.pem
+*.key
+*.crt
