@@ -89,6 +89,24 @@ def board_members(request, pk):
     }, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(responses={204: None, 403: DetailSerializer, 404: DetailSerializer})
+@api_view(["DELETE"])
+def board_leave(request, pk):
+    try:
+        board = Board.objects.get(pk=pk)
+    except Board.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if board.created_by == request.user:
+        return Response({"detail": "The owner cannot leave the board."}, status=status.HTTP_403_FORBIDDEN)
+
+    deleted, _ = BoardMember.objects.filter(board=board, user=request.user).delete()
+    if not deleted:
+        return Response({"detail": "Not a member."}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 @extend_schema(responses={204: None, 404: DetailSerializer})
 @api_view(["DELETE"])
 def board_member_detail(request, pk, user_pk):
