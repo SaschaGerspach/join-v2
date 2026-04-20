@@ -252,6 +252,7 @@
     (closed)="state.selectedTask.set(null)"
     (taskUpdated)="state.onTaskUpdated($event)"
     (taskDeleted)="state.onTaskDeleted($event)"
+    (taskDuplicated)="state.onTaskCreated($event)"
   />
 }
 

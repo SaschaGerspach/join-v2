@@ -123,6 +123,12 @@ export class CalendarPageComponent implements OnInit {
     this.selectedTask.set(null);
   }
 
+  onTaskDuplicated(task: Task): void {
+    if (task.due_date) {
+      this.tasks.update(list => [...list, task]);
+    }
+  }
+
   priorityClass(priority: string): string {
     return `priority-${priority}`;
   }

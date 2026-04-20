@@ -38,6 +38,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   closed = output<void>();
   taskUpdated = output<Task>();
   taskDeleted = output<number>();
+  taskDuplicated = output<Task>();
 
   title = signal('');
   description = signal('');
@@ -118,6 +119,17 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
         this.closed.emit();
       },
       error: () => this.toast.show('Failed to delete task.', 'error'),
+    });
+  }
+
+  duplicateTask(): void {
+    this.tasksApi.duplicate(this.task().id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: newTask => {
+        this.taskDuplicated.emit(newTask);
+        this.closed.emit();
+        this.toast.show('Task duplicated');
+      },
+      error: () => this.toast.show('Failed to duplicate task.', 'error'),
     });
   }
 

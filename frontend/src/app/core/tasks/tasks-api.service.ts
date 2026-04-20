@@ -95,6 +95,10 @@ export class TasksApiService {
     return this.http.delete<void>(`${this.baseUrl}/tasks/${id}/`, { withCredentials: true });
   }
 
+  duplicate(id: number): Observable<Task> {
+    return this.http.post<Task>(`${this.baseUrl}/tasks/${id}/duplicate/`, {}, { withCredentials: true });
+  }
+
   reorder(items: { id: number; order: number; column: number | null }[]): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/tasks/reorder/`, items, { withCredentials: true });
   }

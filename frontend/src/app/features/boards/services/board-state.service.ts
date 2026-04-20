@@ -248,6 +248,10 @@ export class BoardStateService {
     this.tasks.update(t => t.filter(task => task.id !== id));
   }
 
+  onTaskCreated(task: Task): void {
+    this.tasks.update(t => t.some(x => x.id === task.id) ? t : [...t, task]);
+  }
+
   confirmDeleteTask(): void {
     const id = this.pendingDeleteTaskId();
     if (id === null) return;

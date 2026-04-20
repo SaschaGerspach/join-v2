@@ -250,3 +250,36 @@ def my_tasks(request):
         .order_by("due_date", "created_at")[:100]
     )
     return Response([{**serialize_task(t), "board_title": t.board.title} for t in tasks])
+
+
+@extend_schema(responses={201: TaskSerializer, 404: DetailSerializer})
+@api_view(["POST"])
+def task_duplicate(request, pk):
+    try:
+        task = Task.objects.select_related("board").get(pk=pk, archived_at__isnull=True)
+    except Task.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not can_edit_board(task.board, request.user):
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
+    from ..models import Subtask
+    new_task = Task.objects.create(
+        board=task.board,
+        column=task.column,
+        title=f"{task.title} (copy)",
+        description=task.description,
+        priority=task.priority,
+        due_date=task.due_date,
+        recurrence=task.recurrence,
+        order=task.order + 1,
+    )
+    new_task.assignees.set(task.assignees.all())
+    new_task.labels.set(task.labels.all())
+    for sub in task.subtasks.all():
+        Subtask.objects.create(task=new_task, title=sub.title, done=False)
+
+    log_activity(task.board, request.user, "created", "task", new_task.title)
+    data = serialize_task(new_task)
+    send_board_event(task.board_id, "task_created", data)
+    return Response(data, status=status.HTTP_201_CREATED)

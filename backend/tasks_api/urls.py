@@ -9,6 +9,7 @@ urlpatterns = [
     path("archive/", views.task_archive, name="task-archive"),
     path("reorder/", views.task_reorder, name="task-reorder"),
     path("<int:pk>/", views.task_detail, name="task-detail"),
+    path("<int:pk>/duplicate/", views.task_duplicate, name="task-duplicate"),
     path("<int:pk>/restore/", views.task_restore, name="task-restore"),
     path("<int:task_pk>/subtasks/", views.subtask_list, name="subtask-list"),
     path("<int:task_pk>/subtasks/<int:pk>/", views.subtask_detail, name="subtask-detail"),

@@ -1,4 +1,4 @@
-from .tasks import task_list as task_list, task_detail as task_detail, task_reorder as task_reorder, my_tasks as my_tasks
+from .tasks import task_list as task_list, task_detail as task_detail, task_reorder as task_reorder, my_tasks as my_tasks, task_duplicate as task_duplicate
 from .archive import task_archive as task_archive, task_restore as task_restore
 from .subtasks import subtask_list as subtask_list, subtask_detail as subtask_detail
 from .comments import comment_list as comment_list, comment_detail as comment_detail

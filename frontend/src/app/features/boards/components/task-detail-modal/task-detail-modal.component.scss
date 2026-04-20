@@ -199,6 +199,22 @@
   }
 }
 
+.btn-duplicate {
+  background: none;
+  border: 2px solid var(--color-border, #d1d1d1);
+  color: var(--color-text);
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: var(--color-bg, #f6f7f8);
+  }
+}
+
 .btn-cancel {
   background: var(--color-surface);
   color: var(--color-text);
