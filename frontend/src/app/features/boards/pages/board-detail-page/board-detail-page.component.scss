@@ -219,6 +219,10 @@ $bp-tablet: 1024px;
   flex-direction: column;
   gap: 0.75rem;
 
+  &.focused-column .column-header {
+    border-bottom: 2px solid $color-primary;
+  }
+
   @media (max-width: $bp-mobile) {
     min-width: 240px;
     width: 240px;
@@ -325,6 +329,12 @@ $bp-tablet: 1024px;
   &.selected {
     outline: 2px solid $color-primary;
     outline-offset: -2px;
+  }
+
+  &.kb-focused {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba($color-primary, 0.2);
   }
 
   @media (max-width: $bp-mobile) {

@@ -62,8 +62,11 @@ export class KeyboardShortcutsModalComponent {
   shortcuts: Shortcut[] = [
     { key: '?', description: 'Show this help' },
     { key: 'Esc', description: 'Close modals / dialogs' },
-    { key: 'n', description: 'New board (on boards page)' },
-    { key: '/', description: 'Focus search (on board detail)' },
+    { key: 'n', description: 'New task in focused column' },
+    { key: '/', description: 'Focus search' },
+    { key: '← →', description: 'Navigate between columns' },
+    { key: '↑ ↓', description: 'Navigate between tasks' },
+    { key: 'Enter', description: 'Open focused task' },
   ];
 
   @HostListener('document:keydown.escape')
