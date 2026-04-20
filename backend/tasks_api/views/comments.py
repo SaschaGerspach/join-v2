@@ -52,7 +52,7 @@ def comment_list(request, task_pk):
     comment = Comment.objects.create(task=task, author=request.user, text=serializer.validated_data["text"])
     _notify_comment(comment, request.user)
     _notify_mentions(comment, request.user)
-    log_activity(task.board, request.user, "created", "comment", task.title)
+    log_activity(task.board, request.user, "created", "comment", task.title, task=task)
     return Response(serialize_comment(comment), status=status.HTTP_201_CREATED)
 
 

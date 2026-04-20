@@ -33,6 +33,15 @@ export type TimeEntry = {
   logged_at: string;
 };
 
+export type HistoryEntry = {
+  id: number;
+  user_name: string;
+  action: string;
+  entity_type: string;
+  details: string;
+  created_at: string;
+};
+
 export type Task = {
   id: number;
   board: number;
@@ -155,5 +164,9 @@ export class TasksApiService {
 
   deleteTimeEntry(taskId: number, entryId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/tasks/${taskId}/time/${entryId}/`, { withCredentials: true });
+  }
+
+  getHistory(taskId: number): Observable<HistoryEntry[]> {
+    return this.http.get<HistoryEntry[]>(`${this.baseUrl}/tasks/${taskId}/history/`, { withCredentials: true });
   }
 }

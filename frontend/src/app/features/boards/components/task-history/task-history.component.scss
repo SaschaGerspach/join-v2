@@ -1,0 +1,88 @@
+@use 'variables' as *;
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: $color-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.history-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.toggle-icon {
+  font-size: 0.75rem;
+  color: $color-muted;
+}
+
+.history-count {
+  font-size: 0.7rem;
+  background: $color-border;
+  color: $color-muted;
+  border-radius: 10px;
+  padding: 0 0.4rem;
+  font-weight: 700;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.history-entry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--color-text);
+  padding: 0.25rem 0;
+  border-bottom: 1px solid $color-border;
+}
+
+.history-user {
+  font-weight: 700;
+}
+
+.history-action {
+  text-transform: capitalize;
+}
+
+.history-entity {
+  color: $color-muted;
+}
+
+.history-details {
+  color: $color-muted;
+  font-style: italic;
+}
+
+.history-time {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: $color-muted;
+  white-space: nowrap;
+}
+
+.history-empty {
+  font-size: 0.82rem;
+  color: $color-muted;
+  font-style: italic;
+}

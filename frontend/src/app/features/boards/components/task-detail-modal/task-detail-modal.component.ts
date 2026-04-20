@@ -13,11 +13,12 @@ import { TaskLabelsComponent } from '../task-labels/task-labels.component';
 import { TaskDependenciesComponent } from '../task-dependencies/task-dependencies.component';
 import { TaskCustomFieldsComponent } from '../task-custom-fields/task-custom-fields.component';
 import { TaskTimeTrackingComponent } from '../task-time-tracking/task-time-tracking.component';
+import { TaskHistoryComponent } from '../task-history/task-history.component';
 
 @Component({
   selector: 'app-task-detail-modal',
   standalone: true,
-  imports: [FormsModule, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent, TaskDependenciesComponent, TaskCustomFieldsComponent, TaskTimeTrackingComponent],
+  imports: [FormsModule, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent, TaskDependenciesComponent, TaskCustomFieldsComponent, TaskTimeTrackingComponent, TaskHistoryComponent],
   templateUrl: './task-detail-modal.component.html',
   styleUrl: './task-detail-modal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

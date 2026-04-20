@@ -18,6 +18,7 @@ class ActivityEntry(models.Model):
 
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="activity")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    task = models.ForeignKey("tasks_api.Task", on_delete=models.CASCADE, null=True, blank=True, related_name="history")
     action = models.CharField(max_length=20, choices=Action.choices)
     entity_type = models.CharField(max_length=20, choices=EntityType.choices)
     entity_title = models.CharField(max_length=255)

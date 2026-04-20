@@ -87,7 +87,7 @@ def task_list(request):
     if assignee_ids:
         task.assignees.set(assignee_ids)
     _notify_assignments(task, set(), set(assignee_ids), request.user)
-    log_activity(board, request.user, "created", "task", task.title)
+    log_activity(board, request.user, "created", "task", task.title, task=task)
     data = serialize_task(task)
     send_board_event(board.pk, "task_created", data)
     return Response(data, status=status.HTTP_201_CREATED)
@@ -153,9 +153,9 @@ def task_detail(request, pk):
         if "label_ids" in data:
             task.labels.set(Label.objects.filter(pk__in=data["label_ids"], board=task.board))
         if task.column_id != previous_column_id:
-            log_activity(task.board, request.user, "moved", "task", task.title)
+            log_activity(task.board, request.user, "moved", "task", task.title, task=task)
         else:
-            log_activity(task.board, request.user, "updated", "task", task.title)
+            log_activity(task.board, request.user, "updated", "task", task.title, task=task)
         data = serialize_task(task)
         send_board_event(task.board_id, "task_updated", data)
         return Response(data)
@@ -163,13 +163,13 @@ def task_detail(request, pk):
     # Soft-delete: archive instead of destroying so tasks can be restored.
     task.archived_at = timezone.now()
     task.save(update_fields=["archived_at"])
-    log_activity(task.board, request.user, "deleted", "task", task.title)
+    log_activity(task.board, request.user, "deleted", "task", task.title, task=task)
     send_board_event(task.board_id, "task_deleted", {"id": task.pk})
 
     # If task is recurring, archiving triggers creation of the next instance.
     new_task = create_next_recurring_task(task)
     if new_task:
-        log_activity(task.board, request.user, "created", "task", new_task.title, "Recurring")
+        log_activity(task.board, request.user, "created", "task", new_task.title, "Recurring", task=new_task)
         send_board_event(task.board_id, "task_created", serialize_task(new_task))
 
     return Response(status=status.HTTP_204_NO_CONTENT)
@@ -279,7 +279,33 @@ def task_duplicate(request, pk):
     for sub in task.subtasks.all():
         Subtask.objects.create(task=new_task, title=sub.title, done=False)
 
-    log_activity(task.board, request.user, "created", "task", new_task.title)
+    log_activity(task.board, request.user, "created", "task", new_task.title, task=new_task)
     data = serialize_task(new_task)
     send_board_event(task.board_id, "task_created", data)
     return Response(data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(responses={200: None, 404: DetailSerializer})
+@api_view(["GET"])
+def task_history(request, pk):
+    try:
+        task = Task.objects.select_related("board").get(pk=pk)
+    except Task.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+    if not can_access_board(task.board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    entries = task.history.select_related("user").order_by("-created_at")[:50]
+    result = []
+    for entry in entries:
+        user = entry.user
+        user_name = f"{user.first_name} {user.last_name}".strip() or user.email if user else "Deleted user"
+        result.append({
+            "id": entry.pk,
+            "user_name": user_name,
+            "action": entry.action,
+            "entity_type": entry.entity_type,
+            "details": entry.details,
+            "created_at": entry.created_at,
+        })
+    return Response(result)

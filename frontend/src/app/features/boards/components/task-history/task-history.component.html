@@ -1,0 +1,27 @@
+<div class="field-group">
+  <button class="history-toggle" (click)="expanded.set(!expanded())">
+    <span class="field-label">History</span>
+    <span class="toggle-icon">{{ expanded() ? '▾' : '▸' }}</span>
+    @if (entries().length > 0) {
+      <span class="history-count">{{ entries().length }}</span>
+    }
+  </button>
+  @if (expanded()) {
+    <div class="history-list">
+      @for (entry of entries(); track entry.id) {
+        <div class="history-entry">
+          <span class="history-user">{{ entry.user_name }}</span>
+          <span class="history-action">{{ entry.action }}</span>
+          <span class="history-entity">{{ entry.entity_type }}</span>
+          @if (entry.details) {
+            <span class="history-details">— {{ entry.details }}</span>
+          }
+          <span class="history-time">{{ entry.created_at | date:'short' }}</span>
+        </div>
+      }
+      @if (entries().length === 0) {
+        <span class="history-empty">No history yet.</span>
+      }
+    </div>
+  }
+</div>

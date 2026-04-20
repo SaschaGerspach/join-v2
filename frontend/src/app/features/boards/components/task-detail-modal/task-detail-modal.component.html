@@ -113,6 +113,8 @@
         (subtaskCountChanged)="onSubtaskCountChanged($event)"
       />
 
+      <app-task-history [taskId]="task().id" />
+
     </div>
 
     <app-task-comments [taskId]="task().id" [contacts]="contacts()" />
