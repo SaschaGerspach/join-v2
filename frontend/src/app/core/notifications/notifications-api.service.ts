@@ -16,6 +16,7 @@ export type AppNotification = {
 export type NotificationPreferences = {
   disabled_types: string[];
   muted_boards: number[];
+  email_delivery: 'instant' | 'digest' | 'none';
 };
 
 @Injectable({ providedIn: 'root' })

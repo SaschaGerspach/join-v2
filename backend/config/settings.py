@@ -315,6 +315,8 @@ REFRESH_COOKIE_NAME = "refresh_token"
 REFRESH_COOKIE_PATH = "/auth/"
 
 # Celery
+from celery.schedules import crontab  # noqa: E402
+
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', _redis_url)
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', _redis_url)
 CELERY_ACCEPT_CONTENT = ['json']
@@ -326,6 +328,10 @@ CELERY_BEAT_SCHEDULE = {
     'check-due-date-reminders': {
         'task': 'tasks_api.tasks.send_due_date_reminders',
         'schedule': 3600,
+    },
+    'send-daily-digest': {
+        'task': 'notifications_api.tasks.send_daily_digest',
+        'schedule': crontab(hour=7, minute=0),
     },
 }
 

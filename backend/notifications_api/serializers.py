@@ -14,3 +14,4 @@ class NotificationSerializer(serializers.Serializer):
 class NotificationPreferenceSerializer(serializers.Serializer):
     disabled_types = serializers.ListField(child=serializers.CharField(), required=False)
     muted_boards = serializers.ListField(child=serializers.IntegerField(), required=False)
+    email_delivery = serializers.ChoiceField(choices=["instant", "digest", "none"], required=False)

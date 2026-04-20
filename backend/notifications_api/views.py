@@ -73,6 +73,7 @@ def notification_preferences(request):
         return Response({
             "disabled_types": prefs.disabled_types,
             "muted_boards": list(prefs.muted_boards.values_list("pk", flat=True)),
+            "email_delivery": prefs.email_delivery,
         })
 
     serializer = NotificationPreferenceSerializer(data=request.data)
@@ -92,8 +93,12 @@ def notification_preferences(request):
             pk__in=data["muted_boards"],
         ).values_list("pk", flat=True)
         prefs.muted_boards.set(accessible)
+    if "email_delivery" in data:
+        prefs.email_delivery = data["email_delivery"]
+        prefs.save(update_fields=["email_delivery"])
 
     return Response({
         "disabled_types": prefs.disabled_types,
         "muted_boards": list(prefs.muted_boards.values_list("pk", flat=True)),
+        "email_delivery": prefs.email_delivery,
     })

@@ -64,6 +64,21 @@
           Mention notifications
         </label>
       </div>
+      <h3 class="subsection-title">Email delivery</h3>
+      <div class="notification-prefs">
+        <label class="pref-label">
+          <input type="radio" name="emailDelivery" value="instant" [checked]="emailDelivery() === 'instant'" (change)="setEmailDelivery('instant')" />
+          Instant (one email per notification)
+        </label>
+        <label class="pref-label">
+          <input type="radio" name="emailDelivery" value="digest" [checked]="emailDelivery() === 'digest'" (change)="setEmailDelivery('digest')" />
+          Daily digest (summary at 7:00 AM)
+        </label>
+        <label class="pref-label">
+          <input type="radio" name="emailDelivery" value="none" [checked]="emailDelivery() === 'none'" (change)="setEmailDelivery('none')" />
+          No emails
+        </label>
+      </div>
       @if (boards().length > 0) {
         <h3 class="subsection-title">Muted Boards</h3>
         <div class="muted-boards">

@@ -37,6 +37,11 @@ class Notification(models.Model):
 
 
 class NotificationPreference(models.Model):
+    class EmailDelivery(models.TextChoices):
+        INSTANT = "instant", "Instant"
+        DIGEST = "digest", "Daily digest"
+        NONE = "none", "No emails"
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -47,4 +52,9 @@ class NotificationPreference(models.Model):
         "boards_api.Board",
         blank=True,
         related_name="+",
+    )
+    email_delivery = models.CharField(
+        max_length=10,
+        choices=EmailDelivery.choices,
+        default=EmailDelivery.INSTANT,
     )

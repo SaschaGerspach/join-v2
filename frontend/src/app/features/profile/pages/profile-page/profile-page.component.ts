@@ -41,6 +41,7 @@ export class ProfilePageComponent implements OnInit {
   boards = signal<Board[]>([]);
   disabledTypes = signal<Set<string>>(new Set());
   mutedBoardIds = signal<Set<number>>(new Set());
+  emailDelivery = signal<'instant' | 'digest' | 'none'>('instant');
 
   initials = computed(() => {
     const f = this.firstName()[0] ?? '';
@@ -69,6 +70,7 @@ export class ProfilePageComponent implements OnInit {
       next: prefs => {
         this.disabledTypes.set(new Set(prefs.disabled_types));
         this.mutedBoardIds.set(new Set(prefs.muted_boards));
+        this.emailDelivery.set(prefs.email_delivery);
       },
       error: () => {},
     });
@@ -138,6 +140,11 @@ export class ProfilePageComponent implements OnInit {
     this.savePreferences();
   }
 
+  setEmailDelivery(value: 'instant' | 'digest' | 'none'): void {
+    this.emailDelivery.set(value);
+    this.savePreferences();
+  }
+
   toggleMuteBoard(boardId: number): void {
     const muted = new Set(this.mutedBoardIds());
     if (muted.has(boardId)) {
@@ -153,6 +160,7 @@ export class ProfilePageComponent implements OnInit {
     this.notificationsApi.updatePreferences({
       disabled_types: [...this.disabledTypes()],
       muted_boards: [...this.mutedBoardIds()],
+      email_delivery: this.emailDelivery(),
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       error: () => this.toast.show('Failed to save notification settings.', 'error'),
     });
