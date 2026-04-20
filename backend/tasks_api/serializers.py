@@ -133,3 +133,35 @@ class DependencySerializer(serializers.Serializer):
 
 class DependencyCreateSerializer(serializers.Serializer):
     depends_on = serializers.IntegerField()
+
+
+FIELD_TYPE_CHOICES = [("text", "Text"), ("number", "Number"), ("date", "Date"), ("select", "Select")]
+
+
+class CustomFieldSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    field_type = serializers.CharField()
+    options = serializers.ListField(child=serializers.CharField(), required=False)
+    order = serializers.IntegerField()
+
+
+class CustomFieldCreateSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=100)
+    field_type = serializers.ChoiceField(choices=FIELD_TYPE_CHOICES)
+    options = serializers.ListField(child=serializers.CharField(max_length=100), required=False, default=list)
+
+
+class CustomFieldUpdateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False, max_length=100)
+    options = serializers.ListField(child=serializers.CharField(max_length=100), required=False)
+    order = serializers.IntegerField(required=False, min_value=0)
+
+
+class TaskFieldValueSerializer(serializers.Serializer):
+    field_id = serializers.IntegerField()
+    value = serializers.CharField(allow_blank=True)
+
+
+class TaskFieldValuesUpdateSerializer(serializers.Serializer):
+    values = TaskFieldValueSerializer(many=True)

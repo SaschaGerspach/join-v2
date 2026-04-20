@@ -19,4 +19,5 @@ urlpatterns = [
     path("<int:task_pk>/attachments/<int:pk>/download/", views.attachment_download, name="attachment-download"),
     path("<int:task_pk>/dependencies/", views.dependency_list, name="dependency-list"),
     path("<int:task_pk>/dependencies/<int:pk>/", views.dependency_detail, name="dependency-detail"),
+    path("<int:task_pk>/fields/", views.task_field_values, name="task-field-values"),
 ]

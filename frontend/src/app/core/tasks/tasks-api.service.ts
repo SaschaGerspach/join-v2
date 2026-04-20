@@ -11,6 +11,19 @@ export type TaskDependency = {
   title: string;
 };
 
+export type CustomField = {
+  id: number;
+  name: string;
+  field_type: 'text' | 'number' | 'date' | 'select';
+  options: string[];
+  order: number;
+};
+
+export type TaskFieldValue = {
+  field_id: number;
+  value: string;
+};
+
 export type Task = {
   id: number;
   board: number;
@@ -102,5 +115,13 @@ export class TasksApiService {
 
   removeDependency(taskId: number, depId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/tasks/${taskId}/dependencies/${depId}/`, { withCredentials: true });
+  }
+
+  getTaskFieldValues(taskId: number): Observable<{ values: TaskFieldValue[] }> {
+    return this.http.get<{ values: TaskFieldValue[] }>(`${this.baseUrl}/tasks/${taskId}/fields/`, { withCredentials: true });
+  }
+
+  setTaskFieldValues(taskId: number, values: TaskFieldValue[]): Observable<{ values: TaskFieldValue[] }> {
+    return this.http.put<{ values: TaskFieldValue[] }>(`${this.baseUrl}/tasks/${taskId}/fields/`, { values }, { withCredentials: true });
   }
 }

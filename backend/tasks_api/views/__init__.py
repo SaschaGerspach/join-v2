@@ -5,3 +5,4 @@ from .comments import comment_list as comment_list, comment_detail as comment_de
 from .labels import label_list as label_list, label_detail as label_detail
 from .attachments import attachment_list as attachment_list, attachment_detail as attachment_detail, attachment_download as attachment_download
 from .dependencies import dependency_list as dependency_list, dependency_detail as dependency_detail
+from .custom_fields import custom_field_list as custom_field_list, custom_field_detail as custom_field_detail, task_field_values as task_field_values

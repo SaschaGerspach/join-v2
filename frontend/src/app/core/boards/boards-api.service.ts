@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { CustomField } from '../tasks/tasks-api.service';
 
 export type Board = {
   id: number;
@@ -77,5 +78,17 @@ export class BoardsApiService {
 
   exportCsvUrl(boardId: number): string {
     return `${this.baseUrl}/boards/${boardId}/export/csv/`;
+  }
+
+  getCustomFields(boardId: number): Observable<CustomField[]> {
+    return this.http.get<CustomField[]>(`${this.baseUrl}/boards/${boardId}/fields/`, { withCredentials: true });
+  }
+
+  createCustomField(boardId: number, payload: { name: string; field_type: string; options?: string[] }): Observable<CustomField> {
+    return this.http.post<CustomField>(`${this.baseUrl}/boards/${boardId}/fields/`, payload, { withCredentials: true });
+  }
+
+  deleteCustomField(boardId: number, fieldId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/boards/${boardId}/fields/${fieldId}/`, { withCredentials: true });
   }
 }

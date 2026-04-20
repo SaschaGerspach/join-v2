@@ -113,3 +113,34 @@ class TaskDependency(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["task", "depends_on"], name="unique_task_dependency"),
         ]
+
+
+class CustomField(models.Model):
+    class FieldType(models.TextChoices):
+        TEXT = "text", "Text"
+        NUMBER = "number", "Number"
+        DATE = "date", "Date"
+        SELECT = "select", "Select"
+
+    board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="custom_fields")
+    name = models.CharField(max_length=100)
+    field_type = models.CharField(max_length=10, choices=FieldType.choices)
+    options = models.JSONField(default=list, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["board", "name"], name="unique_custom_field_per_board"),
+        ]
+        ordering = ["order", "pk"]
+
+
+class TaskFieldValue(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="field_values")
+    field = models.ForeignKey(CustomField, on_delete=models.CASCADE, related_name="values")
+    value = models.TextField(blank=True, default="")
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["task", "field"], name="unique_task_field_value"),
+        ]

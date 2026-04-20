@@ -102,6 +102,8 @@
 
       <app-task-dependencies [taskId]="task().id" [boardTasks]="boardTasks()" />
 
+      <app-task-custom-fields [taskId]="task().id" [boardId]="task().board" />
+
       <app-task-attachments [taskId]="task().id" />
 
       <app-task-subtasks

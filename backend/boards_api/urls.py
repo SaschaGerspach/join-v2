@@ -14,4 +14,6 @@ urlpatterns = [
     path("<int:pk>/members/<int:user_pk>/", views.board_member_detail, name="board-member-detail"),
     path("<int:board_pk>/labels/", task_views.label_list, name="label-list"),
     path("<int:board_pk>/labels/<int:pk>/", task_views.label_detail, name="label-detail"),
+    path("<int:board_pk>/fields/", task_views.custom_field_list, name="custom-field-list"),
+    path("<int:board_pk>/fields/<int:pk>/", task_views.custom_field_detail, name="custom-field-detail"),
 ]

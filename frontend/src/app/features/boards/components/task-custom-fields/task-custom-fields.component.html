@@ -1,0 +1,30 @@
+@if (fields().length) {
+  <div class="custom-fields-section">
+    <label class="field-label">Custom Fields</label>
+    @for (f of fields(); track f.id) {
+      <div class="custom-field-row">
+        <span class="custom-field-name">{{ f.name }}</span>
+        @switch (f.field_type) {
+          @case ('text') {
+            <input class="field-input" type="text" [ngModel]="values()[f.id]" (ngModelChange)="updateValue(f.id, $event)" />
+          }
+          @case ('number') {
+            <input class="field-input" type="number" [ngModel]="values()[f.id]" (ngModelChange)="updateValue(f.id, $event)" />
+          }
+          @case ('date') {
+            <input class="field-input" type="date" [ngModel]="values()[f.id]" (ngModelChange)="updateValue(f.id, $event)" />
+          }
+          @case ('select') {
+            <select class="field-select" [ngModel]="values()[f.id]" (ngModelChange)="updateValue(f.id, $event)">
+              <option value="">—</option>
+              @for (opt of f.options; track opt) {
+                <option [value]="opt">{{ opt }}</option>
+              }
+            </select>
+          }
+        }
+      </div>
+    }
+    <button class="btn-save-fields" (click)="save()">Save Fields</button>
+  </div>
+}
