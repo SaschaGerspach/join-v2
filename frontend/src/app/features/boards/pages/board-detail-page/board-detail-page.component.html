@@ -224,6 +224,10 @@
             }
           }
 
+          @if (state.hasMoreTasks(column.id)) {
+            <button class="btn-show-more" (click)="state.expandColumn(column.id)">Show all ({{ state.hiddenTaskCount(column.id) }} more)</button>
+          }
+
           @if (state.tasksForColumn(column.id).length === 0) {
             <p class="column-empty">No tasks yet</p>
           }

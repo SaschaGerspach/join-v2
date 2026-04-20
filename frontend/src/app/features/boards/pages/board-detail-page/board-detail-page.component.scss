@@ -619,6 +619,22 @@ $bp-tablet: 1024px;
   }
 }
 
+.btn-show-more {
+  background: none;
+  border: none;
+  color: $color-primary;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 // ─── Shared Buttons ──────────────────────────────────────────────────────────
 
 .btn-icon {

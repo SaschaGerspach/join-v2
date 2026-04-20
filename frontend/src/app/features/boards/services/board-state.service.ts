@@ -59,6 +59,8 @@ export class BoardStateService {
   readonly bulkMoveTarget = signal<number | null>(null);
   readonly pendingBulkDelete = signal(false);
   readonly savedFilters = signal<SavedFilter[]>([]);
+  readonly expandedColumns = signal<Set<number>>(new Set());
+  private readonly COLUMN_TASK_LIMIT = 20;
 
   readonly columnListIds = computed(() => this.columns().map(c => `col-${c.id}`));
   readonly bulkMode = computed(() => this.selectedTaskIds().size > 0);
@@ -171,7 +173,25 @@ export class BoardStateService {
   }
 
   tasksForColumn(columnId: number): Task[] {
+    const all = this.tasksByColumn().get(columnId) ?? [];
+    if (this.expandedColumns().has(columnId)) return all;
+    return all.slice(0, this.COLUMN_TASK_LIMIT);
+  }
+
+  allTasksForColumn(columnId: number): Task[] {
     return this.tasksByColumn().get(columnId) ?? [];
+  }
+
+  hasMoreTasks(columnId: number): boolean {
+    return (this.tasksByColumn().get(columnId)?.length ?? 0) > this.COLUMN_TASK_LIMIT && !this.expandedColumns().has(columnId);
+  }
+
+  hiddenTaskCount(columnId: number): number {
+    return (this.tasksByColumn().get(columnId)?.length ?? 0) - this.COLUMN_TASK_LIMIT;
+  }
+
+  expandColumn(columnId: number): void {
+    this.expandedColumns.update(set => { const s = new Set(set); s.add(columnId); return s; });
   }
 
   groupedTasksForColumn(columnId: number): { label: string; tasks: Task[] }[] {
