@@ -123,3 +123,13 @@ class AttachmentSerializer(serializers.Serializer):
 
 class AttachmentUploadSerializer(serializers.Serializer):
     file = serializers.FileField()
+
+
+class DependencySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    depends_on = serializers.IntegerField()
+    title = serializers.CharField()
+
+
+class DependencyCreateSerializer(serializers.Serializer):
+    depends_on = serializers.IntegerField()

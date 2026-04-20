@@ -5,6 +5,12 @@ import { environment } from '../../../environments/environment';
 
 export type Recurrence = 'daily' | 'weekly' | 'biweekly' | 'monthly' | null;
 
+export type TaskDependency = {
+  id: number;
+  depends_on: number;
+  title: string;
+};
+
 export type Task = {
   id: number;
   board: number;
@@ -21,6 +27,7 @@ export type Task = {
   subtask_done_count: number;
   attachment_count: number;
   labels: { id: number; name: string; color: string }[];
+  dependencies: TaskDependency[];
 };
 
 export type CreateTaskPayload = {
@@ -83,5 +90,17 @@ export class TasksApiService {
 
   restore(id: number): Observable<Task> {
     return this.http.post<Task>(`${this.baseUrl}/tasks/${id}/restore/`, {}, { withCredentials: true });
+  }
+
+  getDependencies(taskId: number): Observable<TaskDependency[]> {
+    return this.http.get<TaskDependency[]>(`${this.baseUrl}/tasks/${taskId}/dependencies/`, { withCredentials: true });
+  }
+
+  addDependency(taskId: number, dependsOnId: number): Observable<TaskDependency> {
+    return this.http.post<TaskDependency>(`${this.baseUrl}/tasks/${taskId}/dependencies/`, { depends_on: dependsOnId }, { withCredentials: true });
+  }
+
+  removeDependency(taskId: number, depId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/tasks/${taskId}/dependencies/${depId}/`, { withCredentials: true });
   }
 }

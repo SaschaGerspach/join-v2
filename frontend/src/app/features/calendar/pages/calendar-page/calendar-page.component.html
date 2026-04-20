@@ -36,6 +36,7 @@
   <app-task-detail-modal
     [task]="selectedTask()!"
     [columns]="columnsForTask(selectedTask()!)"
+    [boardTasks]="tasks()"
     (closed)="selectedTask.set(null)"
     (taskUpdated)="onTaskUpdated($event)"
     (taskDeleted)="onTaskDeleted($event)"

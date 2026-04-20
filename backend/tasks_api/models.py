@@ -102,3 +102,14 @@ class Attachment(models.Model):
 
     def __str__(self):
         return self.filename
+
+
+class TaskDependency(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="dependencies")
+    depends_on = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="dependents")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["task", "depends_on"], name="unique_task_dependency"),
+        ]

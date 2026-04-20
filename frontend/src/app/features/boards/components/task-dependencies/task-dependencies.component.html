@@ -1,0 +1,24 @@
+<div class="dependencies-section">
+  <label class="field-label">Dependencies (blocked by)</label>
+
+  @if (dependencies().length) {
+    <ul class="dependency-list">
+      @for (dep of dependencies(); track dep.id) {
+        <li class="dependency-item">
+          <span class="dependency-title">{{ dep.title }}</span>
+          <button class="btn-remove" (click)="removeDependency(dep)">&#10005;</button>
+        </li>
+      }
+    </ul>
+  }
+
+  <div class="add-dependency">
+    <select class="field-select" [ngModel]="selectedTaskId()" (ngModelChange)="selectedTaskId.set($event)">
+      <option [ngValue]="null">Select task…</option>
+      @for (t of availableTasks(); track t.id) {
+        <option [ngValue]="t.id">{{ t.title }}</option>
+      }
+    </select>
+    <button class="btn-add" [disabled]="!selectedTaskId()" (click)="addDependency()">Add</button>
+  </div>
+</div>

@@ -10,11 +10,12 @@ import { TaskSubtasksComponent } from '../task-subtasks/task-subtasks.component'
 import { TaskCommentsComponent } from '../task-comments/task-comments.component';
 import { TaskAttachmentsComponent } from '../task-attachments/task-attachments.component';
 import { TaskLabelsComponent } from '../task-labels/task-labels.component';
+import { TaskDependenciesComponent } from '../task-dependencies/task-dependencies.component';
 
 @Component({
   selector: 'app-task-detail-modal',
   standalone: true,
-  imports: [FormsModule, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent],
+  imports: [FormsModule, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent, TaskDependenciesComponent],
   templateUrl: './task-detail-modal.component.html',
   styleUrl: './task-detail-modal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,6 +29,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
 
   task = input.required<Task>();
   columns = input.required<Column[]>();
+  boardTasks = input.required<Task[]>();
 
   contacts = signal<Contact[]>([]);
 

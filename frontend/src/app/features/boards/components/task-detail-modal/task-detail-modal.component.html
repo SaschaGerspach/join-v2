@@ -100,6 +100,8 @@
         [(selectedLabelIds)]="selectedLabelIds"
       />
 
+      <app-task-dependencies [taskId]="task().id" [boardTasks]="boardTasks()" />
+
       <app-task-attachments [taskId]="task().id" />
 
       <app-task-subtasks

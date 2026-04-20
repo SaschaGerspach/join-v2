@@ -17,6 +17,7 @@ def serialize_task(task):
     subtasks = list(task.subtasks.all())
     attachments = list(task.attachments.all())
     labels = list(task.labels.all())
+    dependencies = list(task.dependencies.select_related("depends_on").all())
     return {
         "id": task.pk,
         "board": task.board_id,
@@ -33,6 +34,7 @@ def serialize_task(task):
         "subtask_done_count": sum(1 for s in subtasks if s.done),
         "attachment_count": len(attachments),
         "labels": [serialize_label(label) for label in labels],
+        "dependencies": [{"id": d.pk, "depends_on": d.depends_on_id, "title": d.depends_on.title} for d in dependencies],
     }
 
 

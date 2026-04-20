@@ -4,3 +4,4 @@ from .subtasks import subtask_list as subtask_list, subtask_detail as subtask_de
 from .comments import comment_list as comment_list, comment_detail as comment_detail
 from .labels import label_list as label_list, label_detail as label_detail
 from .attachments import attachment_list as attachment_list, attachment_detail as attachment_detail, attachment_download as attachment_download
+from .dependencies import dependency_list as dependency_list, dependency_detail as dependency_detail
