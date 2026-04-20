@@ -134,11 +134,14 @@ def task_detail(request, pk):
                 return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
         previous_assignee_ids = set(task.assignees.values_list("pk", flat=True))
         previous_column_id = task.column_id
+        changed_fields = []
         for field in ["title", "description", "priority", "column", "due_date", "order"]:
             key = f"{field}_id" if field == "column" else field
             if field in data:
                 setattr(task, key, data[field])
-        task.save()
+                changed_fields.append(key)
+        if changed_fields:
+            task.save(update_fields=changed_fields)
         if "assigned_to" in data:
             new_assignee_ids = set(data["assigned_to"])
             task.assignees.set(new_assignee_ids)

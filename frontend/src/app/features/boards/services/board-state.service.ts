@@ -1,5 +1,6 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -293,15 +294,21 @@ export class BoardStateService {
 
   private loadData(boardId: number): void {
     this.loading.set(true);
-    this.boardsApi.getById(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: board => { this.board.set(board); this.titleService.setTitle(`${board.title} | Join`); },
+    forkJoin({
+      board: this.boardsApi.getById(boardId),
+      columns: this.columnsApi.getByBoard(boardId),
+      tasks: this.tasksApi.getByBoard(boardId),
+      contacts: this.contactsApi.getAll(),
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: ({ board, columns, tasks, contacts }) => {
+        this.board.set(board);
+        this.titleService.setTitle(`${board.title} | Join`);
+        this.columns.set(columns);
+        this.tasks.set(tasks);
+        this.contacts.set(contacts);
+        this.loading.set(false);
+      },
       error: () => { this.toast.show('Failed to load board.', 'error'); this.loading.set(false); },
     });
-    this.columnsApi.getByBoard(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(cols => this.columns.set(cols));
-    this.tasksApi.getByBoard(boardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(tasks => {
-      this.tasks.set(tasks);
-      this.loading.set(false);
-    });
-    this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(contacts => this.contacts.set(contacts));
   }
 }

@@ -98,13 +98,18 @@ def column_detail(request, pk):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         data = serializer.validated_data
+        changed_fields = []
         if "title" in data:
             column.title = data["title"]
+            changed_fields.append("title")
         if "order" in data:
             column.order = data["order"]
+            changed_fields.append("order")
         if "wip_limit" in data:
             column.wip_limit = data["wip_limit"]
-        column.save()
+            changed_fields.append("wip_limit")
+        if changed_fields:
+            column.save(update_fields=changed_fields)
         log_activity(column.board, request.user, "updated", "column", column.title)
         data = serialize_column(column)
         send_board_event(column.board_id, "column_updated", data)

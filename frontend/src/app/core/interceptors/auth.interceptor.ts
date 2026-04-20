@@ -6,7 +6,7 @@ import { AuthService } from '../auth/auth.service';
 import { AuthApiService } from '../auth/auth-api.service';
 import { environment } from '../../../environments/environment';
 
-const AUTH_SKIP_PATHS = ['/auth/login', '/auth/token/refresh', '/auth/register'];
+const AUTH_SKIP_PATHS = ['/auth/login/', '/auth/token/refresh/', '/auth/register/'];
 let refresh$: Observable<string> | null = null;
 
 function withBearer(req: HttpRequest<unknown>, token: string): HttpRequest<unknown> {

@@ -14,6 +14,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -61,7 +63,6 @@ def admin_stats(request):
 
 
 urlpatterns = [
-    path('manage/', admin.site.urls),
     path("health/", health),
     path("admin-api/stats/", admin_stats),
     path("auth/", include("auth_api.urls")),
@@ -73,6 +74,9 @@ urlpatterns = [
     path("notifications/", include("notifications_api.urls")),
     path("activity/", include("activity_api.urls")),
 ]
+
+if settings.DEBUG or os.environ.get('DJANGO_ADMIN_ENABLED', 'false').lower() == 'true':
+    urlpatterns += [path('manage/', admin.site.urls)]
 
 if settings.DEBUG:
     urlpatterns += [

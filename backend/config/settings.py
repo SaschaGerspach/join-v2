@@ -113,13 +113,15 @@ if _db_name:
             'PORT': os.environ.get('POSTGRES_PORT', '5432'),
         }
     }
-else:
+elif DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+else:
+    raise ImproperlyConfigured('POSTGRES_DB must be set in production')
 
 
 # Password validation
@@ -204,6 +206,12 @@ CORS_ALLOW_CREDENTIALS = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
+
+if not DEBUG:
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
 
 _secure_cookies_default = 'false' if DEBUG else 'true'
 _samesite_default = 'Lax' if DEBUG else 'None'

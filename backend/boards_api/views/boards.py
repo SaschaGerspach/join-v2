@@ -114,11 +114,15 @@ def board_detail(request, pk):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         data = serializer.validated_data
+        changed_fields = []
         if "title" in data:
             board.title = data["title"]
+            changed_fields.append("title")
         if "color" in data:
             board.color = data["color"]
-        board.save()
+            changed_fields.append("color")
+        if changed_fields:
+            board.save(update_fields=changed_fields)
         return Response(serialize_shared_board(board, request.user))
 
     board.delete()
