@@ -68,8 +68,13 @@
   align-items: flex-end;
 }
 
-.comment-textarea {
+.comment-input-wrapper {
   flex: 1;
+  position: relative;
+}
+
+.comment-textarea {
+  width: 100%;
   border: 1px solid $color-border;
   border-radius: 10px;
   padding: 0.5rem 0.75rem;
@@ -78,8 +83,43 @@
   resize: none;
   color: var(--color-text);
   background: var(--color-surface);
+  box-sizing: border-box;
 
   &:focus { outline: none; border-color: $color-primary; }
+}
+
+.mention-dropdown {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--color-surface, $color-white);
+  border: 1px solid $color-border;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 400;
+}
+
+.mention-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.82rem;
+  color: var(--color-text);
+  transition: background-color 0.1s;
+
+  &:hover, &.selected { background: var(--color-bg, $color-bg); }
+
+  .mention-name { font-weight: 600; }
+  .mention-email { color: $color-muted; font-size: 0.75rem; }
 }
 
 .btn-add-comment {

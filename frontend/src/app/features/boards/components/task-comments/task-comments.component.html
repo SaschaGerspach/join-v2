@@ -25,13 +25,32 @@
   </div>
 
   <div class="comment-input-row">
-    <textarea
-      class="comment-textarea new"
-      [ngModel]="newCommentText()"
-      (ngModelChange)="newCommentText.set($event)"
-      placeholder="Add a comment…"
-      rows="2"
-    ></textarea>
+    <div class="comment-input-wrapper">
+      <textarea
+        #commentTextarea
+        class="comment-textarea new"
+        [ngModel]="newCommentText()"
+        (ngModelChange)="newCommentText.set($event)"
+        (input)="onCommentInput($event)"
+        (keydown)="onCommentKeydown($event)"
+        placeholder="Add a comment… (type @ to mention)"
+        rows="2"
+      ></textarea>
+      @if (mentionActive() && mentionSuggestions().length > 0) {
+        <div class="mention-dropdown">
+          @for (contact of mentionSuggestions(); track contact.id; let i = $index) {
+            <button
+              class="mention-item"
+              [class.selected]="mentionSelectedIndex() === i"
+              (mousedown)="$event.preventDefault(); selectMention(contact)"
+            >
+              <span class="mention-name">{{ contact.first_name }} {{ contact.last_name }}</span>
+              <span class="mention-email">{{ contact.email }}</span>
+            </button>
+          }
+        </div>
+      }
+    </div>
     <button class="btn-add-comment" (click)="addComment()">Post</button>
   </div>
 </div>

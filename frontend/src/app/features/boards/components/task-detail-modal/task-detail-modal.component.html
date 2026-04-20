@@ -96,7 +96,7 @@
 
     </div>
 
-    <app-task-comments [taskId]="task().id" />
+    <app-task-comments [taskId]="task().id" [contacts]="contacts()" />
 
     <div class="modal-footer">
       <button class="btn-danger" (click)="deleteTask()">Delete</button>

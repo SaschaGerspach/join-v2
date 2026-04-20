@@ -268,6 +268,45 @@ class CommentTests(APITestCase):
         response = self.client.delete(self.detail_url(comment.pk))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_mention_creates_notification(self):
+        from notifications_api.models import Notification
+
+        response = self.client.post(
+            self.list_url(),
+            {"text": "Hey @m@example.com check this"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        mention_notif = Notification.objects.filter(
+            recipient=self.member, type=Notification.Type.MENTION
+        )
+        self.assertEqual(mention_notif.count(), 1)
+        self.assertIn("mentioned you", mention_notif.first().message)
+
+    def test_mention_does_not_notify_self(self):
+        from notifications_api.models import Notification
+
+        response = self.client.post(
+            self.list_url(),
+            {"text": "Note to self @a@example.com"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertFalse(
+            Notification.objects.filter(recipient=self.user, type=Notification.Type.MENTION).exists()
+        )
+
+    def test_mention_invalid_email_no_notification(self):
+        from notifications_api.models import Notification
+
+        response = self.client.post(
+            self.list_url(),
+            {"text": "Hey @nonexistent@nowhere.com"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Notification.objects.filter(type=Notification.Type.MENTION).count(), 0)
+
 
 class TaskArchiveTests(APITestCase):
     archive_url = "/tasks/archive/"
