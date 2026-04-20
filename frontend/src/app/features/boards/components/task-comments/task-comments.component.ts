@@ -66,7 +66,7 @@ export class TaskCommentsComponent implements OnInit {
   }
 
   isOwnComment(c: Comment): boolean {
-    return c.author_id === +(this.auth.user()?.id ?? 0);
+    return c.author_id === (this.auth.user()?.id ?? 0);
   }
 
   deleteComment(id: number): void {

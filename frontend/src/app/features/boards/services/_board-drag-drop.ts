@@ -62,7 +62,8 @@ export function handleTaskDrop(
         },
       });
   } else {
-    const prevTasks = filteredForColumn(task.column!).filter(t => t.id !== task.id)
+    if (task.column === null) return;
+    const prevTasks = filteredForColumn(task.column).filter(t => t.id !== task.id)
       .map((t, i) => ({ ...t, order: i }));
     const targetTasks = [...filteredForColumn(targetColumnId)];
     targetTasks.splice(event.currentIndex, 0, { ...task, column: targetColumnId });

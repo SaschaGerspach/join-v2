@@ -1,10 +1,10 @@
 import { inject } from "@angular/core";
-import { CanActivateChildFn, Router } from "@angular/router";
+import { CanActivateFn, Router } from "@angular/router";
 import { AuthService } from "../auth/auth.service";
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, map, take } from "rxjs";
 
-export const authGuard: CanActivateChildFn = () => {
+export const authGuard: CanActivateFn = () => {
     const auth = inject(AuthService);
     const router = inject(Router);
 

@@ -45,7 +45,7 @@ export class ProfilePageComponent implements OnInit {
   ngOnInit(): void {
     const user = this.auth.user();
     if (!user) return;
-    this.userId = Number(user.id);
+    this.userId = user.id;
 
     this.usersApi.get(this.userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (profile) => {

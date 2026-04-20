@@ -3,7 +3,7 @@ import { catchError, finalize, of, tap } from "rxjs";
 import { AuthApiService } from "./auth-api.service";
 
 export type AuthUser = {
-    id: string;
+    id: number;
     email: string;
     first_name: string;
     last_name: string;
