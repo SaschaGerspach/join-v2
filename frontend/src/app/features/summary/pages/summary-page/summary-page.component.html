@@ -64,4 +64,17 @@
 
   </div>
 
+  @if (favoriteBoards().length > 0) {
+    <div class="favorites-section">
+      <h2 class="section-title">Favorite Boards</h2>
+      <div class="favorites-grid">
+        @for (board of favoriteBoards(); track board.id) {
+          <a class="favorite-card" [routerLink]="['/boards', board.id]" [style.borderLeftColor]="board.color || '#4f46e5'">
+            <span class="favorite-title">{{ board.title }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  }
+
 </div>

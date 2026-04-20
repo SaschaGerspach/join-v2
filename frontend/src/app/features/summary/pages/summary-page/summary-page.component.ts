@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { SlicePipe } from '@angular/common';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -11,7 +11,7 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-summary-page',
   standalone: true,
-  imports: [SlicePipe, LoadingSpinnerComponent],
+  imports: [SlicePipe, RouterModule, LoadingSpinnerComponent],
   templateUrl: './summary-page.component.html',
   styleUrl: './summary-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,6 +48,8 @@ export class SummaryPageComponent implements OnInit {
       .sort((a, b) => new Date(a.due_date!).getTime() - new Date(b.due_date!).getTime());
     return upcoming[0]?.due_date ?? null;
   });
+
+  favoriteBoards = computed(() => this.boards().filter(b => b.is_favorite));
 
   greeting = computed(() => {
     const hour = new Date().getHours();

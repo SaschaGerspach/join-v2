@@ -104,3 +104,44 @@
 .deadline-date {
   font-size: 1.1rem !important;
 }
+
+.favorites-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.favorite-card {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: var(--color-surface);
+  border-radius: 12px;
+  border-left: 4px solid $color-primary;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.favorite-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
