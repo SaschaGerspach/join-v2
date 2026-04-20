@@ -222,6 +222,14 @@ input, textarea, select {
     color: $color-link;
     text-decoration: underline;
   }
+
+  .mention {
+    color: var(--color-primary, #29abe2);
+    font-weight: 600;
+    background: rgba(41, 171, 226, 0.08);
+    border-radius: 3px;
+    padding: 0 2px;
+  }
 }
 
 // ─── Assignee Checklist ─────────────────────────────────────────────────────
