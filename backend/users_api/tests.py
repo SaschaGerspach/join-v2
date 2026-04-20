@@ -12,13 +12,16 @@ class UserListTests(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(email="a@example.com", password="pass", first_name="Anna", last_name="A")
-        User.objects.create_user(email="b@example.com", password="pass", first_name="Bob", last_name="B")
+        self.other = User.objects.create_user(email="b@example.com", password="pass", first_name="Bob", last_name="B")
+        board = Board.objects.create(title="Shared", created_by=self.user)
+        BoardMember.objects.create(board=board, user=self.other)
         self.client.force_authenticate(user=self.user)
 
-    def test_list_returns_all_active_users(self):
+    def test_list_returns_co_members(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["results"]), 2)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["email"], "b@example.com")
 
     def test_list_unauthenticated(self):
         self.client.force_authenticate(user=None)

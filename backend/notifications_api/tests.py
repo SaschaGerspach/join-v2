@@ -2,9 +2,18 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from boards_api.models import Board
+from columns_api.models import Column
+from tasks_api.models import Task
 from .models import Notification
 
 User = get_user_model()
+
+
+def _make_task(user):
+    board = Board.objects.create(title="B", created_by=user)
+    col = Column.objects.create(board=board, title="C", order=0)
+    return Task.objects.create(board=board, column=col, title="T")
 
 
 class NotificationListTests(APITestCase):
@@ -51,8 +60,10 @@ class NotificationReadTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(email="a@example.com", password="pass")
         self.other = User.objects.create_user(email="b@example.com", password="pass")
+        task = _make_task(self.user)
         self.notification = Notification.objects.create(
-            recipient=self.user, type="assignment", message="Test", board_id=1, task_id=1,
+            recipient=self.user, type="assignment", message="Test",
+            board=task.board, task=task,
         )
         self.client.force_authenticate(user=self.user)
 
@@ -112,15 +123,16 @@ class NotificationReadAllTests(APITestCase):
 class NotificationModelTests(APITestCase):
     def test_create_with_all_fields(self):
         user = User.objects.create_user(email="a@example.com", password="pass")
+        task = _make_task(user)
         n = Notification.objects.create(
             recipient=user, type=Notification.Type.ASSIGNMENT,
-            message="Assigned", board_id=5, task_id=10,
+            message="Assigned", board=task.board, task=task,
         )
         self.assertEqual(n.recipient, user)
         self.assertEqual(n.type, "assignment")
         self.assertFalse(n.is_read)
-        self.assertEqual(n.board_id, 5)
-        self.assertEqual(n.task_id, 10)
+        self.assertEqual(n.board_id, task.board_id)
+        self.assertEqual(n.task_id, task.pk)
         self.assertIsNotNone(n.created_at)
 
     def test_create_without_optional_fields(self):

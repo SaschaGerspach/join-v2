@@ -6,7 +6,7 @@ User = get_user_model()
 
 
 class RegisterViewTests(APITestCase):
-    url = "/auth/register"
+    url = "/auth/register/"
 
     def test_register_success(self):
         response = self.client.post(self.url, {
@@ -37,7 +37,7 @@ class RegisterViewTests(APITestCase):
 
 
 class LoginViewTests(APITestCase):
-    url = "/auth/login"
+    url = "/auth/login/"
 
     def setUp(self):
         self.user = User.objects.create_user(
@@ -75,7 +75,7 @@ class LoginViewTests(APITestCase):
 
 
 class LogoutViewTests(APITestCase):
-    url = "/auth/logout"
+    url = "/auth/logout/"
 
     def setUp(self):
         self.user = User.objects.create_user(
@@ -94,7 +94,7 @@ class LogoutViewTests(APITestCase):
 
 
 class MeViewTests(APITestCase):
-    url = "/auth/me"
+    url = "/auth/me/"
 
     def setUp(self):
         self.user = User.objects.create_user(
