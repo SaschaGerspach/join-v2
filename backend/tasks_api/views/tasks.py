@@ -20,7 +20,7 @@ from ..serializers import (
     TaskUpdateSerializer,
 )
 from activity_api.helpers import log_activity
-from ._helpers import serialize_task
+from ._helpers import create_next_recurring_task, serialize_task
 from ._notifications import _notify_assignments
 
 
@@ -79,6 +79,7 @@ def task_list(request):
         priority=data.get("priority", Task.Priority.MEDIUM),
         column_id=column_id,
         due_date=data.get("due_date"),
+        recurrence=data.get("recurrence"),
     )
     if assignee_ids:
         task.assignees.set(assignee_ids)
@@ -132,7 +133,7 @@ def task_detail(request, pk):
         previous_assignee_ids = set(task.assignees.values_list("pk", flat=True))
         previous_column_id = task.column_id
         changed_fields = []
-        for field in ["title", "description", "priority", "column", "due_date", "order"]:
+        for field in ["title", "description", "priority", "column", "due_date", "recurrence", "order"]:
             key = f"{field}_id" if field == "column" else field
             if field in data:
                 setattr(task, key, data[field])
@@ -157,6 +158,12 @@ def task_detail(request, pk):
     task.save(update_fields=["archived_at"])
     log_activity(task.board, request.user, "deleted", "task", task.title)
     send_board_event(task.board_id, "task_deleted", {"id": task.pk})
+
+    new_task = create_next_recurring_task(task)
+    if new_task:
+        log_activity(task.board, request.user, "created", "task", new_task.title, "Recurring")
+        send_board_event(task.board_id, "task_created", serialize_task(new_task))
+
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 

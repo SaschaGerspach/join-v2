@@ -17,6 +17,12 @@ class Task(models.Model):
         HIGH = "high", "High"
         URGENT = "urgent", "Urgent"
 
+    class Recurrence(models.TextChoices):
+        DAILY = "daily", "Daily"
+        WEEKLY = "weekly", "Weekly"
+        BIWEEKLY = "biweekly", "Biweekly"
+        MONTHLY = "monthly", "Monthly"
+
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="tasks")
     column = models.ForeignKey(Column, on_delete=models.SET_NULL, null=True, blank=True, related_name="tasks")
     title = models.CharField(max_length=255)
@@ -28,6 +34,7 @@ class Task(models.Model):
         related_name="assigned_tasks",
     )
     due_date = models.DateField(null=True, blank=True)
+    recurrence = models.CharField(max_length=10, choices=Recurrence.choices, null=True, blank=True, default=None)
     labels = models.ManyToManyField('Label', blank=True, related_name="tasks")
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

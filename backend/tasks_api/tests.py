@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from boards_api.models import Board, BoardMember
+from columns_api.models import Column
 from contacts_api.models import Contact
 from notifications_api.models import Notification
 from .models import Task, Subtask, Label, Comment
@@ -483,3 +484,62 @@ class DueDateReminderTests(TestCase):
         task.assignees.add(self.contact)
         count = send_due_date_reminders()
         self.assertEqual(count, 0)
+
+
+class RecurringTaskTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.board = Board.objects.create(title="Board", created_by=self.user)
+        self.col1 = Column.objects.create(board=self.board, title="To do", order=0)
+        self.col2 = Column.objects.create(board=self.board, title="Done", order=1)
+        self.client.force_authenticate(user=self.user)
+
+    def test_archive_recurring_creates_next(self):
+        task = Task.objects.create(
+            board=self.board, column=self.col2, title="Weekly Standup",
+            due_date=timezone.now().date(), recurrence="weekly",
+        )
+        response = self.client.delete(f"/tasks/{task.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        new_task = Task.objects.filter(title="Weekly Standup", archived_at__isnull=True).first()
+        self.assertIsNotNone(new_task)
+        self.assertEqual(new_task.due_date, task.due_date + timedelta(weeks=1))
+        self.assertEqual(new_task.column, self.col1)
+        self.assertEqual(new_task.recurrence, "weekly")
+
+    def test_archive_non_recurring_no_new_task(self):
+        task = Task.objects.create(
+            board=self.board, column=self.col2, title="One-off",
+            due_date=timezone.now().date(),
+        )
+        self.client.delete(f"/tasks/{task.pk}/")
+        self.assertEqual(Task.objects.filter(archived_at__isnull=True).count(), 0)
+
+    def test_archive_recurring_without_due_date_no_new_task(self):
+        task = Task.objects.create(
+            board=self.board, column=self.col2, title="No date",
+            recurrence="daily",
+        )
+        self.client.delete(f"/tasks/{task.pk}/")
+        self.assertEqual(Task.objects.filter(archived_at__isnull=True).count(), 0)
+
+    def test_create_task_with_recurrence(self):
+        response = self.client.post(
+            f"/tasks/?board={self.board.pk}",
+            {"title": "Daily", "due_date": "2026-05-01", "recurrence": "daily"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["recurrence"], "daily")
+
+    def test_patch_recurrence(self):
+        task = Task.objects.create(board=self.board, title="Task")
+        response = self.client.patch(f"/tasks/{task.pk}/", {"recurrence": "monthly"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["recurrence"], "monthly")
+
+    def test_patch_recurrence_null(self):
+        task = Task.objects.create(board=self.board, title="Task", recurrence="weekly")
+        response = self.client.patch(f"/tasks/{task.pk}/", {"recurrence": None}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(response.data["recurrence"])

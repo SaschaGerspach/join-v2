@@ -43,12 +43,16 @@ class TaskSerializer(serializers.Serializer):
     priority = serializers.CharField()
     assigned_to = serializers.ListField(child=serializers.IntegerField())
     due_date = serializers.DateField(allow_null=True)
+    recurrence = serializers.CharField(allow_null=True)
     created_at = serializers.DateTimeField()
     order = serializers.IntegerField()
     subtask_count = serializers.IntegerField()
     subtask_done_count = serializers.IntegerField()
     attachment_count = serializers.IntegerField()
     labels = LabelSerializer(many=True)
+
+
+RECURRENCE_CHOICES = Task.Recurrence.choices
 
 
 class TaskCreateSerializer(serializers.Serializer):
@@ -58,6 +62,7 @@ class TaskCreateSerializer(serializers.Serializer):
     column = serializers.IntegerField(required=False, allow_null=True)
     assigned_to = serializers.ListField(child=serializers.IntegerField(), required=False, default=list)
     due_date = serializers.DateField(required=False, allow_null=True)
+    recurrence = serializers.ChoiceField(choices=RECURRENCE_CHOICES, required=False, allow_null=True, default=None)
 
 
 class TaskUpdateSerializer(serializers.Serializer):
@@ -67,6 +72,7 @@ class TaskUpdateSerializer(serializers.Serializer):
     column = serializers.IntegerField(required=False, allow_null=True)
     assigned_to = serializers.ListField(child=serializers.IntegerField(), required=False)
     due_date = serializers.DateField(required=False, allow_null=True)
+    recurrence = serializers.ChoiceField(choices=RECURRENCE_CHOICES, required=False, allow_null=True)
     order = serializers.IntegerField(required=False, min_value=0)
     label_ids = serializers.ListField(child=serializers.IntegerField(), required=False)
 
