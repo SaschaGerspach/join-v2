@@ -590,6 +590,13 @@ class TaskDependencyTests(APITestCase):
         response = self.client.post(self.url(self.task2.pk), {"depends_on": self.task1.pk}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_transitive_circular_dependency_rejected(self):
+        task3 = Task.objects.create(board=self.board, column=self.col, title="Task 3")
+        TaskDependency.objects.create(task=self.task1, depends_on=self.task2)
+        TaskDependency.objects.create(task=self.task2, depends_on=task3)
+        response = self.client.post(self.url(task3.pk), {"depends_on": self.task1.pk}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_cross_board_rejected(self):
         other_board = Board.objects.create(title="Other", created_by=self.user)
         other_task = Task.objects.create(board=other_board, title="Other Task")

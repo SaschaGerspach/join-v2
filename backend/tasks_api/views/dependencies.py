@@ -8,6 +8,22 @@ from ..models import Task, TaskDependency
 from ..serializers import DependencySerializer, DependencyCreateSerializer
 
 
+def _would_create_cycle(task, new_dependency):
+    """Check if adding task→new_dependency would create a cycle (DFS from new_dependency back to task)."""
+    visited = set()
+    stack = [new_dependency.pk]
+    while stack:
+        current = stack.pop()
+        if current == task.pk:
+            return True
+        if current in visited:
+            continue
+        visited.add(current)
+        children = TaskDependency.objects.filter(task_id=current).values_list("depends_on_id", flat=True)
+        stack.extend(children)
+    return False
+
+
 @extend_schema(
     methods=["GET"],
     responses={200: DependencySerializer(many=True)},
@@ -55,7 +71,7 @@ def dependency_list(request, task_pk):
     if target.board_id != task.board_id:
         return Response({"detail": "Tasks must be on the same board."}, status=status.HTTP_400_BAD_REQUEST)
 
-    if TaskDependency.objects.filter(task=target, depends_on=task).exists():
+    if _would_create_cycle(task, target):
         return Response({"detail": "Circular dependency."}, status=status.HTTP_400_BAD_REQUEST)
 
     dep, created = TaskDependency.objects.get_or_create(task=task, depends_on=target)
