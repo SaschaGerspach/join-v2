@@ -28,13 +28,15 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Favorite boards (star/unstar, favorites sorted first)
 - CSV export (all active tasks with columns, priority, assignees, labels, due date)
 - Swimlane grouping within columns (by priority or assignee)
-- Board activity log (created, moved, deleted, updated events)
+- Board activity log tracking tasks, columns, and comments (created, moved, updated, deleted)
 
 **Collaboration**
 - Real-time board updates via WebSockets (Django Channels + Redis)
-- Board sharing — invite members by email
+- Real-time notification push via dedicated WebSocket (`/ws/notifications/`)
+- Board sharing — invite members by email (with notification email)
 - Granular roles: owner (full control), admin (manage members), editor (modify tasks), viewer (read-only)
 - Role management UI with dropdown per member
+- Account deletion with automatic board ownership transfer to next admin/editor
 
 **Views & Filters**
 - Monthly calendar view for tasks with due dates
@@ -43,8 +45,9 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Overdue and due-soon highlighting
 
 **Notifications & Automation**
-- In-app notification center (assignments, mentions, due dates)
-- Automated due-date reminders (Celery Beat, 24h before deadline)
+- In-app notification center with types: assignment, comment, mention
+- Real-time push via WebSocket (no page reload needed)
+- Automated due-date reminders (Celery Beat, hourly check, 24h window configurable via `DUE_DATE_REMINDER_HOURS`)
 
 **User Experience**
 - Dark mode with toggle and `prefers-color-scheme` detection
@@ -54,19 +57,30 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Toast notifications
 - PWA — installable with service worker
 
+**User Management**
+- User profile editing (name, email, password)
+- Account deletion with board ownership transfer
+- Contact management (shared address book for assignees)
+
 **Authentication & Security**
-- Session-based auth with CSRF protection
-- Email verification on registration
-- Password reset via email
-- Nginx rate limiting (API: 10r/s, Auth: 3r/s)
-- Django Admin at `/manage/` (IP-restricted via Nginx)
+- Session-based auth with CSRF protection (HttpOnly, Secure, SameSite)
+- Email verification on registration (with resend option)
+- Password reset via email with token-based confirmation
+- Nginx rate limiting (API: 10r/s burst 20, Auth: 3r/s burst 5)
+- Security headers: HSTS, CSP, X-Frame-Options DENY, Referrer-Policy
+- Django Admin at `/manage/` (IP-restricted via Nginx, env-gated)
+- Private media storage for attachments (not publicly accessible)
 
 **Infrastructure**
-- Docker Compose: Nginx, Django (Daphne/ASGI), PostgreSQL, Redis, Celery Worker, Celery Beat
-- Automated daily PostgreSQL backups
-- HTTPS via Certbot/Let's Encrypt
-- GitHub Actions CI (backend tests + frontend build)
+- Docker Compose: Nginx, Django (Daphne/ASGI), PostgreSQL, Redis, Celery Worker, Celery Beat, Backup
+- Resource limits per container (memory + CPU caps)
+- Automated daily PostgreSQL backups (pg_dump in dedicated container)
+- HTTPS via Traefik + Let's Encrypt (automatic certificate renewal)
+- GitHub Actions CI: ruff lint, pip-audit, npm audit, backend tests, frontend production build
+- Health check endpoint (`/health/`) for container orchestration
+- OpenAPI schema + Swagger UI + ReDoc (dev mode)
 - Lazy-loaded routes (initial bundle ~300 kB)
+- Gzip compression for all text assets (CSS, JS, JSON, SVG, fonts)
 
 ## Tech Stack
 
@@ -169,10 +183,15 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/auth/register` | Create account |
-| POST | `/auth/login` | Log in |
-| POST | `/auth/logout` | Log out |
-| GET | `/auth/me` | Current user |
+| POST | `/auth/register/` | Create account |
+| POST | `/auth/login/` | Log in (session) |
+| POST | `/auth/logout/` | Log out |
+| GET | `/auth/me/` | Current user |
+| POST | `/auth/verify-email/` | Verify email token |
+| POST | `/auth/resend-verification/` | Resend verification email |
+| POST | `/auth/password-reset/` | Request password reset |
+| POST | `/auth/password-reset/confirm/` | Confirm reset with token |
+| GET/PATCH/DELETE | `/users/:id/` | Profile / update / delete account |
 | GET/POST | `/boards/` | List / create boards |
 | GET/PATCH/DELETE | `/boards/:id/` | Board detail |
 | POST/DELETE | `/boards/:id/favorite/` | Favorite / unfavorite |
@@ -198,9 +217,11 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 | GET/PUT | `/tasks/:id/fields/` | Task custom field values |
 | GET/POST | `/tasks/:id/time/` | Time entries |
 | DELETE | `/tasks/:id/time/:id/` | Delete time entry |
-| GET | `/contacts/` | Contacts |
+| GET/POST | `/contacts/` | Contacts (CRUD) |
 | GET | `/notifications/` | User notifications |
+| GET | `/health/` | Health check |
 | WS | `/ws/board/:id/` | Real-time board events |
+| WS | `/ws/notifications/` | Real-time notification push |
 
 ## Deployment
 
