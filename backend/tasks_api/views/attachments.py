@@ -43,7 +43,7 @@ def serialize_attachment(att, request):
 @api_view(["GET", "POST"])
 def attachment_list(request, task_pk):
     try:
-        task = Task.objects.get(pk=task_pk)
+        task = Task.objects.select_related("board").get(pk=task_pk)
     except Task.DoesNotExist:
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -77,7 +77,7 @@ def attachment_list(request, task_pk):
 @api_view(["DELETE"])
 def attachment_detail(request, task_pk, pk):
     try:
-        att = Attachment.objects.get(pk=pk, task_id=task_pk)
+        att = Attachment.objects.select_related("task__board").get(pk=pk, task_id=task_pk)
     except Attachment.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 

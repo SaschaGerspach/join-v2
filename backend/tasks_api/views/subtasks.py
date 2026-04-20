@@ -34,7 +34,7 @@ def serialize_subtask(subtask):
 @api_view(["GET", "POST"])
 def subtask_list(request, task_pk):
     try:
-        task = Task.objects.get(pk=task_pk)
+        task = Task.objects.select_related("board").get(pk=task_pk)
     except Task.DoesNotExist:
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -64,7 +64,7 @@ def subtask_list(request, task_pk):
 @api_view(["PATCH", "DELETE"])
 def subtask_detail(request, task_pk, pk):
     try:
-        subtask = Subtask.objects.get(pk=pk, task_id=task_pk)
+        subtask = Subtask.objects.select_related("task__board").get(pk=pk, task_id=task_pk)
     except Subtask.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 

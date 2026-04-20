@@ -45,5 +45,5 @@ def activity_list(request):
     if not can_access_board(board, request.user):
         return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    entries = board.activity.select_related("user").all()[:100]
+    entries = board.activity.select_related("user").order_by("-created_at")[:100]
     return Response([serialize_entry(e) for e in entries])

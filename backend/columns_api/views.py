@@ -83,7 +83,7 @@ def column_list(request):
 @api_view(["PATCH", "DELETE"])
 def column_detail(request, pk):
     try:
-        column = Column.objects.get(pk=pk)
+        column = Column.objects.select_related("board").get(pk=pk)
     except Column.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 

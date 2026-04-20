@@ -53,7 +53,7 @@ def task_list(request):
         tasks = (
             board.tasks.filter(archived_at__isnull=True)
             .prefetch_related("subtasks", "attachments", "labels", "assignees")
-            .order_by("order", "created_at")
+            .order_by("order", "created_at")[:500]
         )
         return Response([serialize_task(t) for t in tasks])
 
@@ -108,7 +108,7 @@ def task_list(request):
 @api_view(["GET", "PATCH", "DELETE"])
 def task_detail(request, pk):
     try:
-        task = Task.objects.get(pk=pk, archived_at__isnull=True)
+        task = Task.objects.select_related("board").get(pk=pk, archived_at__isnull=True)
     except Task.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
