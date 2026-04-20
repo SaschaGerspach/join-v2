@@ -5,6 +5,7 @@ app_name = "tasks_api"
 
 urlpatterns = [
     path("", views.task_list, name="task-list"),
+    path("my/", views.my_tasks, name="my-tasks"),
     path("archive/", views.task_archive, name="task-archive"),
     path("reorder/", views.task_reorder, name="task-reorder"),
     path("<int:pk>/", views.task_detail, name="task-detail"),

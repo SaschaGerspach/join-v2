@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
@@ -214,3 +215,16 @@ def task_reorder(request):
         send_board_event(bid, "tasks_reordered", board_tasks)
 
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(responses={200: TaskSerializer(many=True)})
+@api_view(["GET"])
+def my_tasks(request):
+    user = request.user
+    boards = Board.objects.filter(Q(created_by=user) | Q(members__user=user)).distinct()
+    tasks = (
+        Task.objects.filter(board__in=boards, archived_at__isnull=True)
+        .prefetch_related("subtasks", "attachments", "labels", "assignees")
+        .order_by("due_date", "created_at")[:1000]
+    )
+    return Response([serialize_task(t) for t in tasks])

@@ -6,7 +6,7 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 import { AuthService } from '../../../../core/auth/auth.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
-import { forkJoin, of, switchMap } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-summary-page',
@@ -57,17 +57,15 @@ export class SummaryPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.boardsApi.getAll().pipe(
-      switchMap(boards => {
+    forkJoin({
+      boards: this.boardsApi.getAll(),
+      tasks: this.tasksApi.getMyTasks(),
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: ({ boards, tasks }) => {
         this.boards.set(boards);
-        if (boards.length === 0) {
-          return of([] as Task[][]);
-        }
-        return forkJoin(boards.map(b => this.tasksApi.getByBoard(b.id)));
-      }),
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: taskArrays => { this.tasks.set(taskArrays.flat()); this.loading.set(false); },
+        this.tasks.set(tasks);
+        this.loading.set(false);
+      },
       error: () => { this.tasks.set([]); this.loading.set(false); },
     });
   }

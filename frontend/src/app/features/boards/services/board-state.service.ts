@@ -80,6 +80,28 @@ export class BoardStateService {
     !!this.searchQuery() || !!this.filterPriority() || this.filterAssignee() !== '' || !!this.filterDue()
   );
 
+  private readonly contactMap = computed(() => {
+    const map = new Map<number, { name: string; initials: string }>();
+    for (const c of this.contacts()) {
+      map.set(c.id, {
+        name: `${c.first_name} ${c.last_name}`,
+        initials: (c.first_name[0] ?? '') + (c.last_name[0] ?? ''),
+      });
+    }
+    return map;
+  });
+
+  private readonly tasksByColumn = computed(() => {
+    const map = new Map<number, Task[]>();
+    for (const t of this.filteredTasks()) {
+      if (t.column === null) continue;
+      const list = map.get(t.column);
+      if (list) list.push(t);
+      else map.set(t.column, [t]);
+    }
+    return map;
+  });
+
   init(boardId: number): void {
     this.boardId.set(boardId);
     this.loadData(boardId);
@@ -98,19 +120,17 @@ export class BoardStateService {
   }
 
   contactName(id: number | null): string {
-    if (!id) return '';
-    const c = this.contacts().find(x => x.id === id);
-    return c ? `${c.first_name} ${c.last_name}` : '';
+    if (id === null || id === undefined) return '';
+    return this.contactMap().get(id)?.name ?? '';
   }
 
   contactInitials(id: number | null): string {
-    if (!id) return '';
-    const c = this.contacts().find(x => x.id === id);
-    return c ? (c.first_name[0] ?? '') + (c.last_name[0] ?? '') : '';
+    if (id === null || id === undefined) return '';
+    return this.contactMap().get(id)?.initials ?? '';
   }
 
   tasksForColumn(columnId: number): Task[] {
-    return this.filteredTasks().filter(t => t.column === columnId);
+    return this.tasksByColumn().get(columnId) ?? [];
   }
 
   groupedTasksForColumn(columnId: number): { label: string; tasks: Task[] }[] {

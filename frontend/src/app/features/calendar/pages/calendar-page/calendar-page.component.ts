@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
@@ -54,25 +53,28 @@ export class CalendarPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.boardsApi.getAll().pipe(
-      takeUntilDestroyed(this.destroyRef),
-      switchMap(boards => {
-        const taskRequests = boards.map(b => this.tasksApi.getByBoard(b.id));
-        const colRequests = boards.map(b => this.columnsApi.getByBoard(b.id).pipe());
-        return forkJoin({
-          allTasks: forkJoin(taskRequests.length ? taskRequests : [of([])]),
-          allCols: forkJoin(colRequests.length ? colRequests : [of([])]),
-          boards: of(boards),
-        });
-      })
-    ).subscribe({
-      next: ({ allTasks, allCols, boards }) => {
-        this.tasks.set((allTasks as Task[][]).flat().filter(t => !!t.due_date));
+    forkJoin({
+      tasks: this.tasksApi.getMyTasks(),
+      boards: this.boardsApi.getAll(),
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: ({ tasks, boards }) => {
+        this.tasks.set(tasks.filter(t => !!t.due_date));
 
-        const cbMap: Record<number, Column[]> = {};
-        boards.forEach((b, i) => { cbMap[b.id] = (allCols as Column[][])[i] ?? []; });
-        this.columnsByBoard.set(cbMap);
-        this.loading.set(false);
+        const boardIds = new Set(boards.map(b => b.id));
+        const colRequests = boards.map(b => this.columnsApi.getByBoard(b.id));
+        if (colRequests.length === 0) {
+          this.loading.set(false);
+          return;
+        }
+        forkJoin(colRequests).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+          next: allCols => {
+            const cbMap: Record<number, Column[]> = {};
+            boards.forEach((b, i) => { cbMap[b.id] = allCols[i] ?? []; });
+            this.columnsByBoard.set(cbMap);
+            this.loading.set(false);
+          },
+          error: () => this.loading.set(false),
+        });
       },
       error: () => this.loading.set(false),
     });
