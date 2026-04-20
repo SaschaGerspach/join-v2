@@ -3,8 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from boards_api.models import Board
-from boards_api.permissions import can_access_board
+from boards_api.permissions import get_board_or_404
 from config.serializers import DetailSerializer
 from .serializers import ActivityEntrySerializer
 
@@ -37,13 +36,9 @@ def activity_list(request):
     if not board_id:
         return Response({"detail": "board query parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        board = Board.objects.get(pk=board_id)
-    except Board.DoesNotExist:
-        return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
-
-    if not can_access_board(board, request.user):
-        return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
+    board, err = get_board_or_404(board_id, request.user)
+    if err:
+        return err
 
     entries = board.activity.select_related("user").order_by("-created_at")[:100]
     return Response([serialize_entry(e) for e in entries])

@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from config.serializers import DetailSerializer
 from ..models import Board, BoardMember
-from ..permissions import can_access_board
+from ..permissions import get_board_or_404
 from ..serializers import BoardMemberInviteSerializer, BoardMemberSerializer
 
 User = get_user_model()
@@ -30,13 +30,9 @@ User = get_user_model()
 )
 @api_view(["GET", "POST"])
 def board_members(request, pk):
-    try:
-        board = Board.objects.get(pk=pk)
-    except Board.DoesNotExist:
-        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-
-    if not can_access_board(board, request.user):
-        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+    board, err = get_board_or_404(pk, request.user)
+    if err:
+        return err
 
     if request.method == "GET":
         members = board.members.select_related("user").all()
@@ -92,10 +88,9 @@ def board_members(request, pk):
 @extend_schema(responses={204: None, 403: DetailSerializer, 404: DetailSerializer})
 @api_view(["DELETE"])
 def board_leave(request, pk):
-    try:
-        board = Board.objects.get(pk=pk)
-    except Board.DoesNotExist:
-        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+    board, err = get_board_or_404(pk, request.user)
+    if err:
+        return err
 
     if board.created_by == request.user:
         return Response({"detail": "The owner cannot leave the board."}, status=status.HTTP_403_FORBIDDEN)

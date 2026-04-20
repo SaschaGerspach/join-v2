@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from activity_api.helpers import log_activity
 from boards_api.models import Board
-from boards_api.permissions import can_access_board, is_board_owner
+from boards_api.permissions import can_access_board, get_board_or_404, is_board_owner
 from boards_api.ws_events import send_board_event
 from config.serializers import DetailSerializer
 from .models import Column
@@ -44,13 +44,9 @@ def column_list(request):
     if not board_id:
         return Response({"detail": "board query parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        board = Board.objects.get(pk=board_id)
-    except Board.DoesNotExist:
-        return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
-
-    if not can_access_board(board, request.user):
-        return Response({"detail": "Board not found."}, status=status.HTTP_404_NOT_FOUND)
+    board, err = get_board_or_404(board_id, request.user)
+    if err:
+        return err
 
     if request.method == "GET":
         columns = board.columns.all().order_by("order")

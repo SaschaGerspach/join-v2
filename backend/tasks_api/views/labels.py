@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.models import Board
-from boards_api.permissions import can_access_board
+from boards_api.permissions import can_access_board, get_board_or_404
 from config.serializers import DetailSerializer
 from ..models import Label
 from ..serializers import (
@@ -27,13 +27,9 @@ from ._helpers import serialize_label
 )
 @api_view(["GET", "POST"])
 def label_list(request, board_pk):
-    try:
-        board = Board.objects.get(pk=board_pk)
-    except Board.DoesNotExist:
-        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-
-    if not can_access_board(board, request.user):
-        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+    board, err = get_board_or_404(board_pk, request.user)
+    if err:
+        return err
 
     if request.method == "GET":
         return Response([serialize_label(label) for label in board.labels.all()])

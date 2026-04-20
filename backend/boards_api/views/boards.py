@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from columns_api.models import Column
 from config.serializers import DetailSerializer
 from ..models import Board
-from ..permissions import can_access_board, is_board_owner
+from ..permissions import can_access_board, get_board_or_404, is_board_owner
 from ..serializers import (
     BOARD_TEMPLATES,
     BoardCreateSerializer,
@@ -95,13 +95,9 @@ def board_list(request):
 )
 @api_view(["GET", "PATCH", "DELETE"])
 def board_detail(request, pk):
-    try:
-        board = Board.objects.get(pk=pk)
-    except Board.DoesNotExist:
-        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-
-    if not can_access_board(board, request.user):
-        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+    board, err = get_board_or_404(pk, request.user)
+    if err:
+        return err
 
     if request.method == "GET":
         return Response(serialize_shared_board(board, request.user))
