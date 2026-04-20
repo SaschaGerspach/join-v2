@@ -1,0 +1,30 @@
+<div class="global-search">
+  <input
+    class="search-input"
+    type="text"
+    placeholder="Search tasks…"
+    aria-label="Search tasks across all boards"
+    [ngModel]="query()"
+    (ngModelChange)="onInput($event)"
+    (focus)="open.set(true)"
+  />
+  @if (open() && (results().length > 0 || loading() || query().length >= 2)) {
+    <div class="search-dropdown">
+      @if (loading()) {
+        <div class="search-loading">Searching…</div>
+      } @else if (results().length === 0 && query().length >= 2) {
+        <div class="search-empty">No tasks found.</div>
+      } @else {
+        @for (result of results(); track result.id) {
+          <button class="search-result" (mousedown)="openResult(result)">
+            <span class="result-title">{{ result.title }}</span>
+            <span class="result-board">{{ result.board_title }}</span>
+            @if (result.priority === 'urgent' || result.priority === 'high') {
+              <span class="result-priority" [class]="result.priority">{{ result.priority }}</span>
+            }
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

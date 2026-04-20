@@ -228,14 +228,25 @@ def task_reorder(request):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@extend_schema(responses={200: TaskSerializer(many=True)})
+@extend_schema(
+    parameters=[
+        OpenApiParameter(name="search", type=str, required=False, location=OpenApiParameter.QUERY),
+    ],
+    responses={200: TaskSerializer(many=True)},
+)
 @api_view(["GET"])
 def my_tasks(request):
     user = request.user
     boards = Board.objects.filter(Q(created_by=user) | Q(members__user=user)).distinct()
+    qs = Task.objects.filter(board__in=boards, archived_at__isnull=True)
+
+    search = request.query_params.get("search", "").strip()
+    if search:
+        qs = qs.filter(Q(title__icontains=search) | Q(description__icontains=search))
+
     tasks = (
-        Task.objects.filter(board__in=boards, archived_at__isnull=True)
+        qs.select_related("board")
         .prefetch_related("subtasks", "attachments", "labels", "assignees", "dependencies__depends_on")
-        .order_by("due_date", "created_at")[:1000]
+        .order_by("due_date", "created_at")[:100]
     )
-    return Response([serialize_task(t) for t in tasks])
+    return Response([{**serialize_task(t), "board_title": t.board.title} for t in tasks])

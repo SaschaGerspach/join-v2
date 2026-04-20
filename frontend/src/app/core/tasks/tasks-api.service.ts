@@ -103,6 +103,13 @@ export class TasksApiService {
     return this.http.get<Task[]>(`${this.baseUrl}/tasks/my/`, { withCredentials: true });
   }
 
+  searchTasks(query: string): Observable<(Task & { board_title: string })[]> {
+    return this.http.get<(Task & { board_title: string })[]>(`${this.baseUrl}/tasks/my/`, {
+      params: { search: query },
+      withCredentials: true,
+    });
+  }
+
   getArchive(boardId: number): Observable<Task[]> {
     return this.http.get<Task[]>(`${this.baseUrl}/tasks/archive/`, {
       params: { board: boardId },

@@ -6,11 +6,12 @@ import { ToastComponent } from '../../shared/components/toast/toast.component';
 import { ThemeService } from '../../shared/services/theme.service';
 import { NotificationService } from '../../core/notifications/notification.service';
 import { KeyboardShortcutsModalComponent } from '../../shared/components/keyboard-shortcuts-modal/keyboard-shortcuts-modal.component';
+import { GlobalSearchComponent } from '../../shared/components/global-search/global-search.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterModule, DatePipe, ToastComponent, KeyboardShortcutsModalComponent],
+  imports: [RouterModule, DatePipe, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

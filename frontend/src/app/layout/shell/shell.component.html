@@ -47,6 +47,7 @@
         <span class="topbar-title">Kanban Project Management Tool</span>
       </div>
       <div class="topbar-user">
+        <app-global-search />
         <button class="btn-theme-toggle" [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'" (click)="theme.toggle()" [title]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
           {{ theme.isDark() ? '☀' : '☾' }}
         </button>
