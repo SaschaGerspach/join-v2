@@ -1,15 +1,33 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+from rest_framework_simplejwt.tokens import RefreshToken as RefreshTokenClass
 
+from auth_api.views._helpers import clear_refresh_cookie
 from boards_api.models import Board, BoardMember
 from config.serializers import DetailSerializer
 from .serializers import PublicUserSerializer, UserUpdateSerializer
 
 User = get_user_model()
+
+
+def _co_member_ids(user):
+    shared_boards = Board.objects.filter(
+        Q(created_by=user) | Q(members__user=user)
+    )
+    return (
+        User.objects.filter(
+            Q(boards__in=shared_boards) | Q(board_memberships__board__in=shared_boards)
+        )
+        .exclude(pk=user.pk)
+        .values_list("pk", flat=True)
+        .distinct()
+    )
 
 
 class _UserPagination(PageNumberPagination):
@@ -30,7 +48,8 @@ def serialize_user(user):
 @extend_schema(responses={200: PublicUserSerializer(many=True)})
 @api_view(["GET"])
 def user_list(request):
-    users = User.objects.filter(is_active=True).order_by("id")
+    allowed_ids = _co_member_ids(request.user)
+    users = User.objects.filter(pk__in=allowed_ids, is_active=True).order_by("id")
     paginator = _UserPagination()
     page = paginator.paginate_queryset(users, request)
     return paginator.get_paginated_response([serialize_user(u) for u in page])
@@ -57,6 +76,8 @@ def user_detail(request, pk):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
+        if user.pk != request.user.pk and user.pk not in set(_co_member_ids(request.user)):
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(serialize_user(user))
 
     if request.method == "PATCH":
@@ -94,5 +115,14 @@ def user_detail(request, pk):
                 board.delete()
         BoardMember.objects.filter(user=user).delete()
         user.is_active = False
-        user.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        user.save(update_fields=["is_active"])
+
+        for token in OutstandingToken.objects.filter(user=user):
+            try:
+                RefreshTokenClass(token.token).blacklist()
+            except Exception:
+                pass
+
+        response = Response(status=status.HTTP_204_NO_CONTENT)
+        clear_refresh_cookie(response)
+        return response
