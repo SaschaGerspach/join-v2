@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Attachment, AttachmentsApiService } from '../../../../core/tasks/attachments-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -21,6 +21,16 @@ export class TaskAttachmentsComponent implements OnInit {
 
   attachments = signal<Attachment[]>([]);
   pendingDeleteAttachment = signal<Attachment | null>(null);
+
+  private readonly imageExtensions = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp']);
+
+  imageAttachments = computed(() =>
+    this.attachments().filter(a => this.imageExtensions.has(this.getExt(a.filename)))
+  );
+
+  fileAttachments = computed(() =>
+    this.attachments().filter(a => !this.imageExtensions.has(this.getExt(a.filename)))
+  );
 
   private readonly allowedExtensions = new Set([
     'png', 'jpg', 'jpeg', 'gif', 'webp',
@@ -79,5 +89,9 @@ export class TaskAttachmentsComponent implements OnInit {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  }
+
+  private getExt(filename: string): string {
+    return filename.split('.').pop()?.toLowerCase() ?? '';
   }
 }

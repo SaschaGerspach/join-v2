@@ -1,7 +1,19 @@
 <div class="field-group">
   <label class="field-label">Attachments</label>
+  @if (imageAttachments().length > 0) {
+    <div class="attachment-gallery">
+      @for (att of imageAttachments(); track att.id) {
+        <div class="gallery-item">
+          <a [href]="att.url" target="_blank">
+            <img [src]="att.url" [alt]="att.filename" class="gallery-thumb" />
+          </a>
+          <button class="btn-remove-thumb" aria-label="Delete attachment" (click)="deleteAttachment(att)">&#10005;</button>
+        </div>
+      }
+    </div>
+  }
   <div class="attachment-list">
-    @for (att of attachments(); track att.id) {
+    @for (att of fileAttachments(); track att.id) {
       <div class="attachment-item">
         <a [href]="att.url" target="_blank" class="attachment-link">{{ att.filename }}</a>
         <span class="attachment-size">{{ formatSize(att.size) }}</span>

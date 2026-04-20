@@ -67,6 +67,52 @@
   font-style: italic;
 }
 
+.attachment-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid $color-border;
+}
+
+.gallery-thumb {
+  display: block;
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.btn-remove-thumb {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: #fff;
+  font-size: 0.65rem;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+
+  .gallery-item:hover & {
+    opacity: 1;
+  }
+}
+
 .file-input {
   font-size: 0.85rem;
   color: var(--color-text);
