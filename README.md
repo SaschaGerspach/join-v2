@@ -9,23 +9,42 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 
 **Boards & Tasks**
 - Drag-and-drop columns and tasks with Angular CDK
-- Task priority, due dates, assignees, subtasks, and descriptions
+- Task priority, due dates, assignees (multi-select), subtasks, and descriptions
 - Color-coded labels (Many-to-Many) for task categorization
 - File attachments with upload/download (max 5 MB)
-- Task comments with edit/delete (own comments only)
+- Task comments with edit/delete and @-mention autocomplete
+- Markdown rendering in descriptions and comments (via marked + DOMPurify)
 - Bulk select, move, and delete tasks
 - Inline rename for boards and columns (double-click)
+- Task dependencies — "blocked by" relationships with transitive circular detection
+- Recurring tasks (daily/weekly/biweekly/monthly) — auto-creates next instance on archive
+- Custom fields per board (text, number, date, select) with per-task values
+- Time tracking — log minutes per task with notes and total sum
+- WIP limits per column (visual warning when exceeded)
+- Task archive with restore functionality
+
+**Boards**
+- Board templates (Kanban, Scrum, Bug Tracking) with pre-configured columns
+- Favorite boards (star/unstar, favorites sorted first)
+- CSV export (all active tasks with columns, priority, assignees, labels, due date)
+- Swimlane grouping within columns (by priority or assignee)
+- Board activity log (created, moved, deleted, updated events)
 
 **Collaboration**
 - Real-time board updates via WebSockets (Django Channels + Redis)
 - Board sharing — invite members by email
-- Role-based access: owner (full control) vs. member (read/write)
+- Granular roles: owner (full control), admin (manage members), editor (modify tasks), viewer (read-only)
+- Role management UI with dropdown per member
 
 **Views & Filters**
 - Monthly calendar view for tasks with due dates
 - Search, filter by priority, assignee, and due date
 - Board statistics with Chart.js (tasks per column, priority distribution)
 - Overdue and due-soon highlighting
+
+**Notifications & Automation**
+- In-app notification center (assignments, mentions, due dates)
+- Automated due-date reminders (Celery Beat, 24h before deadline)
 
 **User Experience**
 - Dark mode with toggle and `prefers-color-scheme` detection
@@ -43,7 +62,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Django Admin at `/manage/` (IP-restricted via Nginx)
 
 **Infrastructure**
-- Docker Compose: Nginx, Django (Daphne/ASGI), PostgreSQL, Redis
+- Docker Compose: Nginx, Django (Daphne/ASGI), PostgreSQL, Redis, Celery Worker, Celery Beat
 - Automated daily PostgreSQL backups
 - HTTPS via Certbot/Let's Encrypt
 - GitHub Actions CI (backend tests + frontend build)
@@ -55,11 +74,12 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 |-------|-----------|
 | Frontend | Angular 17, TypeScript, SCSS, Angular CDK, Chart.js, ng2-charts |
 | Backend | Django 6, Django REST Framework, Django Channels, Daphne |
+| Task Queue | Celery 5.4 with Redis broker, Celery Beat for scheduling |
 | Database | PostgreSQL 16 |
 | Cache/WS | Redis 7 |
 | Proxy | Nginx with rate limiting and SSL termination |
 | CI/CD | GitHub Actions |
-| Testing | Jasmine/Karma (frontend), Django TestCase (backend), Playwright (E2E) |
+| Testing | Django TestCase (205+ tests), Playwright (E2E) |
 
 ## Architecture
 
@@ -77,12 +97,17 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
           ┌────────────▼─┐  ┌─▼────────────┐
           │   Django     │  │   Daphne      │
           │   REST API   │  │  (WebSocket)  │
-          └──────┬───────┘  └──────┬────────┘
-                 │                 │
-          ┌──────▼───────┐  ┌─────▼─────┐
+          └──┬───────┬───┘  └──────┬────────┘
+             │       │             │
+             │  ┌────▼──────────┐  │
+             │  │ Celery Worker │  │
+             │  │ + Beat        │  │
+             │  └────┬──────────┘  │
+             │       │             │
+          ┌──▼───────▼───┐  ┌─────▼─────┐
           │ PostgreSQL   │  │   Redis    │
-          │   16         │  │  (Channel  │
-          │              │  │   Layer)   │
+          │   16         │  │ (Broker +  │
+          │              │  │  Channels) │
           └──────────────┘  └───────────┘
 ```
 
@@ -150,16 +175,31 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 | GET | `/auth/me` | Current user |
 | GET/POST | `/boards/` | List / create boards |
 | GET/PATCH/DELETE | `/boards/:id/` | Board detail |
+| POST/DELETE | `/boards/:id/favorite/` | Favorite / unfavorite |
+| GET | `/boards/:id/export/csv/` | CSV export |
 | GET/POST | `/boards/:id/members/` | Board members |
+| PATCH/DELETE | `/boards/:id/members/:userId/` | Change role / remove member |
+| DELETE | `/boards/:id/members/leave/` | Leave board |
 | GET/POST | `/boards/:id/labels/` | Board labels |
+| GET/POST | `/boards/:id/fields/` | Custom fields (CRUD) |
+| PATCH/DELETE | `/boards/:id/fields/:id/` | Custom field detail |
 | GET/POST | `/columns/?board=:id` | List / create columns |
 | GET/POST | `/tasks/?board=:id` | List / create tasks |
-| PATCH/DELETE | `/tasks/:id/` | Update / delete task |
+| GET | `/tasks/my/` | All my tasks across boards |
+| GET | `/tasks/archive/?board=:id` | Archived tasks |
+| PATCH/DELETE | `/tasks/:id/` | Update / archive task |
+| POST | `/tasks/:id/restore/` | Restore archived task |
 | POST | `/tasks/reorder/` | Bulk reorder tasks |
 | GET/POST | `/tasks/:id/subtasks/` | Subtasks |
 | GET/POST | `/tasks/:id/comments/` | Comments |
 | GET/POST | `/tasks/:id/attachments/` | File attachments |
+| GET/POST | `/tasks/:id/dependencies/` | Task dependencies |
+| DELETE | `/tasks/:id/dependencies/:id/` | Remove dependency |
+| GET/PUT | `/tasks/:id/fields/` | Task custom field values |
+| GET/POST | `/tasks/:id/time/` | Time entries |
+| DELETE | `/tasks/:id/time/:id/` | Delete time entry |
 | GET | `/contacts/` | Contacts |
+| GET | `/notifications/` | User notifications |
 | WS | `/ws/board/:id/` | Real-time board events |
 
 ## Deployment
