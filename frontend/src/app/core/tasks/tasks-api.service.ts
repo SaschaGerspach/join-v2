@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export type Recurrence = 'daily' | 'weekly' | 'biweekly' | 'monthly' | null;
+
 export type Task = {
   id: number;
   board: number;
@@ -12,6 +14,7 @@ export type Task = {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   assigned_to: number[];
   due_date: string | null;
+  recurrence: Recurrence;
   order: number;
   created_at: string;
   subtask_count: number;
@@ -26,6 +29,7 @@ export type CreateTaskPayload = {
   priority?: string;
   column?: number | null;
   due_date?: string | null;
+  recurrence?: Recurrence;
   assigned_to?: number[];
 };
 

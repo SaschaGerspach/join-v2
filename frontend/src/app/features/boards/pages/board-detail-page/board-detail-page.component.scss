@@ -528,6 +528,15 @@ $bp-tablet: 1024px;
   white-space: nowrap;
 }
 
+.recurrence-badge {
+  font-size: 0.7rem;
+  color: $color-primary;
+  background: rgba(41, 171, 226, 0.1);
+  border-radius: 6px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+
 .attachment-badge {
   font-size: 0.75rem;
   color: $color-muted;

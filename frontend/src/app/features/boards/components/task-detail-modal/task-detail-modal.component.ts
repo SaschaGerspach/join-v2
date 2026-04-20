@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, AfterViewInit, DestroyRef, ElementRef, HostListener, inject, input, output, signal, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { Task, TasksApiService, UpdateTaskPayload } from '../../../../core/tasks/tasks-api.service';
+import { Task, TasksApiService, UpdateTaskPayload, Recurrence } from '../../../../core/tasks/tasks-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -41,10 +41,18 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   dueDate = signal('');
   columnId = signal<number | null>(null);
   assignedTo = signal<number[]>([]);
+  recurrence = signal<Recurrence>(null);
   selectedLabelIds = signal<Set<number>>(new Set());
   showDeleteConfirm = signal(false);
 
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
+  readonly recurrenceOptions = [
+    { value: null, label: 'None' },
+    { value: 'daily', label: 'Daily' },
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'biweekly', label: 'Biweekly' },
+    { value: 'monthly', label: 'Monthly' },
+  ] as const;
 
   ngAfterViewInit(): void {
     this.titleInput?.nativeElement.focus();
@@ -58,6 +66,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.dueDate.set(t.due_date ?? '');
     this.columnId.set(t.column);
     this.assignedTo.set(t.assigned_to ?? []);
+    this.recurrence.set(t.recurrence ?? null);
     this.selectedLabelIds.set(new Set(t.labels?.map(l => l.id) ?? []));
 
     this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(contacts => this.contacts.set(contacts));
@@ -69,6 +78,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       description: this.description().trim(),
       priority: this.priority(),
       due_date: this.dueDate() || null,
+      recurrence: this.recurrence(),
       column: this.columnId(),
       assigned_to: this.assignedTo(),
       label_ids: [...this.selectedLabelIds()],

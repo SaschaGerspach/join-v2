@@ -50,6 +50,19 @@
             (ngModelChange)="dueDate.set($event)"
           />
         </div>
+
+        <div class="field-group">
+          <label class="field-label">Repeat</label>
+          <select
+            class="field-select"
+            [ngModel]="recurrence()"
+            (ngModelChange)="recurrence.set($event || null)"
+          >
+            @for (opt of recurrenceOptions; track opt.value) {
+              <option [ngValue]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
       </div>
 
       <div class="field-row">
