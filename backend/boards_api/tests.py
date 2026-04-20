@@ -298,7 +298,7 @@ class BoardMemberRoleTests(APITestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_admin_can_invite(self):
-        new_user = User.objects.create_user(email="new@example.com", password="pass")
+        User.objects.create_user(email="new@example.com", password="pass")
         self.client.force_authenticate(user=self.admin_user)
         response = self.client.post(
             f"/boards/{self.board.pk}/members/",

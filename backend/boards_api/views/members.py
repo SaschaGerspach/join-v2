@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from config.serializers import DetailSerializer
-from ..models import Board, BoardMember
+from ..models import BoardMember
 from ..permissions import get_board_or_404, can_manage_members
 from ..serializers import BoardMemberInviteSerializer, BoardMemberSerializer, BoardMemberRoleSerializer
 

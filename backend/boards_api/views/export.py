@@ -3,7 +3,6 @@ import io
 
 from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from django.http import HttpResponse
 
 from ..permissions import get_board_or_404
@@ -31,7 +30,7 @@ def board_export_csv(request, pk):
         assignees = ", ".join(
             f"{a.first_name} {a.last_name}".strip() for a in task.assignees.all()
         )
-        labels = ", ".join(l.name for l in task.labels.all())
+        labels = ", ".join(lb.name for lb in task.labels.all())
         writer.writerow([
             task.title,
             task.column.title if task.column else "",
