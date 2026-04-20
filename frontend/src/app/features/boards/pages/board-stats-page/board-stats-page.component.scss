@@ -1,8 +1,4 @@
-$color-primary: #29abe2;
-$color-dark: #2a3647;
-$color-muted: #a8a8a8;
-$color-error: #ff8190;
-$color-done: #7ae229;
+@use 'variables' as *;
 
 .stats-page {
   max-width: 960px;
@@ -67,7 +63,7 @@ $color-done: #7ae229;
   }
 
   &.overdue .stat-value { color: $color-error; }
-  &.done .stat-value { color: $color-done; }
+  &.done .stat-value { color: $priority-low; }
 }
 
 .charts-grid {

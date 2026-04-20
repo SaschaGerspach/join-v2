@@ -1,11 +1,4 @@
-$color-dark:    #2a3647;
-$color-primary: #29abe2;
-$color-white:   #ffffff;
-$color-bg:      #f6f7f8;
-$color-border:  #d1d1d1;
-$color-muted:   #a8a8a8;
-$color-urgent:  #ff3d00;
-$color-high:    #ffa800;
+@use 'variables' as *;
 
 .summary-page {
   display: flex;
@@ -78,9 +71,9 @@ $color-high:    #ffa800;
     .stat-icon, .stat-number, .stat-label { color: $color-white; }
   }
 
-  &.urgent  .stat-number { color: $color-urgent; }
-  &.high    .stat-number { color: $color-high; }
-  &.overdue .stat-number { color: $color-urgent; }
+  &.urgent  .stat-number { color: $priority-urgent; }
+  &.high    .stat-number { color: $priority-medium; }
+  &.overdue .stat-number { color: $priority-urgent; }
   &.deadline .stat-number { font-size: 1.1rem; }
 }
 

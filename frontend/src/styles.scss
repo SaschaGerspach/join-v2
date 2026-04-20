@@ -1,3 +1,5 @@
+@use 'styles/variables' as *;
+
 // ─── Font ────────────────────────────────────────────────────────────────────
 
 @font-face {
@@ -9,22 +11,10 @@
 
 // ─── Variables ───────────────────────────────────────────────────────────────
 
-// Colors
-$color-primary:     #29abe2;
-$color-dark:        #2a3647;
+// Colors (local only)
 $color-dark-hover:  #2a3d59;
 $color-dark-active: #091931;
-$color-error:       #ff8190;
-$color-bg:          #f6f7f8;
-$color-white:       #ffffff;
-$color-border:      #d1d1d1;
-$color-text-muted:  #a8a8a8;
 $color-link:        #007cee;
-
-// Priority
-$priority-high:   #ff3d00;
-$priority-medium: #ffa800;
-$priority-low:    #7ae229;
 
 // Task category colors
 $category-colors: (
@@ -39,9 +29,8 @@ $font-family: 'Inter', Verdana, Geneva, Tahoma, sans-serif;
 $font-size-base: 16px;
 
 // Layout
-$sidebar-width:        248px;
-$header-height:        6rem;
-$mobile-footer-height: 80px;
+$sidebar-width: 248px;
+$header-height: 6rem;
 
 // Border radius
 $radius-xl:    30px;
@@ -50,7 +39,6 @@ $radius-input: 10px;
 $radius-badge: 8px;
 
 // Breakpoints
-$bp-mobile:  800px;
 $bp-tablet:  1080px;
 $bp-desktop: 1410px;
 
@@ -267,6 +255,6 @@ input, textarea, select {
 .no-contacts {
   display: block;
   padding: 0.5rem 0.75rem;
-  color: var(--color-muted, $color-text-muted);
+  color: var(--color-muted, $color-muted);
   font-size: 0.85rem;
 }

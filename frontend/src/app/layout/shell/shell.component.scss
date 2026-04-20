@@ -1,15 +1,11 @@
-// Variables (mirrored from global — component-scoped for clarity)
-$color-dark:        #2a3647;
+@use 'variables' as *;
+
 $color-dark-hover:  #2a3d59;
 $color-dark-active: #091931;
-$color-primary:     #29abe2;
-$color-white:       #ffffff;
-$color-bg:          #f6f7f8;
 $color-text-muted:  #cdcdcd;
 $sidebar-width:     248px;
 $header-height:     6rem;
-$mobile-footer:     64px;
-$bp-mobile:         768px;
+$mobile-footer:     $mobile-footer-height;
 $bp-tablet:         1024px;
 
 // ─── Layout ──────────────────────────────────────────────────────────────────

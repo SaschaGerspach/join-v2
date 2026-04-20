@@ -1,7 +1,6 @@
-$color-dark:    #2a3647;
-$color-white:   #ffffff;
+@use 'variables' as *;
+
 $color-success: #4caf50;
-$color-error:   #ff8190;
 
 .toast-container {
   position: fixed;

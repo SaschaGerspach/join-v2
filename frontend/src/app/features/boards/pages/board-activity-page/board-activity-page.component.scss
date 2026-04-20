@@ -1,7 +1,4 @@
-$color-primary: #29abe2;
-$color-dark: #2a3647;
-$color-muted: #a8a8a8;
-$color-border: #d1d1d1;
+@use 'variables' as *;
 
 .activity-page {
   max-width: 700px;

@@ -1,11 +1,4 @@
-$color-dark:    #2a3647;
-$color-primary: #29abe2;
-$color-white:   #ffffff;
-$color-bg:      #f6f7f8;
-$color-border:  #d1d1d1;
-$color-muted:   #a8a8a8;
-$color-success: #7ae229;
-$color-error:   #ff8190;
+@use 'variables' as *;
 
 .profile-page {
   display: flex;
@@ -139,8 +132,8 @@ $color-error:   #ff8190;
 }
 
 .msg-success {
-  background: rgba($color-success, 0.12);
-  color: darken($color-success, 20%);
+  background: rgba($priority-low, 0.12);
+  color: darken($priority-low, 20%);
 }
 
 // ─── Actions ─────────────────────────────────────────────────────────────────

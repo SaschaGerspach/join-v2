@@ -1,7 +1,4 @@
-$color-dark:  #2a3647;
-$color-white: #ffffff;
-$color-error: #ff8190;
-$color-primary: #29abe2;
+@use 'variables' as *;
 
 .overlay {
   position: fixed;
