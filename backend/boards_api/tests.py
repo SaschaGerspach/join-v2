@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from columns_api.models import Column
+from tasks_api.models import Task
 from .models import Board, BoardFavorite, BoardMember
 
 User = get_user_model()
@@ -204,3 +205,46 @@ class BoardFavoriteTests(APITestCase):
         response = self.client.get("/boards/")
         titles = [b["title"] for b in response.data["results"]]
         self.assertEqual(titles[0], "AAA Board")
+
+
+class BoardExportCSVTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.other = User.objects.create_user(email="b@example.com", password="pass")
+        self.board = Board.objects.create(title="My Board", created_by=self.user)
+        self.col = Column.objects.create(board=self.board, title="To do", order=0)
+        Task.objects.create(board=self.board, column=self.col, title="Task 1", priority="high")
+        Task.objects.create(board=self.board, column=self.col, title="Task 2", priority="low")
+        self.client.force_authenticate(user=self.user)
+
+    def url(self, pk):
+        return f"/boards/{pk}/export/csv/"
+
+    def test_export_csv(self):
+        response = self.client.get(self.url(self.board.pk))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/csv; charset=utf-8")
+        self.assertIn("attachment", response["Content-Disposition"])
+        content = response.content.decode()
+        self.assertIn("Task 1", content)
+        self.assertIn("Task 2", content)
+        self.assertIn("Title,Column,Priority", content)
+
+    def test_export_excludes_archived(self):
+        from django.utils import timezone
+        Task.objects.create(
+            board=self.board, column=self.col, title="Archived Task",
+            archived_at=timezone.now(),
+        )
+        response = self.client.get(self.url(self.board.pk))
+        content = response.content.decode()
+        self.assertNotIn("Archived Task", content)
+
+    def test_outsider_gets_404(self):
+        self.client.force_authenticate(user=self.other)
+        response = self.client.get(self.url(self.board.pk))
+        self.assertEqual(response.status_code, 404)
+
+    def test_nonexistent_board_404(self):
+        response = self.client.get(self.url(9999))
+        self.assertEqual(response.status_code, 404)

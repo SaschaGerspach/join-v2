@@ -8,6 +8,7 @@ import { CreateTaskModalComponent } from '../../components/create-task-modal/cre
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { BoardStateService } from '../../services/board-state.service';
+import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 
@@ -22,6 +23,7 @@ import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 })
 export class BoardDetailPageComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
+  private readonly boardsApi = inject(BoardsApiService);
   protected readonly state = inject(BoardStateService);
 
   showColumnForm = signal(false);
@@ -68,5 +70,9 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
 
   inputValue(event: Event): string {
     return (event.target as HTMLInputElement).value;
+  }
+
+  exportCsv(): void {
+    window.open(this.boardsApi.exportCsvUrl(this.state.boardId()), '_blank');
   }
 }

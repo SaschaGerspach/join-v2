@@ -67,4 +67,8 @@ export class BoardsApiService {
   unfavorite(boardId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/boards/${boardId}/favorite/`, { withCredentials: true });
   }
+
+  exportCsvUrl(boardId: number): string {
+    return `${this.baseUrl}/boards/${boardId}/export/csv/`;
+  }
 }
