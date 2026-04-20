@@ -20,4 +20,6 @@ urlpatterns = [
     path("<int:task_pk>/dependencies/", views.dependency_list, name="dependency-list"),
     path("<int:task_pk>/dependencies/<int:pk>/", views.dependency_detail, name="dependency-detail"),
     path("<int:task_pk>/fields/", views.task_field_values, name="task-field-values"),
+    path("<int:task_pk>/time/", views.time_entry_list, name="time-entry-list"),
+    path("<int:task_pk>/time/<int:pk>/", views.time_entry_detail, name="time-entry-detail"),
 ]

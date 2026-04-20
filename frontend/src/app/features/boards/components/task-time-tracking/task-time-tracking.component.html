@@ -1,0 +1,37 @@
+<div class="time-tracking-section">
+  <label class="field-label">Time Tracking <span class="total-time">({{ formatDuration(totalMinutes()) }} total)</span></label>
+
+  <div class="log-time-form">
+    <input
+      class="field-input duration-input"
+      type="number"
+      min="1"
+      max="1440"
+      placeholder="Min"
+      [ngModel]="newDuration()"
+      (ngModelChange)="newDuration.set($event)"
+    />
+    <input
+      class="field-input note-input"
+      type="text"
+      placeholder="Note (optional)"
+      [ngModel]="newNote()"
+      (ngModelChange)="newNote.set($event)"
+      (keyup.enter)="logTime()"
+    />
+    <button class="btn-log" [disabled]="!newDuration()" (click)="logTime()">Log</button>
+  </div>
+
+  @if (entries().length) {
+    <ul class="time-entries">
+      @for (entry of entries(); track entry.id) {
+        <li class="time-entry">
+          <span class="entry-duration">{{ formatDuration(entry.duration_minutes) }}</span>
+          <span class="entry-note">{{ entry.note || '—' }}</span>
+          <span class="entry-user">{{ entry.user_name }}</span>
+          <button class="btn-remove" (click)="deleteEntry(entry)">&#10005;</button>
+        </li>
+      }
+    </ul>
+  }
+</div>

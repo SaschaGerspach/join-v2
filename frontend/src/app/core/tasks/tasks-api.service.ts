@@ -24,6 +24,15 @@ export type TaskFieldValue = {
   value: string;
 };
 
+export type TimeEntry = {
+  id: number;
+  user_id: number;
+  user_name: string;
+  duration_minutes: number;
+  note: string;
+  logged_at: string;
+};
+
 export type Task = {
   id: number;
   board: number;
@@ -123,5 +132,17 @@ export class TasksApiService {
 
   setTaskFieldValues(taskId: number, values: TaskFieldValue[]): Observable<{ values: TaskFieldValue[] }> {
     return this.http.put<{ values: TaskFieldValue[] }>(`${this.baseUrl}/tasks/${taskId}/fields/`, { values }, { withCredentials: true });
+  }
+
+  getTimeEntries(taskId: number): Observable<{ total_minutes: number; entries: TimeEntry[] }> {
+    return this.http.get<{ total_minutes: number; entries: TimeEntry[] }>(`${this.baseUrl}/tasks/${taskId}/time/`, { withCredentials: true });
+  }
+
+  logTime(taskId: number, durationMinutes: number, note: string = ''): Observable<TimeEntry> {
+    return this.http.post<TimeEntry>(`${this.baseUrl}/tasks/${taskId}/time/`, { duration_minutes: durationMinutes, note }, { withCredentials: true });
+  }
+
+  deleteTimeEntry(taskId: number, entryId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/tasks/${taskId}/time/${entryId}/`, { withCredentials: true });
   }
 }

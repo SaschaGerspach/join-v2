@@ -144,3 +144,18 @@ class TaskFieldValue(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["task", "field"], name="unique_task_field_value"),
         ]
+
+
+class TimeEntry(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="time_entries")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="time_entries",
+    )
+    duration_minutes = models.PositiveIntegerField()
+    note = models.CharField(max_length=255, blank=True, default="")
+    logged_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-logged_at"]

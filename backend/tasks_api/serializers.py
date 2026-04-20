@@ -165,3 +165,17 @@ class TaskFieldValueSerializer(serializers.Serializer):
 
 class TaskFieldValuesUpdateSerializer(serializers.Serializer):
     values = TaskFieldValueSerializer(many=True)
+
+
+class TimeEntrySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    user_id = serializers.IntegerField()
+    user_name = serializers.CharField()
+    duration_minutes = serializers.IntegerField()
+    note = serializers.CharField(allow_blank=True)
+    logged_at = serializers.DateTimeField()
+
+
+class TimeEntryCreateSerializer(serializers.Serializer):
+    duration_minutes = serializers.IntegerField(min_value=1, max_value=1440)
+    note = serializers.CharField(required=False, allow_blank=True, max_length=255, default="")
