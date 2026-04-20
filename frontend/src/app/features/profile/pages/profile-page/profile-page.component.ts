@@ -114,6 +114,22 @@ export class ProfilePageComponent implements OnInit {
     });
   }
 
+  exportData(): void {
+    this.usersApi.exportData().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: data => {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'my-data-export.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        this.toast.show('Data exported.');
+      },
+      error: () => this.toast.show('Failed to export data.', 'error'),
+    });
+  }
+
   save(): void {
     this.errorMessage.set('');
 

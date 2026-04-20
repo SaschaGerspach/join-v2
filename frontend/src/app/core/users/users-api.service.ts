@@ -26,4 +26,8 @@ export class UsersApiService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/users/${id}/`, { withCredentials: true });
   }
+
+  exportData(): Observable<object> {
+    return this.http.get<object>(`${this.baseUrl}/users/export/`, { withCredentials: true });
+  }
 }

@@ -122,6 +122,7 @@
 
 <div class="form-actions">
       <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">Delete account</button>
+      <button class="btn-export" (click)="exportData()">Export my data</button>
       <button class="btn-save" [disabled]="saving()" (click)="save()">
         {{ saving() ? 'Saving…' : 'Save changes' }}
       </button>

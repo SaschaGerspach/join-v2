@@ -139,3 +139,44 @@ def user_detail(request, pk):
         response = Response(status=status.HTTP_204_NO_CONTENT)
         clear_refresh_cookie(response)
         return response
+
+
+@extend_schema(responses={200: None})
+@api_view(["GET"])
+def data_export(request):
+    user = request.user
+    from tasks_api.models import Task, Comment
+    from contacts_api.models import Contact
+    from notifications_api.models import Notification
+
+    boards = list(Board.objects.filter(Q(created_by=user) | Q(members__user=user)).distinct().values(
+        "id", "title", "color", "created_at"
+    ))
+    tasks = list(Task.objects.filter(board__in=[b["id"] for b in boards]).values(
+        "id", "board_id", "title", "description", "priority", "due_date", "created_at"
+    ))
+    comments = list(Comment.objects.filter(author=user).values(
+        "id", "task_id", "text", "created_at"
+    ))
+    contacts = list(Contact.objects.filter(owner=user).values(
+        "id", "first_name", "last_name", "email", "phone"
+    ))
+    notifications = list(Notification.objects.filter(user=user).order_by("-created_at")[:200].values(
+        "id", "notification_type", "message", "is_read", "created_at"
+    ))
+
+    data = {
+        "user": {
+            "id": user.pk,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "date_joined": user.date_joined.isoformat(),
+        },
+        "boards": boards,
+        "tasks": tasks,
+        "comments": comments,
+        "contacts": contacts,
+        "notifications": notifications,
+    }
+    return Response(data)

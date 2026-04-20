@@ -269,3 +269,19 @@
     color: $color-white;
   }
 }
+
+.btn-export {
+  background: none;
+  border: 2px solid $color-primary;
+  color: $color-primary;
+  border-radius: 10px;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba($color-primary, 0.08);
+  }
+}
