@@ -22,6 +22,7 @@ export class NotificationService {
     this.reconnectDelay = 1000;
     this.loadNotifications();
     this.openSocket();
+    this.requestBrowserPermission();
   }
 
   disconnect(): void {
@@ -73,6 +74,7 @@ export class NotificationService {
         if (parsed.event === 'new_notification') {
           const notification: AppNotification = parsed.data;
           this.notifications.update(list => [notification, ...list]);
+          this.showBrowserNotification(notification);
         }
       } catch { /* ignore parse errors */ }
     };
@@ -101,5 +103,17 @@ export class NotificationService {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+  }
+
+  private requestBrowserPermission(): void {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+
+  private showBrowserNotification(notification: AppNotification): void {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    if (document.hasFocus()) return;
+    new Notification('Join', { body: notification.message, icon: '/favicon.ico' });
   }
 }
