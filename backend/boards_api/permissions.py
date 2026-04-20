@@ -20,8 +20,8 @@ def is_board_owner(board, user):
 
 def get_board_or_404(pk, user):
     try:
-        board = Board.objects.get(pk=pk)
-    except Board.DoesNotExist:
+        board = Board.objects.get(pk=int(pk))
+    except (Board.DoesNotExist, ValueError, TypeError):
         return None, Response(_NOT_FOUND, status=status.HTTP_404_NOT_FOUND)
     if not can_access_board(board, user):
         return None, Response(_NOT_FOUND, status=status.HTTP_404_NOT_FOUND)
