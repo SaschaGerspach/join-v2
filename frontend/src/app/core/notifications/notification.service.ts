@@ -1,5 +1,4 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Subject } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { environment } from '../../../environments/environment';
 import { AppNotification, NotificationsApiService } from './notifications-api.service';
@@ -16,7 +15,6 @@ export class NotificationService {
 
   readonly notifications = signal<AppNotification[]>([]);
   readonly unreadCount = computed(() => this.notifications().filter(n => !n.is_read).length);
-  readonly newNotification$ = new Subject<AppNotification>();
 
   connect(): void {
     this.disconnect();
@@ -75,7 +73,6 @@ export class NotificationService {
         if (parsed.event === 'new_notification') {
           const notification: AppNotification = parsed.data;
           this.notifications.update(list => [notification, ...list]);
-          this.newNotification$.next(notification);
         }
       } catch { /* ignore parse errors */ }
     };

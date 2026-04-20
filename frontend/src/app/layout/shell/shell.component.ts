@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal, computed, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, signal, computed, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
 import { AuthService } from '../../core/auth/auth.service';
@@ -20,11 +20,20 @@ export class ShellComponent implements OnInit, OnDestroy {
   readonly theme = inject(ThemeService);
   readonly notificationService = inject(NotificationService);
   private readonly router = inject(Router);
+  private readonly elementRef = inject(ElementRef);
 
   menuOpen = signal(false);
   showShortcuts = signal(false);
   notificationsOpen = signal(false);
   sidebarOpen = signal(false);
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (!this.elementRef.nativeElement.querySelector('.header-right')?.contains(event.target)) {
+      this.menuOpen.set(false);
+      this.notificationsOpen.set(false);
+    }
+  }
 
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {

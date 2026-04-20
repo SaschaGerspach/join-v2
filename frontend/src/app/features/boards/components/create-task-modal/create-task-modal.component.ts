@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, AfterViewInit, ElementRef, HostListener, inject, input, output, OnInit, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Column } from '../../../../core/columns/columns-api.service';
-import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
+import { Contact } from '../../../../core/contacts/contacts-api.service';
 import { CreateTaskPayload } from '../../../../core/tasks/tasks-api.service';
 
 @Component({
@@ -14,7 +14,6 @@ import { CreateTaskPayload } from '../../../../core/tasks/tasks-api.service';
 })
 export class CreateTaskModalComponent implements OnInit, AfterViewInit {
   @ViewChild('titleInput') titleInput!: ElementRef<HTMLInputElement>;
-  private readonly contactsApi = inject(ContactsApiService);
 
   columnId = input.required<number>();
   columns = input.required<Column[]>();
