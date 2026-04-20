@@ -14,7 +14,9 @@ class Contact(models.Model):
     phone = models.CharField(max_length=30, blank=True)
 
     class Meta:
-        unique_together = ("owner", "email")
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "email"], name="unique_contact_per_owner"),
+        ]
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

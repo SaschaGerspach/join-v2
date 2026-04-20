@@ -26,7 +26,9 @@ class BoardMember(models.Model):
     invited_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("board", "user")
+        constraints = [
+            models.UniqueConstraint(fields=["board", "user"], name="unique_board_member"),
+        ]
 
     def __str__(self):
         return f"{self.user.email} → {self.board.title}"

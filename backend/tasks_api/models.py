@@ -47,7 +47,9 @@ class Label(models.Model):
     color = models.CharField(max_length=7, default='#29abe2')
 
     class Meta:
-        unique_together = ("board", "name")
+        constraints = [
+            models.UniqueConstraint(fields=["board", "name"], name="unique_label_per_board"),
+        ]
         ordering = ["name"]
 
     def __str__(self):
