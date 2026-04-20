@@ -13,4 +13,7 @@ urlpatterns = [
     path("resend-verification/", views.resend_verification, name="resend_verification"),
     path("password-reset/", views.password_reset_request, name="password_reset_request"),
     path("password-reset/confirm/", views.password_reset_confirm, name="password_reset_confirm"),
+    path("sessions/", views.session_list, name="session_list"),
+    path("sessions/<int:pk>/", views.session_revoke, name="session_revoke"),
+    path("sessions/revoke-all/", views.session_revoke_all, name="session_revoke_all"),
 ]

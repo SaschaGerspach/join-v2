@@ -77,4 +77,23 @@ export class AuthApiService {
             withCredentials: true,
         });
     }
+
+    getSessions(): Observable<Session[]> {
+        return this.http.get<Session[]>(`${this.baseUrl}/auth/sessions/`, { withCredentials: true });
+    }
+
+    revokeSession(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/auth/sessions/${id}/`, { withCredentials: true });
+    }
+
+    revokeAllSessions(): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/auth/sessions/revoke-all/`, {}, { withCredentials: true });
+    }
 }
+
+export type Session = {
+    id: number;
+    created_at: string;
+    expires_at: string;
+    is_current: boolean;
+};

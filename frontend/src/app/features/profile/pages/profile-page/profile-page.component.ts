@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { AuthApiService, Session } from '../../../../core/auth/auth-api.service';
 import { UsersApiService } from '../../../../core/users/users-api.service';
 import { NotificationsApiService } from '../../../../core/notifications/notifications-api.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
@@ -13,13 +15,14 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent],
+  imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent, DatePipe],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfilePageComponent implements OnInit {
   private readonly auth = inject(AuthService);
+  private readonly authApi = inject(AuthApiService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly usersApi = inject(UsersApiService);
   private readonly notificationsApi = inject(NotificationsApiService);
@@ -39,6 +42,7 @@ export class ProfilePageComponent implements OnInit {
   showDeleteConfirm = signal(false);
 
   boards = signal<Board[]>([]);
+  sessions = signal<Session[]>([]);
   disabledTypes = signal<Set<string>>(new Set());
   mutedBoardIds = signal<Set<number>>(new Set());
   emailDelivery = signal<'instant' | 'digest' | 'none'>('instant');
@@ -78,6 +82,35 @@ export class ProfilePageComponent implements OnInit {
     this.boardsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: boards => this.boards.set(boards),
       error: () => {},
+    });
+
+    this.loadSessions();
+  }
+
+  loadSessions(): void {
+    this.authApi.getSessions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: sessions => this.sessions.set(sessions),
+      error: () => {},
+    });
+  }
+
+  revokeSession(id: number): void {
+    this.authApi.revokeSession(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.sessions.update(list => list.filter(s => s.id !== id));
+        this.toast.show('Session revoked.');
+      },
+      error: () => this.toast.show('Failed to revoke session.', 'error'),
+    });
+  }
+
+  revokeAllSessions(): void {
+    this.authApi.revokeAllSessions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.sessions.update(list => list.filter(s => s.is_current));
+        this.toast.show('All other sessions revoked.');
+      },
+      error: () => this.toast.show('Failed to revoke sessions.', 'error'),
     });
   }
 

@@ -92,6 +92,30 @@
       }
     </div>
 
+    <div class="form-section">
+      <h2 class="section-title">Active Sessions</h2>
+      <div class="session-list">
+        @for (session of sessions(); track session.id) {
+          <div class="session-item" [class.session-current]="session.is_current">
+            <div class="session-info">
+              <span class="session-label">{{ session.is_current ? 'Current session' : 'Session' }}</span>
+              <span class="session-date">Created: {{ session.created_at | date:'short' }}</span>
+              <span class="session-date">Expires: {{ session.expires_at | date:'short' }}</span>
+            </div>
+            @if (!session.is_current) {
+              <button class="btn-revoke" (click)="revokeSession(session.id)">Revoke</button>
+            }
+          </div>
+        }
+        @if (sessions().length === 0) {
+          <span class="session-empty">No active sessions found.</span>
+        }
+      </div>
+      @if (sessions().length > 1) {
+        <button class="btn-danger-outline" (click)="revokeAllSessions()">Revoke all other sessions</button>
+      }
+    </div>
+
     @if (errorMessage()) {
       <p class="msg msg-error">{{ errorMessage() }}</p>
     }
