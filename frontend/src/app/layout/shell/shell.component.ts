@@ -7,11 +7,12 @@ import { ThemeService } from '../../shared/services/theme.service';
 import { NotificationService } from '../../core/notifications/notification.service';
 import { KeyboardShortcutsModalComponent } from '../../shared/components/keyboard-shortcuts-modal/keyboard-shortcuts-modal.component';
 import { GlobalSearchComponent } from '../../shared/components/global-search/global-search.component';
+import { OfflineBannerComponent } from '../../shared/components/offline-banner/offline-banner.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterModule, DatePipe, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent],
+  imports: [RouterModule, DatePipe, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent, OfflineBannerComponent],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
