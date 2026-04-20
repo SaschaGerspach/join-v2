@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -105,17 +106,24 @@ def user_detail(request, pk):
     if request.method == "DELETE":
         if request.user.pk != pk:
             return Response({"detail": "You can only delete your own account."}, status=status.HTTP_403_FORBIDDEN)
-        for board in Board.objects.filter(created_by=user):
-            successor = BoardMember.objects.filter(board=board).order_by("invited_at").first()
-            if successor:
-                board.created_by = successor.user
-                board.save(update_fields=["created_by"])
-                successor.delete()
-            else:
-                board.delete()
-        BoardMember.objects.filter(user=user).delete()
-        user.is_active = False
-        user.save(update_fields=["is_active"])
+
+        with transaction.atomic():
+            for board in Board.objects.select_for_update().filter(created_by=user):
+                successor = (
+                    BoardMember.objects.select_for_update()
+                    .filter(board=board)
+                    .order_by("invited_at")
+                    .first()
+                )
+                if successor:
+                    board.created_by = successor.user
+                    board.save(update_fields=["created_by"])
+                    successor.delete()
+                else:
+                    board.delete()
+            BoardMember.objects.filter(user=user).delete()
+            user.is_active = False
+            user.save(update_fields=["is_active"])
 
         for token in OutstandingToken.objects.filter(user=user):
             try:
