@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from columns_api.models import Column
-from .models import Board, BoardMember
+from .models import Board, BoardFavorite, BoardMember
 
 User = get_user_model()
 
@@ -151,3 +151,56 @@ class BoardLeaveTests(APITestCase):
         self.client.force_authenticate(user=self.member)
         response = self.client.delete(self.url(9999))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class BoardFavoriteTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.other = User.objects.create_user(email="b@example.com", password="pass")
+        self.board = Board.objects.create(title="My Board", created_by=self.user)
+        self.client.force_authenticate(user=self.user)
+
+    def url(self, pk):
+        return f"/boards/{pk}/favorite/"
+
+    def test_favorite_board(self):
+        response = self.client.post(self.url(self.board.pk))
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(BoardFavorite.objects.filter(board=self.board, user=self.user).exists())
+
+    def test_favorite_idempotent(self):
+        self.client.post(self.url(self.board.pk))
+        response = self.client.post(self.url(self.board.pk))
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(BoardFavorite.objects.filter(board=self.board, user=self.user).count(), 1)
+
+    def test_unfavorite_board(self):
+        BoardFavorite.objects.create(board=self.board, user=self.user)
+        response = self.client.delete(self.url(self.board.pk))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(BoardFavorite.objects.filter(board=self.board, user=self.user).exists())
+
+    def test_unfavorite_not_favorited(self):
+        response = self.client.delete(self.url(self.board.pk))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_favorite_nonexistent_board(self):
+        response = self.client.post(self.url(9999))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_outsider_cannot_favorite(self):
+        self.client.force_authenticate(user=self.other)
+        response = self.client.post(self.url(self.board.pk))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_board_list_shows_is_favorite(self):
+        BoardFavorite.objects.create(board=self.board, user=self.user)
+        response = self.client.get("/boards/")
+        self.assertTrue(response.data["results"][0]["is_favorite"])
+
+    def test_favorites_sorted_first(self):
+        board2 = Board.objects.create(title="AAA Board", created_by=self.user)
+        BoardFavorite.objects.create(board=board2, user=self.user)
+        response = self.client.get("/boards/")
+        titles = [b["title"] for b in response.data["results"]]
+        self.assertEqual(titles[0], "AAA Board")

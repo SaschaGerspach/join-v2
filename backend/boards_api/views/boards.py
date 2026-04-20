@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from columns_api.models import Column
 from config.serializers import DetailSerializer
-from ..models import Board
+from ..models import Board, BoardFavorite
 from ..permissions import get_board_or_404, is_board_owner
 from ..serializers import (
     BOARD_TEMPLATES,
@@ -22,7 +22,7 @@ class _BoardPagination(PageNumberPagination):
     max_page_size = 200
 
 
-def serialize_board(board):
+def serialize_board(board, *, is_favorite=False):
     return {
         "id": board.pk,
         "title": board.title,
@@ -30,10 +30,11 @@ def serialize_board(board):
         "created_by": board.created_by_id,
         "created_at": board.created_at,
         "is_owner": True,
+        "is_favorite": is_favorite,
     }
 
 
-def serialize_shared_board(board, user):
+def serialize_shared_board(board, user, *, is_favorite=False):
     return {
         "id": board.pk,
         "title": board.title,
@@ -41,6 +42,7 @@ def serialize_shared_board(board, user):
         "created_by": board.created_by_id,
         "created_at": board.created_at,
         "is_owner": board.created_by == user,
+        "is_favorite": is_favorite,
     }
 
 
@@ -62,9 +64,14 @@ def board_list(request):
             owned = Board.objects.filter(created_by=request.user)
             shared = Board.objects.filter(members__user=request.user)
             boards = (owned | shared).distinct().order_by("-created_at")
+        fav_ids = set(
+            BoardFavorite.objects.filter(user=request.user).values_list("board_id", flat=True)
+        )
         paginator = _BoardPagination()
         page = paginator.paginate_queryset(boards, request)
-        return paginator.get_paginated_response([serialize_shared_board(b, request.user) for b in page])
+        result = [serialize_shared_board(b, request.user, is_favorite=b.pk in fav_ids) for b in page]
+        result.sort(key=lambda b: (not b["is_favorite"], b["title"].lower()))
+        return paginator.get_paginated_response(result)
 
     serializer = BoardCreateSerializer(data=request.data)
     if not serializer.is_valid():
@@ -98,8 +105,10 @@ def board_detail(request, pk):
     if err:
         return err
 
+    is_fav = BoardFavorite.objects.filter(board=board, user=request.user).exists()
+
     if request.method == "GET":
-        return Response(serialize_shared_board(board, request.user))
+        return Response(serialize_shared_board(board, request.user, is_favorite=is_fav))
 
     if not is_board_owner(board, request.user):
         return Response({"detail": "Only the owner can modify this board."}, status=status.HTTP_403_FORBIDDEN)
@@ -118,7 +127,7 @@ def board_detail(request, pk):
             changed_fields.append("color")
         if changed_fields:
             board.save(update_fields=changed_fields)
-        return Response(serialize_shared_board(board, request.user))
+        return Response(serialize_shared_board(board, request.user, is_favorite=is_fav))
 
     board.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

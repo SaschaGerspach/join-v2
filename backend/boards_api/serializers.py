@@ -8,6 +8,7 @@ class BoardSerializer(serializers.Serializer):
     created_by = serializers.IntegerField()
     created_at = serializers.DateTimeField()
     is_owner = serializers.BooleanField()
+    is_favorite = serializers.BooleanField()
 
 
 BOARD_TEMPLATES = {

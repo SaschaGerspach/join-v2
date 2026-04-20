@@ -32,3 +32,18 @@ class BoardMember(models.Model):
 
     def __str__(self):
         return f"{self.user.email} → {self.board.title}"
+
+
+class BoardFavorite(models.Model):
+    board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="favorites")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="board_favorites",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["board", "user"], name="unique_board_favorite"),
+        ]
