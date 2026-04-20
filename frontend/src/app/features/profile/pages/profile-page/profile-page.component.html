@@ -4,7 +4,7 @@
 
   @if (loading()) {
     <app-loading-spinner />
-  }
+  } @else {
 
   <div class="profile-card">
 
@@ -60,6 +60,8 @@
     </div>
 
   </div>
+
+  }
 </div>
 
 @if (showDeleteConfirm()) {
