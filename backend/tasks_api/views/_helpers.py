@@ -17,7 +17,7 @@ def serialize_task(task):
     subtasks = list(task.subtasks.all())
     attachments = list(task.attachments.all())
     labels = list(task.labels.all())
-    dependencies = list(task.dependencies.select_related("depends_on").all())
+    dependencies = list(task.dependencies.all())
     return {
         "id": task.pk,
         "board": task.board_id,

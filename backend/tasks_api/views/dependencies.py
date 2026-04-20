@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from boards_api.permissions import can_access_board
+from boards_api.permissions import can_access_board, can_edit_board
 from ..models import Task, TaskDependency
 from ..serializers import DependencySerializer, DependencyCreateSerializer
 
@@ -34,6 +34,9 @@ def dependency_list(request, task_pk):
             for d in deps
         ]
         return Response(data)
+
+    if not can_edit_board(task.board, request.user):
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
     serializer = DependencyCreateSerializer(data=request.data)
     if not serializer.is_valid():
@@ -70,6 +73,9 @@ def dependency_detail(request, task_pk, pk):
 
     if not can_access_board(task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not can_edit_board(task.board, request.user):
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
     deleted, _ = TaskDependency.objects.filter(pk=pk, task=task).delete()
     if not deleted:

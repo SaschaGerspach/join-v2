@@ -83,6 +83,7 @@ def board_members(request, pk):
         "email": invitee.email,
         "first_name": invitee.first_name,
         "last_name": invitee.last_name,
+        "role": BoardMember.Role.EDITOR,
     }, status=status.HTTP_201_CREATED)
 
 

@@ -49,7 +49,7 @@ def task_list(request):
     if request.method == "GET":
         tasks = (
             board.tasks.filter(archived_at__isnull=True)
-            .prefetch_related("subtasks", "attachments", "labels", "assignees")
+            .prefetch_related("subtasks", "attachments", "labels", "assignees", "dependencies__depends_on")
             .order_by("order", "created_at")[:500]
         )
         return Response([serialize_task(t) for t in tasks])
@@ -217,7 +217,7 @@ def task_reorder(request):
         t.pk: t
         for t in Task.objects
         .filter(pk__in=tasks.keys())
-        .prefetch_related("subtasks", "attachments", "labels", "assignees")
+        .prefetch_related("subtasks", "attachments", "labels", "assignees", "dependencies__depends_on")
     }
     for bid in board_ids:
         board_tasks = [serialize_task(refreshed[pk]) for pk in tasks if refreshed[pk].board_id == bid]
@@ -233,7 +233,7 @@ def my_tasks(request):
     boards = Board.objects.filter(Q(created_by=user) | Q(members__user=user)).distinct()
     tasks = (
         Task.objects.filter(board__in=boards, archived_at__isnull=True)
-        .prefetch_related("subtasks", "attachments", "labels", "assignees")
+        .prefetch_related("subtasks", "attachments", "labels", "assignees", "dependencies__depends_on")
         .order_by("due_date", "created_at")[:1000]
     )
     return Response([serialize_task(t) for t in tasks])
