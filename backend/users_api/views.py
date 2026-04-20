@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Q
@@ -15,6 +17,7 @@ from config.serializers import DetailSerializer
 from .serializers import PublicUserSerializer, UserUpdateSerializer
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 def _co_member_ids(user):
@@ -129,7 +132,7 @@ def user_detail(request, pk):
             try:
                 RefreshTokenClass(token.token).blacklist()
             except Exception:
-                pass
+                logger.warning("Failed to blacklist token %s for user %s", token.pk, user.pk)
 
         response = Response(status=status.HTTP_204_NO_CONTENT)
         clear_refresh_cookie(response)
