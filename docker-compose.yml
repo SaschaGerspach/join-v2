@@ -88,6 +88,58 @@ services:
       - "traefik.http.middlewares.join-backend-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.services.join-backend.loadbalancer.server.port=8000"
 
+  celery-worker:
+    build: ./backend
+    restart: unless-stopped
+    logging: *default-logging
+    mem_limit: 384m
+    cpus: 0.5
+    command: celery -A config worker --loglevel=info --concurrency=2
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY required}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
+      POSTGRES_DB: ${POSTGRES_DB:-join}
+      POSTGRES_USER: ${POSTGRES_USER:-join}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
+      POSTGRES_HOST: db
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      EMAIL_BACKEND: ${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
+      EMAIL_HOST: ${EMAIL_HOST:-}
+      EMAIL_PORT: ${EMAIL_PORT:-25}
+      EMAIL_USE_TLS: ${EMAIL_USE_TLS:-false}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-noreply@join.app}
+      FRONTEND_URL: ${FRONTEND_URL:?FRONTEND_URL required}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery-beat:
+    build: ./backend
+    restart: unless-stopped
+    logging: *default-logging
+    mem_limit: 256m
+    cpus: 0.25
+    command: celery -A config beat --loglevel=info
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY required}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
+      POSTGRES_DB: ${POSTGRES_DB:-join}
+      POSTGRES_USER: ${POSTGRES_USER:-join}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
+      POSTGRES_HOST: db
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   backup:
     image: postgres:16-alpine
     restart: unless-stopped

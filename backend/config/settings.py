@@ -313,3 +313,19 @@ SIMPLE_JWT = {
 
 REFRESH_COOKIE_NAME = "refresh_token"
 REFRESH_COOKIE_PATH = "/auth/"
+
+# Celery
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', _redis_url)
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', _redis_url)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+CELERY_BEAT_SCHEDULE = {
+    'check-due-date-reminders': {
+        'task': 'tasks_api.tasks.send_due_date_reminders',
+        'schedule': 3600,
+    },
+}
+
+DUE_DATE_REMINDER_HOURS = int(os.environ.get('DUE_DATE_REMINDER_HOURS', '24'))

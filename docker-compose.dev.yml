@@ -47,6 +47,46 @@ services:
       redis:
         condition: service_healthy
 
+  celery-worker:
+    build: ./backend
+    command: celery -A config worker --loglevel=info --concurrency=1
+    environment:
+      DJANGO_SECRET_KEY: dev-secret-key-not-for-production
+      DJANGO_DEBUG: "true"
+      POSTGRES_DB: join
+      POSTGRES_USER: join
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_HOST: db
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery-beat:
+    build: ./backend
+    command: celery -A config beat --loglevel=info
+    environment:
+      DJANGO_SECRET_KEY: dev-secret-key-not-for-production
+      DJANGO_DEBUG: "true"
+      POSTGRES_DB: join
+      POSTGRES_USER: join
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_HOST: db
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   frontend:
     build:
       context: ./frontend
