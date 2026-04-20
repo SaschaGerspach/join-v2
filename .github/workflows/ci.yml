@@ -33,6 +33,7 @@ jobs:
       POSTGRES_HOST: localhost
       DJANGO_SECRET_KEY: ci-secret-key
       DJANGO_DEBUG: "false"
+      SECURE_SSL_REDIRECT: "false"
 
     steps:
       - uses: actions/checkout@v4
