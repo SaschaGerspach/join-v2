@@ -285,9 +285,9 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "10000/day" if os.environ.get("DJANGO_DISABLE_THROTTLE") == "true" else "100/day",
-        "user": "10000/hour" if os.environ.get("DJANGO_DISABLE_THROTTLE") == "true" else "1000/hour",
-        "auth_attempts": "1000/minute" if os.environ.get("DJANGO_DISABLE_THROTTLE") == "true" else "10/minute",
+        "anon": "10000/day" if DEBUG else "100/day",
+        "user": "10000/hour" if DEBUG else "1000/hour",
+        "auth_attempts": "1000/minute" if DEBUG else "10/minute",
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }

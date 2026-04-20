@@ -15,8 +15,18 @@ class Notification(models.Model):
     )
     type = models.CharField(max_length=20, choices=Type.choices)
     message = models.CharField(max_length=500)
-    board_id = models.PositiveIntegerField(null=True, blank=True)
-    task_id = models.PositiveIntegerField(null=True, blank=True)
+    board = models.ForeignKey(
+        "boards_api.Board",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    task = models.ForeignKey(
+        "tasks_api.Task",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

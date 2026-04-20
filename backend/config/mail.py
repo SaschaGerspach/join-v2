@@ -1,9 +1,11 @@
 import logging
-import threading
+from concurrent.futures import ThreadPoolExecutor
 
 from django.core.mail import send_mail
 
 logger = logging.getLogger(__name__)
+
+_mail_executor = ThreadPoolExecutor(max_workers=3)
 
 
 def send_mail_async(**kwargs):
@@ -15,4 +17,4 @@ def send_mail_async(**kwargs):
         except Exception:
             logger.warning("Async mail failed: %s", kwargs.get("subject", ""), exc_info=True)
 
-    threading.Thread(target=_send, daemon=True).start()
+    _mail_executor.submit(_send)
