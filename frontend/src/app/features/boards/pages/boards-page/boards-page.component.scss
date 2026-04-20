@@ -194,6 +194,20 @@
     &::-moz-color-swatch { border: 2px solid $color-border; border-radius: 50%; }
   }
 
+  .btn-favorite {
+    background: none;
+    border: none;
+    color: $color-muted;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 2px 4px;
+    line-height: 1;
+    transition: color 0.15s ease, transform 0.15s ease;
+
+    &:hover { color: #f5a623; transform: scale(1.2); }
+    &.active { color: #f5a623; }
+  }
+
   .btn-delete,
   .btn-members {
     background: none;

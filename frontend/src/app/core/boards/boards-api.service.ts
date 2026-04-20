@@ -11,6 +11,7 @@ export type Board = {
   created_by: number;
   created_at: string;
   is_owner: boolean;
+  is_favorite: boolean;
 };
 
 export type BoardMember = {
@@ -57,5 +58,13 @@ export class BoardsApiService {
 
   removeMember(boardId: number, userId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/boards/${boardId}/members/${userId}/`, { withCredentials: true });
+  }
+
+  favorite(boardId: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/boards/${boardId}/favorite/`, {}, { withCredentials: true });
+  }
+
+  unfavorite(boardId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/boards/${boardId}/favorite/`, { withCredentials: true });
   }
 }

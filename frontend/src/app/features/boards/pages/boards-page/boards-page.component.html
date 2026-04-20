@@ -44,6 +44,13 @@
             }
           </div>
           <div class="board-card-actions">
+            <button
+              class="btn-favorite"
+              [class.active]="board.is_favorite"
+              [attr.aria-label]="board.is_favorite ? 'Remove from favorites' : 'Add to favorites'"
+              [title]="board.is_favorite ? 'Remove from favorites' : 'Add to favorites'"
+              (click)="toggleFavorite(board, $event)"
+            >{{ board.is_favorite ? '&#9733;' : '&#9734;' }}</button>
             @if (board.is_owner) {
               <input
                 class="color-picker"

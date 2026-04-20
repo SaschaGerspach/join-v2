@@ -120,6 +120,21 @@ export class BoardsPageComponent implements OnInit {
     });
   }
 
+  toggleFavorite(board: Board, event: Event): void {
+    event.stopPropagation();
+    const action = board.is_favorite ? this.api.unfavorite(board.id) : this.api.favorite(board.id);
+    action.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => this.boards.update(list => {
+        const updated = list.map(b => b.id === board.id ? { ...b, is_favorite: !b.is_favorite } : b);
+        return updated.sort((a, b) => {
+          if (a.is_favorite !== b.is_favorite) return a.is_favorite ? -1 : 1;
+          return a.title.localeCompare(b.title);
+        });
+      }),
+      error: () => this.toast.show('Failed to update favorite.', 'error'),
+    });
+  }
+
   inputValue(event: Event): string {
     return (event.target as HTMLInputElement).value;
   }
