@@ -1,3 +1,4 @@
+import pyotp
 from django.conf import settings
 from django.contrib.auth import authenticate
 from drf_spectacular.utils import extend_schema
@@ -15,6 +16,7 @@ from ..serializers import (
     LoginResponseSerializer,
     LoginSerializer,
     MeSerializer,
+    TwoFactorRequiredSerializer,
 )
 from ._helpers import AuthRateThrottle, clear_refresh_cookie, issue_tokens_for, set_refresh_cookie
 
@@ -23,6 +25,7 @@ from ._helpers import AuthRateThrottle, clear_refresh_cookie, issue_tokens_for, 
     request=LoginSerializer,
     responses={
         200: LoginResponseSerializer,
+        206: TwoFactorRequiredSerializer,
         400: DetailSerializer,
         401: DetailSerializer,
         403: LoginErrorSerializer,
@@ -52,6 +55,20 @@ def login_view(request):
             {"detail": "Please verify your email address before logging in.", "code": "email_not_verified"},
             status=status.HTTP_403_FORBIDDEN,
         )
+
+    if user.totp_enabled:
+        totp_code = request.data.get("totp_code")
+        if not totp_code:
+            return Response(
+                {"requires_2fa": True, "detail": "2FA code required."},
+                status=status.HTTP_206_PARTIAL_CONTENT,
+            )
+        totp = pyotp.TOTP(user.totp_secret)
+        if not totp.verify(totp_code):
+            return Response(
+                {"detail": "Invalid 2FA code."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
     refresh, access = issue_tokens_for(user)
     response = Response({
@@ -124,4 +141,5 @@ def me(request):
         "first_name": user.first_name,
         "last_name": user.last_name,
         "is_staff": user.is_staff,
+        "totp_enabled": user.totp_enabled,
     })

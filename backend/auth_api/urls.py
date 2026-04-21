@@ -16,4 +16,7 @@ urlpatterns = [
     path("sessions/", views.session_list, name="session_list"),
     path("sessions/<int:pk>/", views.session_revoke, name="session_revoke"),
     path("sessions/revoke-all/", views.session_revoke_all, name="session_revoke_all"),
+    path("2fa/setup/", views.totp_setup, name="totp_setup"),
+    path("2fa/confirm/", views.totp_confirm, name="totp_confirm"),
+    path("2fa/disable/", views.totp_disable, name="totp_disable"),
 ]
