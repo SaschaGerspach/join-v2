@@ -2,14 +2,14 @@
   <div class="modal-card" (click)="$event.stopPropagation()">
 
     <div class="modal-header">
-      <h2 id="create-task-title">New Task</h2>
+      <h2 id="create-task-title">{{ 'TASK.NEW_TASK' | translate }}</h2>
       <button class="btn-close" aria-label="Close" (click)="cancelled.emit()">&#10005;</button>
     </div>
 
     <div class="modal-body">
 
       <div class="field-group">
-        <label class="field-label" for="create-task-title-input">Title *</label>
+        <label class="field-label" for="create-task-title-input">{{ 'TASK.TITLE' | translate }} *</label>
         <input
           id="create-task-title-input"
           #titleInput
@@ -21,12 +21,12 @@
           (keyup.enter)="submit()"
         />
         @if (submitted && !title.trim()) {
-          <span class="error-text">Title is required.</span>
+          <span class="error-text">{{ 'TASK.TITLE_REQUIRED' | translate }}</span>
         }
       </div>
 
       <div class="field-group">
-        <label class="field-label">Description</label>
+        <label class="field-label">{{ 'TASK.DESCRIPTION' | translate }}</label>
         <textarea
           class="field-textarea"
           rows="2"
@@ -37,7 +37,7 @@
 
       <div class="field-row">
         <div class="field-group">
-          <label class="field-label">Priority</label>
+          <label class="field-label">{{ 'TASK.PRIORITY' | translate }}</label>
           <div class="priority-options">
             @for (p of priorities; track p) {
               <button
@@ -53,7 +53,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label">Due date</label>
+          <label class="field-label">{{ 'TASK.DUE_DATE' | translate }}</label>
           <input
             class="field-input"
             type="date"
@@ -64,7 +64,7 @@
 
       <div class="field-row">
         <div class="field-group">
-          <label class="field-label">Column</label>
+          <label class="field-label">{{ 'TASK.COLUMN' | translate }}</label>
           <select class="field-select" [(ngModel)]="selectedColumnId">
             @for (col of columns(); track col.id) {
               <option [ngValue]="col.id">{{ col.title }}</option>
@@ -73,7 +73,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label">Assign to</label>
+          <label class="field-label">{{ 'TASK.ASSIGN_TO' | translate }}</label>
           <div class="assignee-checklist">
             @for (c of contacts(); track c.id) {
               <label class="assignee-check-item">
@@ -82,7 +82,7 @@
               </label>
             }
             @if (contacts().length === 0) {
-              <span class="no-contacts">No contacts available</span>
+              <span class="no-contacts">{{ 'TASK.NO_CONTACTS' | translate }}</span>
             }
           </div>
         </div>
@@ -91,8 +91,8 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="cancelled.emit()">Cancel</button>
-      <button class="btn-save" (click)="submit()">Create Task</button>
+      <button class="btn-cancel" (click)="cancelled.emit()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button class="btn-save" (click)="submit()">{{ 'TASK.CREATE_TASK' | translate }}</button>
     </div>
 
   </div>

@@ -6,6 +6,7 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AVATAR_COLORS } from '../../../../shared/constants/colors';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 type ContactForm = {
   first_name: string;
@@ -17,7 +18,7 @@ type ContactForm = {
 @Component({
   selector: 'app-contacts-page',
   standalone: true,
-  imports: [FormsModule, LoadingSpinnerComponent, ConfirmDialogComponent],
+  imports: [FormsModule, LoadingSpinnerComponent, ConfirmDialogComponent, TranslateModule],
   templateUrl: './contacts-page.component.html',
   styleUrl: './contacts-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

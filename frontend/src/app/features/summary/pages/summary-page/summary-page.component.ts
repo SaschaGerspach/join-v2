@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, compute
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterModule } from '@angular/router';
 import { SlicePipe } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
@@ -11,7 +12,7 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-summary-page',
   standalone: true,
-  imports: [SlicePipe, RouterModule, LoadingSpinnerComponent],
+  imports: [SlicePipe, RouterModule, LoadingSpinnerComponent, TranslateModule],
   templateUrl: './summary-page.component.html',
   styleUrl: './summary-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

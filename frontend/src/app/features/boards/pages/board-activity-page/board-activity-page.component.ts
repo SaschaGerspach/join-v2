@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { ActivityApiService, ActivityEntry } from '../../../../core/activity/activity-api.service';
 
 @Component({
   selector: 'app-board-activity-page',
   standalone: true,
-  imports: [RouterModule, DatePipe],
+  imports: [RouterModule, DatePipe, TranslateModule],
   templateUrl: './board-activity-page.component.html',
   styleUrl: './board-activity-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

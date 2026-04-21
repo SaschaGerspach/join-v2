@@ -16,7 +16,7 @@
     <div class="modal-body">
 
       <div class="field-group">
-        <label class="field-label">Description</label>
+        <label class="field-label">{{ 'TASK.DESCRIPTION' | translate }}</label>
         <textarea
           class="field-textarea"
           rows="3"
@@ -28,7 +28,7 @@
 
       <div class="field-row">
         <div class="field-group">
-          <label class="field-label">Priority</label>
+          <label class="field-label">{{ 'TASK.PRIORITY' | translate }}</label>
           <div class="priority-options">
             @for (p of priorities; track p) {
               <button
@@ -43,7 +43,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label">Due date</label>
+          <label class="field-label">{{ 'TASK.DUE_DATE' | translate }}</label>
           <input
             class="field-input"
             type="date"
@@ -53,7 +53,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label">Repeat</label>
+          <label class="field-label">{{ 'TASK.REPEAT' | translate }}</label>
           <select
             class="field-select"
             [ngModel]="recurrence()"
@@ -68,7 +68,7 @@
 
       <div class="field-row">
         <div class="field-group">
-          <label class="field-label">Column</label>
+          <label class="field-label">{{ 'TASK.COLUMN' | translate }}</label>
           <select
             class="field-select"
             [ngModel]="columnId()"
@@ -81,7 +81,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label">Assigned to</label>
+          <label class="field-label">{{ 'TASK.ASSIGNED_TO' | translate }}</label>
           <div class="assignee-checklist">
             @for (contact of contacts(); track contact.id) {
               <label class="assignee-check-item">
@@ -90,7 +90,7 @@
               </label>
             }
             @if (contacts().length === 0) {
-              <span class="no-contacts">No contacts available</span>
+              <span class="no-contacts">{{ 'TASK.NO_CONTACTS' | translate }}</span>
             }
           </div>
         </div>
@@ -121,11 +121,11 @@
     <app-task-comments [taskId]="task().id" [contacts]="contacts()" />
 
     <div class="modal-footer">
-      <button class="btn-danger" (click)="deleteTask()">Delete</button>
-      <button class="btn-duplicate" (click)="duplicateTask()">Duplicate</button>
+      <button class="btn-danger" (click)="deleteTask()">{{ 'COMMON.DELETE' | translate }}</button>
+      <button class="btn-duplicate" (click)="duplicateTask()">{{ 'TASK.DUPLICATE' | translate }}</button>
       <div class="footer-right">
-        <button class="btn-cancel" (click)="close()">Cancel</button>
-        <button class="btn-save" (click)="save()">Save</button>
+        <button class="btn-cancel" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn-save" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
       </div>
     </div>
 

@@ -5,11 +5,12 @@ import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { TaskDetailModalComponent } from '../../../boards/components/task-detail-modal/task-detail-modal.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-calendar-page',
   standalone: true,
-  imports: [TaskDetailModalComponent],
+  imports: [TaskDetailModalComponent, TranslateModule],
   templateUrl: './calendar-page.component.html',
   styleUrl: './calendar-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

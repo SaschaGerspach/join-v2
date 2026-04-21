@@ -1,4 +1,4 @@
-<a class="skip-link" href="#main-content">Skip to content</a>
+<a class="skip-link" href="#main-content">{{ 'NAV.SKIP_TO_CONTENT' | translate }}</a>
 
 <div class="app-layout">
 
@@ -6,36 +6,36 @@
     <div class="sidebar-overlay" (click)="closeSidebar()"></div>
   }
 
-  <aside class="sidebar" [class.open]="sidebarOpen()" [attr.aria-hidden]="!sidebarOpen() ? null : null">
+  <aside class="sidebar" [class.open]="sidebarOpen()">
     <div class="sidebar-logo">
       <span class="logo-text">Join</span>
     </div>
 
-    <nav class="sidebar-nav" aria-label="Main navigation">
+    <nav class="sidebar-nav" [attr.aria-label]="'NAV.MAIN_NAV' | translate">
       <a routerLink="/summary" routerLinkActive="active" (click)="closeSidebar()">
         <span class="nav-icon" aria-hidden="true">&#9632;</span>
-        Summary
+        {{ 'NAV.SUMMARY' | translate }}
       </a>
       <a routerLink="/boards" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" (click)="closeSidebar()">
         <span class="nav-icon" aria-hidden="true">&#9776;</span>
-        Boards
+        {{ 'NAV.BOARDS' | translate }}
       </a>
       <a routerLink="/teams" routerLinkActive="active" (click)="closeSidebar()">
         <span class="nav-icon" aria-hidden="true">&#128101;</span>
-        Teams
+        {{ 'NAV.TEAMS' | translate }}
       </a>
       <a routerLink="/contacts" routerLinkActive="active" (click)="closeSidebar()">
         <span class="nav-icon" aria-hidden="true">&#128100;</span>
-        Contacts
+        {{ 'NAV.CONTACTS' | translate }}
       </a>
       <a routerLink="/calendar" routerLinkActive="active" (click)="closeSidebar()">
         <span class="nav-icon" aria-hidden="true">&#128197;</span>
-        Calendar
+        {{ 'NAV.CALENDAR' | translate }}
       </a>
       @if (auth.user()?.is_staff) {
         <a routerLink="/admin" routerLinkActive="active" (click)="closeSidebar()">
           <span class="nav-icon" aria-hidden="true">&#9881;</span>
-          Admin
+          {{ 'NAV.ADMIN' | translate }}
         </a>
       }
     </nav>
@@ -49,16 +49,20 @@
   <div class="main-wrapper">
     <header class="topbar">
       <div class="topbar-left">
-        <button class="btn-hamburger" aria-label="Open menu" (click)="toggleSidebar()">&#9776;</button>
-        <span class="topbar-title">Kanban Project Management Tool</span>
+        <button class="btn-hamburger" [attr.aria-label]="'TOPBAR.OPEN_MENU' | translate" (click)="toggleSidebar()">&#9776;</button>
+        <span class="topbar-title">{{ 'TOPBAR.TITLE' | translate }}</span>
       </div>
       <div class="topbar-user">
         <app-global-search />
-        <button class="btn-theme-toggle" [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'" (click)="theme.toggle()" [title]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
+        <button class="btn-theme-toggle" [attr.aria-label]="(theme.isDark() ? 'TOPBAR.LIGHT_MODE' : 'TOPBAR.DARK_MODE') | translate" (click)="theme.toggle()" [title]="(theme.isDark() ? 'TOPBAR.LIGHT_MODE' : 'TOPBAR.DARK_MODE') | translate">
           {{ theme.isDark() ? '☀' : '☾' }}
         </button>
+        <select class="lang-select" [attr.aria-label]="'Language'" [ngModel]="lang.currentLang()" (ngModelChange)="lang.setLanguage($event)">
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+        </select>
         <div class="notification-wrapper">
-          <button class="btn-notification" aria-label="Notifications" [attr.aria-expanded]="notificationsOpen()" (click)="toggleNotifications()">
+          <button class="btn-notification" [attr.aria-label]="'TOPBAR.NOTIFICATIONS' | translate" [attr.aria-expanded]="notificationsOpen()" (click)="toggleNotifications()">
             &#128276;
             @if (notificationService.unreadCount() > 0) {
               <span class="notification-badge">{{ notificationService.unreadCount() }}</span>
@@ -67,9 +71,9 @@
           @if (notificationsOpen()) {
             <div class="notification-panel">
               <div class="notification-panel-header">
-                <span>Notifications</span>
+                <span>{{ 'TOPBAR.NOTIFICATIONS' | translate }}</span>
                 @if (notificationService.unreadCount() > 0) {
-                  <button class="btn-mark-all" (click)="notificationService.markAllAsRead()">Mark all read</button>
+                  <button class="btn-mark-all" (click)="notificationService.markAllAsRead()">{{ 'TOPBAR.MARK_ALL_READ' | translate }}</button>
                 }
               </div>
               <div class="notification-panel-list">
@@ -82,19 +86,19 @@
                     </div>
                   </div>
                 } @empty {
-                  <p class="notification-empty">No notifications</p>
+                  <p class="notification-empty">{{ 'TOPBAR.NO_NOTIFICATIONS' | translate }}</p>
                 }
               </div>
             </div>
           }
         </div>
-        <div class="user-badge" role="button" tabindex="0" aria-label="User menu" [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()" (keydown.enter)="toggleMenu()" (keydown.space)="toggleMenu(); $event.preventDefault()">
+        <div class="user-badge" role="button" tabindex="0" [attr.aria-label]="'TOPBAR.USER_MENU' | translate" [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()" (keydown.enter)="toggleMenu()" (keydown.space)="toggleMenu(); $event.preventDefault()">
           <app-user-avatar [firstName]="auth.user()?.first_name ?? ''" [lastName]="auth.user()?.last_name ?? ''" [avatarUrl]="auth.user()?.avatar_url ?? null" [size]="42" />
         </div>
         @if (menuOpen()) {
           <div class="user-menu">
-            <a routerLink="/profile">My Profile</a>
-            <button type="button" (click)="logout()">Log out</button>
+            <a routerLink="/profile">{{ 'TOPBAR.MY_PROFILE' | translate }}</a>
+            <button type="button" (click)="logout()">{{ 'TOPBAR.LOGOUT' | translate }}</button>
           </div>
         }
       </div>
@@ -105,31 +109,31 @@
     </main>
   </div>
 
-  <footer class="mobile-footer" aria-label="Mobile navigation">
+  <footer class="mobile-footer" [attr.aria-label]="'NAV.MOBILE_NAV' | translate">
     <a routerLink="/summary" routerLinkActive="active">
       <span aria-hidden="true">&#9632;</span>
-      <span>Summary</span>
+      <span>{{ 'NAV.SUMMARY' | translate }}</span>
     </a>
     <a routerLink="/boards" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">
       <span aria-hidden="true">&#9776;</span>
-      <span>Boards</span>
+      <span>{{ 'NAV.BOARDS' | translate }}</span>
     </a>
     <a routerLink="/teams" routerLinkActive="active">
       <span aria-hidden="true">&#128101;</span>
-      <span>Teams</span>
+      <span>{{ 'NAV.TEAMS' | translate }}</span>
     </a>
     <a routerLink="/contacts" routerLinkActive="active">
       <span aria-hidden="true">&#128100;</span>
-      <span>Contacts</span>
+      <span>{{ 'NAV.CONTACTS' | translate }}</span>
     </a>
     <a routerLink="/calendar" routerLinkActive="active">
       <span aria-hidden="true">&#128197;</span>
-      <span>Calendar</span>
+      <span>{{ 'NAV.CALENDAR' | translate }}</span>
     </a>
     @if (auth.user()?.is_staff) {
       <a routerLink="/admin" routerLinkActive="active">
         <span aria-hidden="true">&#9881;</span>
-        <span>Admin</span>
+        <span>{{ 'NAV.ADMIN' | translate }}</span>
       </a>
     }
   </footer>

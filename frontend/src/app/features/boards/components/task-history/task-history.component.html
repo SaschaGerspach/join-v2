@@ -1,6 +1,6 @@
 <div class="field-group">
   <button class="history-toggle" [attr.aria-expanded]="expanded()" (click)="expanded.set(!expanded())">
-    <span class="field-label">History</span>
+    <span class="field-label">{{ 'TASK.HISTORY' | translate }}</span>
     <span class="toggle-icon" aria-hidden="true">{{ expanded() ? '▾' : '▸' }}</span>
     @if (entries().length > 0) {
       <span class="history-count">{{ entries().length }}</span>
@@ -20,7 +20,7 @@
         </div>
       }
       @if (entries().length === 0) {
-        <span class="history-empty">No history yet.</span>
+        <span class="history-empty">{{ 'TASK.NO_HISTORY' | translate }}</span>
       }
     </div>
   }

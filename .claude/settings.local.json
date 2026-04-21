@@ -171,7 +171,8 @@
       "Bash(DJANGO_SECRET_KEY=dev DJANGO_DEBUG=true python manage.py test tasks_api.tests.RecurringTaskTests)",
       "Bash(DJANGO_SECRET_KEY=test DJANGO_DEBUG=true python manage.py makemigrations tasks_api --name=add_task_dependency)",
       "Bash(DJANGO_SECRET_KEY=test DJANGO_DEBUG=true python *)",
-      "Bash(grep -E \"\\\\.py$|^d\")"
+      "Bash(grep -E \"\\\\.py$|^d\")",
+      "Bash(node *)"
     ]
   }
 }

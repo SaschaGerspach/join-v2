@@ -1,6 +1,6 @@
 @if (fields().length) {
   <div class="custom-fields-section">
-    <label class="field-label">Custom Fields</label>
+    <label class="field-label">{{ 'TASK.CUSTOM_FIELDS' | translate }}</label>
     @for (f of fields(); track f.id) {
       <div class="custom-field-row">
         <span class="custom-field-name">{{ f.name }}</span>
@@ -25,6 +25,6 @@
         }
       </div>
     }
-    <button class="btn-save-fields" (click)="save()">Save Fields</button>
+    <button class="btn-save-fields" (click)="save()">{{ 'TASK.SAVE_FIELDS' | translate }}</button>
   </div>
 }

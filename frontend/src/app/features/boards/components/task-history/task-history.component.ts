@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { HistoryEntry, TasksApiService } from '../../../../core/tasks/tasks-api.service';
 
 @Component({
   selector: 'app-task-history',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, TranslateModule],
   templateUrl: './task-history.component.html',
   styleUrl: './task-history.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,56 +1,56 @@
 <div class="stats-page">
   <div class="stats-header">
-    <a [routerLink]="['/boards', boardId]" class="back-link">&larr; Back to board</a>
-    <h1>{{ boardTitle() }} — Statistics</h1>
+    <a [routerLink]="['/boards', boardId]" class="back-link">&larr; {{ 'STATS.BACK' | translate }}</a>
+    <h1>{{ boardTitle() }} — {{ 'STATS.TITLE' | translate }}</h1>
   </div>
 
   @if (loading()) {
-    <p class="loading-hint">Loading…</p>
+    <p class="loading-hint">{{ 'COMMON.LOADING' | translate }}</p>
   } @else {
     <div class="stats-summary">
       <div class="stat-card">
         <span class="stat-value">{{ totalTasks() }}</span>
-        <span class="stat-label">Total Tasks</span>
+        <span class="stat-label">{{ 'STATS.TOTAL_TASKS' | translate }}</span>
       </div>
       <div class="stat-card done">
         <span class="stat-value">{{ doneTasks() }}</span>
-        <span class="stat-label">Done</span>
+        <span class="stat-label">{{ 'STATS.DONE' | translate }}</span>
       </div>
       <div class="stat-card overdue">
         <span class="stat-value">{{ overdueTasks() }}</span>
-        <span class="stat-label">Overdue</span>
+        <span class="stat-label">{{ 'STATS.OVERDUE' | translate }}</span>
       </div>
       <div class="stat-card">
         <span class="stat-value">{{ avgSubtaskCompletion() }}%</span>
-        <span class="stat-label">Subtask Completion</span>
+        <span class="stat-label">{{ 'STATS.SUBTASK_COMPLETION' | translate }}</span>
       </div>
     </div>
 
     <div class="charts-grid">
       <div class="chart-card">
-        <h3>Tasks per Column</h3>
+        <h3>{{ 'STATS.TASKS_PER_COLUMN' | translate }}</h3>
         <canvas baseChart [data]="columnChartData()" type="bar" [options]="barOptions"></canvas>
       </div>
       <div class="chart-card">
-        <h3>Tasks by Priority</h3>
+        <h3>{{ 'STATS.TASKS_BY_PRIORITY' | translate }}</h3>
         <canvas baseChart [data]="priorityChartData()" type="doughnut" [options]="doughnutOptions"></canvas>
       </div>
     </div>
 
     <div class="charts-grid">
       <div class="chart-card">
-        <h3>Tasks Created Over Time</h3>
+        <h3>{{ 'STATS.TASKS_CREATED' | translate }}</h3>
         <canvas baseChart [data]="creationChartData()" type="line" [options]="lineOptions"></canvas>
       </div>
       <div class="chart-card">
-        <h3>Activity Over Time</h3>
+        <h3>{{ 'STATS.ACTIVITY_TIME' | translate }}</h3>
         <canvas baseChart [data]="activityChartData()" type="bar" [options]="barOptions"></canvas>
       </div>
     </div>
 
     <div class="charts-grid single">
       <div class="chart-card">
-        <h3>Workload by Assignee</h3>
+        <h3>{{ 'STATS.WORKLOAD' | translate }}</h3>
         <canvas baseChart [data]="assigneeChartData()" type="bar" [options]="horizontalBarOptions"></canvas>
       </div>
     </div>

@@ -6,11 +6,12 @@ import { BoardsApiService, Board, BoardMember, BoardMemberRole } from '../../../
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-boards-page',
   standalone: true,
-  imports: [FormsModule, LoadingSpinnerComponent, ConfirmDialogComponent],
+  imports: [FormsModule, LoadingSpinnerComponent, ConfirmDialogComponent, TranslateModule],
   templateUrl: './boards-page.component.html',
   styleUrl: './boards-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

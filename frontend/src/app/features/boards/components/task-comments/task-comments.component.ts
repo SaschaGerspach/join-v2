@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, ViewChild, inject, input, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { SlicePipe } from '@angular/common';
 import { Comment, CommentsApiService } from '../../../../core/tasks/comments-api.service';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -13,7 +14,7 @@ import { UserAvatarComponent } from '../../../../shared/components/user-avatar/u
 @Component({
   selector: 'app-task-comments',
   standalone: true,
-  imports: [FormsModule, SlicePipe, MarkdownPipe, ConfirmDialogComponent, UserAvatarComponent],
+  imports: [FormsModule, TranslateModule, SlicePipe, MarkdownPipe, ConfirmDialogComponent, UserAvatarComponent],
   templateUrl: './task-comments.component.html',
   styleUrl: './task-comments.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

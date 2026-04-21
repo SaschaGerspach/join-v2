@@ -4,7 +4,7 @@
   </div>
 
   <div class="auth-card">
-    <h1>Sign up</h1>
+    <h1>{{ 'AUTH.SIGNUP' | translate }}</h1>
     <div class="auth-divider"></div>
 
     <form #f="ngForm" (ngSubmit)="register(f)">
@@ -16,14 +16,14 @@
           type="text"
           [(ngModel)]="firstName"
           name="firstName"
-          placeholder="First name"
+          [placeholder]="'AUTH.FIRST_NAME' | translate"
           required
           autocomplete="given-name"
           #firstNameField="ngModel"
           [class.input-error]="firstNameField.invalid && (firstNameField.touched || f.submitted)"
         />
         @if (firstNameField.invalid && (firstNameField.touched || f.submitted)) {
-          <span class="field-error">First name is required.</span>
+          <span class="field-error">{{ 'AUTH.FIRST_NAME_REQUIRED' | translate }}</span>
         }
       </div>
 
@@ -35,14 +35,14 @@
           type="text"
           [(ngModel)]="lastName"
           name="lastName"
-          placeholder="Last name"
+          [placeholder]="'AUTH.LAST_NAME' | translate"
           required
           autocomplete="family-name"
           #lastNameField="ngModel"
           [class.input-error]="lastNameField.invalid && (lastNameField.touched || f.submitted)"
         />
         @if (lastNameField.invalid && (lastNameField.touched || f.submitted)) {
-          <span class="field-error">Last name is required.</span>
+          <span class="field-error">{{ 'AUTH.LAST_NAME_REQUIRED' | translate }}</span>
         }
       </div>
 
@@ -54,7 +54,7 @@
           type="email"
           [(ngModel)]="email"
           name="email"
-          placeholder="Email"
+          [placeholder]="'AUTH.EMAIL' | translate"
           required
           email
           autocomplete="email"
@@ -63,8 +63,8 @@
         />
         @if (emailField.invalid && (emailField.touched || f.submitted)) {
           <span class="field-error">
-            @if (emailField.errors?.['required']) { Email is required. }
-            @else { Enter a valid email address. }
+            @if (emailField.errors?.['required']) { {{ 'AUTH.EMAIL_REQUIRED' | translate }} }
+            @else { {{ 'AUTH.EMAIL_INVALID' | translate }} }
           </span>
         }
       </div>
@@ -79,7 +79,7 @@
             [ngModel]="password"
             (ngModelChange)="onPasswordChange($event)"
             name="password"
-            placeholder="Password (min. 8 characters)"
+            [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate"
             required
             minlength="8"
             autocomplete="new-password"
@@ -102,8 +102,8 @@
         }
         @if (passwordField.invalid && (passwordField.touched || f.submitted)) {
           <span class="field-error">
-            @if (passwordField.errors?.['required']) { Password is required. }
-            @else { Password must be at least 8 characters. }
+            @if (passwordField.errors?.['required']) { {{ 'AUTH.PASSWORD_REQUIRED' | translate }} }
+            @else { {{ 'AUTH.PASSWORD_MIN' | translate }} }
           </span>
         }
       </div>
@@ -113,9 +113,9 @@
       }
 
       <div class="auth-actions">
-        <a routerLink="/login" class="btn-secondary">Back to login</a>
+        <a routerLink="/login" class="btn-secondary">{{ 'AUTH.BACK_TO_LOGIN' | translate }}</a>
         <button type="submit" class="btn-primary" [disabled]="submitting()">
-          {{ submitting() ? 'Signing up…' : 'Sign up' }}
+          {{ submitting() ? ('AUTH.SIGNING_UP' | translate) : ('AUTH.SIGNUP' | translate) }}
         </button>
       </div>
     </form>

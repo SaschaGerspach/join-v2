@@ -5,11 +5,12 @@ import { TeamsApiService, Team, TeamMember } from '../../../../core/teams/teams-
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-teams-page',
   standalone: true,
-  imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent],
+  imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent, TranslateModule],
   templateUrl: './teams-page.component.html',
   styleUrl: './teams-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

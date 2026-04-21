@@ -1,5 +1,5 @@
 <div class="field-group">
-  <label class="field-label">Subtasks</label>
+  <label class="field-label">{{ 'TASK.SUBTASKS' | translate }}</label>
   <div class="subtask-list">
     @for (sub of subtasks(); track sub.id) {
       <div class="subtask-item">
@@ -32,7 +32,7 @@
       type="text"
       [ngModel]="newSubtaskTitle()"
       (ngModelChange)="newSubtaskTitle.set($event)"
-      placeholder="Add subtask..."
+      [placeholder]="'TASK.ADD_SUBTASK' | translate"
       (keyup.enter)="addSubtask()"
     />
     <button class="btn-add-sub" aria-label="Add subtask" (click)="addSubtask()">+</button>

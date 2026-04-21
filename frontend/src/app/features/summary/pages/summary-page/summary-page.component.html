@@ -10,11 +10,11 @@
 
   <div class="stats-grid">
 
-    <div class="stat-card accent" role="button" tabindex="0" aria-label="Go to boards" (click)="goToBoards()" (keydown.enter)="goToBoards()">
+    <div class="stat-card accent" role="button" tabindex="0" [attr.aria-label]="'SUMMARY.GO_TO_BOARDS' | translate" (click)="goToBoards()" (keydown.enter)="goToBoards()">
       <div class="stat-icon">&#9776;</div>
       <div class="stat-body">
         <span class="stat-number">{{ boards().length }}</span>
-        <span class="stat-label">Boards</span>
+        <span class="stat-label">{{ 'SUMMARY.BOARDS' | translate }}</span>
       </div>
     </div>
 
@@ -22,7 +22,7 @@
       <div class="stat-icon">&#9776;</div>
       <div class="stat-body">
         <span class="stat-number">{{ totalTasks() }}</span>
-        <span class="stat-label">Tasks in total</span>
+        <span class="stat-label">{{ 'SUMMARY.TASKS_TOTAL' | translate }}</span>
       </div>
     </div>
 
@@ -30,7 +30,7 @@
       <div class="stat-icon">&#9888;</div>
       <div class="stat-body">
         <span class="stat-number">{{ urgentTasks() }}</span>
-        <span class="stat-label">Urgent</span>
+        <span class="stat-label">{{ 'SUMMARY.URGENT' | translate }}</span>
       </div>
     </div>
 
@@ -38,7 +38,7 @@
       <div class="stat-icon">&#8679;</div>
       <div class="stat-body">
         <span class="stat-number">{{ highTasks() }}</span>
-        <span class="stat-label">High priority</span>
+        <span class="stat-label">{{ 'SUMMARY.HIGH_PRIORITY' | translate }}</span>
       </div>
     </div>
 
@@ -47,7 +47,7 @@
         <div class="stat-icon">&#9888;</div>
         <div class="stat-body">
           <span class="stat-number">{{ overdueTasks() }}</span>
-          <span class="stat-label">Overdue</span>
+          <span class="stat-label">{{ 'SUMMARY.OVERDUE' | translate }}</span>
         </div>
       </div>
     }
@@ -57,7 +57,7 @@
         <div class="stat-icon">&#128197;</div>
         <div class="stat-body">
           <span class="stat-number deadline-date">{{ nextDeadline() | slice:0:10 }}</span>
-          <span class="stat-label">Next deadline</span>
+          <span class="stat-label">{{ 'SUMMARY.NEXT_DEADLINE' | translate }}</span>
         </div>
       </div>
     }
@@ -66,7 +66,7 @@
 
   @if (favoriteBoards().length > 0) {
     <div class="favorites-section">
-      <h2 class="section-title">Favorite Boards</h2>
+      <h2 class="section-title">{{ 'SUMMARY.FAVORITE_BOARDS' | translate }}</h2>
       <div class="favorites-grid">
         @for (board of favoriteBoards(); track board.id) {
           <a class="favorite-card" [routerLink]="['/boards', board.id]" [style.borderLeftColor]="board.color || '#4f46e5'">

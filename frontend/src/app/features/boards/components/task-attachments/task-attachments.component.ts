@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslateModule } from '@ngx-translate/core';
 import { Attachment, AttachmentsApiService } from '../../../../core/tasks/attachments-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -7,7 +8,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 @Component({
   selector: 'app-task-attachments',
   standalone: true,
-  imports: [ConfirmDialogComponent],
+  imports: [TranslateModule, ConfirmDialogComponent],
   templateUrl: './task-attachments.component.html',
   styleUrl: './task-attachments.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

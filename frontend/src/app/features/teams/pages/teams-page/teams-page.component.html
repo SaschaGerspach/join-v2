@@ -1,14 +1,14 @@
 <div class="teams-page">
   <div class="page-header">
-    <h1 class="page-title">Teams</h1>
-    <button class="btn-create" (click)="showCreateForm.set(true)">+ New Team</button>
+    <h1 class="page-title">{{ 'TEAMS.TITLE' | translate }}</h1>
+    <button class="btn-create" (click)="showCreateForm.set(true)">{{ 'TEAMS.NEW_TEAM' | translate }}</button>
   </div>
 
   @if (showCreateForm()) {
     <div class="create-form">
-      <input class="form-input" type="text" aria-label="Team name" [(ngModel)]="newTeamName" placeholder="Team name" (keyup.enter)="createTeam()" />
-      <button class="btn-confirm" (click)="createTeam()">Create</button>
-      <button class="btn-cancel" (click)="showCreateForm.set(false)">Cancel</button>
+      <input class="form-input" type="text" aria-label="Team name" [(ngModel)]="newTeamName" [placeholder]="'TEAMS.TEAM_NAME' | translate" (keyup.enter)="createTeam()" />
+      <button class="btn-confirm" (click)="createTeam()">{{ 'COMMON.CREATE' | translate }}</button>
+      <button class="btn-cancel" (click)="showCreateForm.set(false)">{{ 'COMMON.CANCEL' | translate }}</button>
     </div>
   }
 
@@ -21,7 +21,7 @@
           <div class="team-header" role="button" tabindex="0" [attr.aria-expanded]="expandedTeamId() === team.id" (click)="toggleExpand(team.id)" (keydown.enter)="toggleExpand(team.id)">
             <div class="team-info">
               <span class="team-name">{{ team.name }}</span>
-              <span class="team-meta">{{ team.member_count }} member{{ team.member_count !== 1 ? 's' : '' }}</span>
+              <span class="team-meta">{{ team.member_count }} {{ team.member_count !== 1 ? ('TEAMS.MEMBERS_PLURAL' | translate) : ('TEAMS.MEMBERS' | translate) }}</span>
             </div>
             <div class="team-actions">
               @if (team.is_owner) {
@@ -41,7 +41,7 @@
                       <span class="member-email">{{ member.email }}</span>
                     </div>
                     @if (member.role === 'owner') {
-                      <span class="role-badge owner">Owner</span>
+                      <span class="role-badge owner">{{ 'TEAMS.OWNER' | translate }}</span>
                     } @else if (team.is_owner) {
                       <select class="role-select" [ngModel]="member.role" (ngModelChange)="changeRole(member.user_id, $event)">
                         <option value="admin">Admin</option>
@@ -57,8 +57,8 @@
 
               @if (team.is_owner) {
                 <div class="invite-row">
-                  <input class="form-input" type="email" aria-label="Invite by email" [(ngModel)]="inviteEmail" placeholder="Invite by email" (keyup.enter)="inviteMember()" />
-                  <button class="btn-confirm" (click)="inviteMember()">Invite</button>
+                  <input class="form-input" type="email" aria-label="Invite by email" [(ngModel)]="inviteEmail" [placeholder]="'TEAMS.INVITE_EMAIL' | translate" (keyup.enter)="inviteMember()" />
+                  <button class="btn-confirm" (click)="inviteMember()">{{ 'BOARDS.INVITE' | translate }}</button>
                 </div>
               }
             </div>
@@ -67,7 +67,7 @@
       }
 
       @if (teams().length === 0) {
-        <p class="empty-state">No teams yet. Create one to get started.</p>
+        <p class="empty-state">{{ 'TEAMS.NO_TEAMS' | translate }}</p>
       }
     </div>
   }

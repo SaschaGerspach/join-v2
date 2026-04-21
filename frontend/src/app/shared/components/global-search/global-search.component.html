@@ -2,8 +2,8 @@
   <input
     class="search-input"
     type="text"
-    placeholder="Search tasks…"
-    aria-label="Search tasks across all boards"
+    [placeholder]="'SEARCH.PLACEHOLDER' | translate"
+    [attr.aria-label]="'SEARCH.LABEL' | translate"
     [ngModel]="query()"
     (ngModelChange)="onInput($event)"
     (focus)="open.set(true)"
@@ -11,9 +11,9 @@
   @if (open() && (results().length > 0 || loading() || query().length >= 2)) {
     <div class="search-dropdown" role="listbox" aria-label="Search results">
       @if (loading()) {
-        <div class="search-loading">Searching…</div>
+        <div class="search-loading">{{ 'SEARCH.SEARCHING' | translate }}</div>
       } @else if (results().length === 0 && query().length >= 2) {
-        <div class="search-empty">No tasks found.</div>
+        <div class="search-empty">{{ 'SEARCH.NO_RESULTS' | translate }}</div>
       } @else {
         @for (result of results(); track result.id) {
           <button class="search-result" (mousedown)="openResult(result)">

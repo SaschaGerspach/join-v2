@@ -1,19 +1,22 @@
 import { ChangeDetectionStrategy, Component, ElementRef, inject, signal, computed, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
 import { ThemeService } from '../../shared/services/theme.service';
+import { LanguageService } from '../../shared/services/language.service';
 import { NotificationService } from '../../core/notifications/notification.service';
 import { KeyboardShortcutsModalComponent } from '../../shared/components/keyboard-shortcuts-modal/keyboard-shortcuts-modal.component';
 import { GlobalSearchComponent } from '../../shared/components/global-search/global-search.component';
 import { OfflineBannerComponent } from '../../shared/components/offline-banner/offline-banner.component';
 import { UserAvatarComponent } from '../../shared/components/user-avatar/user-avatar.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterModule, DatePipe, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent, OfflineBannerComponent, UserAvatarComponent],
+  imports: [RouterModule, DatePipe, FormsModule, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent, OfflineBannerComponent, UserAvatarComponent, TranslateModule],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +24,7 @@ import { UserAvatarComponent } from '../../shared/components/user-avatar/user-av
 export class ShellComponent implements OnInit, OnDestroy {
   readonly auth = inject(AuthService);
   readonly theme = inject(ThemeService);
+  readonly lang = inject(LanguageService);
   readonly notificationService = inject(NotificationService);
   private readonly router = inject(Router);
   private readonly elementRef = inject(ElementRef);
@@ -55,6 +59,7 @@ export class ShellComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
+    this.lang.init();
     this.notificationService.connect();
   }
 

@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { TimeEntry, TasksApiService } from '../../../../core/tasks/tasks-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-time-tracking',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslateModule],
   templateUrl: './task-time-tracking.component.html',
   styleUrl: './task-time-tracking.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

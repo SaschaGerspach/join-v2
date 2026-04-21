@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, AfterViewInit, DestroyRef, ElementRef, HostListener, inject, input, output, signal, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { Task, TasksApiService, UpdateTaskPayload, Recurrence } from '../../../../core/tasks/tasks-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
@@ -18,7 +19,7 @@ import { TaskHistoryComponent } from '../task-history/task-history.component';
 @Component({
   selector: 'app-task-detail-modal',
   standalone: true,
-  imports: [FormsModule, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent, TaskDependenciesComponent, TaskCustomFieldsComponent, TaskTimeTrackingComponent, TaskHistoryComponent],
+  imports: [FormsModule, TranslateModule, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent, TaskDependenciesComponent, TaskCustomFieldsComponent, TaskTimeTrackingComponent, TaskHistoryComponent],
   templateUrl: './task-detail-modal.component.html',
   styleUrl: './task-detail-modal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

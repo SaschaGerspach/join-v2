@@ -1,5 +1,5 @@
 <div class="dependencies-section">
-  <label class="field-label">Dependencies (blocked by)</label>
+  <label class="field-label">{{ 'TASK.DEPENDENCIES' | translate }}</label>
 
   @if (dependencies().length) {
     <ul class="dependency-list">
@@ -14,7 +14,7 @@
 
   <div class="add-dependency">
     <select class="field-select" [ngModel]="selectedTaskId()" (ngModelChange)="selectedTaskId.set($event)">
-      <option [ngValue]="null">Select task…</option>
+      <option [ngValue]="null">{{ 'TASK.SELECT_TASK' | translate }}</option>
       @for (t of availableTasks(); track t.id) {
         <option [ngValue]="t.id">{{ t.title }}</option>
       }

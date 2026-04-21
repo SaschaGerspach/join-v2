@@ -1,22 +1,24 @@
 import { ChangeDetectionStrategy, Component, HostListener, output } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 
-export type Shortcut = { key: string; description: string };
+export type Shortcut = { key: string; descriptionKey: string };
 
 @Component({
   selector: 'app-keyboard-shortcuts-modal',
   standalone: true,
+  imports: [TranslateModule],
   template: `
     <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" (click)="closed.emit()">
       <div class="modal-card" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2 id="shortcuts-title">Keyboard Shortcuts</h2>
+          <h2 id="shortcuts-title">{{ 'SHORTCUTS.TITLE' | translate }}</h2>
           <button class="btn-close" aria-label="Close" (click)="closed.emit()">&#10005;</button>
         </div>
         <div class="modal-body">
           @for (s of shortcuts; track s.key) {
             <div class="shortcut-row">
               <kbd>{{ s.key }}</kbd>
-              <span>{{ s.description }}</span>
+              <span>{{ s.descriptionKey | translate }}</span>
             </div>
           }
         </div>
@@ -60,13 +62,13 @@ export class KeyboardShortcutsModalComponent {
   closed = output<void>();
 
   shortcuts: Shortcut[] = [
-    { key: '?', description: 'Show this help' },
-    { key: 'Esc', description: 'Close modals / dialogs' },
-    { key: 'n', description: 'New task in focused column' },
-    { key: '/', description: 'Focus search' },
-    { key: '← →', description: 'Navigate between columns' },
-    { key: '↑ ↓', description: 'Navigate between tasks' },
-    { key: 'Enter', description: 'Open focused task' },
+    { key: '?', descriptionKey: 'SHORTCUTS.HELP' },
+    { key: 'Esc', descriptionKey: 'SHORTCUTS.CLOSE_MODALS' },
+    { key: 'n', descriptionKey: 'SHORTCUTS.NEW_TASK' },
+    { key: '/', descriptionKey: 'SHORTCUTS.FOCUS_SEARCH' },
+    { key: '← →', descriptionKey: 'SHORTCUTS.NAV_COLUMNS' },
+    { key: '↑ ↓', descriptionKey: 'SHORTCUTS.NAV_TASKS' },
+    { key: 'Enter', descriptionKey: 'SHORTCUTS.OPEN_TASK' },
   ];
 
   @HostListener('document:keydown.escape')

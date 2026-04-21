@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { Task, TaskDependency, TasksApiService } from '../../../../core/tasks/tasks-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -8,7 +9,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 @Component({
   selector: 'app-task-dependencies',
   standalone: true,
-  imports: [FormsModule, ConfirmDialogComponent],
+  imports: [FormsModule, TranslateModule, ConfirmDialogComponent],
   templateUrl: './task-dependencies.component.html',
   styleUrl: './task-dependencies.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

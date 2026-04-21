@@ -8,6 +8,8 @@ import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { offlineInterceptor } from './core/interceptors/offline.interceptor';
 import { GlobalErrorHandler } from './core/error-handler/global-error-handler';
 import { provideServiceWorker } from '@angular/service-worker';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,6 +19,13 @@ export const appConfig: ApplicationConfig = {
     provideServiceWorker('ngsw-worker.js', {
         enabled: !isDevMode(),
         registrationStrategy: 'registerWhenStable:30000'
-    })
-],
+    }),
+    provideTranslateService({
+      defaultLanguage: 'en',
+    }),
+    provideTranslateHttpLoader({
+      prefix: './assets/i18n/',
+      suffix: '.json',
+    }),
+  ],
 };

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { forkJoin } from 'rxjs';
 import { CustomField, TaskFieldValue, TasksApiService } from '../../../../core/tasks/tasks-api.service';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
@@ -9,7 +10,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 @Component({
   selector: 'app-task-custom-fields',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslateModule],
   templateUrl: './task-custom-fields.component.html',
   styleUrl: './task-custom-fields.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

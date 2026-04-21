@@ -1,5 +1,5 @@
 <div class="field-group">
-  <label class="field-label">Labels</label>
+  <label class="field-label">{{ 'TASK.LABELS' | translate }}</label>
   <div class="label-options">
     @for (label of boardLabels(); track label.id) {
       <button
@@ -17,7 +17,7 @@
       type="text"
       aria-label="New label name"
       [(ngModel)]="newLabelName"
-      placeholder="New label…"
+      [placeholder]="'TASK.NEW_LABEL' | translate"
       (keyup.enter)="createLabel()"
     />
     <input type="color" [(ngModel)]="newLabelColor" class="label-color-input" aria-label="Label color" />

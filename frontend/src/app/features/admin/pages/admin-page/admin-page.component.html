@@ -1,8 +1,8 @@
 <div class="admin-page">
   <div class="admin-header">
-    <h1>Admin Dashboard</h1>
+    <h1>{{ 'ADMIN.TITLE' | translate }}</h1>
     <a [href]="djangoAdminUrl" target="_blank" rel="noopener" class="btn-django-admin">
-      Open Django Admin ↗
+      {{ 'ADMIN.OPEN_DJANGO' | translate }} ↗
     </a>
   </div>
 
@@ -12,19 +12,19 @@
     <div class="stats-grid">
       <div class="stat-card">
         <span class="stat-value">{{ stats()!.users }}</span>
-        <span class="stat-label">Users</span>
+        <span class="stat-label">{{ 'ADMIN.USERS' | translate }}</span>
       </div>
       <div class="stat-card">
         <span class="stat-value">{{ stats()!.boards }}</span>
-        <span class="stat-label">Boards</span>
+        <span class="stat-label">{{ 'ADMIN.BOARDS' | translate }}</span>
       </div>
       <div class="stat-card">
         <span class="stat-value">{{ stats()!.tasks }}</span>
-        <span class="stat-label">Tasks</span>
+        <span class="stat-label">{{ 'ADMIN.TASKS' | translate }}</span>
       </div>
       <div class="stat-card">
         <span class="stat-value">{{ stats()!.contacts }}</span>
-        <span class="stat-label">Contacts</span>
+        <span class="stat-label">{{ 'ADMIN.CONTACTS' | translate }}</span>
       </div>
     </div>
   }

@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ChartData, ChartOptions } from 'chart.js';
+import { TranslateModule } from '@ngx-translate/core';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
@@ -14,7 +15,7 @@ import { BRAND_COLOR, PRIORITY_COLORS } from '../../../../shared/constants/color
 @Component({
   selector: 'app-board-stats-page',
   standalone: true,
-  imports: [BaseChartDirective, RouterModule],
+  imports: [BaseChartDirective, RouterModule, TranslateModule],
   providers: [provideCharts(withDefaultRegisterables())],
   templateUrl: './board-stats-page.component.html',
   styleUrl: './board-stats-page.component.scss',

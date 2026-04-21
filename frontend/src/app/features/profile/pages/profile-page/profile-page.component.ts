@@ -12,11 +12,12 @@ import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { UserAvatarComponent } from '../../../../shared/components/user-avatar/user-avatar.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent, DatePipe, UserAvatarComponent],
+  imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent, DatePipe, UserAvatarComponent, TranslateModule],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

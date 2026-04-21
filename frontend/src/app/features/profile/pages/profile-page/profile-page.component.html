@@ -1,6 +1,6 @@
 <div class="profile-page">
 
-  <h1 class="page-title">My Profile</h1>
+  <h1 class="page-title">{{ 'PROFILE.TITLE' | translate }}</h1>
 
   @if (loading()) {
     <app-loading-spinner />
@@ -26,70 +26,70 @@
     </div>
 
     <div class="form-section">
-      <h2 class="section-title">Personal Information</h2>
+      <h2 class="section-title">{{ 'PROFILE.PERSONAL_INFO' | translate }}</h2>
       <div class="form-grid">
         <div class="form-field">
-          <label for="profile-first-name">First name</label>
+          <label for="profile-first-name">{{ 'PROFILE.FIRST_NAME' | translate }}</label>
           <input id="profile-first-name" class="field-input" type="text" autocomplete="given-name" [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" />
         </div>
         <div class="form-field">
-          <label for="profile-last-name">Last name</label>
+          <label for="profile-last-name">{{ 'PROFILE.LAST_NAME' | translate }}</label>
           <input id="profile-last-name" class="field-input" type="text" autocomplete="family-name" [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" />
         </div>
         <div class="form-field full-width">
-          <label for="profile-email">Email</label>
+          <label for="profile-email">{{ 'PROFILE.EMAIL' | translate }}</label>
           <input id="profile-email" class="field-input" type="email" autocomplete="email" [ngModel]="email()" (ngModelChange)="email.set($event)" />
         </div>
       </div>
     </div>
 
     <div class="form-section">
-      <h2 class="section-title">Change Password</h2>
+      <h2 class="section-title">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</h2>
       <div class="form-grid">
         <div class="form-field full-width">
-          <label for="profile-new-password">New password (min. 8 characters)</label>
-          <input id="profile-new-password" class="field-input" type="password" minlength="8" autocomplete="new-password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" placeholder="Leave blank to keep current" />
+          <label for="profile-new-password">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
+          <input id="profile-new-password" class="field-input" type="password" minlength="8" autocomplete="new-password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" [placeholder]="'PROFILE.NEW_PASSWORD_PLACEHOLDER' | translate" />
         </div>
         <div class="form-field full-width">
-          <label for="profile-confirm-password">Confirm new password</label>
-          <input id="profile-confirm-password" class="field-input" type="password" autocomplete="new-password" [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" placeholder="Repeat new password" />
+          <label for="profile-confirm-password">{{ 'PROFILE.CONFIRM_PASSWORD' | translate }}</label>
+          <input id="profile-confirm-password" class="field-input" type="password" autocomplete="new-password" [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" [placeholder]="'PROFILE.CONFIRM_PLACEHOLDER' | translate" />
         </div>
       </div>
     </div>
 
     <div class="form-section">
-      <h2 class="section-title">Notification Settings</h2>
+      <h2 class="section-title">{{ 'PROFILE.NOTIFICATIONS' | translate }}</h2>
       <div class="notification-prefs">
         <label class="pref-label">
           <input type="checkbox" [checked]="!disabledTypes().has('assignment')" (change)="toggleType('assignment')" />
-          Assignment notifications
+          {{ 'PROFILE.ASSIGNMENT_NOTIFICATIONS' | translate }}
         </label>
         <label class="pref-label">
           <input type="checkbox" [checked]="!disabledTypes().has('comment')" (change)="toggleType('comment')" />
-          Comment notifications
+          {{ 'PROFILE.COMMENT_NOTIFICATIONS' | translate }}
         </label>
         <label class="pref-label">
           <input type="checkbox" [checked]="!disabledTypes().has('mention')" (change)="toggleType('mention')" />
-          Mention notifications
+          {{ 'PROFILE.MENTION_NOTIFICATIONS' | translate }}
         </label>
       </div>
-      <h3 class="subsection-title">Email delivery</h3>
+      <h3 class="subsection-title">{{ 'PROFILE.EMAIL_DELIVERY' | translate }}</h3>
       <div class="notification-prefs">
         <label class="pref-label">
           <input type="radio" name="emailDelivery" value="instant" [checked]="emailDelivery() === 'instant'" (change)="setEmailDelivery('instant')" />
-          Instant (one email per notification)
+          {{ 'PROFILE.EMAIL_INSTANT' | translate }}
         </label>
         <label class="pref-label">
           <input type="radio" name="emailDelivery" value="digest" [checked]="emailDelivery() === 'digest'" (change)="setEmailDelivery('digest')" />
-          Daily digest (summary at 7:00 AM)
+          {{ 'PROFILE.EMAIL_DIGEST' | translate }}
         </label>
         <label class="pref-label">
           <input type="radio" name="emailDelivery" value="none" [checked]="emailDelivery() === 'none'" (change)="setEmailDelivery('none')" />
-          No emails
+          {{ 'PROFILE.EMAIL_NONE' | translate }}
         </label>
       </div>
       @if (boards().length > 0) {
-        <h3 class="subsection-title">Muted Boards</h3>
+        <h3 class="subsection-title">{{ 'PROFILE.MUTED_BOARDS' | translate }}</h3>
         <div class="muted-boards">
           @for (board of boards(); track board.id) {
             <label class="pref-label">
@@ -102,68 +102,68 @@
     </div>
 
     <div class="form-section">
-      <h2 class="section-title">Active Sessions</h2>
+      <h2 class="section-title">{{ 'PROFILE.SESSIONS' | translate }}</h2>
       <div class="session-list">
         @for (session of sessions(); track session.id) {
           <div class="session-item" [class.session-current]="session.is_current">
             <div class="session-info">
-              <span class="session-label">{{ session.is_current ? 'Current session' : 'Session' }}</span>
-              <span class="session-date">Created: {{ session.created_at | date:'short' }}</span>
-              <span class="session-date">Expires: {{ session.expires_at | date:'short' }}</span>
+              <span class="session-label">{{ session.is_current ? ('PROFILE.CURRENT_SESSION' | translate) : ('PROFILE.SESSION' | translate) }}</span>
+              <span class="session-date">{{ 'PROFILE.CREATED' | translate }}: {{ session.created_at | date:'short' }}</span>
+              <span class="session-date">{{ 'PROFILE.EXPIRES' | translate }}: {{ session.expires_at | date:'short' }}</span>
             </div>
             @if (!session.is_current) {
-              <button class="btn-revoke" (click)="revokeSession(session.id)">Revoke</button>
+              <button class="btn-revoke" (click)="revokeSession(session.id)">{{ 'PROFILE.REVOKE' | translate }}</button>
             }
           </div>
         }
         @if (sessions().length === 0) {
-          <span class="session-empty">No active sessions found.</span>
+          <span class="session-empty">{{ 'PROFILE.NO_SESSIONS' | translate }}</span>
         }
       </div>
       @if (sessions().length > 1) {
-        <button class="btn-danger-outline" (click)="revokeAllSessions()">Revoke all other sessions</button>
+        <button class="btn-danger-outline" (click)="revokeAllSessions()">{{ 'PROFILE.REVOKE_ALL' | translate }}</button>
       }
     </div>
 
     <div class="form-section">
-      <h2 class="section-title">Two-Factor Authentication</h2>
+      <h2 class="section-title">{{ 'PROFILE.TWO_FACTOR' | translate }}</h2>
       @if (totpEnabled()) {
-        <p class="totp-status totp-active">2FA is enabled.</p>
+        <p class="totp-status totp-active">{{ 'PROFILE.TOTP_ENABLED' | translate }}</p>
         <div class="totp-disable-form">
           <div class="form-field">
-            <label for="totp-disable-password">Current password</label>
+            <label for="totp-disable-password">{{ 'PROFILE.CURRENT_PASSWORD' | translate }}</label>
             <input id="totp-disable-password" class="field-input" type="password" autocomplete="current-password" [ngModel]="totpDisablePassword()" (ngModelChange)="totpDisablePassword.set($event)" placeholder="Your password" />
           </div>
           <div class="form-field">
-            <label for="totp-disable-code">Authenticator code</label>
+            <label for="totp-disable-code">{{ 'PROFILE.AUTH_CODE' | translate }}</label>
             <input id="totp-disable-code" class="field-input totp-code-input" type="text" [ngModel]="totpDisableCode()" (ngModelChange)="totpDisableCode.set($event)" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
           </div>
           @if (totpError()) {
             <p class="msg msg-error">{{ totpError() }}</p>
           }
-          <button class="btn-danger-outline" (click)="disableTotp()">Disable 2FA</button>
+          <button class="btn-danger-outline" (click)="disableTotp()">{{ 'PROFILE.DISABLE_2FA' | translate }}</button>
         </div>
       } @else if (totpSetup()) {
         <div class="totp-setup">
-          <p>Scan this QR code with your authenticator app:</p>
+          <p>{{ 'PROFILE.SCAN_QR' | translate }}</p>
           <img class="totp-qr" [src]="totpSetup()!.qr_code" alt="QR code for two-factor authentication setup" />
-          <p class="totp-secret-label">Or enter this key manually:</p>
+          <p class="totp-secret-label">{{ 'PROFILE.MANUAL_KEY' | translate }}</p>
           <code class="totp-secret">{{ totpSetup()!.secret }}</code>
           <div class="form-field">
-            <label for="totp-confirm-code">Enter the 6-digit code to confirm</label>
+            <label for="totp-confirm-code">{{ 'PROFILE.CONFIRM_CODE' | translate }}</label>
             <input id="totp-confirm-code" class="field-input totp-code-input" type="text" [ngModel]="totpConfirmCode()" (ngModelChange)="totpConfirmCode.set($event)" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
           </div>
           @if (totpError()) {
             <p class="msg msg-error">{{ totpError() }}</p>
           }
           <div class="totp-setup-actions">
-            <button class="btn-primary" (click)="confirmTotp()">Confirm</button>
+            <button class="btn-primary" (click)="confirmTotp()">{{ 'PROFILE.CONFIRM' | translate }}</button>
             <button class="btn-secondary" (click)="cancelTotpSetup()">Cancel</button>
           </div>
         </div>
       } @else {
-        <p class="totp-status">2FA is not enabled. Add an extra layer of security to your account.</p>
-        <button class="btn-primary" (click)="startTotpSetup()">Set up 2FA</button>
+        <p class="totp-status">{{ 'PROFILE.TOTP_DISABLED' | translate }}</p>
+        <button class="btn-primary" (click)="startTotpSetup()">{{ 'PROFILE.SETUP_2FA' | translate }}</button>
       }
     </div>
 
@@ -172,10 +172,10 @@
     }
 
 <div class="form-actions">
-      <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">Delete account</button>
-      <button class="btn-export" (click)="exportData()">Export my data</button>
+      <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">{{ 'PROFILE.DELETE_ACCOUNT' | translate }}</button>
+      <button class="btn-export" (click)="exportData()">{{ 'PROFILE.EXPORT_DATA' | translate }}</button>
       <button class="btn-save" [disabled]="saving()" (click)="save()">
-        {{ saving() ? 'Saving…' : 'Save changes' }}
+        {{ saving() ? ('PROFILE.SAVING' | translate) : ('PROFILE.SAVE' | translate) }}
       </button>
     </div>
 

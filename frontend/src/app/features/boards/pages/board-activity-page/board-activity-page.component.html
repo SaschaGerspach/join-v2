@@ -1,13 +1,13 @@
 <div class="activity-page">
   <div class="activity-header">
-    <a [routerLink]="['/boards', boardId]" class="back-link">&larr; Back to board</a>
-    <h1>{{ boardTitle() }} — Activity</h1>
+    <a [routerLink]="['/boards', boardId]" class="back-link">&larr; {{ 'ACTIVITY.BACK' | translate }}</a>
+    <h1>{{ boardTitle() }} — {{ 'ACTIVITY.TITLE' | translate }}</h1>
   </div>
 
   @if (loading()) {
-    <p class="loading-hint">Loading…</p>
+    <p class="loading-hint">{{ 'ACTIVITY.LOADING' | translate }}</p>
   } @else if (entries().length === 0) {
-    <p class="empty-hint">No activity yet.</p>
+    <p class="empty-hint">{{ 'ACTIVITY.NO_ACTIVITY' | translate }}</p>
   } @else {
     <div class="activity-list">
       @for (entry of entries(); track entry.id) {

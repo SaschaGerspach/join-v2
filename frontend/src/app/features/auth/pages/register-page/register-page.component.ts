@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { PendingEmailService } from '../../../../core/auth/pending-email.service';
@@ -8,7 +9,7 @@ import { PendingEmailService } from '../../../../core/auth/pending-email.service
 @Component({
   selector: 'app-register-page',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, TranslateModule],
   templateUrl: './register-page.component.html',
   styleUrl: './register-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

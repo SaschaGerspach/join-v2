@@ -1,15 +1,17 @@
 import { ChangeDetectionStrategy, Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { OfflineQueueService } from '../../../core/offline/offline-queue.service';
 
 @Component({
   selector: 'app-offline-banner',
   standalone: true,
+  imports: [TranslateModule],
   template: `
     @if (offline()) {
       <div class="offline-banner" role="alert">
-        You are offline — changes will sync automatically when reconnected.
+        {{ 'COMMON.OFFLINE' | translate }}
         @if (queue.pendingCount > 0) {
-          <span class="queue-count">({{ queue.pendingCount }} pending)</span>
+          <span class="queue-count">({{ queue.pendingCount }} {{ 'COMMON.PENDING' | translate }})</span>
         }
       </div>
     }

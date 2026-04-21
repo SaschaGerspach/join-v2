@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit, model } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { Label, LabelsApiService } from '../../../../core/tasks/labels-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-labels',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslateModule],
   templateUrl: './task-labels.component.html',
   styleUrl: './task-labels.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

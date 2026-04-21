@@ -4,7 +4,7 @@
   </div>
 
   <div class="auth-card">
-    <h1>Log in</h1>
+    <h1>{{ 'AUTH.LOGIN' | translate }}</h1>
     <div class="auth-divider"></div>
 
     <form #f="ngForm" (ngSubmit)="login(f)">
@@ -17,7 +17,7 @@
             type="email"
             [(ngModel)]="email"
             name="email"
-            placeholder="Email"
+            [placeholder]="'AUTH.EMAIL' | translate"
             required
             email
             autocomplete="email"
@@ -26,8 +26,8 @@
           />
           @if (emailField.invalid && (emailField.touched || f.submitted)) {
             <span class="field-error">
-              @if (emailField.errors?.['required']) { Email is required. }
-              @else { Enter a valid email address. }
+              @if (emailField.errors?.['required']) { {{ 'AUTH.EMAIL_REQUIRED' | translate }} }
+              @else { {{ 'AUTH.EMAIL_INVALID' | translate }} }
             </span>
           }
         </div>
@@ -41,7 +41,7 @@
               [type]="showPassword() ? 'text' : 'password'"
               [(ngModel)]="password"
               name="password"
-              placeholder="Password"
+              [placeholder]="'AUTH.PASSWORD' | translate"
               required
               autocomplete="current-password"
               #passwordField="ngModel"
@@ -52,12 +52,12 @@
             </button>
           </div>
           @if (passwordField.invalid && (passwordField.touched || f.submitted)) {
-            <span class="field-error">Password is required.</span>
+            <span class="field-error">{{ 'AUTH.PASSWORD_REQUIRED' | translate }}</span>
           }
         </div>
       } @else {
         <div class="form-group">
-          <p class="totp-hint">Enter the 6-digit code from your authenticator app.</p>
+          <p class="totp-hint">{{ 'AUTH.TOTP_HINT' | translate }}</p>
           <label for="login-totp" class="visually-hidden">Authentication code</label>
           <input
             id="login-totp"
@@ -75,7 +75,7 @@
             [class.input-error]="totpField.invalid && (totpField.touched || f.submitted)"
           />
           @if (totpField.invalid && (totpField.touched || f.submitted)) {
-            <span class="field-error">Enter a 6-digit code.</span>
+            <span class="field-error">{{ 'AUTH.TOTP_INVALID' | translate }}</span>
           }
         </div>
       }
@@ -85,24 +85,24 @@
       }
       @if (unverifiedEmail()) {
         <p class="error-message">
-          Email not verified.
-          <a href="#" (click)="resendVerification(); $event.preventDefault()" class="link-subtle">Resend link</a>
+          {{ 'AUTH.EMAIL_NOT_VERIFIED' | translate }}
+          <a href="#" (click)="resendVerification(); $event.preventDefault()" class="link-subtle">{{ 'AUTH.RESEND_LINK' | translate }}</a>
         </p>
       }
 
       <div class="auth-actions">
         <button type="submit" class="btn-primary" [disabled]="submitting()">
-          {{ submitting() ? 'Logging in…' : requires2fa() ? 'Verify' : 'Log in' }}
+          {{ submitting() ? ('AUTH.LOGGING_IN' | translate) : requires2fa() ? ('AUTH.VERIFY' | translate) : ('AUTH.LOGIN' | translate) }}
         </button>
         @if (requires2fa()) {
-          <button type="button" class="btn-secondary" (click)="back()">Back</button>
+          <button type="button" class="btn-secondary" (click)="back()">{{ 'AUTH.BACK' | translate }}</button>
         } @else {
-          <a routerLink="/register" class="btn-secondary">Sign up</a>
+          <a routerLink="/register" class="btn-secondary">{{ 'AUTH.SIGNUP' | translate }}</a>
         }
       </div>
       @if (!requires2fa()) {
         <div class="auth-links">
-          <a routerLink="/forgot-password" class="link-subtle">Forgot password?</a>
+          <a routerLink="/forgot-password" class="link-subtle">{{ 'AUTH.FORGOT_PASSWORD' | translate }}</a>
         </div>
       }
     </form>

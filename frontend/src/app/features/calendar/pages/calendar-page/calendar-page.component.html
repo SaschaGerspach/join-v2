@@ -7,7 +7,7 @@
   </div>
 
   @if (loading()) {
-    <p class="loading-hint">Loading tasks…</p>
+    <p class="loading-hint">{{ 'CALENDAR.LOADING' | translate }}</p>
   } @else {
     <div class="calendar-grid" role="grid" aria-label="Calendar">
       @for (day of weekDays; track day) {

@@ -1,7 +1,7 @@
 <div class="boards-page">
   <div class="boards-header">
-    <h1>My Boards</h1>
-    <button class="btn-add" (click)="showForm.set(true)">+ New Board</button>
+    <h1>{{ 'BOARDS.MY_BOARDS' | translate }}</h1>
+    <button class="btn-add" (click)="showForm.set(true)">{{ 'BOARDS.NEW_BOARD' | translate }}</button>
   </div>
 
   @if (showForm()) {
@@ -11,18 +11,18 @@
         type="text"
         aria-label="Board title"
         [(ngModel)]="newTitle"
-        placeholder="Board title"
+        [placeholder]="'BOARDS.BOARD_TITLE' | translate"
         (keyup.enter)="createBoard()"
         autofocus
       />
       <select class="form-select" aria-label="Board template" [(ngModel)]="newTemplate">
-        <option value="kanban">Kanban</option>
-        <option value="scrum">Scrum</option>
-        <option value="bug_tracking">Bug Tracking</option>
+        <option value="kanban">{{ 'BOARDS.KANBAN' | translate }}</option>
+        <option value="scrum">{{ 'BOARDS.SCRUM' | translate }}</option>
+        <option value="bug_tracking">{{ 'BOARDS.BUG_TRACKING' | translate }}</option>
       </select>
       <div class="board-form-actions">
-        <button class="btn-secondary" (click)="showForm.set(false)">Cancel</button>
-        <button class="btn-primary" (click)="createBoard()">Create</button>
+        <button class="btn-secondary" (click)="showForm.set(false)">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn-primary" (click)="createBoard()">{{ 'COMMON.CREATE' | translate }}</button>
       </div>
     </div>
   }
@@ -31,7 +31,7 @@
     <app-loading-spinner />
   } @else if (boards().length === 0) {
     <div class="boards-empty">
-      <p>No boards yet. Create your first board!</p>
+      <p>{{ 'BOARDS.NO_BOARDS' | translate }}</p>
     </div>
   } @else if (!loading()) {
     <div class="boards-grid">
@@ -42,7 +42,7 @@
             @if (board.team_name) {
               <span class="shared-badge">{{ board.team_name }}</span>
             } @else if (!board.is_owner) {
-              <span class="shared-badge">Shared</span>
+              <span class="shared-badge">{{ 'BOARDS.SHARED' | translate }}</span>
             }
           </div>
           <div class="board-card-actions">
@@ -93,7 +93,7 @@
   <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="members-modal-title" (click)="managingBoard.set(null)">
     <div class="members-modal" (click)="$event.stopPropagation()">
       <div class="members-modal-header">
-        <h2 id="members-modal-title">Members — {{ managingBoard()!.title }}</h2>
+        <h2 id="members-modal-title">{{ 'BOARDS.MEMBERS' | translate }} — {{ managingBoard()!.title }}</h2>
         <button class="btn-icon" aria-label="Close" (click)="managingBoard.set(null)">&#10005;</button>
       </div>
 
@@ -103,10 +103,10 @@
           type="email"
           aria-label="Invite by email"
           [(ngModel)]="inviteEmail"
-          placeholder="Invite by email"
+          [placeholder]="'BOARDS.INVITE_EMAIL' | translate"
           (keyup.enter)="invite()"
         />
-        <button class="btn-invite" (click)="invite()">Invite</button>
+        <button class="btn-invite" (click)="invite()">{{ 'BOARDS.INVITE' | translate }}</button>
       </div>
       @if (inviteError()) {
         <p class="invite-error">{{ inviteError() }}</p>
@@ -126,7 +126,7 @@
           </li>
         }
         @if (members().length === 0) {
-          <li class="member-empty">No members yet. Invite someone!</li>
+          <li class="member-empty">{{ 'BOARDS.NO_MEMBERS' | translate }}</li>
         }
       </ul>
     </div>

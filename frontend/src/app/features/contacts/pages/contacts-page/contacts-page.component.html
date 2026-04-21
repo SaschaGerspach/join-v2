@@ -2,8 +2,8 @@
 
   <div class="contacts-sidebar">
     <div class="sidebar-header">
-      <h1>Contacts</h1>
-      <button class="btn-add-contact" (click)="openCreate()">+ New Contact</button>
+      <h1>{{ 'CONTACTS.TITLE' | translate }}</h1>
+      <button class="btn-add-contact" (click)="openCreate()">{{ 'CONTACTS.NEW_CONTACT' | translate }}</button>
     </div>
 
     <div class="contact-list">
@@ -31,7 +31,7 @@
       }
 
       @if (!loading() && contacts().length === 0) {
-        <p class="contacts-empty">No contacts yet. Add your first contact!</p>
+        <p class="contacts-empty">{{ 'CONTACTS.NO_CONTACTS' | translate }}</p>
       }
     </div>
   </div>
@@ -40,28 +40,28 @@
 
     @if (showForm()) {
       <div class="contact-form-card">
-        <h2>{{ editMode() ? 'Edit Contact' : 'New Contact' }}</h2>
+        <h2>{{ editMode() ? ('CONTACTS.EDIT_CONTACT' | translate) : ('CONTACTS.NEW_CONTACT' | translate) }}</h2>
         <div class="form-grid">
           <div class="form-field">
-            <label for="contact-first-name">First name</label>
-            <input id="contact-first-name" class="field-input" type="text" [(ngModel)]="form.first_name" placeholder="First name" />
+            <label for="contact-first-name">{{ 'CONTACTS.FIRST_NAME' | translate }}</label>
+            <input id="contact-first-name" class="field-input" type="text" [(ngModel)]="form.first_name" [placeholder]="'CONTACTS.FIRST_NAME' | translate" />
           </div>
           <div class="form-field">
-            <label for="contact-last-name">Last name</label>
-            <input id="contact-last-name" class="field-input" type="text" [(ngModel)]="form.last_name" placeholder="Last name" />
+            <label for="contact-last-name">{{ 'CONTACTS.LAST_NAME' | translate }}</label>
+            <input id="contact-last-name" class="field-input" type="text" [(ngModel)]="form.last_name" [placeholder]="'CONTACTS.LAST_NAME' | translate" />
           </div>
           <div class="form-field full-width">
-            <label for="contact-email">Email</label>
-            <input id="contact-email" class="field-input" type="email" [(ngModel)]="form.email" placeholder="Email address" />
+            <label for="contact-email">{{ 'CONTACTS.EMAIL' | translate }}</label>
+            <input id="contact-email" class="field-input" type="email" [(ngModel)]="form.email" [placeholder]="'CONTACTS.EMAIL' | translate" />
           </div>
           <div class="form-field full-width">
-            <label for="contact-phone">Phone</label>
-            <input id="contact-phone" class="field-input" type="tel" [(ngModel)]="form.phone" placeholder="Phone number (optional)" />
+            <label for="contact-phone">{{ 'CONTACTS.PHONE' | translate }}</label>
+            <input id="contact-phone" class="field-input" type="tel" [(ngModel)]="form.phone" [placeholder]="'CONTACTS.PHONE_PLACEHOLDER' | translate" />
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn-cancel" (click)="showForm.set(false)">Cancel</button>
-          <button class="btn-save" (click)="save()">{{ editMode() ? 'Save' : 'Create' }}</button>
+          <button class="btn-cancel" (click)="showForm.set(false)">{{ 'COMMON.CANCEL' | translate }}</button>
+          <button class="btn-save" (click)="save()">{{ editMode() ? ('COMMON.SAVE' | translate) : ('COMMON.CREATE' | translate) }}</button>
         </div>
       </div>
     } @else if (selectedContact()) {
@@ -75,25 +75,25 @@
 
         <div class="detail-fields">
           <div class="detail-field">
-            <span class="detail-label">Email</span>
+            <span class="detail-label">{{ 'CONTACTS.EMAIL' | translate }}</span>
             <a class="detail-value link" [href]="'mailto:' + selectedContact()!.email">{{ selectedContact()!.email }}</a>
           </div>
           @if (selectedContact()!.phone) {
             <div class="detail-field">
-              <span class="detail-label">Phone</span>
+              <span class="detail-label">{{ 'CONTACTS.PHONE' | translate }}</span>
               <span class="detail-value">{{ selectedContact()!.phone }}</span>
             </div>
           }
         </div>
 
         <div class="detail-actions">
-          <button class="btn-edit" (click)="openEdit(selectedContact()!)">Edit</button>
-          <button class="btn-danger" (click)="deleteContact(selectedContact()!.id)">Delete</button>
+          <button class="btn-edit" (click)="openEdit(selectedContact()!)">{{ 'COMMON.EDIT' | translate }}</button>
+          <button class="btn-danger" (click)="deleteContact(selectedContact()!.id)">{{ 'COMMON.DELETE' | translate }}</button>
         </div>
       </div>
     } @else {
       <div class="contacts-placeholder">
-        <p>Select a contact or create a new one.</p>
+        <p>{{ 'CONTACTS.SELECT_OR_CREATE' | translate }}</p>
       </div>
     }
 

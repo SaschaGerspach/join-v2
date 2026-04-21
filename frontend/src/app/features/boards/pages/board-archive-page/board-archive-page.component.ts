@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -9,7 +10,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 @Component({
   selector: 'app-board-archive-page',
   standalone: true,
-  imports: [RouterModule, DatePipe],
+  imports: [RouterModule, DatePipe, TranslateModule],
   templateUrl: './board-archive-page.component.html',
   styleUrl: './board-archive-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

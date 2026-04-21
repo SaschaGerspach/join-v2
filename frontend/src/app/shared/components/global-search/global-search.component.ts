@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 import { Task, TasksApiService } from '../../../core/tasks/tasks-api.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 type SearchResult = Task & { board_title: string };
 
 @Component({
   selector: 'app-global-search',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslateModule],
   templateUrl: './global-search.component.html',
   styleUrl: './global-search.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
