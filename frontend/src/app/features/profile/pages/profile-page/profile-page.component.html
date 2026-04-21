@@ -116,6 +116,48 @@
       }
     </div>
 
+    <div class="form-section">
+      <h2 class="section-title">Two-Factor Authentication</h2>
+      @if (totpEnabled()) {
+        <p class="totp-status totp-active">2FA is enabled.</p>
+        <div class="totp-disable-form">
+          <div class="form-field">
+            <label>Current password</label>
+            <input class="field-input" type="password" [ngModel]="totpDisablePassword()" (ngModelChange)="totpDisablePassword.set($event)" placeholder="Your password" />
+          </div>
+          <div class="form-field">
+            <label>Authenticator code</label>
+            <input class="field-input totp-code-input" type="text" [ngModel]="totpDisableCode()" (ngModelChange)="totpDisableCode.set($event)" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
+          </div>
+          @if (totpError()) {
+            <p class="msg msg-error">{{ totpError() }}</p>
+          }
+          <button class="btn-danger-outline" (click)="disableTotp()">Disable 2FA</button>
+        </div>
+      } @else if (totpSetup()) {
+        <div class="totp-setup">
+          <p>Scan this QR code with your authenticator app:</p>
+          <img class="totp-qr" [src]="totpSetup()!.qr_code" alt="QR Code" />
+          <p class="totp-secret-label">Or enter this key manually:</p>
+          <code class="totp-secret">{{ totpSetup()!.secret }}</code>
+          <div class="form-field">
+            <label>Enter the 6-digit code to confirm</label>
+            <input class="field-input totp-code-input" type="text" [ngModel]="totpConfirmCode()" (ngModelChange)="totpConfirmCode.set($event)" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
+          </div>
+          @if (totpError()) {
+            <p class="msg msg-error">{{ totpError() }}</p>
+          }
+          <div class="totp-setup-actions">
+            <button class="btn-primary" (click)="confirmTotp()">Confirm</button>
+            <button class="btn-secondary" (click)="cancelTotpSetup()">Cancel</button>
+          </div>
+        </div>
+      } @else {
+        <p class="totp-status">2FA is not enabled. Add an extra layer of security to your account.</p>
+        <button class="btn-primary" (click)="startTotpSetup()">Set up 2FA</button>
+      }
+    </div>
+
     @if (errorMessage()) {
       <p class="msg msg-error">{{ errorMessage() }}</p>
     }

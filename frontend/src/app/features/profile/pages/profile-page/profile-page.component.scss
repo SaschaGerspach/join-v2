@@ -270,6 +270,93 @@
   }
 }
 
+// ─── 2FA ─────────────────────────────────────────────────────────────────────
+
+.totp-status {
+  font-size: 0.9rem;
+  color: var(--color-muted, $color-muted);
+
+  &.totp-active {
+    color: $priority-low;
+    font-weight: 600;
+  }
+}
+
+.totp-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  p { font-size: 0.9rem; color: var(--color-text); margin: 0; }
+}
+
+.totp-qr {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border, $color-border);
+}
+
+.totp-secret-label {
+  font-size: 0.8rem;
+  color: var(--color-muted, $color-muted);
+}
+
+.totp-secret {
+  font-size: 0.85rem;
+  background: var(--color-bg, $color-bg);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, $color-border);
+  word-break: break-all;
+  user-select: all;
+}
+
+.totp-code-input {
+  text-align: center;
+  font-size: 1.25rem;
+  letter-spacing: 0.4rem;
+  font-variant-numeric: tabular-nums;
+  max-width: 200px;
+}
+
+.totp-setup-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.totp-disable-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btn-primary {
+  background: var(--color-sidebar-bg, $color-dark);
+  color: var(--color-sidebar-text, $color-white);
+  border: 2px solid var(--color-sidebar-bg, $color-dark);
+  border-radius: 10px;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover { background: $color-primary; border-color: $color-primary; }
+}
+
+.btn-secondary {
+  background: none;
+  border: 2px solid var(--color-border, $color-border);
+  border-radius: 10px;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  cursor: pointer;
+
+  &:hover { background: var(--color-bg, $color-bg); }
+}
+
 .btn-export {
   background: none;
   border: 2px solid $color-primary;

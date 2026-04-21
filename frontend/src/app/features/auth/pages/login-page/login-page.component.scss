@@ -22,3 +22,16 @@
     text-decoration: underline;
   }
 }
+
+.totp-hint {
+  font-size: 0.9rem;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.totp-input {
+  text-align: center;
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}

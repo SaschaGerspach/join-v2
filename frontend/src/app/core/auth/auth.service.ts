@@ -8,6 +8,7 @@ export type AuthUser = {
     first_name: string;
     last_name: string;
     is_staff: boolean;
+    totp_enabled: boolean;
 };
 
 @Injectable({ providedIn: 'root'})
@@ -42,8 +43,8 @@ export class AuthService {
         return this._user() !== null;
     }
 
-    login(email: string, password: string) {
-        return this.api.login({ email, password }).pipe(
+    login(email: string, password: string, totpCode?: string) {
+        return this.api.login({ email, password, totp_code: totpCode }).pipe(
             tap((res) => {
                 const { access, ...user } = res;
                 this.accessToken = access;

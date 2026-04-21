@@ -7,6 +7,7 @@ import { environment } from "../../../environments/environment";
 type LoginRequest = {
     email: string;
     password: string;
+    totp_code?: string;
 };
 
 type RegisterRequest = {
@@ -89,6 +90,18 @@ export class AuthApiService {
     revokeAllSessions(): Observable<void> {
         return this.http.post<void>(`${this.baseUrl}/auth/sessions/revoke-all/`, {}, { withCredentials: true });
     }
+
+    totpSetup(): Observable<TotpSetupResponse> {
+        return this.http.post<TotpSetupResponse>(`${this.baseUrl}/auth/2fa/setup/`, {}, { withCredentials: true });
+    }
+
+    totpConfirm(code: string): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/auth/2fa/confirm/`, { code }, { withCredentials: true });
+    }
+
+    totpDisable(password: string, code: string): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/auth/2fa/disable/`, { password, code }, { withCredentials: true });
+    }
 }
 
 export type Session = {
@@ -96,4 +109,9 @@ export type Session = {
     created_at: string;
     expires_at: string;
     is_current: boolean;
+};
+
+export type TotpSetupResponse = {
+    secret: string;
+    qr_code: string;
 };

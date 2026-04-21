@@ -8,46 +8,69 @@
     <div class="auth-divider"></div>
 
     <form #f="ngForm" (ngSubmit)="login(f)">
-      <div class="form-group">
-        <input
-          class="form-input"
-          type="email"
-          [(ngModel)]="email"
-          name="email"
-          placeholder="Email"
-          required
-          email
-          #emailField="ngModel"
-          [class.input-error]="emailField.invalid && (emailField.touched || f.submitted)"
-        />
-        @if (emailField.invalid && (emailField.touched || f.submitted)) {
-          <span class="field-error">
-            @if (emailField.errors?.['required']) { Email is required. }
-            @else { Enter a valid email address. }
-          </span>
-        }
-      </div>
-
-      <div class="form-group">
-        <div class="password-wrapper">
+      @if (!requires2fa()) {
+        <div class="form-group">
           <input
             class="form-input"
-            [type]="showPassword() ? 'text' : 'password'"
-            [(ngModel)]="password"
-            name="password"
-            placeholder="Password"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="Email"
             required
-            #passwordField="ngModel"
-            [class.input-error]="passwordField.invalid && (passwordField.touched || f.submitted)"
+            email
+            #emailField="ngModel"
+            [class.input-error]="emailField.invalid && (emailField.touched || f.submitted)"
           />
-          <button type="button" class="btn-eye" aria-label="Toggle password visibility" (click)="showPassword.set(!showPassword())">
-            {{ showPassword() ? '🙈' : '👁' }}
-          </button>
+          @if (emailField.invalid && (emailField.touched || f.submitted)) {
+            <span class="field-error">
+              @if (emailField.errors?.['required']) { Email is required. }
+              @else { Enter a valid email address. }
+            </span>
+          }
         </div>
-        @if (passwordField.invalid && (passwordField.touched || f.submitted)) {
-          <span class="field-error">Password is required.</span>
-        }
-      </div>
+
+        <div class="form-group">
+          <div class="password-wrapper">
+            <input
+              class="form-input"
+              [type]="showPassword() ? 'text' : 'password'"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Password"
+              required
+              #passwordField="ngModel"
+              [class.input-error]="passwordField.invalid && (passwordField.touched || f.submitted)"
+            />
+            <button type="button" class="btn-eye" aria-label="Toggle password visibility" (click)="showPassword.set(!showPassword())">
+              {{ showPassword() ? '🙈' : '👁' }}
+            </button>
+          </div>
+          @if (passwordField.invalid && (passwordField.touched || f.submitted)) {
+            <span class="field-error">Password is required.</span>
+          }
+        </div>
+      } @else {
+        <div class="form-group">
+          <p class="totp-hint">Enter the 6-digit code from your authenticator app.</p>
+          <input
+            class="form-input totp-input"
+            type="text"
+            [(ngModel)]="totpCode"
+            name="totpCode"
+            placeholder="000000"
+            required
+            minlength="6"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            autocomplete="one-time-code"
+            #totpField="ngModel"
+            [class.input-error]="totpField.invalid && (totpField.touched || f.submitted)"
+          />
+          @if (totpField.invalid && (totpField.touched || f.submitted)) {
+            <span class="field-error">Enter a 6-digit code.</span>
+          }
+        </div>
+      }
 
       @if (error()) {
         <p class="error-message">{{ error() }}</p>
@@ -61,13 +84,19 @@
 
       <div class="auth-actions">
         <button type="submit" class="btn-primary" [disabled]="submitting()">
-          {{ submitting() ? 'Logging in…' : 'Log in' }}
+          {{ submitting() ? 'Logging in…' : requires2fa() ? 'Verify' : 'Log in' }}
         </button>
-        <a routerLink="/register" class="btn-secondary">Sign up</a>
+        @if (requires2fa()) {
+          <button type="button" class="btn-secondary" (click)="back()">Back</button>
+        } @else {
+          <a routerLink="/register" class="btn-secondary">Sign up</a>
+        }
       </div>
-      <div class="auth-links">
-        <a routerLink="/forgot-password" class="link-subtle">Forgot password?</a>
-      </div>
+      @if (!requires2fa()) {
+        <div class="auth-links">
+          <a routerLink="/forgot-password" class="link-subtle">Forgot password?</a>
+        </div>
+      }
     </form>
   </div>
 </div>

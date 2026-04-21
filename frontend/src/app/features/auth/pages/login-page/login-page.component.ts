@@ -19,9 +19,11 @@ export class LoginPageComponent {
 
   email = '';
   password = '';
+  totpCode = '';
   error = signal<string | null>(null);
   showPassword = signal(false);
   submitting = signal(false);
+  requires2fa = signal(false);
 
   unverifiedEmail = signal<string | null>(null);
 
@@ -38,16 +40,28 @@ export class LoginPageComponent {
     this.error.set(null);
     this.unverifiedEmail.set(null);
     this.submitting.set(true);
-    this.auth.login(this.email, this.password).subscribe({
+
+    const code = this.requires2fa() ? this.totpCode : undefined;
+    this.auth.login(this.email, this.password, code).subscribe({
       next: () => this.router.navigate(['/boards']),
       error: (err) => {
-        if (err?.error?.code === 'email_not_verified') {
+        if (err?.status === 206 && err?.error?.requires_2fa) {
+          this.requires2fa.set(true);
+        } else if (err?.error?.code === 'email_not_verified') {
           this.unverifiedEmail.set(this.email);
+        } else if (this.requires2fa()) {
+          this.error.set('Invalid 2FA code.');
         } else {
           this.error.set('Invalid email or password.');
         }
         this.submitting.set(false);
       },
     });
+  }
+
+  back(): void {
+    this.requires2fa.set(false);
+    this.totpCode = '';
+    this.error.set(null);
   }
 }

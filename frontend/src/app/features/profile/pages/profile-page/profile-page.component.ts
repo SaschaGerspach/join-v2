@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
-import { AuthApiService, Session } from '../../../../core/auth/auth-api.service';
+import { AuthApiService, Session, TotpSetupResponse } from '../../../../core/auth/auth-api.service';
 import { UsersApiService } from '../../../../core/users/users-api.service';
 import { NotificationsApiService } from '../../../../core/notifications/notifications-api.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
@@ -47,6 +47,13 @@ export class ProfilePageComponent implements OnInit {
   mutedBoardIds = signal<Set<number>>(new Set());
   emailDelivery = signal<'instant' | 'digest' | 'none'>('instant');
 
+  totpEnabled = signal(false);
+  totpSetup = signal<TotpSetupResponse | null>(null);
+  totpConfirmCode = signal('');
+  totpDisableCode = signal('');
+  totpDisablePassword = signal('');
+  totpError = signal('');
+
   initials = computed(() => {
     const f = this.firstName()[0] ?? '';
     const l = this.lastName()[0] ?? '';
@@ -59,6 +66,8 @@ export class ProfilePageComponent implements OnInit {
     const user = this.auth.user();
     if (!user) return;
     this.userId = user.id;
+
+    this.totpEnabled.set(user.totp_enabled ?? false);
 
     this.usersApi.get(this.userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (profile) => {
@@ -203,6 +212,52 @@ export class ProfilePageComponent implements OnInit {
     }
     this.mutedBoardIds.set(muted);
     this.savePreferences();
+  }
+
+  startTotpSetup(): void {
+    this.totpError.set('');
+    this.authApi.totpSetup().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => this.totpSetup.set(res),
+      error: () => this.toast.show('Failed to start 2FA setup.', 'error'),
+    });
+  }
+
+  confirmTotp(): void {
+    const code = this.totpConfirmCode().trim();
+    if (code.length !== 6) { this.totpError.set('Enter a 6-digit code.'); return; }
+    this.totpError.set('');
+    this.authApi.totpConfirm(code).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.totpEnabled.set(true);
+        this.totpSetup.set(null);
+        this.totpConfirmCode.set('');
+        this.toast.show('2FA enabled.');
+      },
+      error: () => this.totpError.set('Invalid code. Try again.'),
+    });
+  }
+
+  cancelTotpSetup(): void {
+    this.totpSetup.set(null);
+    this.totpConfirmCode.set('');
+    this.totpError.set('');
+  }
+
+  disableTotp(): void {
+    const code = this.totpDisableCode().trim();
+    const password = this.totpDisablePassword().trim();
+    if (!password) { this.totpError.set('Password is required.'); return; }
+    if (code.length !== 6) { this.totpError.set('Enter a 6-digit code.'); return; }
+    this.totpError.set('');
+    this.authApi.totpDisable(password, code).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.totpEnabled.set(false);
+        this.totpDisableCode.set('');
+        this.totpDisablePassword.set('');
+        this.toast.show('2FA disabled.');
+      },
+      error: (err) => this.totpError.set(err?.error?.detail ?? 'Failed to disable 2FA.'),
+    });
   }
 
   private savePreferences(): void {
