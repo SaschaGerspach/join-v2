@@ -1,17 +1,17 @@
 <div class="calendar-page">
 
   <div class="calendar-header">
-    <button class="btn-nav" (click)="prevMonth()">&#8592;</button>
+    <button class="btn-nav" aria-label="Previous month" (click)="prevMonth()">&#8592;</button>
     <h1 class="month-label">{{ monthLabel() }}</h1>
-    <button class="btn-nav" (click)="nextMonth()">&#8594;</button>
+    <button class="btn-nav" aria-label="Next month" (click)="nextMonth()">&#8594;</button>
   </div>
 
   @if (loading()) {
     <p class="loading-hint">Loading tasks…</p>
   } @else {
-    <div class="calendar-grid">
+    <div class="calendar-grid" role="grid" aria-label="Calendar">
       @for (day of weekDays; track day) {
-        <div class="weekday-header">{{ day }}</div>
+        <div class="weekday-header" role="columnheader">{{ day }}</div>
       }
       @for (day of calendarDays(); track $index) {
         <div class="calendar-cell" [class.today]="day && isToday(day)" [class.empty]="!day">

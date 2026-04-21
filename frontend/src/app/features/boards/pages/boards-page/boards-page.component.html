@@ -36,7 +36,7 @@
   } @else if (!loading()) {
     <div class="boards-grid">
       @for (board of boards(); track board.id) {
-        <div class="board-card" [style.border-left]="'4px solid ' + board.color" (click)="openBoard(board.id)">
+        <div class="board-card" role="button" tabindex="0" [style.border-left]="'4px solid ' + board.color" (click)="openBoard(board.id)" (keydown.enter)="openBoard(board.id)">
           <div class="board-card-body">
             <h2>{{ board.title }}</h2>
             @if (board.team_name) {
@@ -90,10 +90,10 @@
 }
 
 @if (managingBoard()) {
-  <div class="modal-overlay" (click)="managingBoard.set(null)">
+  <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="members-modal-title" (click)="managingBoard.set(null)">
     <div class="members-modal" (click)="$event.stopPropagation()">
       <div class="members-modal-header">
-        <h2>Members — {{ managingBoard()!.title }}</h2>
+        <h2 id="members-modal-title">Members — {{ managingBoard()!.title }}</h2>
         <button class="btn-icon" aria-label="Close" (click)="managingBoard.set(null)">&#10005;</button>
       </div>
 

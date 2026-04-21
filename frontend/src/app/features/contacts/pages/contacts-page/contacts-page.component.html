@@ -15,8 +15,11 @@
         @for (contact of group[1]; track contact.id) {
           <div
             class="contact-list-item"
+            role="button"
+            tabindex="0"
             [class.active]="selectedContact()?.id === contact.id"
             (click)="selectContact(contact)"
+            (keydown.enter)="selectContact(contact)"
           >
             <div class="contact-avatar" [style.background]="avatarColor(contact)">{{ initials(contact) }}</div>
             <div class="contact-list-info">
@@ -40,20 +43,20 @@
         <h2>{{ editMode() ? 'Edit Contact' : 'New Contact' }}</h2>
         <div class="form-grid">
           <div class="form-field">
-            <label>First name</label>
-            <input class="field-input" type="text" [(ngModel)]="form.first_name" placeholder="First name" />
+            <label for="contact-first-name">First name</label>
+            <input id="contact-first-name" class="field-input" type="text" [(ngModel)]="form.first_name" placeholder="First name" />
           </div>
           <div class="form-field">
-            <label>Last name</label>
-            <input class="field-input" type="text" [(ngModel)]="form.last_name" placeholder="Last name" />
+            <label for="contact-last-name">Last name</label>
+            <input id="contact-last-name" class="field-input" type="text" [(ngModel)]="form.last_name" placeholder="Last name" />
           </div>
           <div class="form-field full-width">
-            <label>Email</label>
-            <input class="field-input" type="email" [(ngModel)]="form.email" placeholder="Email address" />
+            <label for="contact-email">Email</label>
+            <input id="contact-email" class="field-input" type="email" [(ngModel)]="form.email" placeholder="Email address" />
           </div>
           <div class="form-field full-width">
-            <label>Phone</label>
-            <input class="field-input" type="tel" [(ngModel)]="form.phone" placeholder="Phone number (optional)" />
+            <label for="contact-phone">Phone</label>
+            <input id="contact-phone" class="field-input" type="tel" [(ngModel)]="form.phone" placeholder="Phone number (optional)" />
           </div>
         </div>
         <div class="form-actions">

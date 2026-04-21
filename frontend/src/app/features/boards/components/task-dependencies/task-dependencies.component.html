@@ -6,7 +6,7 @@
       @for (dep of dependencies(); track dep.id) {
         <li class="dependency-item">
           <span class="dependency-title">{{ dep.title }}</span>
-          <button class="btn-remove" (click)="removeDependency(dep)">&#10005;</button>
+          <button class="btn-remove" aria-label="Remove dependency" (click)="removeDependency(dep)">&#10005;</button>
         </li>
       }
     </ul>

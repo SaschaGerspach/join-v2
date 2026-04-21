@@ -10,7 +10,9 @@
     <form #f="ngForm" (ngSubmit)="login(f)">
       @if (!requires2fa()) {
         <div class="form-group">
+          <label for="login-email" class="visually-hidden">Email</label>
           <input
+            id="login-email"
             class="form-input"
             type="email"
             [(ngModel)]="email"
@@ -18,6 +20,7 @@
             placeholder="Email"
             required
             email
+            autocomplete="email"
             #emailField="ngModel"
             [class.input-error]="emailField.invalid && (emailField.touched || f.submitted)"
           />
@@ -31,13 +34,16 @@
 
         <div class="form-group">
           <div class="password-wrapper">
+            <label for="login-password" class="visually-hidden">Password</label>
             <input
+              id="login-password"
               class="form-input"
               [type]="showPassword() ? 'text' : 'password'"
               [(ngModel)]="password"
               name="password"
               placeholder="Password"
               required
+              autocomplete="current-password"
               #passwordField="ngModel"
               [class.input-error]="passwordField.invalid && (passwordField.touched || f.submitted)"
             />
@@ -52,7 +58,9 @@
       } @else {
         <div class="form-group">
           <p class="totp-hint">Enter the 6-digit code from your authenticator app.</p>
+          <label for="login-totp" class="visually-hidden">Authentication code</label>
           <input
+            id="login-totp"
             class="form-input totp-input"
             type="text"
             [(ngModel)]="totpCode"
@@ -73,7 +81,7 @@
       }
 
       @if (error()) {
-        <p class="error-message">{{ error() }}</p>
+        <p class="error-message" role="alert">{{ error() }}</p>
       }
       @if (unverifiedEmail()) {
         <p class="error-message">

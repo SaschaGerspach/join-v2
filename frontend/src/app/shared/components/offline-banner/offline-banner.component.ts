@@ -6,7 +6,7 @@ import { OfflineQueueService } from '../../../core/offline/offline-queue.service
   standalone: true,
   template: `
     @if (offline()) {
-      <div class="offline-banner">
+      <div class="offline-banner" role="alert">
         You are offline — changes will sync automatically when reconnected.
         @if (queue.pendingCount > 0) {
           <span class="queue-count">({{ queue.pendingCount }} pending)</span>

@@ -1,38 +1,40 @@
+<a class="skip-link" href="#main-content">Skip to content</a>
+
 <div class="app-layout">
 
   @if (sidebarOpen()) {
     <div class="sidebar-overlay" (click)="closeSidebar()"></div>
   }
 
-  <aside class="sidebar" [class.open]="sidebarOpen()">
+  <aside class="sidebar" [class.open]="sidebarOpen()" [attr.aria-hidden]="!sidebarOpen() ? null : null">
     <div class="sidebar-logo">
       <span class="logo-text">Join</span>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="Main navigation">
       <a routerLink="/summary" routerLinkActive="active" (click)="closeSidebar()">
-        <span class="nav-icon">&#9632;</span>
+        <span class="nav-icon" aria-hidden="true">&#9632;</span>
         Summary
       </a>
       <a routerLink="/boards" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" (click)="closeSidebar()">
-        <span class="nav-icon">&#9776;</span>
+        <span class="nav-icon" aria-hidden="true">&#9776;</span>
         Boards
       </a>
       <a routerLink="/teams" routerLinkActive="active" (click)="closeSidebar()">
-        <span class="nav-icon">&#128101;</span>
+        <span class="nav-icon" aria-hidden="true">&#128101;</span>
         Teams
       </a>
       <a routerLink="/contacts" routerLinkActive="active" (click)="closeSidebar()">
-        <span class="nav-icon">&#128100;</span>
+        <span class="nav-icon" aria-hidden="true">&#128100;</span>
         Contacts
       </a>
       <a routerLink="/calendar" routerLinkActive="active" (click)="closeSidebar()">
-        <span class="nav-icon">&#128197;</span>
+        <span class="nav-icon" aria-hidden="true">&#128197;</span>
         Calendar
       </a>
       @if (auth.user()?.is_staff) {
         <a routerLink="/admin" routerLinkActive="active" (click)="closeSidebar()">
-          <span class="nav-icon">&#9881;</span>
+          <span class="nav-icon" aria-hidden="true">&#9881;</span>
           Admin
         </a>
       }
@@ -56,7 +58,7 @@
           {{ theme.isDark() ? '☀' : '☾' }}
         </button>
         <div class="notification-wrapper">
-          <button class="btn-notification" aria-label="Notifications" (click)="toggleNotifications()">
+          <button class="btn-notification" aria-label="Notifications" [attr.aria-expanded]="notificationsOpen()" (click)="toggleNotifications()">
             &#128276;
             @if (notificationService.unreadCount() > 0) {
               <span class="notification-badge">{{ notificationService.unreadCount() }}</span>
@@ -72,8 +74,8 @@
               </div>
               <div class="notification-panel-list">
                 @for (n of notificationService.notifications(); track n.id) {
-                  <div class="notification-item" [class.unread]="!n.is_read" (click)="openNotification(n)">
-                    <span class="notification-icon">{{ n.type === 'assignment' ? '&#128100;' : n.type === 'mention' ? '&#64;' : '&#128172;' }}</span>
+                  <div class="notification-item" role="button" tabindex="0" [class.unread]="!n.is_read" (click)="openNotification(n)" (keydown.enter)="openNotification(n)">
+                    <span class="notification-icon" aria-hidden="true">{{ n.type === 'assignment' ? '&#128100;' : n.type === 'mention' ? '&#64;' : '&#128172;' }}</span>
                     <div class="notification-content">
                       <p class="notification-message">{{ n.message }}</p>
                       <span class="notification-time">{{ n.created_at | date:'short' }}</span>
@@ -86,7 +88,7 @@
             </div>
           }
         </div>
-        <div class="user-badge" role="button" aria-label="User menu" (click)="toggleMenu()">
+        <div class="user-badge" role="button" tabindex="0" aria-label="User menu" [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()" (keydown.enter)="toggleMenu()" (keydown.space)="toggleMenu(); $event.preventDefault()">
           <app-user-avatar [firstName]="auth.user()?.first_name ?? ''" [lastName]="auth.user()?.last_name ?? ''" [avatarUrl]="auth.user()?.avatar_url ?? null" [size]="42" />
         </div>
         @if (menuOpen()) {
@@ -98,35 +100,35 @@
       </div>
     </header>
 
-    <section class="page">
+    <main class="page" id="main-content">
       <router-outlet></router-outlet>
-    </section>
+    </main>
   </div>
 
-  <footer class="mobile-footer">
+  <footer class="mobile-footer" aria-label="Mobile navigation">
     <a routerLink="/summary" routerLinkActive="active">
-      <span>&#9632;</span>
+      <span aria-hidden="true">&#9632;</span>
       <span>Summary</span>
     </a>
     <a routerLink="/boards" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">
-      <span>&#9776;</span>
+      <span aria-hidden="true">&#9776;</span>
       <span>Boards</span>
     </a>
     <a routerLink="/teams" routerLinkActive="active">
-      <span>&#128101;</span>
+      <span aria-hidden="true">&#128101;</span>
       <span>Teams</span>
     </a>
     <a routerLink="/contacts" routerLinkActive="active">
-      <span>&#128100;</span>
+      <span aria-hidden="true">&#128100;</span>
       <span>Contacts</span>
     </a>
     <a routerLink="/calendar" routerLinkActive="active">
-      <span>&#128197;</span>
+      <span aria-hidden="true">&#128197;</span>
       <span>Calendar</span>
     </a>
     @if (auth.user()?.is_staff) {
       <a routerLink="/admin" routerLinkActive="active">
-        <span>&#9881;</span>
+        <span aria-hidden="true">&#9881;</span>
         <span>Admin</span>
       </a>
     }

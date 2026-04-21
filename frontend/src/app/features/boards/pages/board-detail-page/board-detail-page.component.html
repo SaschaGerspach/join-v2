@@ -51,7 +51,7 @@
       <option value="assignee">Group by Assignee</option>
     </select>
     @if (state.hasActiveFilter()) {
-      <button class="btn-clear-filter" (click)="state.clearFilters()">&#10005; Clear</button>
+      <button class="btn-clear-filter" aria-label="Clear filters" (click)="state.clearFilters()">&#10005; Clear</button>
       <button class="btn-save-filter" (click)="saveFilter()">Save filter</button>
     }
     @if (state.savedFilters().length > 0) {

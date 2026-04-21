@@ -6,7 +6,7 @@
 
   @if (showCreateForm()) {
     <div class="create-form">
-      <input class="form-input" type="text" [(ngModel)]="newTeamName" placeholder="Team name" (keyup.enter)="createTeam()" />
+      <input class="form-input" type="text" aria-label="Team name" [(ngModel)]="newTeamName" placeholder="Team name" (keyup.enter)="createTeam()" />
       <button class="btn-confirm" (click)="createTeam()">Create</button>
       <button class="btn-cancel" (click)="showCreateForm.set(false)">Cancel</button>
     </div>
@@ -18,16 +18,16 @@
     <div class="teams-list">
       @for (team of teams(); track team.id) {
         <div class="team-card" [class.expanded]="expandedTeamId() === team.id">
-          <div class="team-header" (click)="toggleExpand(team.id)">
+          <div class="team-header" role="button" tabindex="0" [attr.aria-expanded]="expandedTeamId() === team.id" (click)="toggleExpand(team.id)" (keydown.enter)="toggleExpand(team.id)">
             <div class="team-info">
               <span class="team-name">{{ team.name }}</span>
               <span class="team-meta">{{ team.member_count }} member{{ team.member_count !== 1 ? 's' : '' }}</span>
             </div>
             <div class="team-actions">
               @if (team.is_owner) {
-                <button class="btn-icon danger" (click)="deleteTeam(team.id); $event.stopPropagation()">&#10005;</button>
+                <button class="btn-icon danger" aria-label="Delete team" (click)="deleteTeam(team.id); $event.stopPropagation()">&#10005;</button>
               }
-              <span class="expand-arrow">{{ expandedTeamId() === team.id ? '▲' : '▼' }}</span>
+              <span class="expand-arrow" aria-hidden="true">{{ expandedTeamId() === team.id ? '▲' : '▼' }}</span>
             </div>
           </div>
 
@@ -47,7 +47,7 @@
                         <option value="admin">Admin</option>
                         <option value="member">Member</option>
                       </select>
-                      <button class="btn-icon danger small" (click)="removeMember(member.user_id)">&#10005;</button>
+                      <button class="btn-icon danger small" aria-label="Remove member" (click)="removeMember(member.user_id)">&#10005;</button>
                     } @else {
                       <span class="role-badge">{{ member.role }}</span>
                     }
@@ -57,7 +57,7 @@
 
               @if (team.is_owner) {
                 <div class="invite-row">
-                  <input class="form-input" type="email" [(ngModel)]="inviteEmail" placeholder="Invite by email" (keyup.enter)="inviteMember()" />
+                  <input class="form-input" type="email" aria-label="Invite by email" [(ngModel)]="inviteEmail" placeholder="Invite by email" (keyup.enter)="inviteMember()" />
                   <button class="btn-confirm" (click)="inviteMember()">Invite</button>
                 </div>
               }

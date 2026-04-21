@@ -11,12 +11,12 @@
     <div class="profile-avatar-section">
       <div class="avatar-upload-wrapper">
         <app-user-avatar [firstName]="firstName()" [lastName]="lastName()" [avatarUrl]="avatarUrl()" [size]="72" />
-        <label class="avatar-upload-btn" title="Change avatar">
-          &#9998;
+        <label class="avatar-upload-btn" title="Change avatar" aria-label="Change avatar">
+          <span aria-hidden="true">&#9998;</span>
           <input type="file" accept="image/*" hidden (change)="onAvatarSelected($event)" />
         </label>
         @if (avatarUrl()) {
-          <button class="avatar-remove-btn" title="Remove avatar" (click)="removeAvatar()">&#10005;</button>
+          <button class="avatar-remove-btn" title="Remove avatar" aria-label="Remove avatar" (click)="removeAvatar()">&#10005;</button>
         }
       </div>
       <div class="profile-name">
@@ -29,16 +29,16 @@
       <h2 class="section-title">Personal Information</h2>
       <div class="form-grid">
         <div class="form-field">
-          <label>First name</label>
-          <input class="field-input" type="text" [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" />
+          <label for="profile-first-name">First name</label>
+          <input id="profile-first-name" class="field-input" type="text" autocomplete="given-name" [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" />
         </div>
         <div class="form-field">
-          <label>Last name</label>
-          <input class="field-input" type="text" [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" />
+          <label for="profile-last-name">Last name</label>
+          <input id="profile-last-name" class="field-input" type="text" autocomplete="family-name" [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" />
         </div>
         <div class="form-field full-width">
-          <label>Email</label>
-          <input class="field-input" type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" />
+          <label for="profile-email">Email</label>
+          <input id="profile-email" class="field-input" type="email" autocomplete="email" [ngModel]="email()" (ngModelChange)="email.set($event)" />
         </div>
       </div>
     </div>
@@ -47,12 +47,12 @@
       <h2 class="section-title">Change Password</h2>
       <div class="form-grid">
         <div class="form-field full-width">
-          <label>New password (min. 8 characters)</label>
-          <input class="field-input" type="password" minlength="8" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" placeholder="Leave blank to keep current" />
+          <label for="profile-new-password">New password (min. 8 characters)</label>
+          <input id="profile-new-password" class="field-input" type="password" minlength="8" autocomplete="new-password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" placeholder="Leave blank to keep current" />
         </div>
         <div class="form-field full-width">
-          <label>Confirm new password</label>
-          <input class="field-input" type="password" [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" placeholder="Repeat new password" />
+          <label for="profile-confirm-password">Confirm new password</label>
+          <input id="profile-confirm-password" class="field-input" type="password" autocomplete="new-password" [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" placeholder="Repeat new password" />
         </div>
       </div>
     </div>
@@ -131,12 +131,12 @@
         <p class="totp-status totp-active">2FA is enabled.</p>
         <div class="totp-disable-form">
           <div class="form-field">
-            <label>Current password</label>
-            <input class="field-input" type="password" [ngModel]="totpDisablePassword()" (ngModelChange)="totpDisablePassword.set($event)" placeholder="Your password" />
+            <label for="totp-disable-password">Current password</label>
+            <input id="totp-disable-password" class="field-input" type="password" autocomplete="current-password" [ngModel]="totpDisablePassword()" (ngModelChange)="totpDisablePassword.set($event)" placeholder="Your password" />
           </div>
           <div class="form-field">
-            <label>Authenticator code</label>
-            <input class="field-input totp-code-input" type="text" [ngModel]="totpDisableCode()" (ngModelChange)="totpDisableCode.set($event)" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
+            <label for="totp-disable-code">Authenticator code</label>
+            <input id="totp-disable-code" class="field-input totp-code-input" type="text" [ngModel]="totpDisableCode()" (ngModelChange)="totpDisableCode.set($event)" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
           </div>
           @if (totpError()) {
             <p class="msg msg-error">{{ totpError() }}</p>
@@ -146,12 +146,12 @@
       } @else if (totpSetup()) {
         <div class="totp-setup">
           <p>Scan this QR code with your authenticator app:</p>
-          <img class="totp-qr" [src]="totpSetup()!.qr_code" alt="QR Code" />
+          <img class="totp-qr" [src]="totpSetup()!.qr_code" alt="QR code for two-factor authentication setup" />
           <p class="totp-secret-label">Or enter this key manually:</p>
           <code class="totp-secret">{{ totpSetup()!.secret }}</code>
           <div class="form-field">
-            <label>Enter the 6-digit code to confirm</label>
-            <input class="field-input totp-code-input" type="text" [ngModel]="totpConfirmCode()" (ngModelChange)="totpConfirmCode.set($event)" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
+            <label for="totp-confirm-code">Enter the 6-digit code to confirm</label>
+            <input id="totp-confirm-code" class="field-input totp-code-input" type="text" [ngModel]="totpConfirmCode()" (ngModelChange)="totpConfirmCode.set($event)" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
           </div>
           @if (totpError()) {
             <p class="msg msg-error">{{ totpError() }}</p>

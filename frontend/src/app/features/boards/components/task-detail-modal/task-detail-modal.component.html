@@ -1,4 +1,4 @@
-<div class="modal-backdrop" (click)="close()">
+<div class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Task details" (click)="close()">
   <div class="modal-card" (click)="$event.stopPropagation()">
 
     <div class="modal-header">
@@ -35,6 +35,7 @@
                 class="priority-btn"
                 [class]="'priority-' + p"
                 [class.active]="priority() === p"
+                [attr.aria-pressed]="priority() === p"
                 (click)="priority.set(p)"
               >{{ p }}</button>
             }

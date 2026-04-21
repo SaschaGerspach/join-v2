@@ -7,6 +7,7 @@
       type="number"
       min="1"
       max="1440"
+      aria-label="Duration in minutes"
       placeholder="Min"
       [ngModel]="newDuration()"
       (ngModelChange)="newDuration.set($event)"
@@ -14,6 +15,7 @@
     <input
       class="field-input note-input"
       type="text"
+      aria-label="Time entry note"
       placeholder="Note (optional)"
       [ngModel]="newNote()"
       (ngModelChange)="newNote.set($event)"
@@ -29,7 +31,7 @@
           <span class="entry-duration">{{ formatDuration(entry.duration_minutes) }}</span>
           <span class="entry-note">{{ entry.note || '—' }}</span>
           <span class="entry-user">{{ entry.user_name }}</span>
-          <button class="btn-remove" (click)="deleteEntry(entry)">&#10005;</button>
+          <button class="btn-remove" aria-label="Delete time entry" (click)="deleteEntry(entry)">&#10005;</button>
         </li>
       }
     </ul>

@@ -9,13 +9,16 @@
 
     <form #f="ngForm" (ngSubmit)="register(f)">
       <div class="form-group">
+        <label for="register-first-name" class="visually-hidden">First name</label>
         <input
+          id="register-first-name"
           class="form-input"
           type="text"
           [(ngModel)]="firstName"
           name="firstName"
           placeholder="First name"
           required
+          autocomplete="given-name"
           #firstNameField="ngModel"
           [class.input-error]="firstNameField.invalid && (firstNameField.touched || f.submitted)"
         />
@@ -25,13 +28,16 @@
       </div>
 
       <div class="form-group">
+        <label for="register-last-name" class="visually-hidden">Last name</label>
         <input
+          id="register-last-name"
           class="form-input"
           type="text"
           [(ngModel)]="lastName"
           name="lastName"
           placeholder="Last name"
           required
+          autocomplete="family-name"
           #lastNameField="ngModel"
           [class.input-error]="lastNameField.invalid && (lastNameField.touched || f.submitted)"
         />
@@ -41,7 +47,9 @@
       </div>
 
       <div class="form-group">
+        <label for="register-email" class="visually-hidden">Email</label>
         <input
+          id="register-email"
           class="form-input"
           type="email"
           [(ngModel)]="email"
@@ -49,6 +57,7 @@
           placeholder="Email"
           required
           email
+          autocomplete="email"
           #emailField="ngModel"
           [class.input-error]="emailField.invalid && (emailField.touched || f.submitted)"
         />
@@ -62,7 +71,9 @@
 
       <div class="form-group">
         <div class="password-wrapper">
+          <label for="register-password" class="visually-hidden">Password</label>
           <input
+            id="register-password"
             class="form-input"
             [type]="showPassword() ? 'text' : 'password'"
             [ngModel]="password"
@@ -71,6 +82,7 @@
             placeholder="Password (min. 8 characters)"
             required
             minlength="8"
+            autocomplete="new-password"
             #passwordField="ngModel"
             [class.input-error]="passwordField.invalid && (passwordField.touched || f.submitted)"
           />
@@ -97,7 +109,7 @@
       </div>
 
       @if (error()) {
-        <p class="error-message">{{ error() }}</p>
+        <p class="error-message" role="alert">{{ error() }}</p>
       }
 
       <div class="auth-actions">

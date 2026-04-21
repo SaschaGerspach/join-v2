@@ -9,7 +9,7 @@
     (focus)="open.set(true)"
   />
   @if (open() && (results().length > 0 || loading() || query().length >= 2)) {
-    <div class="search-dropdown">
+    <div class="search-dropdown" role="listbox" aria-label="Search results">
       @if (loading()) {
         <div class="search-loading">Searching…</div>
       } @else if (results().length === 0 && query().length >= 2) {

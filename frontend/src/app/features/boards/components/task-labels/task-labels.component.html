@@ -6,6 +6,7 @@
         class="label-toggle"
         [style.background]="label.color"
         [class.active]="selectedLabelIds().has(label.id)"
+        [attr.aria-pressed]="selectedLabelIds().has(label.id)"
         (click)="toggleLabel(label.id)"
       >{{ label.name }}</button>
     }
@@ -14,6 +15,7 @@
     <input
       class="field-input"
       type="text"
+      aria-label="New label name"
       [(ngModel)]="newLabelName"
       placeholder="New label…"
       (keyup.enter)="createLabel()"

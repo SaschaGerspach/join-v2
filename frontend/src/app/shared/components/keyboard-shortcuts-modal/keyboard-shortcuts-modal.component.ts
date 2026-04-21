@@ -6,11 +6,11 @@ export type Shortcut = { key: string; description: string };
   selector: 'app-keyboard-shortcuts-modal',
   standalone: true,
   template: `
-    <div class="modal-backdrop" (click)="closed.emit()">
+    <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" (click)="closed.emit()">
       <div class="modal-card" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>Keyboard Shortcuts</h2>
-          <button class="btn-close" (click)="closed.emit()">&#10005;</button>
+          <h2 id="shortcuts-title">Keyboard Shortcuts</h2>
+          <button class="btn-close" aria-label="Close" (click)="closed.emit()">&#10005;</button>
         </div>
         <div class="modal-body">
           @for (s of shortcuts; track s.key) {
