@@ -2,32 +2,30 @@ import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@ang
 import { RouterModule, Router } from '@angular/router';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { PendingEmailService } from '../../../../core/auth/pending-email.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-verify-email-sent-page',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, TranslateModule],
   template: `
     <div class="auth-page">
       <div class="auth-logo"><span>Join</span></div>
       <div class="auth-card">
-        <h1>Check your inbox</h1>
+        <h1>{{ 'AUTH.CHECK_INBOX' | translate }}</h1>
         <div class="auth-divider"></div>
-        <p class="info-message">
-          We sent a verification link to <strong>{{ email() }}</strong>.
-          Click it to activate your account.
-        </p>
+        <p class="info-message" [innerHTML]="'AUTH.VERIFICATION_SENT' | translate:{ email: email() }"></p>
         @if (sent()) {
-          <p class="info-message success">Verification email resent.</p>
+          <p class="info-message success">{{ 'AUTH.VERIFICATION_RESENT' | translate }}</p>
         }
         @if (error()) {
           <p class="error-message">{{ error() }}</p>
         }
         <div class="auth-actions">
           <button class="btn-secondary" (click)="resend()" [disabled]="resending()">
-            {{ resending() ? 'Sending…' : 'Resend email' }}
+            {{ resending() ? ('AUTH.SENDING' | translate) : ('AUTH.RESEND_EMAIL' | translate) }}
           </button>
-          <a routerLink="/login" class="btn-primary">Go to login</a>
+          <a routerLink="/login" class="btn-primary">{{ 'AUTH.GO_TO_LOGIN' | translate }}</a>
         </div>
       </div>
     </div>
@@ -39,6 +37,7 @@ export class VerifyEmailSentPageComponent implements OnInit {
   private readonly authApi = inject(AuthApiService);
   private readonly pendingEmail = inject(PendingEmailService);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
 
   email = signal('');
   resending = signal(false);
@@ -60,7 +59,7 @@ export class VerifyEmailSentPageComponent implements OnInit {
     this.sent.set(false);
     this.authApi.resendVerification(this.email()).subscribe({
       next: () => { this.sent.set(true); this.resending.set(false); },
-      error: () => { this.error.set('Failed to resend. Try again.'); this.resending.set(false); },
+      error: () => { this.error.set(this.translate.instant('AUTH.RESEND_FAILED')); this.resending.set(false); },
     });
   }
 }

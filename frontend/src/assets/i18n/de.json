@@ -46,7 +46,30 @@
     "TOTP_INVALID": "Geben Sie einen 6-stelligen Code ein.",
     "EMAIL_NOT_VERIFIED": "E-Mail nicht bestätigt.",
     "RESEND_LINK": "Link erneut senden",
-    "PASSWORD_PLACEHOLDER": "Passwort (min. 8 Zeichen)"
+    "PASSWORD_PLACEHOLDER": "Passwort (min. 8 Zeichen)",
+    "RESET_PASSWORD": "Passwort zurücksetzen",
+    "RESET_SENT": "Wenn ein Konto für diese E-Mail existiert, erhalten Sie in Kürze einen Link zum Zurücksetzen.",
+    "SEND_RESET_LINK": "Link senden",
+    "SENDING": "Senden…",
+    "SOMETHING_WRONG": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "SET_NEW_PASSWORD": "Neues Passwort setzen",
+    "PASSWORD_UPDATED": "Passwort aktualisiert. Du kannst dich jetzt anmelden.",
+    "GO_TO_LOGIN": "Zur Anmeldung",
+    "NEW_PASSWORD": "Neues Passwort",
+    "CONFIRM_PASSWORD": "Passwort bestätigen",
+    "SAVING": "Speichern…",
+    "SET_PASSWORD": "Passwort setzen",
+    "PASSWORDS_NO_MATCH": "Passwörter stimmen nicht überein.",
+    "INVALID_LINK": "Ungültiger oder abgelaufener Link.",
+    "CHECK_INBOX": "Prüfe dein Postfach",
+    "VERIFICATION_SENT": "Wir haben einen Bestätigungslink an <strong>{{email}}</strong> gesendet. Klicke darauf, um dein Konto zu aktivieren.",
+    "VERIFICATION_RESENT": "Bestätigungs-E-Mail erneut gesendet.",
+    "RESEND_EMAIL": "Erneut senden",
+    "RESEND_FAILED": "Erneutes Senden fehlgeschlagen. Versuche es nochmal.",
+    "VERIFYING": "Wird überprüft…",
+    "EMAIL_VERIFIED": "E-Mail bestätigt!",
+    "ACCOUNT_ACTIVE": "Dein Konto ist jetzt aktiv. Du kannst dich anmelden.",
+    "VERIFICATION_FAILED": "Bestätigung fehlgeschlagen"
   },
   "BOARDS": {
     "MY_BOARDS": "Meine Boards",
@@ -115,7 +138,16 @@
     "FILTER_ASSIGNEE": "Nach Zuständigem filtern",
     "FILTER_DUE": "Nach Fälligkeitsdatum filtern",
     "GROUP_BY": "Gruppieren nach",
-    "MOVE_COLUMN": "Aufgaben in Spalte verschieben"
+    "MOVE_COLUMN": "Aufgaben in Spalte verschieben",
+    "URGENT": "Dringend",
+    "HIGH": "Hoch",
+    "MEDIUM": "Mittel",
+    "LOW": "Niedrig",
+    "REPEATS": "Wiederholt sich {{interval}}",
+    "BOARD_TITLE_LABEL": "Board-Titel",
+    "IMPORT_SUCCESS": "{{count}} Aufgaben importiert.",
+    "IMPORT_FAILED": "Import fehlgeschlagen.",
+    "FILTER_NAME": "Filtername:"
   },
   "TASK": {
     "NEW_TASK": "Neue Aufgabe",
@@ -332,5 +364,10 @@
     "CONFIRM": "Bestätigen",
     "OFFLINE": "Du bist offline — Änderungen werden automatisch synchronisiert.",
     "PENDING": "ausstehend"
+  },
+  "NOT_FOUND": {
+    "TITLE": "404",
+    "MESSAGE": "Diese Seite existiert nicht.",
+    "BACK_HOME": "Zurück zur Startseite"
   }
 }

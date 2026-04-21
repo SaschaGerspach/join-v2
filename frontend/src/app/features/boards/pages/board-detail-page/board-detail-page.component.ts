@@ -13,11 +13,12 @@ import { Column } from '../../../../core/columns/columns-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 import { UserAvatarComponent } from '../../../../shared/components/user-avatar/user-avatar.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule, DragDropModule, SlicePipe, UpperCasePipe, RouterModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe, UserAvatarComponent],
+  imports: [FormsModule, DragDropModule, SlicePipe, UpperCasePipe, RouterModule, TranslateModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe, UserAvatarComponent],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
   providers: [BoardStateService],
@@ -28,6 +29,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly boardsApi = inject(BoardsApiService);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   protected readonly state = inject(BoardStateService);
 
   showColumnForm = signal(false);
@@ -103,16 +105,16 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
     if (!file) return;
     this.boardsApi.importCsv(this.state.boardId(), file).subscribe({
       next: (res) => {
-        this.toast.show(`Imported ${res.imported} tasks.`);
+        this.toast.show(this.translate.instant('BOARD_DETAIL.IMPORT_SUCCESS', { count: res.imported }));
         this.state.reload();
       },
-      error: (err) => this.toast.show(err?.error?.detail ?? 'Import failed.', 'error'),
+      error: (err) => this.toast.show(err?.error?.detail ?? this.translate.instant('BOARD_DETAIL.IMPORT_FAILED'), 'error'),
     });
     input.value = '';
   }
 
   saveFilter(): void {
-    const name = prompt('Filter name:');
+    const name = prompt(this.translate.instant('BOARD_DETAIL.FILTER_NAME'));
     if (name?.trim()) {
       this.state.saveCurrentFilter(name.trim());
     }

@@ -1,15 +1,16 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-not-found-page',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslateModule],
   template: `
     <div class="not-found">
       <h1>404</h1>
-      <p>This page does not exist.</p>
-      <a routerLink="/">Back to home</a>
+      <p>{{ 'NOT_FOUND.MESSAGE' | translate }}</p>
+      <a routerLink="/">{{ 'NOT_FOUND.BACK_HOME' | translate }}</a>
     </div>
   `,
   styles: [`

@@ -2,22 +2,23 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-forgot-password-page',
   standalone: true,
-  imports: [FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule, TranslateModule],
   template: `
     <div class="auth-page">
       <div class="auth-logo"><span>Join</span></div>
       <div class="auth-card">
-        <h1>Reset password</h1>
+        <h1>{{ 'AUTH.RESET_PASSWORD' | translate }}</h1>
         <div class="auth-divider"></div>
 
         @if (sent()) {
-          <p class="info-message">If an account exists for this email, you will receive a reset link shortly.</p>
+          <p class="info-message">{{ 'AUTH.RESET_SENT' | translate }}</p>
           <div class="auth-actions">
-            <a routerLink="/login" class="btn-secondary">Back to login</a>
+            <a routerLink="/login" class="btn-secondary">{{ 'AUTH.BACK_TO_LOGIN' | translate }}</a>
           </div>
         } @else {
           <form #f="ngForm" (ngSubmit)="submit(f)">
@@ -27,14 +28,14 @@ import { AuthApiService } from '../../../../core/auth/auth-api.service';
                 type="email"
                 [(ngModel)]="email"
                 name="email"
-                placeholder="Email"
+                [placeholder]="'AUTH.EMAIL' | translate"
                 required
                 email
                 #emailField="ngModel"
                 [class.input-error]="emailField.invalid && (emailField.touched || f.submitted)"
               />
               @if (emailField.invalid && (emailField.touched || f.submitted)) {
-                <span class="field-error">Enter a valid email address.</span>
+                <span class="field-error">{{ 'AUTH.EMAIL_INVALID' | translate }}</span>
               }
             </div>
             @if (error()) {
@@ -42,9 +43,9 @@ import { AuthApiService } from '../../../../core/auth/auth-api.service';
             }
             <div class="auth-actions">
               <button type="submit" class="btn-primary" [disabled]="submitting()">
-                {{ submitting() ? 'Sending…' : 'Send reset link' }}
+                {{ submitting() ? ('AUTH.SENDING' | translate) : ('AUTH.SEND_RESET_LINK' | translate) }}
               </button>
-              <a routerLink="/login" class="btn-secondary">Cancel</a>
+              <a routerLink="/login" class="btn-secondary">{{ 'COMMON.CANCEL' | translate }}</a>
             </div>
           </form>
         }

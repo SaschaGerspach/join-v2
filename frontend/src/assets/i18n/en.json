@@ -46,7 +46,30 @@
     "TOTP_INVALID": "Enter a 6-digit code.",
     "EMAIL_NOT_VERIFIED": "Email not verified.",
     "RESEND_LINK": "Resend link",
-    "PASSWORD_PLACEHOLDER": "Password (min. 8 characters)"
+    "PASSWORD_PLACEHOLDER": "Password (min. 8 characters)",
+    "RESET_PASSWORD": "Reset password",
+    "RESET_SENT": "If an account exists for this email, you will receive a reset link shortly.",
+    "SEND_RESET_LINK": "Send reset link",
+    "SENDING": "Sending…",
+    "SOMETHING_WRONG": "Something went wrong. Please try again.",
+    "SET_NEW_PASSWORD": "Set new password",
+    "PASSWORD_UPDATED": "Password updated. You can now log in.",
+    "GO_TO_LOGIN": "Go to login",
+    "NEW_PASSWORD": "New password",
+    "CONFIRM_PASSWORD": "Confirm password",
+    "SAVING": "Saving…",
+    "SET_PASSWORD": "Set password",
+    "PASSWORDS_NO_MATCH": "Passwords do not match.",
+    "INVALID_LINK": "Invalid or expired link.",
+    "CHECK_INBOX": "Check your inbox",
+    "VERIFICATION_SENT": "We sent a verification link to <strong>{{email}}</strong>. Click it to activate your account.",
+    "VERIFICATION_RESENT": "Verification email resent.",
+    "RESEND_EMAIL": "Resend email",
+    "RESEND_FAILED": "Failed to resend. Try again.",
+    "VERIFYING": "Verifying…",
+    "EMAIL_VERIFIED": "Email verified!",
+    "ACCOUNT_ACTIVE": "Your account is now active. You can log in.",
+    "VERIFICATION_FAILED": "Verification failed"
   },
   "BOARDS": {
     "MY_BOARDS": "My Boards",
@@ -115,7 +138,16 @@
     "FILTER_ASSIGNEE": "Filter by assignee",
     "FILTER_DUE": "Filter by due date",
     "GROUP_BY": "Group by",
-    "MOVE_COLUMN": "Move tasks to column"
+    "MOVE_COLUMN": "Move tasks to column",
+    "URGENT": "Urgent",
+    "HIGH": "High",
+    "MEDIUM": "Medium",
+    "LOW": "Low",
+    "REPEATS": "Repeats {{interval}}",
+    "BOARD_TITLE_LABEL": "Board title",
+    "IMPORT_SUCCESS": "Imported {{count}} tasks.",
+    "IMPORT_FAILED": "Import failed.",
+    "FILTER_NAME": "Filter name:"
   },
   "TASK": {
     "NEW_TASK": "New Task",
@@ -332,5 +364,10 @@
     "CONFIRM": "Confirm",
     "OFFLINE": "You are offline — changes will sync automatically when reconnected.",
     "PENDING": "pending"
+  },
+  "NOT_FOUND": {
+    "TITLE": "404",
+    "MESSAGE": "This page does not exist.",
+    "BACK_HOME": "Back to home"
   }
 }

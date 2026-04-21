@@ -9,7 +9,7 @@
       <input
         class="board-title-input"
         type="text"
-        aria-label="Board title"
+        [attr.aria-label]="'BOARD_DETAIL.BOARD_TITLE_LABEL' | translate"
         [(ngModel)]="boardTitleInput"
         (keyup.enter)="confirmRenameBoardTitle()"
         (keyup.escape)="state.editingBoardTitle.set(false)"
@@ -22,41 +22,41 @@
       #searchInput
       class="search-input"
       type="search"
-      aria-label="Search tasks"
-      placeholder="Search tasks… (press /)"
+      [attr.aria-label]="'BOARD_DETAIL.SEARCH_TASKS' | translate"
+      [placeholder]="'BOARD_DETAIL.SEARCH_TASKS' | translate"
       [value]="state.searchQuery()"
       (input)="state.searchQuery.set(inputValue($event))"
     />
-    <select class="filter-select" aria-label="Filter by priority" [ngModel]="state.filterPriority()" (ngModelChange)="state.filterPriority.set($event)">
-      <option value="">All priorities</option>
-      <option value="urgent">Urgent</option>
-      <option value="high">High</option>
-      <option value="medium">Medium</option>
-      <option value="low">Low</option>
+    <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.FILTER_PRIORITY' | translate" [ngModel]="state.filterPriority()" (ngModelChange)="state.filterPriority.set($event)">
+      <option value="">{{ 'BOARD_DETAIL.ALL_PRIORITIES' | translate }}</option>
+      <option value="urgent">{{ 'BOARD_DETAIL.URGENT' | translate }}</option>
+      <option value="high">{{ 'BOARD_DETAIL.HIGH' | translate }}</option>
+      <option value="medium">{{ 'BOARD_DETAIL.MEDIUM' | translate }}</option>
+      <option value="low">{{ 'BOARD_DETAIL.LOW' | translate }}</option>
     </select>
-    <select class="filter-select" aria-label="Filter by assignee" [ngModel]="state.filterAssignee()" (ngModelChange)="state.filterAssignee.set($event === '' ? '' : +$event)">
-      <option value="">All assignees</option>
+    <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.FILTER_ASSIGNEE' | translate" [ngModel]="state.filterAssignee()" (ngModelChange)="state.filterAssignee.set($event === '' ? '' : +$event)">
+      <option value="">{{ 'BOARD_DETAIL.ALL_ASSIGNEES' | translate }}</option>
       @for (c of state.contacts(); track c.id) {
         <option [value]="c.id">{{ c.first_name }} {{ c.last_name }}</option>
       }
     </select>
-    <select class="filter-select" aria-label="Filter by due date" [ngModel]="state.filterDue()" (ngModelChange)="state.filterDue.set($event)">
-      <option value="">Any due date</option>
-      <option value="overdue">Overdue</option>
-      <option value="soon">Due soon</option>
+    <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.FILTER_DUE' | translate" [ngModel]="state.filterDue()" (ngModelChange)="state.filterDue.set($event)">
+      <option value="">{{ 'BOARD_DETAIL.ANY_DUE_DATE' | translate }}</option>
+      <option value="overdue">{{ 'BOARD_DETAIL.OVERDUE' | translate }}</option>
+      <option value="soon">{{ 'BOARD_DETAIL.DUE_SOON' | translate }}</option>
     </select>
-    <select class="filter-select" aria-label="Group by" [ngModel]="state.groupBy()" (ngModelChange)="state.groupBy.set($event)">
-      <option value="none">No grouping</option>
-      <option value="priority">Group by Priority</option>
-      <option value="assignee">Group by Assignee</option>
+    <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.GROUP_BY' | translate" [ngModel]="state.groupBy()" (ngModelChange)="state.groupBy.set($event)">
+      <option value="none">{{ 'BOARD_DETAIL.NO_GROUPING' | translate }}</option>
+      <option value="priority">{{ 'BOARD_DETAIL.GROUP_PRIORITY' | translate }}</option>
+      <option value="assignee">{{ 'BOARD_DETAIL.GROUP_ASSIGNEE' | translate }}</option>
     </select>
     @if (state.hasActiveFilter()) {
-      <button class="btn-clear-filter" aria-label="Clear filters" (click)="state.clearFilters()">&#10005; Clear</button>
-      <button class="btn-save-filter" (click)="saveFilter()">Save filter</button>
+      <button class="btn-clear-filter" [attr.aria-label]="'BOARD_DETAIL.CLEAR_FILTERS' | translate" (click)="state.clearFilters()">&#10005; {{ 'BOARD_DETAIL.CLEAR' | translate }}</button>
+      <button class="btn-save-filter" (click)="saveFilter()">{{ 'BOARD_DETAIL.SAVE_FILTER' | translate }}</button>
     }
     @if (state.savedFilters().length > 0) {
-      <select class="filter-select" aria-label="Saved filters" (change)="applySavedFilter($event)">
-        <option value="">Saved filters…</option>
+      <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.SAVED_FILTERS' | translate" (change)="applySavedFilter($event)">
+        <option value="">{{ 'BOARD_DETAIL.SAVED_FILTERS' | translate }}</option>
         @for (f of state.savedFilters(); track f.name) {
           <option [value]="f.name">{{ f.name }}</option>
         }
@@ -71,31 +71,31 @@
         }
       </div>
     }
-    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'stats']">Stats</a>
-    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'activity']">Activity</a>
+    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'stats']">{{ 'BOARD_DETAIL.STATS' | translate }}</a>
+    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'activity']">{{ 'BOARD_DETAIL.ACTIVITY' | translate }}</a>
     @if (state.canViewArchive()) {
-      <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'archive']">Archive</a>
+      <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'archive']">{{ 'BOARD_DETAIL.ARCHIVE' | translate }}</a>
     }
-    <button class="btn-stats" (click)="exportCsv()">Export CSV</button>
+    <button class="btn-stats" (click)="exportCsv()">{{ 'BOARD_DETAIL.EXPORT_CSV' | translate }}</button>
     <label class="btn-stats import-label">
-      Import CSV
+      {{ 'BOARD_DETAIL.IMPORT_CSV' | translate }}
       <input type="file" accept=".csv" hidden (change)="importCsv($event)" />
     </label>
-    <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>
+    <button class="btn-add-column" (click)="showColumnForm.set(true)">{{ 'BOARD_DETAIL.ADD_COLUMN' | translate }}</button>
   </div>
 
   @if (state.bulkMode()) {
     <div class="bulk-toolbar">
-      <span class="bulk-count">{{ state.selectedTaskIds().size }} selected</span>
-      <select class="filter-select" aria-label="Move tasks to column" [ngModel]="state.bulkMoveTarget()" (ngModelChange)="state.bulkMoveTarget.set($event === '' ? null : +$event)">
-        <option value="">Move to…</option>
+      <span class="bulk-count">{{ 'BOARD_DETAIL.SELECTED' | translate:{ count: state.selectedTaskIds().size } }}</span>
+      <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.MOVE_COLUMN' | translate" [ngModel]="state.bulkMoveTarget()" (ngModelChange)="state.bulkMoveTarget.set($event === '' ? null : +$event)">
+        <option value="">{{ 'BOARD_DETAIL.MOVE_TO' | translate }}</option>
         @for (col of state.columns(); track col.id) {
           <option [value]="col.id">{{ col.title }}</option>
         }
       </select>
-      <button class="btn-bulk-move" [disabled]="state.bulkMoveTarget() === null" (click)="state.bulkMove()">Move</button>
-      <button class="btn-bulk-delete" (click)="state.pendingBulkDelete.set(true)">Delete</button>
-      <button class="btn-clear-filter" (click)="state.clearSelection()">&#10005; Cancel</button>
+      <button class="btn-bulk-move" [disabled]="state.bulkMoveTarget() === null" (click)="state.bulkMove()">{{ 'BOARD_DETAIL.MOVE' | translate }}</button>
+      <button class="btn-bulk-delete" (click)="state.pendingBulkDelete.set(true)">{{ 'BOARD_DETAIL.DELETE' | translate }}</button>
+      <button class="btn-clear-filter" (click)="state.clearSelection()">&#10005; {{ 'COMMON.CANCEL' | translate }}</button>
     </div>
   }
 
@@ -104,14 +104,14 @@
       <input
         class="form-input"
         type="text"
-        aria-label="New column title"
+        [attr.aria-label]="'BOARD_DETAIL.COLUMN_TITLE' | translate"
         [(ngModel)]="newColumnTitle"
-        placeholder="Column title"
+        [placeholder]="'BOARD_DETAIL.COLUMN_TITLE' | translate"
         (keyup.enter)="createColumn()"
       />
       <div class="column-form-actions">
-        <button class="btn-cancel" (click)="showColumnForm.set(false)">Cancel</button>
-        <button class="btn-confirm" (click)="createColumn()">Add</button>
+        <button class="btn-cancel" (click)="showColumnForm.set(false)">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn-confirm" (click)="createColumn()">{{ 'BOARD_DETAIL.ADD' | translate }}</button>
       </div>
     </div>
   }
@@ -132,7 +132,7 @@
             <input
               class="column-title-input"
               type="text"
-              aria-label="Column title"
+              [attr.aria-label]="'BOARD_DETAIL.COLUMN_TITLE' | translate"
               [(ngModel)]="editingColumnTitle"
               (keyup.enter)="confirmRenameColumn(column.id)"
               (keyup.escape)="state.editingColumnId.set(null)"
@@ -150,14 +150,14 @@
             class="wip-limit-input"
             type="number"
             min="1"
-            aria-label="WIP limit"
-            title="WIP limit"
+            [attr.aria-label]="'BOARD_DETAIL.WIP_LIMIT' | translate"
+            [title]="'BOARD_DETAIL.WIP_LIMIT' | translate"
             [value]="column.wip_limit ?? ''"
-            placeholder="WIP"
+            [placeholder]="'BOARD_DETAIL.WIP_LIMIT' | translate"
             (change)="onWipLimitChange(column.id, $event)"
             (click)="$event.stopPropagation()"
           />
-          <button class="btn-icon" (click)="state.pendingDeleteColumnId.set(column.id)" title="Delete column" aria-label="Delete column">&#10005;</button>
+          <button class="btn-icon" (click)="state.pendingDeleteColumnId.set(column.id)" [title]="'BOARD_DETAIL.DELETE_COLUMN' | translate" [attr.aria-label]="'BOARD_DETAIL.DELETE_COLUMN' | translate">&#10005;</button>
         </div>
 
         <div
@@ -179,14 +179,14 @@
                   <input
                     type="checkbox"
                     class="task-select-checkbox"
-                    aria-label="Select task"
+                    [attr.aria-label]="'BOARD_DETAIL.SELECT_TASK' | translate"
                     [checked]="state.isTaskSelected(task.id)"
                     (click)="state.toggleTaskSelection(task.id, $event)"
                   />
                   <span class="task-priority" [class]="state.priorityClass(task.priority)">
                     {{ task.priority }}
                   </span>
-                  <button class="btn-icon small" aria-label="Delete task" (click)="$event.stopPropagation(); state.pendingDeleteTaskId.set(task.id)">&#10005;</button>
+                  <button class="btn-icon small" [attr.aria-label]="'BOARD_DETAIL.DELETE_TASK' | translate" (click)="$event.stopPropagation(); state.pendingDeleteTaskId.set(task.id)">&#10005;</button>
                 </div>
                 <p class="task-title">{{ task.title }}</p>
                 @if (task.labels && task.labels.length > 0) {
@@ -203,7 +203,7 @@
                   <div class="task-due-date"
                        [class.overdue]="state.isOverdue(task.due_date)"
                        [class.due-soon]="!state.isOverdue(task.due_date) && state.isSoon(task.due_date)">
-                    <span class="due-icon">&#128197;</span>
+                    <span class="due-icon" aria-hidden="true">&#128197;</span>
                     <span>{{ task.due_date | slice:0:10 }}</span>
                   </div>
                 }
@@ -228,24 +228,24 @@
                   </div>
                 }
                 @if (task.recurrence) {
-                  <span class="recurrence-badge" title="Repeats {{ task.recurrence }}">&#128260; {{ task.recurrence }}</span>
+                  <span class="recurrence-badge" [title]="'BOARD_DETAIL.REPEATS' | translate:{ interval: task.recurrence }">&#128260; {{ task.recurrence }}</span>
                 }
                 @if (task.attachment_count > 0) {
-                  <span class="attachment-badge" title="Attachments">📎 {{ task.attachment_count }}</span>
+                  <span class="attachment-badge" [title]="'TASK.ATTACHMENTS' | translate">📎 {{ task.attachment_count }}</span>
                 }
               </div>
             }
           }
 
           @if (state.hasMoreTasks(column.id)) {
-            <button class="btn-show-more" (click)="state.expandColumn(column.id)">Show all ({{ state.hiddenTaskCount(column.id) }} more)</button>
+            <button class="btn-show-more" (click)="state.expandColumn(column.id)">{{ 'BOARD_DETAIL.SHOW_MORE' | translate:{ count: state.hiddenTaskCount(column.id) } }}</button>
           }
 
           @if (state.tasksForColumn(column.id).length === 0) {
-            <p class="column-empty">No tasks yet</p>
+            <p class="column-empty">{{ 'BOARD_DETAIL.NO_TASKS' | translate }}</p>
           }
 
-          <button class="btn-add-task" (click)="state.addingTaskForColumn.set(column.id)">+ Add Task</button>
+          <button class="btn-add-task" (click)="state.addingTaskForColumn.set(column.id)">{{ 'BOARD_DETAIL.ADD_TASK' | translate }}</button>
         </div>
 
       </div>
@@ -253,7 +253,7 @@
 
     @if (state.columns().length === 0) {
       <div class="board-empty">
-        <p>No columns yet. Add your first column!</p>
+        <p>{{ 'BOARD_DETAIL.NO_COLUMNS' | translate }}</p>
       </div>
     }
   </div>
@@ -284,7 +284,7 @@
 
 @if (state.pendingDeleteColumnId() !== null) {
   <app-confirm-dialog
-    message="Delete this column? All tasks inside will be removed."
+    [message]="'BOARD_DETAIL.CONFIRM_DELETE_COLUMN' | translate"
     (confirmed)="state.confirmDeleteColumn()"
     (cancelled)="state.pendingDeleteColumnId.set(null)"
   />
@@ -292,7 +292,7 @@
 
 @if (state.pendingDeleteTaskId() !== null) {
   <app-confirm-dialog
-    message="Delete this task?"
+    [message]="'BOARD_DETAIL.CONFIRM_DELETE_TASK' | translate"
     (confirmed)="state.confirmDeleteTask()"
     (cancelled)="state.pendingDeleteTaskId.set(null)"
   />
@@ -300,7 +300,7 @@
 
 @if (state.pendingBulkDelete()) {
   <app-confirm-dialog
-    [message]="'Delete ' + state.selectedTaskIds().size + ' selected task(s)?'"
+    [message]="'BOARD_DETAIL.CONFIRM_BULK_DELETE' | translate:{ count: state.selectedTaskIds().size }"
     (confirmed)="state.confirmBulkDelete()"
     (cancelled)="state.pendingBulkDelete.set(false)"
   />
