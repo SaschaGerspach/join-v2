@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'contacts_api',
     'notifications_api',
     'activity_api',
+    'teams_api',
 ]
 
 MIDDLEWARE = [

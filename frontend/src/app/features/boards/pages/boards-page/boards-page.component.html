@@ -39,7 +39,9 @@
         <div class="board-card" [style.border-left]="'4px solid ' + board.color" (click)="openBoard(board.id)">
           <div class="board-card-body">
             <h2>{{ board.title }}</h2>
-            @if (!board.is_owner) {
+            @if (board.team_name) {
+              <span class="shared-badge">{{ board.team_name }}</span>
+            } @else if (!board.is_owner) {
               <span class="shared-badge">Shared</span>
             }
           </div>

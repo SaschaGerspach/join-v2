@@ -17,14 +17,22 @@ def _get_member_role(board, user):
 def can_access_board(board, user):
     if user.is_staff:
         return True
-    return board.created_by_id == user.id or board.members.filter(user=user).exists()
+    if board.created_by_id == user.id or board.members.filter(user=user).exists():
+        return True
+    if board.team_id and board.team.members.filter(user=user).exists():
+        return True
+    return False
 
 
 def can_edit_board(board, user):
     if user.is_staff or board.created_by_id == user.id:
         return True
     role = _get_member_role(board, user)
-    return role in (BoardMember.Role.ADMIN, BoardMember.Role.EDITOR)
+    if role in (BoardMember.Role.ADMIN, BoardMember.Role.EDITOR):
+        return True
+    if board.team_id and board.team.members.filter(user=user).exists():
+        return True
+    return False
 
 
 def can_manage_members(board, user):

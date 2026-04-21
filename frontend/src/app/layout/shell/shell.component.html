@@ -18,6 +18,10 @@
         <span class="nav-icon">&#9776;</span>
         Boards
       </a>
+      <a routerLink="/teams" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="nav-icon">&#128101;</span>
+        Teams
+      </a>
       <a routerLink="/contacts" routerLinkActive="active" (click)="closeSidebar()">
         <span class="nav-icon">&#128100;</span>
         Contacts
@@ -107,6 +111,10 @@
     <a routerLink="/boards" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">
       <span>&#9776;</span>
       <span>Boards</span>
+    </a>
+    <a routerLink="/teams" routerLinkActive="active">
+      <span>&#128101;</span>
+      <span>Teams</span>
     </a>
     <a routerLink="/contacts" routerLinkActive="active">
       <span>&#128100;</span>

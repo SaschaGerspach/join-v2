@@ -43,6 +43,8 @@ def serialize_shared_board(board, user, *, is_favorite=False):
         "created_at": board.created_at,
         "is_owner": board.created_by == user,
         "is_favorite": is_favorite,
+        "team_id": board.team_id,
+        "team_name": board.team.name if board.team_id else None,
     }
 
 
@@ -63,7 +65,9 @@ def board_list(request):
         else:
             owned = Board.objects.filter(created_by=request.user)
             shared = Board.objects.filter(members__user=request.user)
-            boards = (owned | shared).distinct().order_by("-created_at")
+            team_boards = Board.objects.filter(team__members__user=request.user)
+            team_owned = Board.objects.filter(team__created_by=request.user)
+            boards = (owned | shared | team_boards | team_owned).distinct().order_by("-created_at")
         fav_ids = set(
             BoardFavorite.objects.filter(user=request.user).values_list("board_id", flat=True)
         )
@@ -77,7 +81,17 @@ def board_list(request):
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    board = Board.objects.create(title=serializer.validated_data["title"], created_by=request.user)
+    team_id = serializer.validated_data.get("team_id")
+    team = None
+    if team_id:
+        from teams_api.models import Team
+        try:
+            team = Team.objects.get(pk=team_id)
+            if not (team.created_by == request.user or team.members.filter(user=request.user).exists()):
+                team = None
+        except Team.DoesNotExist:
+            pass
+    board = Board.objects.create(title=serializer.validated_data["title"], created_by=request.user, team=team)
     template = serializer.validated_data.get("template", "kanban")
     columns = BOARD_TEMPLATES.get(template, BOARD_TEMPLATES["kanban"])
     Column.objects.bulk_create([
@@ -125,6 +139,18 @@ def board_detail(request, pk):
         if "color" in data:
             board.color = data["color"]
             changed_fields.append("color")
+        if "team_id" in data:
+            if data["team_id"] is None:
+                board.team = None
+            else:
+                from teams_api.models import Team
+                try:
+                    t = Team.objects.get(pk=data["team_id"])
+                    if t.created_by == request.user or t.members.filter(user=request.user).exists():
+                        board.team = t
+                except Team.DoesNotExist:
+                    pass
+            changed_fields.append("team")
         if changed_fields:
             board.save(update_fields=changed_fields)
         return Response(serialize_shared_board(board, request.user, is_favorite=is_fav))

@@ -10,6 +10,13 @@ class Board(models.Model):
         on_delete=models.CASCADE,
         related_name="boards",
     )
+    team = models.ForeignKey(
+        "teams_api.Team",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="boards",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

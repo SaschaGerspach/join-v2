@@ -9,6 +9,8 @@ class BoardSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField()
     is_owner = serializers.BooleanField()
     is_favorite = serializers.BooleanField()
+    team_id = serializers.IntegerField(allow_null=True)
+    team_name = serializers.CharField(allow_null=True)
 
 
 BOARD_TEMPLATES = {
@@ -25,11 +27,13 @@ class BoardCreateSerializer(serializers.Serializer):
         required=False,
         default="kanban",
     )
+    team_id = serializers.IntegerField(required=False, allow_null=True)
 
 
 class BoardUpdateSerializer(serializers.Serializer):
     title = serializers.CharField(required=False, max_length=255)
     color = serializers.RegexField(regex=r'^#[0-9a-fA-F]{6}$', required=False)
+    team_id = serializers.IntegerField(required=False, allow_null=True)
 
 
 class BoardMemberSerializer(serializers.Serializer):

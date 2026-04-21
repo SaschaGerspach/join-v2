@@ -13,6 +13,8 @@ export type Board = {
   created_at: string;
   is_owner: boolean;
   is_favorite: boolean;
+  team_id: number | null;
+  team_name: string | null;
 };
 
 export type BoardMemberRole = 'admin' | 'editor' | 'viewer';

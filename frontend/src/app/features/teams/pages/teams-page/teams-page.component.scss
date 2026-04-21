@@ -1,0 +1,302 @@
+@use 'variables' as *;
+
+.teams-page {
+  max-width: 800px;
+}
+
+// ─── Header ──────────────────────────────────────────────────────────────────
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text);
+
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
+  }
+}
+
+.btn-create {
+  background: $color-dark;
+  color: $color-white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: $color-primary;
+  }
+}
+
+// ─── Create Form ─────────────────────────────────────────────────────────────
+
+.create-form {
+  background: var(--color-surface);
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.form-input {
+  flex: 1;
+  border: 1px solid $color-border;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+
+  &:focus {
+    border-color: $color-primary;
+    outline: none;
+  }
+
+  &::placeholder {
+    color: $color-border;
+  }
+}
+
+.btn-confirm {
+  background: $color-dark;
+  color: $color-white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.7rem 1.4rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: $color-primary;
+  }
+}
+
+.btn-cancel {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 2px solid $color-border;
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $color-dark;
+  }
+}
+
+// ─── Team List ───────────────────────────────────────────────────────────────
+
+.teams-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.empty-state {
+  border: 1px dashed $color-muted;
+  border-radius: 16px;
+  padding: 3rem;
+  text-align: center;
+  color: $color-muted;
+  font-size: 1rem;
+}
+
+// ─── Team Card ───────────────────────────────────────────────────────────────
+
+.team-card {
+  background: var(--color-surface);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  }
+
+  &.expanded {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+  }
+}
+
+.team-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.team-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.team-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.team-meta {
+  font-size: 0.82rem;
+  color: $color-muted;
+}
+
+.team-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  color: $color-muted;
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  &.danger:hover {
+    color: $color-error;
+    background: rgba($color-error, 0.1);
+  }
+
+  &.small {
+    font-size: 0.85rem;
+    padding: 2px 4px;
+  }
+}
+
+.expand-arrow {
+  font-size: 0.75rem;
+  color: $color-muted;
+}
+
+// ─── Team Detail ─────────────────────────────────────────────────────────────
+
+.team-detail {
+  padding: 0 1.5rem 1.5rem;
+  border-top: 1px solid var(--color-border, $color-border);
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1rem;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--color-bg, $color-bg);
+  border-radius: 10px;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+  }
+}
+
+.member-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.member-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-email {
+  font-size: 0.8rem;
+  color: $color-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.role-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $color-muted;
+  background: var(--color-surface);
+  border: 1px solid $color-border;
+  border-radius: 6px;
+  padding: 3px 8px;
+  text-transform: capitalize;
+
+  &.owner {
+    color: $color-primary;
+    background: rgba($color-primary, 0.1);
+    border-color: rgba($color-primary, 0.3);
+  }
+}
+
+.role-select {
+  border: 1px solid $color-border;
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 0.82rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  cursor: pointer;
+
+  &:focus {
+    border-color: $color-primary;
+    outline: none;
+  }
+}
+
+// ─── Invite Row ──────────────────────────────────────────────────────────────
+
+.invite-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}

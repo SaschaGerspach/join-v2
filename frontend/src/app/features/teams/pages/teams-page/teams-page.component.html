@@ -1,0 +1,82 @@
+<div class="teams-page">
+  <div class="page-header">
+    <h1 class="page-title">Teams</h1>
+    <button class="btn-create" (click)="showCreateForm.set(true)">+ New Team</button>
+  </div>
+
+  @if (showCreateForm()) {
+    <div class="create-form">
+      <input class="form-input" type="text" [(ngModel)]="newTeamName" placeholder="Team name" (keyup.enter)="createTeam()" />
+      <button class="btn-confirm" (click)="createTeam()">Create</button>
+      <button class="btn-cancel" (click)="showCreateForm.set(false)">Cancel</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <app-loading-spinner />
+  } @else {
+    <div class="teams-list">
+      @for (team of teams(); track team.id) {
+        <div class="team-card" [class.expanded]="expandedTeamId() === team.id">
+          <div class="team-header" (click)="toggleExpand(team.id)">
+            <div class="team-info">
+              <span class="team-name">{{ team.name }}</span>
+              <span class="team-meta">{{ team.member_count }} member{{ team.member_count !== 1 ? 's' : '' }}</span>
+            </div>
+            <div class="team-actions">
+              @if (team.is_owner) {
+                <button class="btn-icon danger" (click)="deleteTeam(team.id); $event.stopPropagation()">&#10005;</button>
+              }
+              <span class="expand-arrow">{{ expandedTeamId() === team.id ? '▲' : '▼' }}</span>
+            </div>
+          </div>
+
+          @if (expandedTeamId() === team.id) {
+            <div class="team-detail">
+              <div class="members-list">
+                @for (member of teamMembers(); track member.user_id) {
+                  <div class="member-item">
+                    <div class="member-info">
+                      <span class="member-name">{{ member.first_name }} {{ member.last_name }}</span>
+                      <span class="member-email">{{ member.email }}</span>
+                    </div>
+                    @if (member.role === 'owner') {
+                      <span class="role-badge owner">Owner</span>
+                    } @else if (team.is_owner) {
+                      <select class="role-select" [ngModel]="member.role" (ngModelChange)="changeRole(member.user_id, $event)">
+                        <option value="admin">Admin</option>
+                        <option value="member">Member</option>
+                      </select>
+                      <button class="btn-icon danger small" (click)="removeMember(member.user_id)">&#10005;</button>
+                    } @else {
+                      <span class="role-badge">{{ member.role }}</span>
+                    }
+                  </div>
+                }
+              </div>
+
+              @if (team.is_owner) {
+                <div class="invite-row">
+                  <input class="form-input" type="email" [(ngModel)]="inviteEmail" placeholder="Invite by email" (keyup.enter)="inviteMember()" />
+                  <button class="btn-confirm" (click)="inviteMember()">Invite</button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (teams().length === 0) {
+        <p class="empty-state">No teams yet. Create one to get started.</p>
+      }
+    </div>
+  }
+</div>
+
+@if (pendingDeleteTeamId() !== null) {
+  <app-confirm-dialog
+    message="Delete this team? Boards won't be deleted but will lose their team assignment."
+    (confirmed)="confirmDeleteTeam()"
+    (cancelled)="pendingDeleteTeamId.set(null)"
+  />
+}
