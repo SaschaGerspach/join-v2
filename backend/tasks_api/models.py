@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import FileSystemStorage, storages
 from django.db import models
 
 from boards_api.models import Board
@@ -7,6 +7,8 @@ from columns_api.models import Column
 
 
 def _private_storage():
+    if getattr(settings, 'AWS_STORAGE_BUCKET_NAME', None):
+        return storages["private"]
     return FileSystemStorage(location=settings.PRIVATE_MEDIA_ROOT)
 
 

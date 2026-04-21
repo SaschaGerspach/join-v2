@@ -1,8 +1,10 @@
+import io
 import re
 import uuid
 
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.urls import reverse
+from PIL import Image
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -16,8 +18,18 @@ from ..serializers import AttachmentSerializer, AttachmentUploadSerializer
 from ._helpers import ALLOWED_ATTACHMENT_EXTENSIONS, serialize_task
 
 
+IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp", "bmp"}
+THUMB_MAX_PX = 200
+
+
 def serialize_attachment(att, request):
     download_url = reverse("tasks_api:attachment-download", kwargs={"task_pk": att.task_id, "pk": att.pk})
+    ext = att.filename.rsplit(".", 1)[-1].lower() if "." in att.filename else ""
+    thumb_url = None
+    if ext in IMAGE_EXTENSIONS:
+        thumb_url = request.build_absolute_uri(
+            reverse("tasks_api:attachment-thumbnail", kwargs={"task_pk": att.task_id, "pk": att.pk})
+        )
     try:
         size = att.file.size
     except (OSError, ValueError):
@@ -26,6 +38,7 @@ def serialize_attachment(att, request):
         "id": att.pk,
         "filename": att.filename,
         "url": request.build_absolute_uri(download_url),
+        "thumbnail_url": thumb_url,
         "size": size,
         "uploaded_at": att.uploaded_at,
     }
@@ -109,5 +122,31 @@ def attachment_download(request, task_pk, pk):
 
     try:
         return FileResponse(att.file.open("rb"), as_attachment=True, filename=att.filename)
+    except (FileNotFoundError, OSError):
+        return Response({"detail": "File not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET"])
+def attachment_thumbnail(request, task_pk, pk):
+    try:
+        att = Attachment.objects.select_related("task__board").get(pk=pk, task_id=task_pk)
+    except Attachment.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not can_access_board(att.task.board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    ext = att.filename.rsplit(".", 1)[-1].lower() if "." in att.filename else ""
+    if ext not in IMAGE_EXTENSIONS:
+        return Response({"detail": "Not an image."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        img = Image.open(att.file.open("rb"))
+        img = img.convert("RGB")
+        img.thumbnail((THUMB_MAX_PX, THUMB_MAX_PX), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=80)
+        buf.seek(0)
+        return HttpResponse(buf.getvalue(), content_type="image/jpeg")
     except (FileNotFoundError, OSError):
         return Response({"detail": "File not found."}, status=status.HTTP_404_NOT_FOUND)
