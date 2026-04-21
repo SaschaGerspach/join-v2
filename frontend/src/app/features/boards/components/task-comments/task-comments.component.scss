@@ -133,4 +133,38 @@
   white-space: nowrap;
 
   &:hover { background: $color-primary; }
+  &.small { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+}
+
+.comment-replies {
+  margin-top: 0.5rem;
+  margin-left: 1.25rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid $color-border;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.comment-item.reply {
+  background: var(--color-surface);
+  padding: 0.4rem 0.6rem;
+}
+
+.reply-input-row {
+  margin-top: 0.5rem;
+  margin-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.reply-textarea {
+  font-size: 0.82rem;
+}
+
+.reply-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }

@@ -32,6 +32,14 @@ export class TaskCommentsComponent implements OnInit {
   editingCommentId = signal<number | null>(null);
   editingCommentText = '';
   pendingDeleteCommentId = signal<number | null>(null);
+  replyingTo = signal<number | null>(null);
+  replyText = signal('');
+
+  topLevelComments = computed(() => this.comments().filter(c => !c.parent_id));
+
+  repliesFor(commentId: number): Comment[] {
+    return this.comments().filter(c => c.parent_id === commentId);
+  }
 
   mentionQuery = signal('');
   mentionActive = signal(false);
@@ -67,6 +75,31 @@ export class TaskCommentsComponent implements OnInit {
           this.newCommentText.set('');
         },
         error: () => this.toast.show('Failed to add comment.', 'error'),
+      });
+  }
+
+  startReply(commentId: number): void {
+    this.replyingTo.set(commentId);
+    this.replyText.set('');
+  }
+
+  cancelReply(): void {
+    this.replyingTo.set(null);
+    this.replyText.set('');
+  }
+
+  submitReply(parentId: number): void {
+    const text = this.replyText().trim();
+    if (!text) return;
+    this.commentsApi.create(this.taskId(), text, parentId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: c => {
+          this.comments.update(list => [...list, c]);
+          this.replyingTo.set(null);
+          this.replyText.set('');
+        },
+        error: () => this.toast.show('Failed to add reply.', 'error'),
       });
   }
 

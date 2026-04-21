@@ -17,6 +17,7 @@ def serialize_comment(comment):
         "task": comment.task_id,
         "author_id": comment.author_id,
         "author_name": f"{comment.author.first_name} {comment.author.last_name}".strip() or comment.author.email,
+        "parent_id": comment.parent_id,
         "text": comment.text,
         "created_at": comment.created_at,
         "updated_at": comment.updated_at,
@@ -49,7 +50,11 @@ def comment_list(request, task_pk):
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    comment = Comment.objects.create(task=task, author=request.user, text=serializer.validated_data["text"])
+    parent_id = serializer.validated_data.get("parent_id")
+    parent = None
+    if parent_id:
+        parent = Comment.objects.filter(pk=parent_id, task=task).first()
+    comment = Comment.objects.create(task=task, author=request.user, text=serializer.validated_data["text"], parent=parent)
     _notify_comment(comment, request.user)
     _notify_mentions(comment, request.user)
     log_activity(task.board, request.user, "created", "comment", task.title, task=task)

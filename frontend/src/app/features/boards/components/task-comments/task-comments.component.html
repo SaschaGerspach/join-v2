@@ -2,7 +2,7 @@
   <h3 class="section-label">Comments</h3>
 
   <div class="comment-list">
-    @for (c of comments(); track c.id) {
+    @for (c of topLevelComments(); track c.id) {
       <div class="comment-item">
         <div class="comment-header">
           <span class="comment-author">{{ c.author_name }}</span>
@@ -11,11 +11,44 @@
             <button class="btn-comment-action" (click)="startEditComment(c)">Edit</button>
             <button class="btn-comment-action danger" (click)="deleteComment(c.id)">Delete</button>
           }
+          <button class="btn-comment-action" (click)="startReply(c.id)">Reply</button>
         </div>
         @if (editingCommentId() === c.id) {
           <textarea class="comment-textarea" [(ngModel)]="editingCommentText" rows="2" (blur)="confirmEditComment(c)"></textarea>
         } @else {
           <div class="comment-text markdown-content" [innerHTML]="c.text | markdown"></div>
+        }
+
+        @if (repliesFor(c.id).length > 0) {
+          <div class="comment-replies">
+            @for (reply of repliesFor(c.id); track reply.id) {
+              <div class="comment-item reply">
+                <div class="comment-header">
+                  <span class="comment-author">{{ reply.author_name }}</span>
+                  <span class="comment-date">{{ reply.created_at | slice:0:10 }}</span>
+                  @if (isOwnComment(reply)) {
+                    <button class="btn-comment-action" (click)="startEditComment(reply)">Edit</button>
+                    <button class="btn-comment-action danger" (click)="deleteComment(reply.id)">Delete</button>
+                  }
+                </div>
+                @if (editingCommentId() === reply.id) {
+                  <textarea class="comment-textarea" [(ngModel)]="editingCommentText" rows="2" (blur)="confirmEditComment(reply)"></textarea>
+                } @else {
+                  <div class="comment-text markdown-content" [innerHTML]="reply.text | markdown"></div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        @if (replyingTo() === c.id) {
+          <div class="reply-input-row">
+            <textarea class="comment-textarea new reply-textarea" [ngModel]="replyText()" (ngModelChange)="replyText.set($event)" placeholder="Write a reply…" rows="2"></textarea>
+            <div class="reply-actions">
+              <button class="btn-add-comment small" (click)="submitReply(c.id)">Reply</button>
+              <button class="btn-comment-action" (click)="cancelReply()">Cancel</button>
+            </div>
+          </div>
         }
       </div>
     }

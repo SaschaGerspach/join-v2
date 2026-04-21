@@ -8,6 +8,7 @@ export type Comment = {
   task: number;
   author_id: number;
   author_name: string;
+  parent_id: number | null;
   text: string;
   created_at: string;
   updated_at: string;
@@ -22,8 +23,10 @@ export class CommentsApiService {
     return this.http.get<Comment[]>(`${this.baseUrl}/tasks/${taskId}/comments/`, { withCredentials: true });
   }
 
-  create(taskId: number, text: string): Observable<Comment> {
-    return this.http.post<Comment>(`${this.baseUrl}/tasks/${taskId}/comments/`, { text }, { withCredentials: true });
+  create(taskId: number, text: string, parentId?: number): Observable<Comment> {
+    const body: Record<string, unknown> = { text };
+    if (parentId) body['parent_id'] = parentId;
+    return this.http.post<Comment>(`${this.baseUrl}/tasks/${taskId}/comments/`, body, { withCredentials: true });
   }
 
   patch(taskId: number, commentId: number, text: string): Observable<Comment> {

@@ -104,6 +104,7 @@ class CommentSerializer(serializers.Serializer):
     task = serializers.IntegerField()
     author_id = serializers.IntegerField()
     author_name = serializers.CharField()
+    parent_id = serializers.IntegerField(allow_null=True)
     text = serializers.CharField()
     created_at = serializers.DateTimeField()
     updated_at = serializers.DateTimeField()
@@ -111,6 +112,7 @@ class CommentSerializer(serializers.Serializer):
 
 class CommentCreateSerializer(serializers.Serializer):
     text = serializers.CharField(max_length=5000)
+    parent_id = serializers.IntegerField(required=False, allow_null=True)
 
 
 class AttachmentSerializer(serializers.Serializer):
