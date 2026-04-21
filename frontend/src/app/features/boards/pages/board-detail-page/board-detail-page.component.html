@@ -68,6 +68,10 @@
       <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'archive']">Archive</a>
     }
     <button class="btn-stats" (click)="exportCsv()">Export CSV</button>
+    <label class="btn-stats import-label">
+      Import CSV
+      <input type="file" accept=".csv" hidden (change)="importCsv($event)" />
+    </label>
     <button class="btn-add-column" (click)="showColumnForm.set(true)">+ Add Column</button>
   </div>
 

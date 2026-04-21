@@ -8,6 +8,7 @@ urlpatterns = [
     path("", views.board_list, name="board-list"),
     path("<int:pk>/", views.board_detail, name="board-detail"),
     path("<int:pk>/export/csv/", views.board_export_csv, name="board-export-csv"),
+    path("<int:pk>/import/csv/", views.board_import_csv, name="board-import-csv"),
     path("<int:pk>/favorite/", views.board_favorite, name="board-favorite"),
     path("<int:pk>/members/", views.board_members, name="board-members"),
     path("<int:pk>/members/leave/", views.board_leave, name="board-leave"),

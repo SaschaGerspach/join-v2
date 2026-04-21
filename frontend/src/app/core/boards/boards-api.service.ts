@@ -80,6 +80,12 @@ export class BoardsApiService {
     return `${this.baseUrl}/boards/${boardId}/export/csv/`;
   }
 
+  importCsv(boardId: number, file: File): Observable<{ imported: number }> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<{ imported: number }>(`${this.baseUrl}/boards/${boardId}/import/csv/`, form, { withCredentials: true });
+  }
+
   getCustomFields(boardId: number): Observable<CustomField[]> {
     return this.http.get<CustomField[]>(`${this.baseUrl}/boards/${boardId}/fields/`, { withCredentials: true });
   }

@@ -10,6 +10,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
 import { BoardStateService } from '../../services/board-state.service';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 
 @Component({
@@ -25,6 +26,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   private readonly route = inject(ActivatedRoute);
   private readonly boardsApi = inject(BoardsApiService);
+  private readonly toast = inject(ToastService);
   protected readonly state = inject(BoardStateService);
 
   showColumnForm = signal(false);
@@ -92,6 +94,20 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
 
   exportCsv(): void {
     window.open(this.boardsApi.exportCsvUrl(this.state.boardId()), '_blank');
+  }
+
+  importCsv(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.boardsApi.importCsv(this.state.boardId(), file).subscribe({
+      next: (res) => {
+        this.toast.show(`Imported ${res.imported} tasks.`);
+        this.state.reload();
+      },
+      error: (err) => this.toast.show(err?.error?.detail ?? 'Import failed.', 'error'),
+    });
+    input.value = '';
   }
 
   saveFilter(): void {

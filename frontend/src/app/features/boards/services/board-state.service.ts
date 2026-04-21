@@ -124,6 +124,10 @@ export class BoardStateService {
     this.boardWs.disconnect();
   }
 
+  reload(): void {
+    this.loadData(this.boardId());
+  }
+
   clearFilters(): void {
     this.searchQuery.set('');
     this.filterPriority.set('');
