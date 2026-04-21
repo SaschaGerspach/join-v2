@@ -14,6 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken as RefreshTokenClass
 from auth_api.views._helpers import clear_refresh_cookie
 from boards_api.models import Board, BoardMember
 from config.serializers import DetailSerializer
+from audit_api.helpers import log_audit
 from .serializers import PublicUserSerializer, UserUpdateSerializer
 
 User = get_user_model()
@@ -129,6 +130,7 @@ def user_detail(request, pk):
             BoardMember.objects.filter(user=user).delete()
             user.is_active = False
             user.save(update_fields=["is_active"])
+        log_audit("account_deleted", user=user, request=request, detail=f"email={user.email}")
 
         for token in OutstandingToken.objects.filter(user=user):
             try:

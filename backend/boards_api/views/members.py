@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from config.serializers import DetailSerializer
 from ..models import BoardMember
 from ..permissions import get_board_or_404, can_manage_members
+from audit_api.helpers import log_audit
 from ..serializers import BoardMemberInviteSerializer, BoardMemberSerializer, BoardMemberRoleSerializer
 
 User = get_user_model()
@@ -65,6 +66,7 @@ def board_members(request, pk):
     _, created = BoardMember.objects.get_or_create(board=board, user=invitee)
     if not created:
         return Response({"detail": "User is already a member."}, status=status.HTTP_400_BAD_REQUEST)
+    log_audit("board_member_added", user=request.user, request=request, detail=f"board={board.pk} invited={invitee.email}")
 
     inviter = (request.user.first_name or request.user.email).replace('\n', '').replace('\r', '')
     board_title = board.title.replace('\n', '').replace('\r', '')
@@ -133,8 +135,10 @@ def board_member_detail(request, pk, user_pk):
         serializer = BoardMemberRoleSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        old_role = member.role
         member.role = serializer.validated_data["role"]
         member.save(update_fields=["role"])
+        log_audit("board_member_role_changed", user=request.user, request=request, detail=f"board={board.pk} user={member.user.email} {old_role}->{member.role}")
         return Response({
             "user_id": member.user_id,
             "email": member.user.email,
@@ -144,5 +148,6 @@ def board_member_detail(request, pk, user_pk):
             "avatar_url": request.build_absolute_uri(member.user.avatar.url) if member.user.avatar else None,
         })
 
+    log_audit("board_member_removed", user=request.user, request=request, detail=f"board={board.pk} removed={member.user.email}")
     member.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

@@ -18,6 +18,7 @@ from ..serializers import (
     MeSerializer,
     TwoFactorRequiredSerializer,
 )
+from audit_api.helpers import log_audit
 from ._helpers import AuthRateThrottle, clear_refresh_cookie, issue_tokens_for, set_refresh_cookie
 
 
@@ -45,6 +46,7 @@ def login_view(request):
     user = authenticate(request, username=email, password=password)
 
     if user is None:
+        log_audit("login_failed", request=request, detail=f"email={email}")
         return Response(
             {"detail": "Invalid credentials."},
             status=status.HTTP_401_UNAUTHORIZED,
@@ -65,11 +67,13 @@ def login_view(request):
             )
         totp = pyotp.TOTP(user.totp_secret)
         if not totp.verify(totp_code):
+            log_audit("login_failed", user=user, request=request, detail="invalid 2FA code")
             return Response(
                 {"detail": "Invalid 2FA code."},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
+    log_audit("login_success", user=user, request=request)
     refresh, access = issue_tokens_for(user)
     response = Response({
         "id": user.pk,

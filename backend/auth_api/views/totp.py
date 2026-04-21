@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from audit_api.helpers import log_audit
 from ..serializers import TotpSetupSerializer, TotpCodeSerializer, TotpDisableSerializer
 
 
@@ -56,6 +57,7 @@ def totp_confirm(request):
 
     user.totp_enabled = True
     user.save(update_fields=["totp_enabled"])
+    log_audit("totp_enabled", user=user, request=request)
     return Response({"detail": "2FA enabled."})
 
 
@@ -81,4 +83,5 @@ def totp_disable(request):
     user.totp_enabled = False
     user.totp_secret = ""
     user.save(update_fields=["totp_enabled", "totp_secret"])
+    log_audit("totp_disabled", user=user, request=request)
     return Response({"detail": "2FA disabled."})

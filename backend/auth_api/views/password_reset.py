@@ -12,6 +12,7 @@ from rest_framework.response import Response
 
 from config.serializers import DetailSerializer
 from ..serializers import EmailSerializer, PasswordResetConfirmSerializer
+from audit_api.helpers import log_audit
 from ._helpers import AuthRateThrottle, User
 
 
@@ -76,4 +77,5 @@ def password_reset_confirm(request):
         return Response({"detail": errors[0]}, status=status.HTTP_400_BAD_REQUEST)
 
     form.save()
+    log_audit("password_reset", user=user, request=request)
     return Response(status=status.HTTP_204_NO_CONTENT)

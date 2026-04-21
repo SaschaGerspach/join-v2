@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'notifications_api',
     'activity_api',
     'teams_api',
+    'audit_api',
 ]
 
 MIDDLEWARE = [
@@ -76,6 +77,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'audit_api.middleware.AdminAuditMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -347,6 +349,10 @@ CELERY_BEAT_SCHEDULE = {
     'send-daily-digest': {
         'task': 'notifications_api.tasks.send_daily_digest',
         'schedule': crontab(hour=7, minute=0),
+    },
+    'cleanup-audit-logs': {
+        'task': 'audit_api.tasks.cleanup_old_audit_logs',
+        'schedule': crontab(hour=3, minute=0),
     },
 }
 

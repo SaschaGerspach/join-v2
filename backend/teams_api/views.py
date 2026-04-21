@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Team, TeamMember
+from audit_api.helpers import log_audit
 from .serializers import TeamSerializer, TeamCreateSerializer, TeamMemberSerializer, InviteSerializer
 
 User = get_user_model()
@@ -121,6 +122,8 @@ def team_members(request, pk):
         return Response({"detail": "User is the team owner."}, status=status.HTTP_400_BAD_REQUEST)
 
     member, created = TeamMember.objects.get_or_create(team=team, user=user, defaults={"role": TeamMember.Role.MEMBER})
+    if created:
+        log_audit("team_member_added", user=request.user, request=request, detail=f"team={team.pk} invited={user.email}")
     return Response({
         "user_id": member.user_id, "email": user.email,
         "first_name": user.first_name, "last_name": user.last_name,
@@ -148,8 +151,10 @@ def team_member_detail(request, pk, user_pk):
     if request.method == "PATCH":
         role = request.data.get("role", "").strip()
         if role in (TeamMember.Role.ADMIN, TeamMember.Role.MEMBER):
+            old_role = member.role
             member.role = role
             member.save(update_fields=["role"])
+            log_audit("team_member_role_changed", user=request.user, request=request, detail=f"team={team.pk} user={member.user.email} {old_role}->{role}")
         return Response({
             "user_id": member.user_id, "email": member.user.email,
             "first_name": member.user.first_name, "last_name": member.user.last_name,
@@ -157,5 +162,6 @@ def team_member_detail(request, pk, user_pk):
             "avatar_url": request.build_absolute_uri(member.user.avatar.url) if member.user.avatar else None,
         })
 
+    log_audit("team_member_removed", user=request.user, request=request, detail=f"team={team.pk} removed={member.user.email}")
     member.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
