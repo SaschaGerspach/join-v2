@@ -5,6 +5,8 @@ import { Task } from '../tasks/tasks-api.service';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../auth/auth.service';
 
+export type PresenceUser = { id: number; first_name: string; last_name: string; email: string };
+
 export type BoardWsEvent =
   | { event: 'task_created'; data: Task }
   | { event: 'task_updated'; data: Task }
@@ -12,7 +14,10 @@ export type BoardWsEvent =
   | { event: 'tasks_reordered'; data: Task[] }
   | { event: 'column_created'; data: Column }
   | { event: 'column_updated'; data: Column }
-  | { event: 'column_deleted'; data: { id: number } };
+  | { event: 'column_deleted'; data: { id: number } }
+  | { event: 'presence_list'; data: PresenceUser[] }
+  | { event: 'presence_joined'; data: PresenceUser }
+  | { event: 'presence_left'; data: { id: number } };
 
 @Injectable({ providedIn: 'root' })
 export class BoardWsService {

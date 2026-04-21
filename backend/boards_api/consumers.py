@@ -1,5 +1,6 @@
 import json
 import logging
+from collections import defaultdict
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -8,6 +9,8 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken
 
 logger = logging.getLogger(__name__)
+
+_board_presence: dict[str, dict[int, dict]] = defaultdict(dict)
 
 
 class BoardConsumer(AsyncWebsocketConsumer):
@@ -36,11 +39,30 @@ class BoardConsumer(AsyncWebsocketConsumer):
             self.user = user
             self.group_name = f"board_{self.board_id}"
             await self.channel_layer.group_add(self.group_name, self.channel_name)
+
+            user_info = {"id": user.pk, "first_name": user.first_name, "last_name": user.last_name, "email": user.email}
+            online = list(_board_presence[self.group_name].values())
+            _board_presence[self.group_name][user.pk] = user_info
+
             await self.send(text_data=json.dumps({"type": "authenticated"}))
+            await self.send(text_data=json.dumps({"event": "presence_list", "data": list(_board_presence[self.group_name].values())}))
+
+            await self.channel_layer.group_send(self.group_name, {
+                "type": "board.event",
+                "payload": {"event": "presence_joined", "data": user_info},
+            })
             return
 
     async def disconnect(self, close_code):
         if self.group_name:
+            if self.user:
+                _board_presence[self.group_name].pop(self.user.pk, None)
+                await self.channel_layer.group_send(self.group_name, {
+                    "type": "board.event",
+                    "payload": {"event": "presence_left", "data": {"id": self.user.pk}},
+                })
+                if not _board_presence[self.group_name]:
+                    del _board_presence[self.group_name]
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     async def board_event(self, event):

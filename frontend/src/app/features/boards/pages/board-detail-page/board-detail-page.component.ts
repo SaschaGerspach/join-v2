@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { SlicePipe } from '@angular/common';
+import { SlicePipe, UpperCasePipe } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { TaskDetailModalComponent } from '../../components/task-detail-modal/task-detail-modal.component';
 import { CreateTaskModalComponent } from '../../components/create-task-modal/create-task-modal.component';
@@ -16,7 +16,7 @@ import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule, DragDropModule, SlicePipe, RouterModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe],
+  imports: [FormsModule, DragDropModule, SlicePipe, UpperCasePipe, RouterModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
   providers: [BoardStateService],

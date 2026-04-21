@@ -142,12 +142,42 @@ $bp-tablet: 1024px;
   color: $color-primary;
   text-decoration: none;
   white-space: nowrap;
+  cursor: pointer;
+  background: none;
 
   &:hover {
     background: $color-primary;
     color: $color-white;
     text-decoration: none;
   }
+}
+
+.import-label {
+  cursor: pointer;
+}
+
+.presence-bar {
+  display: flex;
+  align-items: center;
+  gap: -4px;
+  margin-left: auto;
+}
+
+.presence-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: $color-primary;
+  color: $color-white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-surface, $color-white);
+  margin-left: -6px;
+
+  &:first-child { margin-left: 0; }
 }
 
 .btn-add-column {

@@ -9,7 +9,7 @@ import { ColumnsApiService, Column } from '../../../core/columns/columns-api.ser
 import { TasksApiService, Task, CreateTaskPayload } from '../../../core/tasks/tasks-api.service';
 import { ContactsApiService, Contact } from '../../../core/contacts/contacts-api.service';
 import { ToastService } from '../../../shared/services/toast.service';
-import { BoardWsService } from '../../../core/websocket/board-ws.service';
+import { BoardWsService, PresenceUser } from '../../../core/websocket/board-ws.service';
 import { connectBoardWebSocket } from './_board-ws-handler';
 import { handleColumnDrop, handleTaskDrop } from './_board-drag-drop';
 import { bulkMoveTasks, bulkDeleteTasks } from './_board-bulk-ops';
@@ -39,6 +39,7 @@ export class BoardStateService {
   readonly columns = signal<Column[]>([]);
   readonly tasks = signal<Task[]>([]);
   readonly contacts = signal<Contact[]>([]);
+  readonly onlineUsers = signal<PresenceUser[]>([]);
   readonly loading = signal(true);
 
   readonly searchQuery = signal('');
@@ -117,7 +118,7 @@ export class BoardStateService {
     this.boardId.set(boardId);
     this.loadData(boardId);
     this.loadSavedFilters();
-    connectBoardWebSocket(boardId, this.boardWs, this.tasks, this.columns, this.destroyRef);
+    connectBoardWebSocket(boardId, this.boardWs, this.tasks, this.columns, this.onlineUsers, this.destroyRef);
   }
 
   cleanup(): void {

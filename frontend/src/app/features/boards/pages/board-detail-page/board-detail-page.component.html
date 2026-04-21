@@ -62,6 +62,15 @@
         }
       </select>
     }
+    @if (state.onlineUsers().length > 0) {
+      <div class="presence-bar">
+        @for (u of state.onlineUsers(); track u.id) {
+          <span class="presence-avatar" [title]="u.first_name + ' ' + u.last_name">
+            {{ (u.first_name[0] + u.last_name[0]) | uppercase }}
+          </span>
+        }
+      </div>
+    }
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'stats']">Stats</a>
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'activity']">Activity</a>
     @if (state.canViewArchive()) {
