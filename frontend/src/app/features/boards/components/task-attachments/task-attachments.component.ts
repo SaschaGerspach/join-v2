@@ -21,6 +21,7 @@ export class TaskAttachmentsComponent implements OnInit {
 
   attachments = signal<Attachment[]>([]);
   pendingDeleteAttachment = signal<Attachment | null>(null);
+  previewAttachment = signal<Attachment | null>(null);
 
   private readonly imageExtensions = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp']);
 
@@ -89,6 +90,22 @@ export class TaskAttachmentsComponent implements OnInit {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  }
+
+  openPreview(att: Attachment): void {
+    this.previewAttachment.set(att);
+  }
+
+  closePreview(): void {
+    this.previewAttachment.set(null);
+  }
+
+  isImage(filename: string): boolean {
+    return this.imageExtensions.has(this.getExt(filename));
+  }
+
+  isPdf(filename: string): boolean {
+    return this.getExt(filename) === 'pdf';
   }
 
   private getExt(filename: string): string {

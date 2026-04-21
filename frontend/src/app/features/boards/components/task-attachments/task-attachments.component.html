@@ -4,9 +4,7 @@
     <div class="attachment-gallery">
       @for (att of imageAttachments(); track att.id) {
         <div class="gallery-item">
-          <a [href]="att.url" target="_blank">
-            <img [src]="att.url" [alt]="att.filename" class="gallery-thumb" />
-          </a>
+          <img [src]="att.url" [alt]="att.filename" class="gallery-thumb" (click)="openPreview(att)" />
           <button class="btn-remove-thumb" aria-label="Delete attachment" (click)="deleteAttachment(att)">&#10005;</button>
         </div>
       }
@@ -15,7 +13,7 @@
   <div class="attachment-list">
     @for (att of fileAttachments(); track att.id) {
       <div class="attachment-item">
-        <a [href]="att.url" target="_blank" class="attachment-link">{{ att.filename }}</a>
+        <a class="attachment-link" (click)="openPreview(att); $event.preventDefault()" href="#">{{ att.filename }}</a>
         <span class="attachment-size">{{ formatSize(att.size) }}</span>
         <button class="btn-remove-sub" aria-label="Delete attachment" (click)="deleteAttachment(att)">&#10005;</button>
       </div>
@@ -32,6 +30,30 @@
     (change)="onFileSelected($event)"
   />
 </div>
+
+@if (previewAttachment()) {
+  <div class="preview-overlay" (click)="closePreview()">
+    <div class="preview-container" (click)="$event.stopPropagation()">
+      <div class="preview-header">
+        <span class="preview-filename">{{ previewAttachment()!.filename }}</span>
+        <a [href]="previewAttachment()!.url" target="_blank" class="preview-download">Download</a>
+        <button class="preview-close" (click)="closePreview()">&#10005;</button>
+      </div>
+      <div class="preview-body">
+        @if (isImage(previewAttachment()!.filename)) {
+          <img [src]="previewAttachment()!.url" [alt]="previewAttachment()!.filename" class="preview-image" />
+        } @else if (isPdf(previewAttachment()!.filename)) {
+          <iframe [src]="previewAttachment()!.url" class="preview-pdf"></iframe>
+        } @else {
+          <div class="preview-fallback">
+            <p>Preview not available for this file type.</p>
+            <a [href]="previewAttachment()!.url" target="_blank" class="btn-download">Download file</a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
 
 @if (pendingDeleteAttachment()) {
   <app-confirm-dialog
