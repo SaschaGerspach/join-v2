@@ -5,7 +5,7 @@ import { Task } from '../tasks/tasks-api.service';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../auth/auth.service';
 
-export type PresenceUser = { id: number; first_name: string; last_name: string; email: string };
+export type PresenceUser = { id: number; first_name: string; last_name: string; email: string; avatar_url: string | null };
 
 export type BoardWsEvent =
   | { event: 'task_created'; data: Task }

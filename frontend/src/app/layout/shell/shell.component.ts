@@ -8,11 +8,12 @@ import { NotificationService } from '../../core/notifications/notification.servi
 import { KeyboardShortcutsModalComponent } from '../../shared/components/keyboard-shortcuts-modal/keyboard-shortcuts-modal.component';
 import { GlobalSearchComponent } from '../../shared/components/global-search/global-search.component';
 import { OfflineBannerComponent } from '../../shared/components/offline-banner/offline-banner.component';
+import { UserAvatarComponent } from '../../shared/components/user-avatar/user-avatar.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterModule, DatePipe, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent, OfflineBannerComponent],
+  imports: [RouterModule, DatePipe, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent, OfflineBannerComponent, UserAvatarComponent],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

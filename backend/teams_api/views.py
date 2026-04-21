@@ -90,14 +90,17 @@ def team_members(request, pk):
 
     if request.method == "GET":
         members = team.members.select_related("user").all()
-        result = [{"user_id": team.created_by_id, "email": team.created_by.email,
-                    "first_name": team.created_by.first_name, "last_name": team.created_by.last_name,
-                    "role": "owner"}]
+        owner = team.created_by
+        result = [{"user_id": owner.pk, "email": owner.email,
+                    "first_name": owner.first_name, "last_name": owner.last_name,
+                    "role": "owner",
+                    "avatar_url": request.build_absolute_uri(owner.avatar.url) if owner.avatar else None}]
         for m in members:
             result.append({
                 "user_id": m.user_id, "email": m.user.email,
                 "first_name": m.user.first_name, "last_name": m.user.last_name,
                 "role": m.role,
+                "avatar_url": request.build_absolute_uri(m.user.avatar.url) if m.user.avatar else None,
             })
         return Response(result)
 
@@ -122,6 +125,7 @@ def team_members(request, pk):
         "user_id": member.user_id, "email": user.email,
         "first_name": user.first_name, "last_name": user.last_name,
         "role": member.role,
+        "avatar_url": request.build_absolute_uri(user.avatar.url) if user.avatar else None,
     }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
 
@@ -150,6 +154,7 @@ def team_member_detail(request, pk, user_pk):
             "user_id": member.user_id, "email": member.user.email,
             "first_name": member.user.first_name, "last_name": member.user.last_name,
             "role": member.role,
+            "avatar_url": request.build_absolute_uri(member.user.avatar.url) if member.user.avatar else None,
         })
 
     member.delete()

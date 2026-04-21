@@ -43,6 +43,7 @@ def board_members(request, pk):
             "last_name": m.user.last_name,
             "role": m.role,
             "invited_at": m.invited_at,
+            "avatar_url": request.build_absolute_uri(m.user.avatar.url) if m.user.avatar else None,
         } for m in members])
 
     if not can_manage_members(board, request.user):
@@ -84,6 +85,7 @@ def board_members(request, pk):
         "first_name": invitee.first_name,
         "last_name": invitee.last_name,
         "role": BoardMember.Role.EDITOR,
+        "avatar_url": request.build_absolute_uri(invitee.avatar.url) if invitee.avatar else None,
     }, status=status.HTTP_201_CREATED)
 
 
@@ -139,6 +141,7 @@ def board_member_detail(request, pk, user_pk):
             "first_name": member.user.first_name,
             "last_name": member.user.last_name,
             "role": member.role,
+            "avatar_url": request.build_absolute_uri(member.user.avatar.url) if member.user.avatar else None,
         })
 
     member.delete()

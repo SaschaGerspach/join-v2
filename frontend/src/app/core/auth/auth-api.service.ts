@@ -102,6 +102,16 @@ export class AuthApiService {
     totpDisable(password: string, code: string): Observable<void> {
         return this.http.post<void>(`${this.baseUrl}/auth/2fa/disable/`, { password, code }, { withCredentials: true });
     }
+
+    uploadAvatar(file: File): Observable<{ avatar_url: string }> {
+        const form = new FormData();
+        form.append('avatar', file);
+        return this.http.post<{ avatar_url: string }>(`${this.baseUrl}/auth/avatar/`, form, { withCredentials: true });
+    }
+
+    deleteAvatar(): Observable<{ avatar_url: null }> {
+        return this.http.delete<{ avatar_url: null }>(`${this.baseUrl}/auth/avatar/`, { withCredentials: true });
+    }
 }
 
 export type Session = {

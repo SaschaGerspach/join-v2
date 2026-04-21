@@ -12,11 +12,12 @@ import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
+import { UserAvatarComponent } from '../../../../shared/components/user-avatar/user-avatar.component';
 
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule, DragDropModule, SlicePipe, UpperCasePipe, RouterModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe],
+  imports: [FormsModule, DragDropModule, SlicePipe, UpperCasePipe, RouterModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe, UserAvatarComponent],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
   providers: [BoardStateService],

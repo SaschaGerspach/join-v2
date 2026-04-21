@@ -40,7 +40,7 @@ class BoardConsumer(AsyncWebsocketConsumer):
             self.group_name = f"board_{self.board_id}"
             await self.channel_layer.group_add(self.group_name, self.channel_name)
 
-            user_info = {"id": user.pk, "first_name": user.first_name, "last_name": user.last_name, "email": user.email}
+            user_info = {"id": user.pk, "first_name": user.first_name, "last_name": user.last_name, "email": user.email, "avatar_url": user.avatar.url if user.avatar else None}
             _board_presence[self.group_name][user.pk] = user_info
 
             await self.send(text_data=json.dumps({"type": "authenticated"}))

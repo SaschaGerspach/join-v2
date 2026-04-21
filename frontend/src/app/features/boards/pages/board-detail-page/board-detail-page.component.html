@@ -65,8 +65,8 @@
     @if (state.onlineUsers().length > 0) {
       <div class="presence-bar">
         @for (u of state.onlineUsers(); track u.id) {
-          <span class="presence-avatar" [title]="u.first_name + ' ' + u.last_name">
-            {{ (u.first_name[0] + u.last_name[0]) | uppercase }}
+          <span class="presence-avatar-wrap" [title]="u.first_name + ' ' + u.last_name">
+            <app-user-avatar [firstName]="u.first_name" [lastName]="u.last_name" [avatarUrl]="u.avatar_url" [size]="32" />
           </span>
         }
       </div>

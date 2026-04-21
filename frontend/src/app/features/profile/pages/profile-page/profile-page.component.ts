@@ -11,11 +11,12 @@ import { BoardsApiService, Board } from '../../../../core/boards/boards-api.serv
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { UserAvatarComponent } from '../../../../shared/components/user-avatar/user-avatar.component';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent, DatePipe],
+  imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent, DatePipe, UserAvatarComponent],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,6 +48,8 @@ export class ProfilePageComponent implements OnInit {
   mutedBoardIds = signal<Set<number>>(new Set());
   emailDelivery = signal<'instant' | 'digest' | 'none'>('instant');
 
+  avatarUrl = signal<string | null>(null);
+
   totpEnabled = signal(false);
   totpSetup = signal<TotpSetupResponse | null>(null);
   totpConfirmCode = signal('');
@@ -68,6 +71,7 @@ export class ProfilePageComponent implements OnInit {
     this.userId = user.id;
 
     this.totpEnabled.set(user.totp_enabled ?? false);
+    this.avatarUrl.set(user.avatar_url ?? null);
 
     this.usersApi.get(this.userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (profile) => {
@@ -257,6 +261,30 @@ export class ProfilePageComponent implements OnInit {
         this.toast.show('2FA disabled.');
       },
       error: (err) => this.totpError.set(err?.error?.detail ?? 'Failed to disable 2FA.'),
+    });
+  }
+
+  onAvatarSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.authApi.uploadAvatar(file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: res => {
+        this.avatarUrl.set(res.avatar_url);
+        this.auth.init();
+        this.toast.show('Avatar updated.');
+      },
+      error: (err) => this.toast.show(err?.error?.detail ?? 'Failed to upload avatar.', 'error'),
+    });
+  }
+
+  removeAvatar(): void {
+    this.authApi.deleteAvatar().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.avatarUrl.set(null);
+        this.auth.init();
+        this.toast.show('Avatar removed.');
+      },
+      error: () => this.toast.show('Failed to remove avatar.', 'error'),
     });
   }
 

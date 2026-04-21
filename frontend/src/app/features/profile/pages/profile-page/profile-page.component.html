@@ -9,7 +9,16 @@
   <div class="profile-card">
 
     <div class="profile-avatar-section">
-      <div class="profile-avatar">{{ initials() }}</div>
+      <div class="avatar-upload-wrapper">
+        <app-user-avatar [firstName]="firstName()" [lastName]="lastName()" [avatarUrl]="avatarUrl()" [size]="72" />
+        <label class="avatar-upload-btn" title="Change avatar">
+          &#9998;
+          <input type="file" accept="image/*" hidden (change)="onAvatarSelected($event)" />
+        </label>
+        @if (avatarUrl()) {
+          <button class="avatar-remove-btn" title="Remove avatar" (click)="removeAvatar()">&#10005;</button>
+        }
+      </div>
       <div class="profile-name">
         <span class="profile-full-name">{{ firstName() }} {{ lastName() }}</span>
         <span class="profile-email-display">{{ email() }}</span>

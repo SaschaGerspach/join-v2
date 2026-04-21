@@ -11,12 +11,16 @@ from ..serializers import CommentCreateSerializer, CommentSerializer
 from ._notifications import _notify_comment, _notify_mentions
 
 
-def serialize_comment(comment):
+def serialize_comment(comment, request=None):
+    avatar_url = None
+    if comment.author.avatar:
+        avatar_url = request.build_absolute_uri(comment.author.avatar.url) if request else comment.author.avatar.url
     return {
         "id": comment.pk,
         "task": comment.task_id,
         "author_id": comment.author_id,
         "author_name": f"{comment.author.first_name} {comment.author.last_name}".strip() or comment.author.email,
+        "author_avatar_url": avatar_url,
         "parent_id": comment.parent_id,
         "text": comment.text,
         "created_at": comment.created_at,
@@ -44,7 +48,7 @@ def comment_list(request, task_pk):
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
-        return Response([serialize_comment(c) for c in task.comments.select_related("author").all()])
+        return Response([serialize_comment(c, request) for c in task.comments.select_related("author").all()])
 
     serializer = CommentCreateSerializer(data=request.data)
     if not serializer.is_valid():
@@ -58,7 +62,7 @@ def comment_list(request, task_pk):
     _notify_comment(comment, request.user)
     _notify_mentions(comment, request.user)
     log_activity(task.board, request.user, "created", "comment", task.title, task=task)
-    return Response(serialize_comment(comment), status=status.HTTP_201_CREATED)
+    return Response(serialize_comment(comment, request), status=status.HTTP_201_CREATED)
 
 
 @extend_schema(
@@ -89,7 +93,7 @@ def comment_detail(request, task_pk, pk):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         comment.text = serializer.validated_data["text"]
         comment.save(update_fields=["text", "updated_at"])
-        return Response(serialize_comment(comment))
+        return Response(serialize_comment(comment, request))
 
     comment.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

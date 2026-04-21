@@ -87,7 +87,7 @@
           }
         </div>
         <div class="user-badge" role="button" aria-label="User menu" (click)="toggleMenu()">
-          {{ userInitials() }}
+          <app-user-avatar [firstName]="auth.user()?.first_name ?? ''" [lastName]="auth.user()?.last_name ?? ''" [avatarUrl]="auth.user()?.avatar_url ?? null" [size]="42" />
         </div>
         @if (menuOpen()) {
           <div class="user-menu">

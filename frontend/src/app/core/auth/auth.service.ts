@@ -9,6 +9,7 @@ export type AuthUser = {
     last_name: string;
     is_staff: boolean;
     totp_enabled: boolean;
+    avatar_url: string | null;
 };
 
 @Injectable({ providedIn: 'root'})

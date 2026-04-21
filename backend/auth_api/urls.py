@@ -19,4 +19,5 @@ urlpatterns = [
     path("2fa/setup/", views.totp_setup, name="totp_setup"),
     path("2fa/confirm/", views.totp_confirm, name="totp_confirm"),
     path("2fa/disable/", views.totp_disable, name="totp_disable"),
+    path("avatar/", views.avatar_upload, name="avatar_upload"),
 ]

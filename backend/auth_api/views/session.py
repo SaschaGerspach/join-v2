@@ -142,4 +142,5 @@ def me(request):
         "last_name": user.last_name,
         "is_staff": user.is_staff,
         "totp_enabled": user.totp_enabled,
+        "avatar_url": request.build_absolute_uri(user.avatar.url) if user.avatar else None,
     })

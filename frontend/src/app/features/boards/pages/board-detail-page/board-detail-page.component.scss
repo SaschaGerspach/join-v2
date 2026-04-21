@@ -163,19 +163,11 @@ $bp-tablet: 1024px;
   margin-left: auto;
 }
 
-.presence-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: $color-primary;
-  color: $color-white;
-  font-size: 0.7rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--color-surface, $color-white);
+.presence-avatar-wrap {
   margin-left: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--color-surface, $color-white);
+  display: inline-flex;
 
   &:first-child { margin-left: 0; }
 }

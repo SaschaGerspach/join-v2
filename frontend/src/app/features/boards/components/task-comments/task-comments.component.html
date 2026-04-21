@@ -5,6 +5,7 @@
     @for (c of topLevelComments(); track c.id) {
       <div class="comment-item">
         <div class="comment-header">
+          <app-user-avatar [firstName]="c.author_name.split(' ')[0]" [lastName]="c.author_name.split(' ')[1]" [avatarUrl]="c.author_avatar_url" [size]="28" />
           <span class="comment-author">{{ c.author_name }}</span>
           <span class="comment-date">{{ c.created_at | slice:0:10 }}</span>
           @if (isOwnComment(c)) {
@@ -24,6 +25,7 @@
             @for (reply of repliesFor(c.id); track reply.id) {
               <div class="comment-item reply">
                 <div class="comment-header">
+                  <app-user-avatar [firstName]="reply.author_name.split(' ')[0]" [lastName]="reply.author_name.split(' ')[1]" [avatarUrl]="reply.author_avatar_url" [size]="24" />
                   <span class="comment-author">{{ reply.author_name }}</span>
                   <span class="comment-date">{{ reply.created_at | slice:0:10 }}</span>
                   @if (isOwnComment(reply)) {

@@ -25,6 +25,7 @@ export type BoardMember = {
   first_name: string;
   last_name: string;
   role: BoardMemberRole;
+  avatar_url: string | null;
 };
 
 @Injectable({ providedIn: 'root' })

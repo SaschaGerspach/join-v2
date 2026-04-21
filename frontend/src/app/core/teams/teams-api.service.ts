@@ -18,6 +18,7 @@ export type TeamMember = {
   first_name: string;
   last_name: string;
   role: string;
+  avatar_url: string | null;
 };
 
 @Injectable({ providedIn: 'root' })

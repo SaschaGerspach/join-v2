@@ -4,3 +4,4 @@ from .sessions import session_list as session_list, session_revoke as session_re
 from .verification import verify_email as verify_email, resend_verification as resend_verification
 from .password_reset import password_reset_request as password_reset_request, password_reset_confirm as password_reset_confirm
 from .totp import totp_setup as totp_setup, totp_confirm as totp_confirm, totp_disable as totp_disable
+from .avatar import avatar_upload as avatar_upload

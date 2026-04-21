@@ -8,11 +8,12 @@ import { Contact } from '../../../../core/contacts/contacts-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
+import { UserAvatarComponent } from '../../../../shared/components/user-avatar/user-avatar.component';
 
 @Component({
   selector: 'app-task-comments',
   standalone: true,
-  imports: [FormsModule, SlicePipe, MarkdownPipe, ConfirmDialogComponent],
+  imports: [FormsModule, SlicePipe, MarkdownPipe, ConfirmDialogComponent, UserAvatarComponent],
   templateUrl: './task-comments.component.html',
   styleUrl: './task-comments.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

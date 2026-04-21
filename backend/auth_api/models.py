@@ -28,6 +28,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_verified = models.BooleanField(default=False)
     totp_secret = models.CharField(max_length=32, blank=True, default="")
     totp_enabled = models.BooleanField(default=False)
+    avatar = models.ImageField(upload_to="avatars/", blank=True, default="")
 
     objects = UserManager()
 

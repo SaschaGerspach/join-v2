@@ -212,24 +212,12 @@ $bp-tablet:         1024px;
 }
 
 .user-badge {
-  width: 48px;
-  height: 48px;
+  cursor: pointer;
+  user-select: none;
   border-radius: 50%;
-  background-color: $color-primary;
-  border: 2px solid $color-dark;
-  color: $color-white;
-  font-weight: 700;
-  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  user-select: none;
-  transition: background-color 0.15s ease;
-
-  &:hover {
-    background-color: $color-dark;
-  }
 }
 
 .user-menu {

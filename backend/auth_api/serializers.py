@@ -27,6 +27,7 @@ class UserSerializer(serializers.Serializer):
 class MeSerializer(UserSerializer):
     is_staff = serializers.BooleanField()
     totp_enabled = serializers.BooleanField()
+    avatar_url = serializers.CharField(allow_null=True)
 
 
 class LoginResponseSerializer(UserSerializer):
@@ -80,3 +81,7 @@ class TwoFactorLoginSerializer(serializers.Serializer):
 class TwoFactorRequiredSerializer(serializers.Serializer):
     requires_2fa = serializers.BooleanField()
     detail = serializers.CharField()
+
+
+class AvatarSerializer(serializers.Serializer):
+    avatar_url = serializers.CharField(allow_null=True)

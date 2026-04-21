@@ -8,6 +8,7 @@ export type Comment = {
   task: number;
   author_id: number;
   author_name: string;
+  author_avatar_url: string | null;
   parent_id: number | null;
   text: string;
   created_at: string;

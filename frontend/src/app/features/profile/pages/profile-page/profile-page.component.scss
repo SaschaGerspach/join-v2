@@ -31,18 +31,49 @@
   gap: 1.25rem;
 }
 
-.profile-avatar {
-  width: 72px;
-  height: 72px;
+.avatar-upload-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-upload-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: var(--color-sidebar-bg, $color-dark);
-  color: var(--color-sidebar-text, $color-white);
-  font-size: 1.5rem;
-  font-weight: 700;
+  background: $color-primary;
+  color: $color-white;
+  font-size: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  cursor: pointer;
+  border: 2px solid var(--color-surface);
+  transition: background-color 0.15s ease;
+
+  &:hover { background: darken($color-primary, 10%); }
+}
+
+.avatar-remove-btn {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: $color-error;
+  color: $color-white;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid var(--color-surface);
+  transition: background-color 0.15s ease;
+
+  &:hover { background: darken($color-error, 10%); }
 }
 
 .profile-name {
