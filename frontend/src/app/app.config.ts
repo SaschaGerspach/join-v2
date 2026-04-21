@@ -5,13 +5,14 @@ import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { retryInterceptor } from './core/interceptors/retry.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { offlineInterceptor } from './core/interceptors/offline.interceptor';
 import { GlobalErrorHandler } from './core/error-handler/global-error-handler';
 import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(withInterceptors([retryInterceptor, errorInterceptor, authInterceptor])),
+    provideHttpClient(withInterceptors([offlineInterceptor, retryInterceptor, errorInterceptor, authInterceptor])),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideServiceWorker('ngsw-worker.js', {
         enabled: !isDevMode(),

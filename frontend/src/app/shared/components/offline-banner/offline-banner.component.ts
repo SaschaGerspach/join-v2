@@ -1,11 +1,17 @@
-import { ChangeDetectionStrategy, Component, signal, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { OfflineQueueService } from '../../../core/offline/offline-queue.service';
 
 @Component({
   selector: 'app-offline-banner',
   standalone: true,
   template: `
     @if (offline()) {
-      <div class="offline-banner">You are offline — changes will retry automatically when reconnected.</div>
+      <div class="offline-banner">
+        You are offline — changes will sync automatically when reconnected.
+        @if (queue.pendingCount > 0) {
+          <span class="queue-count">({{ queue.pendingCount }} pending)</span>
+        }
+      </div>
     }
   `,
   styles: [`
@@ -26,6 +32,7 @@ import { ChangeDetectionStrategy, Component, signal, OnInit, OnDestroy } from '@
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OfflineBannerComponent implements OnInit, OnDestroy {
+  readonly queue = inject(OfflineQueueService);
   offline = signal(!navigator.onLine);
 
   private onOnline = () => this.offline.set(false);

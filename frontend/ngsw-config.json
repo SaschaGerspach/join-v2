@@ -26,5 +26,37 @@
         ]
       }
     }
+  ],
+  "dataGroups": [
+    {
+      "name": "api-boards",
+      "urls": ["/boards/", "/boards/*/"],
+      "cacheConfig": {
+        "maxSize": 50,
+        "maxAge": "1h",
+        "strategy": "freshness",
+        "timeout": "5s"
+      }
+    },
+    {
+      "name": "api-tasks",
+      "urls": ["/tasks/*"],
+      "cacheConfig": {
+        "maxSize": 200,
+        "maxAge": "1h",
+        "strategy": "freshness",
+        "timeout": "5s"
+      }
+    },
+    {
+      "name": "api-user",
+      "urls": ["/auth/me/", "/notifications/", "/contacts/"],
+      "cacheConfig": {
+        "maxSize": 20,
+        "maxAge": "30m",
+        "strategy": "freshness",
+        "timeout": "5s"
+      }
+    }
   ]
 }
