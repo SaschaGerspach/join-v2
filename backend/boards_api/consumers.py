@@ -41,7 +41,6 @@ class BoardConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_add(self.group_name, self.channel_name)
 
             user_info = {"id": user.pk, "first_name": user.first_name, "last_name": user.last_name, "email": user.email}
-            online = list(_board_presence[self.group_name].values())
             _board_presence[self.group_name][user.pk] = user_info
 
             await self.send(text_data=json.dumps({"type": "authenticated"}))
