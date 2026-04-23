@@ -15,12 +15,12 @@
     <input
       class="field-input"
       type="text"
-      aria-label="New label name"
+      [attr.aria-label]="'TASK.NEW_LABEL' | translate"
       [(ngModel)]="newLabelName"
       [placeholder]="'TASK.NEW_LABEL' | translate"
       (keyup.enter)="createLabel()"
     />
-    <input type="color" [(ngModel)]="newLabelColor" class="label-color-input" aria-label="Label color" />
-    <button class="btn-add-sub" aria-label="Add label" (click)="createLabel()">+</button>
+    <input type="color" [(ngModel)]="newLabelColor" class="label-color-input" [attr.aria-label]="'TASK.LABEL_COLOR' | translate" />
+    <button class="btn-add-sub" [attr.aria-label]="'TASK.ADD_LABEL' | translate" (click)="createLabel()">+</button>
   </div>
 </div>

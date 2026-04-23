@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, AfterViewInit, DestroyRef, ElementRef, HostListener, inject, input, output, signal, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Task, TasksApiService, UpdateTaskPayload, Recurrence } from '../../../../core/tasks/tasks-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
@@ -29,6 +29,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly contactsApi = inject(ContactsApiService);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   task = input.required<Task>();
@@ -54,11 +55,11 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
 
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
   readonly recurrenceOptions = [
-    { value: null, label: 'None' },
-    { value: 'daily', label: 'Daily' },
-    { value: 'weekly', label: 'Weekly' },
-    { value: 'biweekly', label: 'Biweekly' },
-    { value: 'monthly', label: 'Monthly' },
+    { value: null, labelKey: 'TASK.NONE' },
+    { value: 'daily', labelKey: 'TASK.DAILY' },
+    { value: 'weekly', labelKey: 'TASK.WEEKLY' },
+    { value: 'biweekly', labelKey: 'TASK.BIWEEKLY' },
+    { value: 'monthly', labelKey: 'TASK.MONTHLY' },
   ] as const;
 
   ngAfterViewInit(): void {
@@ -95,9 +96,9 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       next: updated => {
         this.taskUpdated.emit(updated);
         this.closed.emit();
-        this.toast.show('Task saved');
+        this.toast.show(this.translate.instant('TOAST.TASK_SAVED'));
       },
-      error: () => this.toast.show('Failed to save task.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_SAVE_TASK'), 'error'),
     });
   }
 
@@ -120,7 +121,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
         this.taskDeleted.emit(this.task().id);
         this.closed.emit();
       },
-      error: () => this.toast.show('Failed to delete task.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_TASK'), 'error'),
     });
   }
 
@@ -129,9 +130,9 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       next: newTask => {
         this.taskDuplicated.emit(newTask);
         this.closed.emit();
-        this.toast.show('Task duplicated');
+        this.toast.show(this.translate.instant('TOAST.TASK_DUPLICATED'));
       },
-      error: () => this.toast.show('Failed to duplicate task.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DUPLICATE_TASK'), 'error'),
     });
   }
 

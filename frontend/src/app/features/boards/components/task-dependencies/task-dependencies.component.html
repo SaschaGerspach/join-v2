@@ -6,7 +6,7 @@
       @for (dep of dependencies(); track dep.id) {
         <li class="dependency-item">
           <span class="dependency-title">{{ dep.title }}</span>
-          <button class="btn-remove" aria-label="Remove dependency" (click)="removeDependency(dep)">&#10005;</button>
+          <button class="btn-remove" [attr.aria-label]="'TASK.REMOVE_DEPENDENCY' | translate" (click)="removeDependency(dep)">&#10005;</button>
         </li>
       }
     </ul>
@@ -19,7 +19,7 @@
         <option [ngValue]="t.id">{{ t.title }}</option>
       }
     </select>
-    <button class="btn-add" [disabled]="!selectedTaskId()" (click)="addDependency()">Add</button>
+    <button class="btn-add" [disabled]="!selectedTaskId()" (click)="addDependency()">{{ 'COMMON.ADD' | translate }}</button>
   </div>
 </div>
 

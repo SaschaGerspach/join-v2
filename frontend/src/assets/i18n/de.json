@@ -8,7 +8,9 @@
     "ADMIN": "Admin",
     "SKIP_TO_CONTENT": "Zum Inhalt springen",
     "MAIN_NAV": "Hauptnavigation",
-    "MOBILE_NAV": "Mobile Navigation"
+    "MOBILE_NAV": "Mobile Navigation",
+    "PRIVACY_POLICY": "Datenschutz",
+    "LEGAL_NOTICE": "Impressum"
   },
   "TOPBAR": {
     "TITLE": "Kanban-Projektmanagement-Tool",
@@ -20,7 +22,8 @@
     "MY_PROFILE": "Mein Profil",
     "LOGOUT": "Abmelden",
     "LIGHT_MODE": "Zum hellen Modus wechseln",
-    "DARK_MODE": "Zum dunklen Modus wechseln"
+    "DARK_MODE": "Zum dunklen Modus wechseln",
+    "LANGUAGE": "Sprache"
   },
   "AUTH": {
     "LOGIN": "Anmelden",
@@ -69,7 +72,8 @@
     "VERIFYING": "Wird überprüft…",
     "EMAIL_VERIFIED": "E-Mail bestätigt!",
     "ACCOUNT_ACTIVE": "Dein Konto ist jetzt aktiv. Du kannst dich anmelden.",
-    "VERIFICATION_FAILED": "Bestätigung fehlgeschlagen"
+    "VERIFICATION_FAILED": "Bestätigung fehlgeschlagen",
+    "TOGGLE_PASSWORD": "Passwort ein-/ausblenden"
   },
   "BOARDS": {
     "MY_BOARDS": "Meine Boards",
@@ -97,7 +101,10 @@
     "REMOVE_MEMBER": "Mitglied entfernen",
     "CLOSE": "Schließen",
     "SHARED_BOARDS": "Geteilte Boards",
-    "ALL_BOARDS": "Alle Boards"
+    "ALL_BOARDS": "Alle Boards",
+    "ROLE_ADMIN": "Admin",
+    "ROLE_EDITOR": "Bearbeiter",
+    "ROLE_VIEWER": "Betrachter"
   },
   "BOARD_DETAIL": {
     "SEARCH_TASKS": "Aufgaben suchen… (drücke /)",
@@ -195,6 +202,7 @@
     "PREVIEW_UNAVAILABLE": "Vorschau für diesen Dateityp nicht verfügbar.",
     "DOWNLOAD_FILE": "Datei herunterladen",
     "UPLOAD_ATTACHMENT": "Anhang hochladen",
+    "ATTACHMENT_PREVIEW": "Anhang-Vorschau",
     "TIME_TRACKING": "Zeiterfassung",
     "TOTAL": "gesamt",
     "DURATION_MIN": "Min",
@@ -212,7 +220,12 @@
     "WRITE_REPLY": "Antwort schreiben…",
     "CONFIRM_DELETE_COMMENT": "Diesen Kommentar löschen?",
     "CONFIRM_DELETE_TASK": "Diese Aufgabe löschen? Dies kann nicht rückgängig gemacht werden.",
-    "TASK_DETAILS": "Aufgabendetails"
+    "TASK_DETAILS": "Aufgabendetails",
+    "TASK_TITLE_PLACEHOLDER": "Aufgabentitel",
+    "DESCRIPTION_PLACEHOLDER": "Beschreibung hinzufügen…",
+    "DESCRIPTION_OPTIONAL": "Optionale Beschreibung…",
+    "DURATION_LABEL": "Dauer in Minuten",
+    "TIME_NOTE_LABEL": "Notiz zum Zeiteintrag"
   },
   "CONTACTS": {
     "TITLE": "Kontakte",
@@ -240,12 +253,15 @@
     "INVITE_EMAIL": "Per E-Mail einladen",
     "REMOVE_MEMBER": "Mitglied entfernen",
     "NO_TEAMS": "Noch keine Teams. Erstelle eins, um loszulegen.",
-    "CONFIRM_DELETE": "Team löschen? Boards werden nicht gelöscht, verlieren aber ihre Teamzuordnung."
+    "CONFIRM_DELETE": "Team löschen? Boards werden nicht gelöscht, verlieren aber ihre Teamzuordnung.",
+    "ROLE_ADMIN": "Admin",
+    "ROLE_MEMBER": "Mitglied"
   },
   "CALENDAR": {
     "PREV_MONTH": "Vorheriger Monat",
     "NEXT_MONTH": "Nächster Monat",
-    "LOADING": "Aufgaben werden geladen…"
+    "LOADING": "Aufgaben werden geladen…",
+    "CALENDAR_LABEL": "Kalender"
   },
   "SUMMARY": {
     "BOARDS": "Boards",
@@ -255,7 +271,10 @@
     "OVERDUE": "Überfällig",
     "NEXT_DEADLINE": "Nächste Frist",
     "GO_TO_BOARDS": "Zu den Boards",
-    "FAVORITE_BOARDS": "Favorisierte Boards"
+    "FAVORITE_BOARDS": "Favorisierte Boards",
+    "GOOD_MORNING": "Guten Morgen",
+    "GOOD_AFTERNOON": "Guten Tag",
+    "GOOD_EVENING": "Guten Abend"
   },
   "PROFILE": {
     "TITLE": "Mein Profil",
@@ -421,7 +440,11 @@
     "AVATAR_REMOVED": "Avatar entfernt.",
     "FAILED_REMOVE_AVATAR": "Avatar konnte nicht entfernt werden.",
     "FAILED_SAVE_NOTIFICATIONS": "Benachrichtigungseinstellungen konnten nicht gespeichert werden.",
-    "INVALID_TOTP_CODE": "Ungültiger Code. Versuche es erneut."
+    "INVALID_TOTP_CODE": "Ungültiger Code. Versuche es erneut.",
+    "TASK_SAVED": "Aufgabe gespeichert",
+    "FAILED_SAVE_TASK": "Aufgabe konnte nicht gespeichert werden.",
+    "TASK_DUPLICATED": "Aufgabe dupliziert",
+    "FAILED_DUPLICATE_TASK": "Aufgabe konnte nicht dupliziert werden."
   },
   "ERROR": {
     "INVALID_2FA": "Ungültiger 2FA-Code.",

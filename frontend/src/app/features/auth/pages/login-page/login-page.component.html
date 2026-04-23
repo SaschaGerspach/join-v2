@@ -51,7 +51,7 @@
               #passwordField="ngModel"
               [class.input-error]="passwordField.invalid && (passwordField.touched || f.submitted)"
             />
-            <button type="button" class="btn-eye" aria-label="Toggle password visibility" (click)="showPassword.set(!showPassword())">
+            <button type="button" class="btn-eye" [attr.aria-label]="'AUTH.TOGGLE_PASSWORD' | translate" (click)="showPassword.set(!showPassword())">
               {{ showPassword() ? '🙈' : '👁' }}
             </button>
           </div>

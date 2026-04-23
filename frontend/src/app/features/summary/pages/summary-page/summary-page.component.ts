@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, compute
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterModule } from '@angular/router';
 import { SlicePipe } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
@@ -23,6 +23,7 @@ export class SummaryPageComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   loading = signal(true);
   boards = signal<Board[]>([]);
@@ -54,9 +55,9 @@ export class SummaryPageComponent implements OnInit {
 
   greeting = computed(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return this.translate.instant('SUMMARY.GOOD_MORNING');
+    if (hour < 18) return this.translate.instant('SUMMARY.GOOD_AFTERNOON');
+    return this.translate.instant('SUMMARY.GOOD_EVENING');
   });
 
   ngOnInit(): void {

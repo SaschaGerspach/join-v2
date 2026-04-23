@@ -9,13 +9,13 @@
       <input
         class="form-input"
         type="text"
-        aria-label="Board title"
+        [attr.aria-label]="'BOARDS.BOARD_TITLE' | translate"
         [(ngModel)]="newTitle"
         [placeholder]="'BOARDS.BOARD_TITLE' | translate"
         (keyup.enter)="createBoard()"
         autofocus
       />
-      <select class="form-select" aria-label="Board template" [(ngModel)]="newTemplate">
+      <select class="form-select" [attr.aria-label]="'BOARDS.BOARD_TEMPLATE' | translate" [(ngModel)]="newTemplate">
         <option value="kanban">{{ 'BOARDS.KANBAN' | translate }}</option>
         <option value="scrum">{{ 'BOARDS.SCRUM' | translate }}</option>
         <option value="bug_tracking">{{ 'BOARDS.BUG_TRACKING' | translate }}</option>
@@ -76,22 +76,22 @@
       <button
         class="btn-favorite"
         [class.active]="board.is_favorite"
-        [attr.aria-label]="board.is_favorite ? 'Remove from favorites' : 'Add to favorites'"
-        [title]="board.is_favorite ? 'Remove from favorites' : 'Add to favorites'"
+        [attr.aria-label]="(board.is_favorite ? 'BOARDS.REMOVE_FAVORITE' : 'BOARDS.ADD_FAVORITE') | translate"
+        [title]="(board.is_favorite ? 'BOARDS.REMOVE_FAVORITE' : 'BOARDS.ADD_FAVORITE') | translate"
         (click)="toggleFavorite(board, $event)"
       >{{ board.is_favorite ? '&#9733;' : '&#9734;' }}</button>
       @if (board.is_owner) {
         <input
           class="color-picker"
           type="color"
-          aria-label="Board color"
+          [attr.aria-label]="'BOARDS.BOARD_COLOR' | translate"
           [value]="board.color"
           (click)="$event.stopPropagation()"
           (change)="changeColor(board, inputValue($event))"
-          title="Board color"
+          [title]="'BOARDS.BOARD_COLOR' | translate"
         />
-        <button class="btn-members" aria-label="Manage members" (click)="openMembers(board, $event)" title="Manage members">&#128101;</button>
-        <button class="btn-delete" aria-label="Delete board" (click)="deleteBoard(board.id, $event)" title="Delete board">&#10005;</button>
+        <button class="btn-members" [attr.aria-label]="'BOARDS.MANAGE_MEMBERS' | translate" (click)="openMembers(board, $event)" [title]="'BOARDS.MANAGE_MEMBERS' | translate">&#128101;</button>
+        <button class="btn-delete" [attr.aria-label]="'BOARDS.DELETE_BOARD' | translate" (click)="deleteBoard(board.id, $event)" [title]="'BOARDS.DELETE_BOARD' | translate">&#10005;</button>
       }
     </div>
   </div>
@@ -118,14 +118,14 @@
     <div class="members-modal" (click)="$event.stopPropagation()">
       <div class="members-modal-header">
         <h2 id="members-modal-title">{{ 'BOARDS.MEMBERS' | translate }} — {{ managingBoard()!.title }}</h2>
-        <button class="btn-icon" aria-label="Close" (click)="managingBoard.set(null)">&#10005;</button>
+        <button class="btn-icon" [attr.aria-label]="'COMMON.CLOSE' | translate" (click)="managingBoard.set(null)">&#10005;</button>
       </div>
 
       <div class="invite-row">
         <input
           class="invite-input"
           type="email"
-          aria-label="Invite by email"
+          [attr.aria-label]="'BOARDS.INVITE_EMAIL' | translate"
           [(ngModel)]="inviteEmail"
           [placeholder]="'BOARDS.INVITE_EMAIL' | translate"
           (keyup.enter)="invite()"
@@ -142,11 +142,11 @@
             <span class="member-name">{{ m.first_name }} {{ m.last_name }}</span>
             <span class="member-email">{{ m.email }}</span>
             <select class="role-select" [ngModel]="m.role" (ngModelChange)="changeRole(m.user_id, $event)">
-              <option value="admin">Admin</option>
-              <option value="editor">Editor</option>
-              <option value="viewer">Viewer</option>
+              <option value="admin">{{ 'BOARDS.ROLE_ADMIN' | translate }}</option>
+              <option value="editor">{{ 'BOARDS.ROLE_EDITOR' | translate }}</option>
+              <option value="viewer">{{ 'BOARDS.ROLE_VIEWER' | translate }}</option>
             </select>
-            <button class="btn-icon small" aria-label="Remove member" (click)="removeMember(m.user_id)" title="Remove">&#10005;</button>
+            <button class="btn-icon small" [attr.aria-label]="'BOARDS.REMOVE_MEMBER' | translate" (click)="removeMember(m.user_id)" [title]="'BOARDS.REMOVE_MEMBER' | translate">&#10005;</button>
           </li>
         }
         @if (members().length === 0) {

@@ -8,7 +8,9 @@
     "ADMIN": "Admin",
     "SKIP_TO_CONTENT": "Skip to content",
     "MAIN_NAV": "Main navigation",
-    "MOBILE_NAV": "Mobile navigation"
+    "MOBILE_NAV": "Mobile navigation",
+    "PRIVACY_POLICY": "Privacy Policy",
+    "LEGAL_NOTICE": "Legal Notice"
   },
   "TOPBAR": {
     "TITLE": "Kanban Project Management Tool",
@@ -20,7 +22,8 @@
     "MY_PROFILE": "My Profile",
     "LOGOUT": "Log out",
     "LIGHT_MODE": "Switch to light mode",
-    "DARK_MODE": "Switch to dark mode"
+    "DARK_MODE": "Switch to dark mode",
+    "LANGUAGE": "Language"
   },
   "AUTH": {
     "LOGIN": "Log in",
@@ -69,7 +72,8 @@
     "VERIFYING": "Verifying…",
     "EMAIL_VERIFIED": "Email verified!",
     "ACCOUNT_ACTIVE": "Your account is now active. You can log in.",
-    "VERIFICATION_FAILED": "Verification failed"
+    "VERIFICATION_FAILED": "Verification failed",
+    "TOGGLE_PASSWORD": "Toggle password visibility"
   },
   "BOARDS": {
     "MY_BOARDS": "My Boards",
@@ -97,7 +101,10 @@
     "REMOVE_MEMBER": "Remove member",
     "CLOSE": "Close",
     "SHARED_BOARDS": "Shared Boards",
-    "ALL_BOARDS": "All Boards"
+    "ALL_BOARDS": "All Boards",
+    "ROLE_ADMIN": "Admin",
+    "ROLE_EDITOR": "Editor",
+    "ROLE_VIEWER": "Viewer"
   },
   "BOARD_DETAIL": {
     "SEARCH_TASKS": "Search tasks… (press /)",
@@ -195,6 +202,7 @@
     "PREVIEW_UNAVAILABLE": "Preview not available for this file type.",
     "DOWNLOAD_FILE": "Download file",
     "UPLOAD_ATTACHMENT": "Upload attachment",
+    "ATTACHMENT_PREVIEW": "Attachment preview",
     "TIME_TRACKING": "Time Tracking",
     "TOTAL": "total",
     "DURATION_MIN": "Min",
@@ -212,7 +220,12 @@
     "WRITE_REPLY": "Write a reply…",
     "CONFIRM_DELETE_COMMENT": "Delete this comment?",
     "CONFIRM_DELETE_TASK": "Delete this task? This cannot be undone.",
-    "TASK_DETAILS": "Task details"
+    "TASK_DETAILS": "Task details",
+    "TASK_TITLE_PLACEHOLDER": "Task title",
+    "DESCRIPTION_PLACEHOLDER": "Add a description...",
+    "DESCRIPTION_OPTIONAL": "Optional description...",
+    "DURATION_LABEL": "Duration in minutes",
+    "TIME_NOTE_LABEL": "Time entry note"
   },
   "CONTACTS": {
     "TITLE": "Contacts",
@@ -240,12 +253,15 @@
     "INVITE_EMAIL": "Invite by email",
     "REMOVE_MEMBER": "Remove member",
     "NO_TEAMS": "No teams yet. Create one to get started.",
-    "CONFIRM_DELETE": "Delete this team? Boards won't be deleted but will lose their team assignment."
+    "CONFIRM_DELETE": "Delete this team? Boards won't be deleted but will lose their team assignment.",
+    "ROLE_ADMIN": "Admin",
+    "ROLE_MEMBER": "Member"
   },
   "CALENDAR": {
     "PREV_MONTH": "Previous month",
     "NEXT_MONTH": "Next month",
-    "LOADING": "Loading tasks…"
+    "LOADING": "Loading tasks…",
+    "CALENDAR_LABEL": "Calendar"
   },
   "SUMMARY": {
     "BOARDS": "Boards",
@@ -255,7 +271,10 @@
     "OVERDUE": "Overdue",
     "NEXT_DEADLINE": "Next deadline",
     "GO_TO_BOARDS": "Go to boards",
-    "FAVORITE_BOARDS": "Favorite Boards"
+    "FAVORITE_BOARDS": "Favorite Boards",
+    "GOOD_MORNING": "Good morning",
+    "GOOD_AFTERNOON": "Good afternoon",
+    "GOOD_EVENING": "Good evening"
   },
   "PROFILE": {
     "TITLE": "My Profile",
@@ -421,7 +440,11 @@
     "AVATAR_REMOVED": "Avatar removed.",
     "FAILED_REMOVE_AVATAR": "Failed to remove avatar.",
     "FAILED_SAVE_NOTIFICATIONS": "Failed to save notification settings.",
-    "INVALID_TOTP_CODE": "Invalid code. Try again."
+    "INVALID_TOTP_CODE": "Invalid code. Try again.",
+    "TASK_SAVED": "Task saved",
+    "FAILED_SAVE_TASK": "Failed to save task.",
+    "TASK_DUPLICATED": "Task duplicated",
+    "FAILED_DUPLICATE_TASK": "Failed to duplicate task."
   },
   "ERROR": {
     "INVALID_2FA": "Invalid 2FA code.",

@@ -5,7 +5,7 @@ import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { TaskDetailModalComponent } from '../../../boards/components/task-detail-modal/task-detail-modal.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-calendar-page',
@@ -20,6 +20,7 @@ export class CalendarPageComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   viewDate = signal(new Date());
   tasks = signal<Task[]>([]);
@@ -27,10 +28,19 @@ export class CalendarPageComponent implements OnInit {
   selectedTask = signal<Task | null>(null);
   loading = signal(true);
 
-  readonly weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  weekDays = computed(() => {
+    const locale = this.translate.currentLang || 'en';
+    const base = new Date(2024, 0, 1); // Monday
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(base);
+      d.setDate(d.getDate() + i);
+      return d.toLocaleDateString(locale, { weekday: 'short' });
+    });
+  });
 
   monthLabel = computed(() => {
-    return this.viewDate().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const locale = this.translate.currentLang || 'en';
+    return this.viewDate().toLocaleDateString(locale, { month: 'long', year: 'numeric' });
   });
 
   calendarDays = computed(() => {

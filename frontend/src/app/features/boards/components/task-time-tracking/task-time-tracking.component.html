@@ -7,21 +7,21 @@
       type="number"
       min="1"
       max="1440"
-      aria-label="Duration in minutes"
-      placeholder="Min"
+      [attr.aria-label]="'TASK.DURATION_LABEL' | translate"
+      [placeholder]="'TASK.DURATION_MIN' | translate"
       [ngModel]="newDuration()"
       (ngModelChange)="newDuration.set($event)"
     />
     <input
       class="field-input note-input"
       type="text"
-      aria-label="Time entry note"
-      placeholder="Note (optional)"
+      [attr.aria-label]="'TASK.TIME_NOTE_LABEL' | translate"
+      [placeholder]="'TASK.NOTE_OPTIONAL' | translate"
       [ngModel]="newNote()"
       (ngModelChange)="newNote.set($event)"
       (keyup.enter)="logTime()"
     />
-    <button class="btn-log" [disabled]="!newDuration()" (click)="logTime()">Log</button>
+    <button class="btn-log" [disabled]="!newDuration()" (click)="logTime()">{{ 'TASK.LOG' | translate }}</button>
   </div>
 
   @if (entries().length) {
@@ -31,7 +31,7 @@
           <span class="entry-duration">{{ formatDuration(entry.duration_minutes) }}</span>
           <span class="entry-note">{{ entry.note || '—' }}</span>
           <span class="entry-user">{{ entry.user_name }}</span>
-          <button class="btn-remove" aria-label="Delete time entry" (click)="deleteEntry(entry)">&#10005;</button>
+          <button class="btn-remove" [attr.aria-label]="'TASK.DELETE_TIME_ENTRY' | translate" (click)="deleteEntry(entry)">&#10005;</button>
         </li>
       }
     </ul>

@@ -3,7 +3,7 @@
 
     <div class="modal-header">
       <h2 id="create-task-title">{{ 'TASK.NEW_TASK' | translate }}</h2>
-      <button class="btn-close" aria-label="Close" (click)="cancelled.emit()">&#10005;</button>
+      <button class="btn-close" [attr.aria-label]="'COMMON.CLOSE' | translate" (click)="cancelled.emit()">&#10005;</button>
     </div>
 
     <div class="modal-body">
@@ -16,7 +16,7 @@
           class="field-input"
           type="text"
           [(ngModel)]="title"
-          placeholder="Task title"
+          [placeholder]="'TASK.TASK_TITLE_PLACEHOLDER' | translate"
           [class.field-error]="submitted && !title.trim()"
           (keyup.enter)="submit()"
         />
@@ -31,7 +31,7 @@
           class="field-textarea"
           rows="2"
           [(ngModel)]="description"
-          placeholder="Optional description..."
+          [placeholder]="'TASK.DESCRIPTION_OPTIONAL' | translate"
         ></textarea>
       </div>
 
@@ -47,7 +47,7 @@
                 [class.active]="priority === p"
                 [attr.aria-pressed]="priority === p"
                 (click)="priority = p"
-              >{{ p }}</button>
+              >{{ 'BOARD_DETAIL.' + p.toUpperCase() | translate }}</button>
             }
           </div>
         </div>

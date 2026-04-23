@@ -11,12 +11,12 @@
     <div class="profile-avatar-section">
       <div class="avatar-upload-wrapper">
         <app-user-avatar [firstName]="firstName()" [lastName]="lastName()" [avatarUrl]="avatarUrl()" [size]="72" />
-        <label class="avatar-upload-btn" title="Change avatar" aria-label="Change avatar">
+        <label class="avatar-upload-btn" [title]="'PROFILE.CHANGE_AVATAR' | translate" [attr.aria-label]="'PROFILE.CHANGE_AVATAR' | translate">
           <span aria-hidden="true">&#9998;</span>
           <input type="file" accept="image/*" hidden (change)="onAvatarSelected($event)" />
         </label>
         @if (avatarUrl()) {
-          <button class="avatar-remove-btn" title="Remove avatar" aria-label="Remove avatar" (click)="removeAvatar()">&#10005;</button>
+          <button class="avatar-remove-btn" [title]="'PROFILE.REMOVE_AVATAR' | translate" [attr.aria-label]="'PROFILE.REMOVE_AVATAR' | translate" (click)="removeAvatar()">&#10005;</button>
         }
       </div>
       <div class="profile-name">

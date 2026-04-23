@@ -22,7 +22,7 @@
         } @else {
           <label [for]="'sub-' + sub.id" [class.done]="sub.done" (dblclick)="startEditSubtask(sub)">{{ sub.title }}</label>
         }
-        <button class="btn-remove-sub" aria-label="Delete subtask" (click)="deleteSubtask(sub)">&#10005;</button>
+        <button class="btn-remove-sub" [attr.aria-label]="'TASK.DELETE_SUBTASK' | translate" (click)="deleteSubtask(sub)">&#10005;</button>
       </div>
     }
   </div>
@@ -35,7 +35,7 @@
       [placeholder]="'TASK.ADD_SUBTASK' | translate"
       (keyup.enter)="addSubtask()"
     />
-    <button class="btn-add-sub" aria-label="Add subtask" (click)="addSubtask()">+</button>
+    <button class="btn-add-sub" [attr.aria-label]="'TASK.ADD_SUBTASK' | translate" (click)="addSubtask()">+</button>
   </div>
 </div>
 

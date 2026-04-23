@@ -1,4 +1,4 @@
-<div class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Task details" (click)="close()">
+<div class="modal-backdrop" role="dialog" aria-modal="true" [attr.aria-label]="'TASK.TASK_DETAILS' | translate" (click)="close()">
   <div class="modal-card" (click)="$event.stopPropagation()">
 
     <div class="modal-header">
@@ -8,9 +8,9 @@
         type="text"
         [ngModel]="title()"
         (ngModelChange)="title.set($event)"
-        placeholder="Task title"
+        [placeholder]="'TASK.TASK_TITLE_PLACEHOLDER' | translate"
       />
-      <button class="btn-close" aria-label="Close" (click)="close()">&#10005;</button>
+      <button class="btn-close" [attr.aria-label]="'COMMON.CLOSE' | translate" (click)="close()">&#10005;</button>
     </div>
 
     <div class="modal-body">
@@ -22,7 +22,7 @@
           rows="3"
           [ngModel]="description()"
           (ngModelChange)="description.set($event)"
-          placeholder="Add a description..."
+          [placeholder]="'TASK.DESCRIPTION_PLACEHOLDER' | translate"
         ></textarea>
       </div>
 
@@ -37,7 +37,7 @@
                 [class.active]="priority() === p"
                 [attr.aria-pressed]="priority() === p"
                 (click)="priority.set(p)"
-              >{{ p }}</button>
+              >{{ 'BOARD_DETAIL.' + p.toUpperCase() | translate }}</button>
             }
           </div>
         </div>
@@ -60,7 +60,7 @@
             (ngModelChange)="recurrence.set($event || null)"
           >
             @for (opt of recurrenceOptions; track opt.value) {
-              <option [ngValue]="opt.value">{{ opt.label }}</option>
+              <option [ngValue]="opt.value">{{ opt.labelKey | translate }}</option>
             }
           </select>
         </div>

@@ -41,8 +41,8 @@
     </nav>
 
     <div class="sidebar-footer">
-      <a routerLink="/privacy" (click)="closeSidebar()">Privacy Policy</a>
-      <a routerLink="/legal" (click)="closeSidebar()">Legal Notice</a>
+      <a routerLink="/privacy" (click)="closeSidebar()">{{ 'NAV.PRIVACY_POLICY' | translate }}</a>
+      <a routerLink="/legal" (click)="closeSidebar()">{{ 'NAV.LEGAL_NOTICE' | translate }}</a>
     </div>
   </aside>
 
@@ -57,7 +57,7 @@
         <button class="btn-theme-toggle" [attr.aria-label]="(theme.isDark() ? 'TOPBAR.LIGHT_MODE' : 'TOPBAR.DARK_MODE') | translate" (click)="theme.toggle()" [title]="(theme.isDark() ? 'TOPBAR.LIGHT_MODE' : 'TOPBAR.DARK_MODE') | translate">
           {{ theme.isDark() ? '☀' : '☾' }}
         </button>
-        <select class="lang-select" [attr.aria-label]="'Language'" [ngModel]="lang.currentLang()" (ngModelChange)="lang.setLanguage($event)">
+        <select class="lang-select" [attr.aria-label]="'TOPBAR.LANGUAGE' | translate" [ngModel]="lang.currentLang()" (ngModelChange)="lang.setLanguage($event)">
           <option value="en">EN</option>
           <option value="de">DE</option>
         </select>

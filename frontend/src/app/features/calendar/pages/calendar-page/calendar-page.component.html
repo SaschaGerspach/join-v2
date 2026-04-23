@@ -1,16 +1,16 @@
 <div class="calendar-page">
 
   <div class="calendar-header">
-    <button class="btn-nav" aria-label="Previous month" (click)="prevMonth()">&#8592;</button>
+    <button class="btn-nav" [attr.aria-label]="'CALENDAR.PREV_MONTH' | translate" (click)="prevMonth()">&#8592;</button>
     <h1 class="month-label">{{ monthLabel() }}</h1>
-    <button class="btn-nav" aria-label="Next month" (click)="nextMonth()">&#8594;</button>
+    <button class="btn-nav" [attr.aria-label]="'CALENDAR.NEXT_MONTH' | translate" (click)="nextMonth()">&#8594;</button>
   </div>
 
   @if (loading()) {
     <p class="loading-hint">{{ 'CALENDAR.LOADING' | translate }}</p>
   } @else {
-    <div class="calendar-grid" role="grid" aria-label="Calendar">
-      @for (day of weekDays; track day) {
+    <div class="calendar-grid" role="grid" [attr.aria-label]="'CALENDAR.CALENDAR_LABEL' | translate">
+      @for (day of weekDays(); track day) {
         <div class="weekday-header" role="columnheader">{{ day }}</div>
       }
       @for (day of calendarDays(); track $index) {
