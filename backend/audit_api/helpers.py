@@ -16,10 +16,13 @@ def get_client_ip(request):
     return request.META.get("REMOTE_ADDR")
 
 
+MAX_DETAIL_LENGTH = 1000
+
+
 def log_audit(event_type, *, user=None, request=None, detail=""):
     AuditLog.objects.create(
         user=user,
         event_type=event_type,
-        detail=detail,
+        detail=detail[:MAX_DETAIL_LENGTH] if detail else "",
         ip_address=get_client_ip(request) if request else None,
     )
