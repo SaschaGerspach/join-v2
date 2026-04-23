@@ -1,16 +1,22 @@
 import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { RouterModule, ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LanguageService } from '../../../../shared/services/language.service';
 
 @Component({
   selector: 'app-verify-email-page',
   standalone: true,
-  imports: [RouterModule, TranslateModule],
+  imports: [RouterModule, FormsModule, TranslateModule],
   template: `
     <div class="auth-page">
       <div class="auth-logo"><span>Join</span></div>
       <div class="auth-card">
+        <select class="auth-lang-select" [ngModel]="lang.currentLang()" (ngModelChange)="lang.setLanguage($event)">
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+        </select>
         @if (loading()) {
           <p class="info-message">{{ 'AUTH.VERIFYING' | translate }}</p>
         } @else if (success()) {
@@ -38,6 +44,7 @@ export class VerifyEmailPageComponent implements OnInit {
   private readonly authApi = inject(AuthApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly translate = inject(TranslateService);
+  readonly lang = inject(LanguageService);
 
   loading = signal(true);
   success = signal(false);

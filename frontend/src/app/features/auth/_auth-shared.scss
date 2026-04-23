@@ -2,7 +2,7 @@
 
 .auth-page {
   min-height: 100vh;
-  background-color: $color-bg;
+  background-color: var(--color-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,12 +27,37 @@
   width: 100%;
   max-width: 496px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  position: relative;
 
   h1 {
     font-size: 2rem;
     font-weight: 700;
     color: var(--color-text);
     margin-bottom: 1rem;
+  }
+}
+
+.auth-lang-select {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid $color-border;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+
+  option {
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
   }
 }
 
@@ -55,6 +80,7 @@
     padding: 0.8rem 1.5rem;
     font-size: 1rem;
     background: var(--color-surface);
+    color: var(--color-text);
     transition: border-color 0.2s ease;
 
     &::placeholder {
@@ -68,6 +94,14 @@
 
     &.input-error {
       border-color: $color-error;
+    }
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 1000px var(--color-surface) inset;
+      -webkit-text-fill-color: var(--color-text);
+      transition: background-color 5000s ease-in-out 0s;
     }
   }
 }
@@ -132,13 +166,13 @@
   }
 
   .btn-primary {
-    background-color: $color-dark;
+    background-color: $color-primary;
     color: $color-white;
-    border: 2px solid $color-dark;
+    border: 2px solid $color-primary;
 
     &:hover {
-      background-color: $color-primary;
-      border-color: $color-primary;
+      background-color: darken($color-primary, 10%);
+      border-color: darken($color-primary, 10%);
     }
   }
 

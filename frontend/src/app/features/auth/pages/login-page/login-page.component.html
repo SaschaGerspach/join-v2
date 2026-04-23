@@ -4,6 +4,10 @@
   </div>
 
   <div class="auth-card">
+    <select class="auth-lang-select" [ngModel]="lang.currentLang()" (ngModelChange)="lang.setLanguage($event)">
+      <option value="en">EN</option>
+      <option value="de">DE</option>
+    </select>
     <h1>{{ 'AUTH.LOGIN' | translate }}</h1>
     <div class="auth-divider"></div>
 

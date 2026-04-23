@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { PendingEmailService } from '../../../../core/auth/pending-email.service';
+import { LanguageService } from '../../../../shared/services/language.service';
 
 @Component({
   selector: 'app-register-page',
@@ -19,6 +20,8 @@ export class RegisterPageComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly pendingEmail = inject(PendingEmailService);
+  private readonly translate = inject(TranslateService);
+  readonly lang = inject(LanguageService);
 
   firstName = '';
   lastName = '';
@@ -55,7 +58,7 @@ export class RegisterPageComponent {
         this.router.navigate(['/verify-email-sent']);
       },
       error: (err) => {
-        this.error.set(err?.error?.detail ?? 'Registration failed. Email may already be in use.');
+        this.error.set(err?.error?.detail ?? this.translate.instant('ERROR.REGISTRATION_FAILED'));
         this.submitting.set(false);
       },
     });

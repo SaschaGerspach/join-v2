@@ -3,6 +3,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LanguageService } from '../../../../shared/services/language.service';
 
 @Component({
   selector: 'app-reset-password-page',
@@ -12,6 +13,10 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     <div class="auth-page">
       <div class="auth-logo"><span>Join</span></div>
       <div class="auth-card">
+        <select class="auth-lang-select" [ngModel]="lang.currentLang()" (ngModelChange)="lang.setLanguage($event)">
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+        </select>
         <h1>{{ 'AUTH.SET_NEW_PASSWORD' | translate }}</h1>
         <div class="auth-divider"></div>
 
@@ -70,6 +75,7 @@ export class ResetPasswordPageComponent implements OnInit {
   private readonly authApi = inject(AuthApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly translate = inject(TranslateService);
+  readonly lang = inject(LanguageService);
 
   password = '';
   confirm = '';
