@@ -11,7 +11,7 @@ export class MarkdownPipe implements PipeTransform {
   transform(value: string | null | undefined): string {
     if (!value) return '';
     const raw = marked.parse(value, { async: false }) as string;
-    const sanitized = DOMPurify.sanitize(raw);
-    return sanitized.replace(MENTION_RE, '<span class="mention">@$1</span>');
+    const withMentions = raw.replace(MENTION_RE, '<span class="mention">@$1</span>');
+    return DOMPurify.sanitize(withMentions);
   }
 }

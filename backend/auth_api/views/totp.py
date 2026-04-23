@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from audit_api.helpers import log_audit
+from ..encryption import encrypt_totp_secret, decrypt_totp_secret
 from ..serializers import TotpSetupSerializer, TotpCodeSerializer, TotpDisableSerializer
 
 
@@ -20,7 +21,7 @@ def totp_setup(request):
         return Response({"detail": "2FA is already enabled."}, status=status.HTTP_400_BAD_REQUEST)
 
     secret = pyotp.random_base32()
-    user.totp_secret = secret
+    user.totp_secret = encrypt_totp_secret(secret)
     user.save(update_fields=["totp_secret"])
 
     totp = pyotp.TOTP(secret)
@@ -51,7 +52,7 @@ def totp_confirm(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     code = serializer.validated_data["code"]
-    totp = pyotp.TOTP(user.totp_secret)
+    totp = pyotp.TOTP(decrypt_totp_secret(user.totp_secret))
     if not totp.verify(code):
         return Response({"detail": "Invalid code."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -76,7 +77,7 @@ def totp_disable(request):
         return Response({"detail": "Wrong password."}, status=status.HTTP_400_BAD_REQUEST)
 
     code = serializer.validated_data["code"]
-    totp = pyotp.TOTP(user.totp_secret)
+    totp = pyotp.TOTP(decrypt_totp_secret(user.totp_secret))
     if not totp.verify(code):
         return Response({"detail": "Invalid code."}, status=status.HTTP_400_BAD_REQUEST)
 

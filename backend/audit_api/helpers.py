@@ -1,10 +1,18 @@
+from django.conf import settings
+
 from .models import AuditLog
+
+TRUSTED_PROXY_COUNT = getattr(settings, "TRUSTED_PROXY_COUNT", 1)
 
 
 def get_client_ip(request):
     xff = request.META.get("HTTP_X_FORWARDED_FOR")
     if xff:
-        return xff.split(",")[0].strip()
+        parts = [p.strip() for p in xff.split(",")]
+        try:
+            return parts[-TRUSTED_PROXY_COUNT]
+        except IndexError:
+            return parts[0]
     return request.META.get("REMOTE_ADDR")
 
 

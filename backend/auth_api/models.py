@@ -26,7 +26,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
-    totp_secret = models.CharField(max_length=32, blank=True, default="")
+    totp_secret = models.CharField(max_length=255, blank=True, default="")
     totp_enabled = models.BooleanField(default=False)
     avatar = models.ImageField(upload_to="avatars/", blank=True, default="")
     date_joined = models.DateTimeField(auto_now_add=True)
