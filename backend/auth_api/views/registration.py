@@ -1,3 +1,6 @@
+import random
+import time
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
@@ -29,6 +32,7 @@ def register(request):
     last_name = data.get("last_name", "").strip()
 
     if User.objects.filter(email=email).exists():
+        time.sleep(random.uniform(0.5, 1.5))
         return Response(
             {"email": email},
             status=status.HTTP_201_CREATED,
