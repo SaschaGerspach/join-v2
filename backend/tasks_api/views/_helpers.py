@@ -50,10 +50,16 @@ def next_due_date(current_date, recurrence):
     return None
 
 
+MAX_RECURRENCE_INSTANCES = 100
+
+
 def create_next_recurring_task(task):
     if not task.recurrence or not task.due_date:
         return None
     from ..models import Task
+    existing_count = Task.objects.filter(board=task.board, title=task.title, recurrence=task.recurrence).count()
+    if existing_count >= MAX_RECURRENCE_INSTANCES:
+        return None
     new_due = next_due_date(task.due_date, task.recurrence)
     if not new_due:
         return None

@@ -128,7 +128,8 @@ def user_detail(request, pk):
                     # Remove membership row since the successor is now the owner (implicit role).
                     successor.delete()
                 else:
-                    board.delete()
+                    board.title = f"[Deleted User] {board.title}"
+                    board.save(update_fields=["title"])
             BoardMember.objects.filter(user=user).delete()
             user.is_active = False
             user.save(update_fields=["is_active"])

@@ -97,7 +97,9 @@ class Comment(models.Model):
 
 
 def attachment_path(instance, filename):
-    return f"attachments/task_{instance.task_id}/{filename}"
+    import uuid as _uuid
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "bin"
+    return f"attachments/task_{instance.task_id}/{_uuid.uuid4().hex}.{ext}"
 
 
 class Attachment(models.Model):
