@@ -184,7 +184,7 @@
                     (click)="state.toggleTaskSelection(task.id, $event)"
                   />
                   <span class="task-priority" [class]="state.priorityClass(task.priority)">
-                    {{ task.priority }}
+                    {{ 'BOARD_DETAIL.' + task.priority.toUpperCase() | translate }}
                   </span>
                   <button class="btn-icon small" [attr.aria-label]="'BOARD_DETAIL.DELETE_TASK' | translate" (click)="$event.stopPropagation(); state.pendingDeleteTaskId.set(task.id)">&#10005;</button>
                 </div>
@@ -228,7 +228,7 @@
                   </div>
                 }
                 @if (task.recurrence) {
-                  <span class="recurrence-badge" [title]="'BOARD_DETAIL.REPEATS' | translate:{ interval: task.recurrence }">&#128260; {{ task.recurrence }}</span>
+                  <span class="recurrence-badge" [title]="'BOARD_DETAIL.REPEATS' | translate:{ interval: ('TASK.' + task.recurrence.toUpperCase() | translate) }">&#128260; {{ 'TASK.' + task.recurrence.toUpperCase() | translate }}</span>
                 }
                 @if (task.attachment_count > 0) {
                   <span class="attachment-badge" [title]="'TASK.ATTACHMENTS' | translate">📎 {{ task.attachment_count }}</span>
