@@ -1,5 +1,6 @@
 import csv
 import io
+import re
 
 from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import api_view
@@ -42,6 +43,7 @@ def board_export_csv(request, pk):
         ])
 
     response = HttpResponse(buf.getvalue(), content_type="text/csv; charset=utf-8")
-    filename = f"{board.title.replace(' ', '_')}_export.csv"
+    safe_title = re.sub(r'[^\w\-]', '_', board.title)
+    filename = f"{safe_title}_export.csv"
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response
