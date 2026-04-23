@@ -13,6 +13,7 @@ export type Board = {
   created_at: string;
   is_owner: boolean;
   is_favorite: boolean;
+  is_member: boolean;
   team_id: number | null;
   team_name: string | null;
 };
@@ -79,8 +80,11 @@ export class BoardsApiService {
     return this.http.delete<void>(`${this.baseUrl}/boards/${boardId}/favorite/`, { withCredentials: true });
   }
 
-  exportCsvUrl(boardId: number): string {
-    return `${this.baseUrl}/boards/${boardId}/export/csv/`;
+  exportCsv(boardId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/boards/${boardId}/export/csv/`, {
+      withCredentials: true,
+      responseType: 'blob',
+    });
   }
 
   importCsv(boardId: number, file: File): Observable<{ imported: number }> {

@@ -36,7 +36,7 @@ export class ShellComponent implements OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
-    if (!this.elementRef.nativeElement.querySelector('.header-right')?.contains(event.target)) {
+    if (!this.elementRef.nativeElement.querySelector('.topbar-user')?.contains(event.target)) {
       this.menuOpen.set(false);
       this.notificationsOpen.set(false);
     }
@@ -59,7 +59,6 @@ export class ShellComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.lang.init();
     this.notificationService.connect();
   }
 

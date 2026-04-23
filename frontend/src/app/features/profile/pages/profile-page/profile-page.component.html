@@ -38,7 +38,7 @@
         </div>
         <div class="form-field full-width">
           <label for="profile-email">{{ 'PROFILE.EMAIL' | translate }}</label>
-          <input id="profile-email" class="field-input" type="email" autocomplete="email" [ngModel]="email()" (ngModelChange)="email.set($event)" />
+          <input id="profile-email" class="field-input" type="email" autocomplete="email" [ngModel]="email()" (ngModelChange)="email.set($event)" [readonly]="!isAdmin()" [class.field-readonly]="!isAdmin()" />
         </div>
       </div>
     </div>
@@ -172,7 +172,9 @@
     }
 
 <div class="form-actions">
-      <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">{{ 'PROFILE.DELETE_ACCOUNT' | translate }}</button>
+      @if (isAdmin()) {
+        <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">{{ 'PROFILE.DELETE_ACCOUNT' | translate }}</button>
+      }
       <button class="btn-export" (click)="exportData()">{{ 'PROFILE.EXPORT_DATA' | translate }}</button>
       <button class="btn-save" [disabled]="saving()" (click)="save()">
         {{ saving() ? ('PROFILE.SAVING' | translate) : ('PROFILE.SAVE' | translate) }}
@@ -186,7 +188,7 @@
 
 @if (showDeleteConfirm()) {
   <app-confirm-dialog
-    message="Delete your account? This cannot be undone."
+    [message]="'PROFILE.CONFIRM_DELETE' | translate"
     (confirmed)="confirmDeleteAccount()"
     (cancelled)="showDeleteConfirm.set(false)"
   />

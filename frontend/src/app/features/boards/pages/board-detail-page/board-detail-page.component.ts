@@ -96,7 +96,17 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   }
 
   exportCsv(): void {
-    window.open(this.boardsApi.exportCsvUrl(this.state.boardId()), '_blank');
+    this.boardsApi.exportCsv(this.state.boardId()).subscribe({
+      next: blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `board-${this.state.boardId()}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => this.toast.show('Export failed.', 'error'),
+    });
   }
 
   importCsv(event: Event): void {

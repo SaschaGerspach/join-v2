@@ -1,4 +1,4 @@
-import { ApplicationConfig, ErrorHandler, isDevMode } from '@angular/core';
+import { ApplicationConfig, APP_INITIALIZER, ErrorHandler, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
@@ -10,6 +10,8 @@ import { GlobalErrorHandler } from './core/error-handler/global-error-handler';
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { LanguageService } from './shared/services/language.service';
+import { ThemeService } from './shared/services/theme.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -27,5 +29,17 @@ export const appConfig: ApplicationConfig = {
       prefix: './assets/i18n/',
       suffix: '.json',
     }),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (lang: LanguageService) => () => lang.init(),
+      deps: [LanguageService],
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (_theme: ThemeService) => () => {},
+      deps: [ThemeService],
+      multi: true,
+    },
   ],
 };

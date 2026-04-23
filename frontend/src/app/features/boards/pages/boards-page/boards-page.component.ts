@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { NgTemplateOutlet } from '@angular/common';
 import { BoardsApiService, Board, BoardMember, BoardMemberRole } from '../../../../core/boards/boards-api.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -11,7 +12,7 @@ import { TranslateModule } from '@ngx-translate/core';
 @Component({
   selector: 'app-boards-page',
   standalone: true,
-  imports: [FormsModule, LoadingSpinnerComponent, ConfirmDialogComponent, TranslateModule],
+  imports: [FormsModule, NgTemplateOutlet, LoadingSpinnerComponent, ConfirmDialogComponent, TranslateModule],
   templateUrl: './boards-page.component.html',
   styleUrl: './boards-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,6 +24,9 @@ export class BoardsPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   boards = signal<Board[]>([]);
+  ownedBoards = computed(() => this.boards().filter(b => b.is_owner && b.is_member));
+  sharedBoards = computed(() => this.boards().filter(b => !b.is_owner && b.is_member));
+  adminBoards = computed(() => this.boards().filter(b => !b.is_member));
   newTitle = '';
   newTemplate = 'kanban';
   showForm = signal(false);

@@ -147,6 +147,11 @@
     border-color: $color-primary;
     outline: none;
   }
+
+  &.field-readonly {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 // ─── Notification Preferences ────────────────────────────────────────────────
