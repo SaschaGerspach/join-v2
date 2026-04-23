@@ -1,3 +1,4 @@
+from django.db import transaction
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -34,7 +35,7 @@ def serialize_board(board, *, is_favorite=False):
     }
 
 
-def serialize_shared_board(board, user, *, is_favorite=False):
+def serialize_shared_board(board, user, *, is_favorite=False, is_member=True):
     return {
         "id": board.pk,
         "title": board.title,
@@ -43,6 +44,7 @@ def serialize_shared_board(board, user, *, is_favorite=False):
         "created_at": board.created_at,
         "is_owner": board.created_by == user,
         "is_favorite": is_favorite,
+        "is_member": is_member,
         "team_id": board.team_id,
         "team_name": board.team.name if board.team_id else None,
     }
@@ -60,21 +62,30 @@ def serialize_shared_board(board, user, *, is_favorite=False):
 @api_view(["GET", "POST"])
 def board_list(request):
     if request.method == "GET":
+        owned = Board.objects.filter(created_by=request.user)
+        shared = Board.objects.filter(members__user=request.user)
+        team_boards = Board.objects.filter(team__members__user=request.user)
+        team_owned = Board.objects.filter(team__created_by=request.user)
+        member_boards = (owned | shared | team_boards | team_owned).distinct()
         if request.user.is_staff:
-            boards = Board.objects.all().order_by("-created_at")
+            boards = Board.objects.select_related("team").all().order_by("-created_at")
+            member_ids = set(member_boards.values_list("pk", flat=True))
         else:
-            owned = Board.objects.filter(created_by=request.user)
-            shared = Board.objects.filter(members__user=request.user)
-            team_boards = Board.objects.filter(team__members__user=request.user)
-            team_owned = Board.objects.filter(team__created_by=request.user)
-            boards = (owned | shared | team_boards | team_owned).distinct().order_by("-created_at")
+            boards = member_boards.select_related("team").order_by("-created_at")
+            member_ids = None
         fav_ids = set(
             BoardFavorite.objects.filter(user=request.user).values_list("board_id", flat=True)
         )
         paginator = _BoardPagination()
         page = paginator.paginate_queryset(boards, request)
-        result = [serialize_shared_board(b, request.user, is_favorite=b.pk in fav_ids) for b in page]
-        result.sort(key=lambda b: (not b["is_favorite"], b["title"].lower()))
+        result = [
+            serialize_shared_board(
+                b, request.user,
+                is_favorite=b.pk in fav_ids,
+                is_member=member_ids is None or b.pk in member_ids,
+            )
+            for b in page
+        ]
         return paginator.get_paginated_response(result)
 
     serializer = BoardCreateSerializer(data=request.data)
@@ -91,12 +102,13 @@ def board_list(request):
                 team = None
         except Team.DoesNotExist:
             pass
-    board = Board.objects.create(title=serializer.validated_data["title"], created_by=request.user, team=team)
-    template = serializer.validated_data.get("template", "kanban")
-    columns = BOARD_TEMPLATES.get(template, BOARD_TEMPLATES["kanban"])
-    Column.objects.bulk_create([
-        Column(board=board, title=t, order=i) for i, t in enumerate(columns)
-    ])
+    with transaction.atomic():
+        board = Board.objects.create(title=serializer.validated_data["title"], created_by=request.user, team=team)
+        template = serializer.validated_data.get("template", "kanban")
+        columns = BOARD_TEMPLATES.get(template, BOARD_TEMPLATES["kanban"])
+        Column.objects.bulk_create([
+            Column(board=board, title=t, order=i) for i, t in enumerate(columns)
+        ])
     return Response(serialize_board(board), status=status.HTTP_201_CREATED)
 
 
@@ -146,10 +158,12 @@ def board_detail(request, pk):
                 from teams_api.models import Team
                 try:
                     t = Team.objects.get(pk=data["team_id"])
-                    if t.created_by == request.user or t.members.filter(user=request.user).exists():
+                    if t.created_by == request.user or t.members.filter(user=request.user).exists() or request.user.is_staff:
                         board.team = t
+                    else:
+                        return Response({"detail": "Not a member of this team."}, status=status.HTTP_403_FORBIDDEN)
                 except Team.DoesNotExist:
-                    pass
+                    return Response({"detail": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
             changed_fields.append("team")
         if changed_fields:
             board.save(update_fields=changed_fields)
