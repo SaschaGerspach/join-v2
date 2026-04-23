@@ -499,7 +499,8 @@
     "FAILED_DELETE_TIME_ENTRY": "Fehler beim Löschen des Eintrags.",
     "FAILED_LOAD_STATS": "Fehler beim Laden der Statistiken.",
     "FAILED_LOAD_PREFERENCES": "Benachrichtigungseinstellungen konnten nicht geladen werden.",
-    "FAILED_LOAD_SESSIONS": "Sitzungen konnten nicht geladen werden."
+    "FAILED_LOAD_SESSIONS": "Sitzungen konnten nicht geladen werden.",
+    "REQUEST_TIMEOUT": "Zeitüberschreitung der Anfrage. Bitte versuche es erneut."
   },
   "ERROR": {
     "INVALID_2FA": "Ungültiger 2FA-Code.",

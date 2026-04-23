@@ -499,7 +499,8 @@
     "FAILED_DELETE_TIME_ENTRY": "Failed to delete entry.",
     "FAILED_LOAD_STATS": "Failed to load stats.",
     "FAILED_LOAD_PREFERENCES": "Failed to load notification preferences.",
-    "FAILED_LOAD_SESSIONS": "Failed to load sessions."
+    "FAILED_LOAD_SESSIONS": "Failed to load sessions.",
+    "REQUEST_TIMEOUT": "Request timed out. Please try again."
   },
   "ERROR": {
     "INVALID_2FA": "Invalid 2FA code.",

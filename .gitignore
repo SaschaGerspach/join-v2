@@ -13,3 +13,9 @@ venv/
 *.pem
 *.key
 *.crt
+.idea/
+.vscode/
+*.swp
+*.swo
+backend/celerybeat-schedule*
+backend/private_media/
