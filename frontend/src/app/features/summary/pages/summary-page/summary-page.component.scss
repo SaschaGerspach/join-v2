@@ -65,10 +65,7 @@
   }
 
   &.accent {
-    background: $color-dark;
     cursor: pointer;
-
-    .stat-icon, .stat-number, .stat-label { color: $color-white; }
   }
 
   &.urgent  .stat-number { color: $priority-urgent; }

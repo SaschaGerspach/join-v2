@@ -190,6 +190,7 @@ input, textarea, select {
   padding: 0.8rem 1.5rem;
   font-size: $font-size-base;
   background: var(--color-surface);
+  color: var(--color-text);
   transition: border-color 0.2s ease;
 
   &::placeholder {
@@ -202,6 +203,14 @@ input, textarea, select {
 
   &.error {
     border-color: $color-error;
+  }
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--color-surface) inset;
+    -webkit-text-fill-color: var(--color-text);
+    transition: background-color 5000s ease-in-out 0s;
   }
 }
 
