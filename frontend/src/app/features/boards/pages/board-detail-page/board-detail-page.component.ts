@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SlicePipe, UpperCasePipe } from '@angular/common';
@@ -30,6 +31,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   private readonly boardsApi = inject(BoardsApiService);
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly state = inject(BoardStateService);
 
   showColumnForm = signal(false);
@@ -96,7 +98,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   }
 
   exportCsv(): void {
-    this.boardsApi.exportCsv(this.state.boardId()).subscribe({
+    this.boardsApi.exportCsv(this.state.boardId()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: blob => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -113,7 +115,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    this.boardsApi.importCsv(this.state.boardId(), file).subscribe({
+    this.boardsApi.importCsv(this.state.boardId(), file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.toast.show(this.translate.instant('BOARD_DETAIL.IMPORT_SUCCESS', { count: res.imported }));
         this.state.reload();

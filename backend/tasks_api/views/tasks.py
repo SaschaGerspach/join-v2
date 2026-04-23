@@ -187,31 +187,36 @@ def task_reorder(request):
     items = serializer.validated_data
 
     task_ids = [item["id"] for item in items]
-    fetched = list(Task.objects.filter(pk__in=task_ids, archived_at__isnull=True).select_related("board"))
-    if len(fetched) != len(set(task_ids)):
-        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-    for t in fetched:
-        if not can_access_board(t.board, request.user):
-            return Response({"detail": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
-    tasks = {t.pk: t for t in fetched}
-
-    board_ids = {t.board_id for t in fetched}
-    columns_by_board = {}
-    for col_id, bid in Column.objects.filter(board_id__in=board_ids).values_list("pk", "board_id"):
-        columns_by_board.setdefault(bid, set()).add(col_id)
-
-    for item in items:
-        task = tasks.get(item.get("id"))
-        if not task:
-            continue
-        if "order" in item:
-            task.order = item["order"]
-        if "column" in item:
-            if item["column"] not in columns_by_board.get(task.board_id, set()):
-                return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
-            task.column_id = item["column"]
 
     with transaction.atomic():
+        fetched = list(
+            Task.objects.select_for_update()
+            .filter(pk__in=task_ids, archived_at__isnull=True)
+            .select_related("board")
+        )
+        if len(fetched) != len(set(task_ids)):
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        for t in fetched:
+            if not can_access_board(t.board, request.user):
+                return Response({"detail": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
+        tasks = {t.pk: t for t in fetched}
+
+        board_ids = {t.board_id for t in fetched}
+        columns_by_board = {}
+        for col_id, bid in Column.objects.filter(board_id__in=board_ids).values_list("pk", "board_id"):
+            columns_by_board.setdefault(bid, set()).add(col_id)
+
+        for item in items:
+            task = tasks.get(item.get("id"))
+            if not task:
+                continue
+            if "order" in item:
+                task.order = item["order"]
+            if "column" in item:
+                if item["column"] not in columns_by_board.get(task.board_id, set()):
+                    return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
+                task.column_id = item["column"]
+
         Task.objects.bulk_update(list(tasks.values()), ["order", "column_id"])
 
     board_ids = {t.board_id for t in tasks.values()}

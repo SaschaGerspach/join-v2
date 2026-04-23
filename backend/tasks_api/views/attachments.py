@@ -81,6 +81,12 @@ def attachment_list(request, task_pk):
             {"detail": "File type not allowed."},
             status=status.HTTP_400_BAD_REQUEST,
         )
+    BLOCKED_MIME_PREFIXES = ("application/x-msdownload", "application/x-executable", "application/x-msdos-program")
+    if file.content_type and file.content_type.startswith(BLOCKED_MIME_PREFIXES):
+        return Response(
+            {"detail": "File type not allowed."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     safe_name = re.sub(r'[^\w.\-]', '_', file.name)
     file.name = f"{uuid.uuid4().hex}_{safe_name}"

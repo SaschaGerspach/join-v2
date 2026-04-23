@@ -98,7 +98,8 @@ def board_list(request):
         from teams_api.models import Team
         try:
             team = Team.objects.get(pk=team_id)
-            if not (team.created_by == request.user or team.members.filter(user=request.user).exists()):
+            from teams_api.views import _is_team_admin
+            if not _is_team_admin(team, request.user):
                 team = None
         except Team.DoesNotExist:
             pass
@@ -158,7 +159,8 @@ def board_detail(request, pk):
                 from teams_api.models import Team
                 try:
                     t = Team.objects.get(pk=data["team_id"])
-                    if t.created_by == request.user or t.members.filter(user=request.user).exists() or request.user.is_staff:
+                    from teams_api.views import _is_team_admin
+                    if _is_team_admin(t, request.user):
                         board.team = t
                     else:
                         return Response({"detail": "Not a member of this team."}, status=status.HTTP_403_FORBIDDEN)

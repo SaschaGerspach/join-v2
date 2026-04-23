@@ -51,6 +51,10 @@ def board_import_csv(request, pk):
         label_cache[lb.name.lower()] = lb
 
     MAX_ROWS = 1000
+    MAX_NEW_COLUMNS = 20
+    MAX_NEW_LABELS = 50
+    new_columns_created = 0
+    new_labels_created = 0
     max_order = Task.objects.filter(board=board).count()
     created = 0
 
@@ -66,8 +70,11 @@ def board_import_csv(request, pk):
         if col_name:
             key = col_name.lower()
             if key not in column_cache:
+                if new_columns_created >= MAX_NEW_COLUMNS:
+                    continue
                 order = len(column_cache)
                 column_cache[key] = Column.objects.create(board=board, title=col_name, order=order)
+                new_columns_created += 1
             column = column_cache[key]
 
         priority = (row.get("Priority") or "medium").strip().lower()
@@ -103,7 +110,10 @@ def board_import_csv(request, pk):
         for name in label_names:
             key = name.lower()
             if key not in label_cache:
+                if new_labels_created >= MAX_NEW_LABELS:
+                    continue
                 label_cache[key] = Label.objects.create(board=board, name=name)
+                new_labels_created += 1
             task.labels.add(label_cache[key])
 
         created += 1
