@@ -18,7 +18,7 @@ def _resize_avatar(file):
     img = Image.open(file)
     img = img.convert("RGB")
     if img.width > AVATAR_MAX_PX or img.height > AVATAR_MAX_PX:
-        img.thumbnail((AVATAR_MAX_PX, AVATAR_MAX_PX), Image.LANCZOS)
+        img.thumbnail((AVATAR_MAX_PX, AVATAR_MAX_PX), Image.Resampling.LANCZOS)
     buf = io.BytesIO()
     img.save(buf, format="JPEG", quality=85)
     buf.seek(0)

@@ -155,7 +155,7 @@ def attachment_thumbnail(request, task_pk, pk):
     try:
         img = Image.open(att.file.open("rb"))
         img = img.convert("RGB")
-        img.thumbnail((THUMB_MAX_PX, THUMB_MAX_PX), Image.LANCZOS)
+        img.thumbnail((THUMB_MAX_PX, THUMB_MAX_PX), Image.Resampling.LANCZOS)
         buf = io.BytesIO()
         img.save(buf, format="JPEG", quality=80)
         buf.seek(0)
