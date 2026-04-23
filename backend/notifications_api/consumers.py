@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 
@@ -11,10 +12,17 @@ logger = logging.getLogger(__name__)
 
 
 class NotificationConsumer(AsyncWebsocketConsumer):
+    AUTH_TIMEOUT = 10
+
     async def connect(self):
         self.group_name = None
         self.user = None
         await self.accept()
+        self._auth_timer = asyncio.get_event_loop().call_later(self.AUTH_TIMEOUT, lambda: asyncio.ensure_future(self._auth_timeout()))
+
+    async def _auth_timeout(self):
+        if self.user is None:
+            await self.close(code=4408)
 
     async def receive(self, text_data=None, bytes_data=None):
         try:
@@ -37,6 +45,8 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             return
 
     async def disconnect(self, close_code):
+        if hasattr(self, '_auth_timer'):
+            self._auth_timer.cancel()
         if self.group_name:
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
 

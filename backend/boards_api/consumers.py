@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 from collections import defaultdict
@@ -14,11 +15,18 @@ _board_presence: dict[str, dict[int, dict]] = defaultdict(dict)
 
 
 class BoardConsumer(AsyncWebsocketConsumer):
+    AUTH_TIMEOUT = 10
+
     async def connect(self):
         self.board_id = self.scope["url_route"]["kwargs"]["board_id"]
         self.group_name = None
         self.user = None
         await self.accept()
+        self._auth_timer = asyncio.get_event_loop().call_later(self.AUTH_TIMEOUT, lambda: asyncio.ensure_future(self._auth_timeout()))
+
+    async def _auth_timeout(self):
+        if self.user is None:
+            await self.close(code=4408)
 
     async def receive(self, text_data=None, bytes_data=None):
         try:
@@ -53,6 +61,8 @@ class BoardConsumer(AsyncWebsocketConsumer):
             return
 
     async def disconnect(self, close_code):
+        if hasattr(self, '_auth_timer'):
+            self._auth_timer.cancel()
         if self.group_name:
             if self.user:
                 _board_presence[self.group_name].pop(self.user.pk, None)
