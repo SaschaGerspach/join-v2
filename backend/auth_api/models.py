@@ -29,6 +29,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     totp_secret = models.CharField(max_length=32, blank=True, default="")
     totp_enabled = models.BooleanField(default=False)
     avatar = models.ImageField(upload_to="avatars/", blank=True, default="")
+    date_joined = models.DateTimeField(auto_now_add=True)
 
     objects = UserManager()
 

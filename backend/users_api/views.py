@@ -86,12 +86,14 @@ def user_detail(request, pk):
         return Response(serialize_user(user))
 
     if request.method == "PATCH":
-        if request.user.pk != pk:
+        if request.user.pk != pk and not request.user.is_staff:
             return Response({"detail": "You can only edit your own profile."}, status=status.HTTP_403_FORBIDDEN)
         serializer = UserUpdateSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         data = serializer.validated_data
+        if "email" in data and not request.user.is_staff:
+            return Response({"detail": "Only admins can change email addresses."}, status=status.HTTP_403_FORBIDDEN)
         if "email" in data:
             new_email = data["email"].lower()
             if User.objects.filter(email=new_email, is_active=True).exclude(pk=pk).exists():
@@ -108,8 +110,8 @@ def user_detail(request, pk):
         return Response(serialize_user(user))
 
     if request.method == "DELETE":
-        if request.user.pk != pk:
-            return Response({"detail": "You can only delete your own account."}, status=status.HTTP_403_FORBIDDEN)
+        if not request.user.is_staff:
+            return Response({"detail": "Only admins can delete accounts."}, status=status.HTTP_403_FORBIDDEN)
 
         # Transfer ownership to the longest-standing member; if no members exist, delete the board entirely.
         with transaction.atomic():
@@ -163,8 +165,8 @@ def data_export(request):
     contacts = list(Contact.objects.filter(owner=user).values(
         "id", "first_name", "last_name", "email", "phone"
     ))
-    notifications = list(Notification.objects.filter(user=user).order_by("-created_at")[:200].values(
-        "id", "notification_type", "message", "is_read", "created_at"
+    notifications = list(Notification.objects.filter(recipient=user).order_by("-created_at")[:200].values(
+        "id", "type", "message", "is_read", "created_at"
     ))
 
     data = {
