@@ -5,7 +5,7 @@ import { TeamsApiService, Team, TeamMember } from '../../../../core/teams/teams-
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-teams-page',
@@ -18,6 +18,7 @@ import { TranslateModule } from '@ngx-translate/core';
 export class TeamsPageComponent implements OnInit {
   private readonly teamsApi = inject(TeamsApiService);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   teams = signal<Team[]>([]);
@@ -34,7 +35,7 @@ export class TeamsPageComponent implements OnInit {
   ngOnInit(): void {
     this.teamsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: teams => { this.teams.set(teams); this.loading.set(false); },
-      error: () => { this.toast.show('Failed to load teams.', 'error'); this.loading.set(false); },
+      error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_TEAMS'), 'error'); this.loading.set(false); },
     });
   }
 
@@ -46,9 +47,9 @@ export class TeamsPageComponent implements OnInit {
         this.teams.update(list => [team, ...list]);
         this.newTeamName = '';
         this.showCreateForm.set(false);
-        this.toast.show('Team created.');
+        this.toast.show(this.translate.instant('TOAST.TEAM_CREATED'));
       },
-      error: () => this.toast.show('Failed to create team.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_TEAM'), 'error'),
     });
   }
 
@@ -61,7 +62,7 @@ export class TeamsPageComponent implements OnInit {
     this.teamMembers.set([]);
     this.teamsApi.getMembers(teamId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: members => this.teamMembers.set(members),
-      error: () => this.toast.show('Failed to load members.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_MEMBERS'), 'error'),
     });
   }
 
@@ -74,9 +75,9 @@ export class TeamsPageComponent implements OnInit {
       next: member => {
         this.teamMembers.update(list => list.some(m => m.user_id === member.user_id) ? list : [...list, member]);
         this.inviteEmail = '';
-        this.toast.show('Member invited.');
+        this.toast.show(this.translate.instant('TOAST.MEMBER_INVITED'));
       },
-      error: (err) => this.toast.show(err?.error?.detail ?? 'Failed to invite.', 'error'),
+      error: (err) => this.toast.show(err?.error?.detail ?? this.translate.instant('TOAST.FAILED_INVITE'), 'error'),
     });
   }
 
@@ -86,9 +87,9 @@ export class TeamsPageComponent implements OnInit {
     this.teamsApi.removeMember(teamId, userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.teamMembers.update(list => list.filter(m => m.user_id !== userId));
-        this.toast.show('Member removed.');
+        this.toast.show(this.translate.instant('TOAST.MEMBER_REMOVED'));
       },
-      error: () => this.toast.show('Failed to remove member.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REMOVE_MEMBER'), 'error'),
     });
   }
 
@@ -97,7 +98,7 @@ export class TeamsPageComponent implements OnInit {
     if (!teamId) return;
     this.teamsApi.patchMemberRole(teamId, userId, role).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => this.teamMembers.update(list => list.map(m => m.user_id === updated.user_id ? updated : m)),
-      error: () => this.toast.show('Failed to update role.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPDATE_ROLE'), 'error'),
     });
   }
 
@@ -113,9 +114,9 @@ export class TeamsPageComponent implements OnInit {
       next: () => {
         this.teams.update(list => list.filter(t => t.id !== id));
         if (this.expandedTeamId() === id) this.expandedTeamId.set(null);
-        this.toast.show('Team deleted.');
+        this.toast.show(this.translate.instant('TOAST.TEAM_DELETED'));
       },
-      error: () => this.toast.show('Failed to delete team.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_TEAM'), 'error'),
     });
   }
 }

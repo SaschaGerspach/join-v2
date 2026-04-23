@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, ViewChild, inject, input, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SlicePipe } from '@angular/common';
 import { Comment, CommentsApiService } from '../../../../core/tasks/comments-api.service';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -23,6 +23,7 @@ export class TaskCommentsComponent implements OnInit {
   @ViewChild('commentTextarea') commentTextarea!: ElementRef<HTMLTextAreaElement>;
   private readonly commentsApi = inject(CommentsApiService);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly auth = inject(AuthService);
 
@@ -76,7 +77,7 @@ export class TaskCommentsComponent implements OnInit {
           this.comments.update(list => [...list, c]);
           this.newCommentText.set('');
         },
-        error: () => this.toast.show('Failed to add comment.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_ADD_COMMENT'), 'error'),
       });
   }
 
@@ -101,7 +102,7 @@ export class TaskCommentsComponent implements OnInit {
           this.replyingTo.set(null);
           this.replyText.set('');
         },
-        error: () => this.toast.show('Failed to add reply.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_ADD_REPLY'), 'error'),
       });
   }
 
@@ -118,7 +119,7 @@ export class TaskCommentsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: updated => this.comments.update(list => list.map(x => x.id === updated.id ? updated : x)),
-        error: () => this.toast.show('Failed to edit comment.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_EDIT_COMMENT'), 'error'),
       });
   }
 
@@ -138,7 +139,7 @@ export class TaskCommentsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.comments.update(list => list.filter(c => c.id !== id)),
-        error: () => this.toast.show('Failed to delete comment.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_COMMENT'), 'error'),
       });
   }
 

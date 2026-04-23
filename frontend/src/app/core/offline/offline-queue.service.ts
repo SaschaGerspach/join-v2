@@ -1,5 +1,6 @@
 import { Injectable, inject, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../shared/services/toast.service';
 
 type QueuedRequest = {
@@ -15,6 +16,7 @@ const STORAGE_KEY = 'offline_queue';
 export class OfflineQueueService implements OnDestroy {
   private readonly http = inject(HttpClient);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private readonly onOnline = () => this.flush();
 
   constructor() {
@@ -45,8 +47,8 @@ export class OfflineQueueService implements OnDestroy {
 
     const processNext = (index: number) => {
       if (index >= queue.length) {
-        if (success > 0) this.toast.show(`${success} queued change(s) synced.`);
-        if (failed > 0) this.toast.show(`${failed} queued change(s) failed.`, 'error');
+        if (success > 0) this.toast.show(this.translate.instant('TOAST.QUEUED_CHANGES_SYNCED', { count: success }));
+        if (failed > 0) this.toast.show(this.translate.instant('TOAST.QUEUED_CHANGES_FAILED', { count: failed }), 'error');
         return;
       }
       const req = queue[index];

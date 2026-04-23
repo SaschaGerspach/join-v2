@@ -107,7 +107,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
         a.click();
         URL.revokeObjectURL(url);
       },
-      error: () => this.toast.show('Export failed.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.EXPORT_FAILED'), 'error'),
     });
   }
 

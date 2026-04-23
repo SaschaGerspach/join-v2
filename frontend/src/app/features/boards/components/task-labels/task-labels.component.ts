@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit, model } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Label, LabelsApiService } from '../../../../core/tasks/labels-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 
@@ -16,6 +16,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 export class TaskLabelsComponent implements OnInit {
   private readonly labelsApi = inject(LabelsApiService);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   boardId = input.required<number>();
@@ -51,7 +52,7 @@ export class TaskLabelsComponent implements OnInit {
           this.selectedLabelIds.update(s => { const n = new Set(s); n.add(label.id); return n; });
           this.newLabelName = '';
         },
-        error: () => this.toast.show('Failed to create label.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_LABEL'), 'error'),
       });
   }
 }

@@ -7,7 +7,7 @@ import { BoardsApiService, Board, BoardMember, BoardMemberRole } from '../../../
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FocusTrapDirective } from '../../../../shared/directives/focus-trap.directive';
 
 @Component({
@@ -22,6 +22,7 @@ export class BoardsPageComponent implements OnInit {
   private readonly api = inject(BoardsApiService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   boards = signal<Board[]>([]);
@@ -48,7 +49,7 @@ export class BoardsPageComponent implements OnInit {
     this.loading.set(true);
     this.api.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: boards => { this.boards.set(boards); this.loading.set(false); },
-      error: () => { this.toast.show('Failed to load boards.', 'error'); this.loading.set(false); },
+      error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARDS'), 'error'); this.loading.set(false); },
     });
   }
 
@@ -62,9 +63,9 @@ export class BoardsPageComponent implements OnInit {
         this.newTitle = '';
         this.newTemplate = 'kanban';
         this.showForm.set(false);
-        this.toast.show('Board created');
+        this.toast.show(this.translate.instant('TOAST.BOARD_CREATED'));
       },
-      error: () => this.toast.show('Failed to create board.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_BOARD'), 'error'),
     });
   }
 
@@ -84,9 +85,9 @@ export class BoardsPageComponent implements OnInit {
       next: () => {
         this.boards.update(b => b.filter(board => board.id !== id));
         this.pendingDeleteId.set(null);
-        this.toast.show('Board deleted');
+        this.toast.show(this.translate.instant('TOAST.BOARD_DELETED'));
       },
-      error: () => this.toast.show('Failed to delete board.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_BOARD'), 'error'),
     });
   }
 
@@ -106,15 +107,15 @@ export class BoardsPageComponent implements OnInit {
     if (!board || !this.inviteEmail.trim()) return;
     this.inviteError.set('');
     this.api.inviteMember(board.id, this.inviteEmail.trim()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: m => { this.members.update(list => [...list, m]); this.inviteEmail = ''; this.toast.show('Invitation sent'); },
-      error: (err) => this.inviteError.set(err?.error?.detail ?? 'Failed to invite.'),
+      next: m => { this.members.update(list => [...list, m]); this.inviteEmail = ''; this.toast.show(this.translate.instant('TOAST.INVITATION_SENT')); },
+      error: (err) => this.inviteError.set(err?.error?.detail ?? this.translate.instant('TOAST.FAILED_INVITE')),
     });
   }
 
   changeColor(board: Board, color: string): void {
     this.api.patch(board.id, { color }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => this.boards.update(list => list.map(b => b.id === updated.id ? updated : b)),
-      error: () => this.toast.show('Failed to change color.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CHANGE_COLOR'), 'error'),
     });
   }
 
@@ -129,7 +130,7 @@ export class BoardsPageComponent implements OnInit {
     this.pendingRemoveMemberId.set(null);
     this.api.removeMember(board.id, userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.members.update(list => list.filter(m => m.user_id !== userId)),
-      error: () => this.toast.show('Failed to remove member.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REMOVE_MEMBER'), 'error'),
     });
   }
 
@@ -138,7 +139,7 @@ export class BoardsPageComponent implements OnInit {
     if (!board) return;
     this.api.patchMemberRole(board.id, userId, role).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => this.members.update(list => list.map(m => m.user_id === userId ? { ...m, role: updated.role } : m)),
-      error: () => this.toast.show('Failed to change role.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CHANGE_ROLE'), 'error'),
     });
   }
 
@@ -153,7 +154,7 @@ export class BoardsPageComponent implements OnInit {
           return a.title.localeCompare(b.title);
         });
       }),
-      error: () => this.toast.show('Failed to update favorite.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPDATE_FAVORITE'), 'error'),
     });
   }
 

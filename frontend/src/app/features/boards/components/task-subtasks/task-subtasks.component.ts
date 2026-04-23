@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, output, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -17,6 +17,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 export class TaskSubtasksComponent implements OnInit {
   private readonly subtasksApi = inject(SubtasksApiService);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   taskId = input.required<number>();
@@ -46,7 +47,7 @@ export class TaskSubtasksComponent implements OnInit {
           this.newSubtaskTitle.set('');
           this.emitCounts();
         },
-        error: () => this.toast.show('Failed to add subtask.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_ADD_SUBTASK'), 'error'),
       });
   }
 
@@ -58,7 +59,7 @@ export class TaskSubtasksComponent implements OnInit {
           this.subtasks.update(s => s.map(x => x.id === updated.id ? updated : x));
           this.emitCounts();
         },
-        error: () => this.toast.show('Failed to update subtask.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPDATE_SUBTASK'), 'error'),
       });
   }
 
@@ -77,7 +78,7 @@ export class TaskSubtasksComponent implements OnInit {
           this.subtasks.update(s => s.filter(x => x.id !== sub.id));
           this.emitCounts();
         },
-        error: () => this.toast.show('Failed to delete subtask.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_SUBTASK'), 'error'),
       });
   }
 
@@ -94,7 +95,7 @@ export class TaskSubtasksComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: updated => this.subtasks.update(s => s.map(x => x.id === updated.id ? updated : x)),
-        error: () => this.toast.show('Failed to rename subtask.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_RENAME_SUBTASK'), 'error'),
       });
   }
 

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -21,6 +21,7 @@ export class BoardArchivePageComponent implements OnInit {
   private readonly boardsApi = inject(BoardsApiService);
   private readonly tasksApi = inject(TasksApiService);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
 
   boardId = 0;
   boardTitle = signal('Board');
@@ -40,9 +41,9 @@ export class BoardArchivePageComponent implements OnInit {
     this.tasksApi.restore(task.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.tasks.update(list => list.filter(t => t.id !== task.id));
-        this.toast.show('Task restored');
+        this.toast.show(this.translate.instant('TOAST.TASK_RESTORED'));
       },
-      error: () => this.toast.show('Failed to restore task.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_RESTORE_TASK'), 'error'),
     });
   }
 
@@ -55,7 +56,7 @@ export class BoardArchivePageComponent implements OnInit {
           this.loading.set(false);
         },
         error: () => {
-          this.toast.show('Failed to load archive.', 'error');
+          this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_ARCHIVE'), 'error');
           this.loading.set(false);
         },
       });
