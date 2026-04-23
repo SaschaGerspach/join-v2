@@ -51,7 +51,7 @@ def column_list(request):
         columns = board.columns.all().order_by("order")
         return Response([serialize_column(c) for c in columns])
 
-    if not is_board_owner(board, request.user):
+    if not is_board_owner(board, request.user) and not request.user.is_staff:
         return Response({"detail": "Only the board owner can create columns."}, status=status.HTTP_403_FORBIDDEN)
 
     serializer = ColumnCreateSerializer(data=request.data)
@@ -85,7 +85,7 @@ def column_detail(request, pk):
     if not can_access_board(column.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not is_board_owner(column.board, request.user):
+    if not is_board_owner(column.board, request.user) and not request.user.is_staff:
         return Response({"detail": "Only the board owner can modify columns."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":

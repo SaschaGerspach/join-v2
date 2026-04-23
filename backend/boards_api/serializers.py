@@ -9,6 +9,7 @@ class BoardSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField()
     is_owner = serializers.BooleanField()
     is_favorite = serializers.BooleanField()
+    is_member = serializers.BooleanField()
     team_id = serializers.IntegerField(allow_null=True)
     team_name = serializers.CharField(allow_null=True)
 
