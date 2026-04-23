@@ -70,33 +70,47 @@ class UserDetailTests(APITestCase):
         self.user.refresh_from_db()
         self.assertEqual(self.user.email, "a@example.com")
 
-    def test_delete_own_account(self):
+    def test_delete_requires_staff(self):
         response = self.client.delete(self.url(self.user.pk))
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(User.objects.get(pk=self.user.pk).is_active)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_other_account_forbidden(self):
         response = self.client.delete(self.url(self.other.pk))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_delete_as_admin(self):
+        self.user.is_staff = True
+        self.user.save()
+        target = User.objects.create_user(email="target@example.com", password="pass")
+        response = self.client.delete(self.url(target.pk))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(User.objects.get(pk=target.pk).is_active)
+
     def test_delete_transfers_board_to_member(self):
-        board = Board.objects.create(title="Team", created_by=self.user)
+        self.user.is_staff = True
+        self.user.save()
+        target = User.objects.create_user(email="target@example.com", password="pass")
+        board = Board.objects.create(title="Team", created_by=target)
         BoardMember.objects.create(board=board, user=self.other)
-        self.client.delete(self.url(self.user.pk))
+        self.client.delete(self.url(target.pk))
         board.refresh_from_db()
         self.assertEqual(board.created_by, self.other)
         self.assertFalse(BoardMember.objects.filter(board=board, user=self.other).exists())
 
     def test_delete_preserves_board_without_members(self):
-        board = Board.objects.create(title="Solo", created_by=self.user)
-        board_id = board.pk
-        self.client.delete(self.url(self.user.pk))
+        self.user.is_staff = True
+        self.user.save()
+        target = User.objects.create_user(email="target@example.com", password="pass")
+        board = Board.objects.create(title="Solo", created_by=target)
+        self.client.delete(self.url(target.pk))
         board.refresh_from_db()
-        self.assertTrue(Board.objects.filter(pk=board_id).exists())
         self.assertTrue(board.title.startswith("[Deleted User]"))
 
     def test_delete_removes_memberships(self):
+        self.user.is_staff = True
+        self.user.save()
+        target = User.objects.create_user(email="target@example.com", password="pass")
         board = Board.objects.create(title="Other", created_by=self.other)
-        BoardMember.objects.create(board=board, user=self.user)
-        self.client.delete(self.url(self.user.pk))
-        self.assertFalse(BoardMember.objects.filter(user=self.user).exists())
+        BoardMember.objects.create(board=board, user=target)
+        self.client.delete(self.url(target.pk))
+        self.assertFalse(BoardMember.objects.filter(user=target).exists())
