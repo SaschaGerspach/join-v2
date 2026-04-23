@@ -46,10 +46,13 @@ def board_import_csv(request, pk):
     for lb in board.labels.all():
         label_cache[lb.name.lower()] = lb
 
+    MAX_ROWS = 1000
     max_order = Task.objects.filter(board=board).count()
     created = 0
 
     for row in reader:
+        if created >= MAX_ROWS:
+            break
         title = (row.get("Title") or "").strip()
         if not title:
             continue
