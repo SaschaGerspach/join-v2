@@ -4,7 +4,7 @@
     <div class="attachment-gallery">
       @for (att of imageAttachments(); track att.id) {
         <div class="gallery-item">
-          <img [src]="att.thumbnail_url ?? att.url" [alt]="att.filename" class="gallery-thumb" (click)="openPreview(att)" />
+          <img [src]="att.thumbnail_url ?? att.url" [alt]="att.filename" class="gallery-thumb" loading="lazy" decoding="async" (click)="openPreview(att)" />
           <button class="btn-remove-thumb" [attr.aria-label]="'TASK.DELETE_ATTACHMENT' | translate" (click)="deleteAttachment(att)">&#10005;</button>
         </div>
       }

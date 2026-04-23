@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export type AppNotification = {
@@ -25,7 +26,9 @@ export class NotificationsApiService {
   private readonly baseUrl = environment.apiUrl;
 
   getAll(): Observable<AppNotification[]> {
-    return this.http.get<AppNotification[]>(`${this.baseUrl}/notifications/`, { withCredentials: true });
+    return this.http.get<{ results: AppNotification[]; has_more: boolean }>(`${this.baseUrl}/notifications/`, { withCredentials: true }).pipe(
+      map(res => res.results),
+    );
   }
 
   markAsRead(id: number): Observable<AppNotification> {

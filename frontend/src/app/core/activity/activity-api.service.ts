@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export type ActivityEntry = {
@@ -19,9 +20,9 @@ export class ActivityApiService {
   private readonly baseUrl = environment.apiUrl;
 
   getByBoard(boardId: number): Observable<ActivityEntry[]> {
-    return this.http.get<ActivityEntry[]>(`${this.baseUrl}/activity/`, {
+    return this.http.get<{ results: ActivityEntry[]; has_more: boolean }>(`${this.baseUrl}/activity/`, {
       params: { board: boardId },
       withCredentials: true,
-    });
+    }).pipe(map(res => res.results));
   }
 }

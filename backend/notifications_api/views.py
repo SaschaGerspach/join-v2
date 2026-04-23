@@ -26,8 +26,15 @@ def serialize_notification(n):
 )
 @api_view(["GET"])
 def notification_list(request):
-    notifications = request.user.notifications.all()[:50]
-    return Response([serialize_notification(n) for n in notifications])
+    PAGE_SIZE = 50
+    before = request.query_params.get("before")
+    qs = request.user.notifications.all()
+    if before:
+        qs = qs.filter(pk__lt=before)
+    notifications = list(qs[:PAGE_SIZE + 1])
+    has_more = len(notifications) > PAGE_SIZE
+    notifications = notifications[:PAGE_SIZE]
+    return Response({"results": [serialize_notification(n) for n in notifications], "has_more": has_more})
 
 
 @extend_schema(

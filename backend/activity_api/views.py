@@ -40,5 +40,13 @@ def activity_list(request):
     if err:
         return err
 
-    entries = board.activity.select_related("user").order_by("-created_at")[:100]
-    return Response([serialize_entry(e) for e in entries])
+    PAGE_SIZE = 50
+    before = request.query_params.get("before")
+    qs = board.activity.select_related("user").order_by("-created_at")
+    if before:
+        qs = qs.filter(pk__lt=before)
+    entries = list(qs[:PAGE_SIZE + 1])
+    has_more = len(entries) > PAGE_SIZE
+    entries = entries[:PAGE_SIZE]
+    result = [serialize_entry(e) for e in entries]
+    return Response({"results": result, "has_more": has_more})

@@ -118,6 +118,8 @@
 
   <div
     class="kanban-board"
+    aria-live="polite"
+    aria-atomic="false"
     cdkDropList
     cdkDropListOrientation="horizontal"
     [cdkDropListData]="state.columns()"

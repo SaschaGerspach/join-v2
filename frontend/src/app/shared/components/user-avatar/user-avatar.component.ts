@@ -5,7 +5,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   standalone: true,
   template: `
     @if (avatarUrl()) {
-      <img [src]="avatarUrl()" [alt]="initials()" class="avatar-img" [style.width.px]="size()" [style.height.px]="size()" />
+      <img [src]="avatarUrl()" [alt]="initials()" class="avatar-img" loading="lazy" decoding="async" [style.width.px]="size()" [style.height.px]="size()" />
     } @else {
       <span class="avatar-initials" [style.width.px]="size()" [style.height.px]="size()" [style.font-size.px]="fontSize()">{{ initials() }}</span>
     }
