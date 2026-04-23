@@ -46,11 +46,15 @@ def custom_field_list(request, board_pk):
     if CustomField.objects.filter(board=board, name=data["name"]).exists():
         return Response({"detail": "A field with this name already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
+    options = data.get("options", [])
+    if data["field_type"] == "select" and not options:
+        return Response({"detail": "Select fields require at least one option."}, status=status.HTTP_400_BAD_REQUEST)
+
     field = CustomField.objects.create(
         board=board,
         name=data["name"],
         field_type=data["field_type"],
-        options=data.get("options", []),
+        options=options,
     )
     return Response(
         {"id": field.pk, "name": field.name, "field_type": field.field_type, "options": field.options, "order": field.order},

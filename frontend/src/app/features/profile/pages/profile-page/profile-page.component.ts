@@ -93,12 +93,12 @@ export class ProfilePageComponent implements OnInit {
         this.mutedBoardIds.set(new Set(prefs.muted_boards));
         this.emailDelivery.set(prefs.email_delivery);
       },
-      error: () => {},
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_PREFERENCES'), 'error'),
     });
 
     this.boardsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: boards => this.boards.set(boards),
-      error: () => {},
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARDS'), 'error'),
     });
 
     this.loadSessions();
@@ -107,7 +107,7 @@ export class ProfilePageComponent implements OnInit {
   loadSessions(): void {
     this.authApi.getSessions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: sessions => this.sessions.set(sessions),
-      error: () => {},
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_SESSIONS'), 'error'),
     });
   }
 

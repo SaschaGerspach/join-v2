@@ -8,12 +8,15 @@ from ..models import Task, TaskDependency
 from ..serializers import DependencySerializer, DependencyCreateSerializer
 
 
-def _would_create_cycle(task, new_dependency):
-    # DFS: walk the dependency graph starting from new_dependency; if we reach task, adding the edge would form a cycle.
+MAX_DEPENDENCY_DEPTH = 50
 
+
+def _would_create_cycle(task, new_dependency):
     visited = set()
     stack = [new_dependency.pk]
     while stack:
+        if len(visited) >= MAX_DEPENDENCY_DEPTH:
+            return True
         current = stack.pop()
         if current == task.pk:
             return True

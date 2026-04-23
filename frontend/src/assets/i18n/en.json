@@ -497,7 +497,9 @@
     "FAILED_CREATE_LABEL": "Failed to create label.",
     "FAILED_LOG_TIME": "Failed to log time.",
     "FAILED_DELETE_TIME_ENTRY": "Failed to delete entry.",
-    "FAILED_LOAD_STATS": "Failed to load stats."
+    "FAILED_LOAD_STATS": "Failed to load stats.",
+    "FAILED_LOAD_PREFERENCES": "Failed to load notification preferences.",
+    "FAILED_LOAD_SESSIONS": "Failed to load sessions."
   },
   "ERROR": {
     "INVALID_2FA": "Invalid 2FA code.",
