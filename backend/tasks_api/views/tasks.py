@@ -109,7 +109,7 @@ def task_list(request):
 @api_view(["GET", "PATCH", "DELETE"])
 def task_detail(request, pk):
     try:
-        task = Task.objects.select_related("board").get(pk=pk, archived_at__isnull=True)
+        task = Task.objects.select_related("board").prefetch_related("assignees", "subtasks", "attachments", "labels", "dependencies").get(pk=pk, archived_at__isnull=True)
     except Task.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -237,7 +237,7 @@ def task_reorder(request):
 @api_view(["GET"])
 def my_tasks(request):
     user = request.user
-    boards = Board.objects.filter(Q(created_by=user) | Q(members__user=user)).distinct()
+    boards = Board.objects.filter(Q(created_by=user) | Q(members__user=user) | Q(team__members__user=user) | Q(team__created_by=user)).distinct()
     qs = Task.objects.filter(board__in=boards, archived_at__isnull=True)
 
     search = request.query_params.get("search", "").strip()
