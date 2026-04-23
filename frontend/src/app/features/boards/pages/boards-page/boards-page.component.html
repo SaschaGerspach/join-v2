@@ -108,6 +108,7 @@
 @if (pendingRemoveMemberId() !== null) {
   <app-confirm-dialog
     [message]="'BOARDS.CONFIRM_REMOVE_MEMBER' | translate"
+    [confirmLabel]="'BOARDS.REMOVE_MEMBER' | translate"
     (confirmed)="confirmRemoveMember()"
     (cancelled)="pendingRemoveMemberId.set(null)"
   />

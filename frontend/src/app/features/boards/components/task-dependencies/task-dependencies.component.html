@@ -26,6 +26,7 @@
 @if (pendingRemoveDep()) {
   <app-confirm-dialog
     [message]="'TASK.CONFIRM_REMOVE_DEPENDENCY' | translate"
+    [confirmLabel]="'TASK.REMOVE_DEPENDENCY' | translate"
     (confirmed)="confirmRemoveDependency()"
     (cancelled)="pendingRemoveDep.set(null)"
   />

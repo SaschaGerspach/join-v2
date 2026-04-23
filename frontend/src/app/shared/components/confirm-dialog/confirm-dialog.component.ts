@@ -11,6 +11,7 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class ConfirmDialogComponent {
   message = input<string>('Are you sure?');
+  confirmLabel = input<string>('');
   confirmed = output<void>();
   cancelled = output<void>();
 
