@@ -69,7 +69,7 @@
             type="text"
             [(ngModel)]="totpCode"
             name="totpCode"
-            placeholder="000000"
+            [placeholder]="'PROFILE.TOTP_PLACEHOLDER' | translate"
             required
             minlength="6"
             maxlength="6"

@@ -132,11 +132,11 @@
         <div class="totp-disable-form">
           <div class="form-field">
             <label for="totp-disable-password">{{ 'PROFILE.CURRENT_PASSWORD' | translate }}</label>
-            <input id="totp-disable-password" class="field-input" type="password" autocomplete="current-password" [ngModel]="totpDisablePassword()" (ngModelChange)="totpDisablePassword.set($event)" placeholder="Your password" />
+            <input id="totp-disable-password" class="field-input" type="password" autocomplete="current-password" [ngModel]="totpDisablePassword()" (ngModelChange)="totpDisablePassword.set($event)" [placeholder]="'PROFILE.YOUR_PASSWORD' | translate" />
           </div>
           <div class="form-field">
             <label for="totp-disable-code">{{ 'PROFILE.AUTH_CODE' | translate }}</label>
-            <input id="totp-disable-code" class="field-input totp-code-input" type="text" [ngModel]="totpDisableCode()" (ngModelChange)="totpDisableCode.set($event)" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
+            <input id="totp-disable-code" class="field-input totp-code-input" type="text" [ngModel]="totpDisableCode()" (ngModelChange)="totpDisableCode.set($event)" [placeholder]="'PROFILE.TOTP_PLACEHOLDER' | translate" maxlength="6" autocomplete="one-time-code" />
           </div>
           @if (totpError()) {
             <p class="msg msg-error">{{ totpError() }}</p>
@@ -146,19 +146,19 @@
       } @else if (totpSetup()) {
         <div class="totp-setup">
           <p>{{ 'PROFILE.SCAN_QR' | translate }}</p>
-          <img class="totp-qr" [src]="totpSetup()!.qr_code" alt="QR code for two-factor authentication setup" />
+          <img class="totp-qr" [src]="totpSetup()!.qr_code" [attr.alt]="'PROFILE.QR_ALT' | translate" />
           <p class="totp-secret-label">{{ 'PROFILE.MANUAL_KEY' | translate }}</p>
           <code class="totp-secret">{{ totpSetup()!.secret }}</code>
           <div class="form-field">
             <label for="totp-confirm-code">{{ 'PROFILE.CONFIRM_CODE' | translate }}</label>
-            <input id="totp-confirm-code" class="field-input totp-code-input" type="text" [ngModel]="totpConfirmCode()" (ngModelChange)="totpConfirmCode.set($event)" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
+            <input id="totp-confirm-code" class="field-input totp-code-input" type="text" [ngModel]="totpConfirmCode()" (ngModelChange)="totpConfirmCode.set($event)" [placeholder]="'PROFILE.TOTP_PLACEHOLDER' | translate" maxlength="6" autocomplete="one-time-code" />
           </div>
           @if (totpError()) {
             <p class="msg msg-error">{{ totpError() }}</p>
           }
           <div class="totp-setup-actions">
             <button class="btn-primary" (click)="confirmTotp()">{{ 'PROFILE.CONFIRM' | translate }}</button>
-            <button class="btn-secondary" (click)="cancelTotpSetup()">Cancel</button>
+            <button class="btn-secondary" (click)="cancelTotpSetup()">{{ 'COMMON.CANCEL' | translate }}</button>
           </div>
         </div>
       } @else {
