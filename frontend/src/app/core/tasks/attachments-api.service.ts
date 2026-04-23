@@ -7,6 +7,7 @@ export type Attachment = {
   id: number;
   filename: string;
   url: string;
+  thumbnail_url: string | null;
   size: number;
   uploaded_at: string;
 };
@@ -28,5 +29,12 @@ export class AttachmentsApiService {
 
   delete(taskId: number, attachmentId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/tasks/${taskId}/attachments/${attachmentId}/`, { withCredentials: true });
+  }
+
+  download(taskId: number, attachmentId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/tasks/${taskId}/attachments/${attachmentId}/download/`, {
+      withCredentials: true,
+      responseType: 'blob',
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateModule } from '@ngx-translate/core';
 import { Attachment, AttachmentsApiService } from '../../../../core/tasks/attachments-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -17,12 +18,14 @@ export class TaskAttachmentsComponent implements OnInit {
   private readonly attachmentsApi = inject(AttachmentsApiService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly sanitizer = inject(DomSanitizer);
 
   taskId = input.required<number>();
 
   attachments = signal<Attachment[]>([]);
   pendingDeleteAttachment = signal<Attachment | null>(null);
   previewAttachment = signal<Attachment | null>(null);
+  previewBlobUrl = signal<SafeResourceUrl | null>(null);
 
   private readonly imageExtensions = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp']);
 
@@ -95,10 +98,41 @@ export class TaskAttachmentsComponent implements OnInit {
 
   openPreview(att: Attachment): void {
     this.previewAttachment.set(att);
+    this.previewBlobUrl.set(null);
+    if (this.isPdf(att.filename) || this.isImage(att.filename)) {
+      this.attachmentsApi.download(this.taskId(), att.id)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: blob => {
+            const url = URL.createObjectURL(blob);
+            this.previewBlobUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+          },
+        });
+    }
   }
 
   closePreview(): void {
+    const url = this.previewBlobUrl();
+    if (url) {
+      this.previewBlobUrl.set(null);
+    }
     this.previewAttachment.set(null);
+  }
+
+  downloadAttachment(att: Attachment): void {
+    this.attachmentsApi.download(this.taskId(), att.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = att.filename;
+          a.click();
+          URL.revokeObjectURL(url);
+        },
+        error: () => this.toast.show('Download failed.', 'error'),
+      });
   }
 
   isImage(filename: string): boolean {

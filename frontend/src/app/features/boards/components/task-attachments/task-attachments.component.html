@@ -4,7 +4,7 @@
     <div class="attachment-gallery">
       @for (att of imageAttachments(); track att.id) {
         <div class="gallery-item">
-          <img [src]="att.url" [alt]="att.filename" class="gallery-thumb" (click)="openPreview(att)" />
+          <img [src]="att.thumbnail_url ?? att.url" [alt]="att.filename" class="gallery-thumb" (click)="openPreview(att)" />
           <button class="btn-remove-thumb" aria-label="Delete attachment" (click)="deleteAttachment(att)">&#10005;</button>
         </div>
       }
@@ -36,18 +36,18 @@
     <div class="preview-container" (click)="$event.stopPropagation()">
       <div class="preview-header">
         <span class="preview-filename">{{ previewAttachment()!.filename }}</span>
-        <a [href]="previewAttachment()!.url" target="_blank" class="preview-download">{{ 'TASK.DOWNLOAD' | translate }}</a>
+        <button class="preview-download" (click)="downloadAttachment(previewAttachment()!)">{{ 'TASK.DOWNLOAD' | translate }}</button>
         <button class="preview-close" aria-label="Close preview" (click)="closePreview()">&#10005;</button>
       </div>
       <div class="preview-body">
-        @if (isImage(previewAttachment()!.filename)) {
-          <img [src]="previewAttachment()!.url" [alt]="previewAttachment()!.filename" class="preview-image" />
-        } @else if (isPdf(previewAttachment()!.filename)) {
-          <iframe [src]="previewAttachment()!.url" class="preview-pdf"></iframe>
-        } @else {
+        @if (isImage(previewAttachment()!.filename) && previewBlobUrl()) {
+          <img [src]="previewBlobUrl()!" [alt]="previewAttachment()!.filename" class="preview-image" />
+        } @else if (isPdf(previewAttachment()!.filename) && previewBlobUrl()) {
+          <iframe [src]="previewBlobUrl()!" class="preview-pdf"></iframe>
+        } @else if (!isImage(previewAttachment()!.filename) && !isPdf(previewAttachment()!.filename)) {
           <div class="preview-fallback">
             <p>{{ 'TASK.PREVIEW_UNAVAILABLE' | translate }}</p>
-            <a [href]="previewAttachment()!.url" target="_blank" class="btn-download">{{ 'TASK.DOWNLOAD_FILE' | translate }}</a>
+            <button class="btn-download" (click)="downloadAttachment(previewAttachment()!)">{{ 'TASK.DOWNLOAD_FILE' | translate }}</button>
           </div>
         }
       </div>
@@ -57,7 +57,7 @@
 
 @if (pendingDeleteAttachment()) {
   <app-confirm-dialog
-    message="Delete this attachment? The file will be permanently removed."
+    [message]="'TASK.CONFIRM_DELETE_ATTACHMENT' | translate"
     (confirmed)="confirmDeleteAttachment()"
     (cancelled)="pendingDeleteAttachment.set(null)"
   />
