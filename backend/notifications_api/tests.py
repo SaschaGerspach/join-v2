@@ -27,22 +27,25 @@ class NotificationListTests(APITestCase):
     def test_list_empty(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, [])
+        self.assertEqual(response.data["results"], [])
+        self.assertFalse(response.data["has_more"])
 
     def test_list_own_notifications(self):
         Notification.objects.create(recipient=self.user, type="assignment", message="You were assigned")
         Notification.objects.create(recipient=self.other, type="comment", message="Someone else")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["message"], "You were assigned")
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["message"], "You were assigned")
 
     def test_list_ordered_newest_first(self):
         n1 = Notification.objects.create(recipient=self.user, type="assignment", message="First")
         n2 = Notification.objects.create(recipient=self.user, type="comment", message="Second")
         response = self.client.get(self.url)
-        self.assertEqual(response.data[0]["id"], n2.pk)
-        self.assertEqual(response.data[1]["id"], n1.pk)
+        results = response.data["results"]
+        self.assertEqual(results[0]["id"], n2.pk)
+        self.assertEqual(results[1]["id"], n1.pk)
 
     def test_list_unauthenticated(self):
         self.client.force_authenticate(user=None)
@@ -53,7 +56,8 @@ class NotificationListTests(APITestCase):
         for i in range(55):
             Notification.objects.create(recipient=self.user, type="assignment", message=f"N{i}")
         response = self.client.get(self.url)
-        self.assertEqual(len(response.data), 50)
+        self.assertEqual(len(response.data["results"]), 50)
+        self.assertTrue(response.data["has_more"])
 
 
 class NotificationReadTests(APITestCase):

@@ -56,7 +56,15 @@ class UserDetailTests(APITestCase):
         response = self.client.patch(self.url(self.other.pk), {"first_name": "Hacked"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_patch_email_requires_staff(self):
+        response = self.client.patch(self.url(self.user.pk), {"email": "new@example.com"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, "a@example.com")
+
     def test_patch_email_duplicate_rejected(self):
+        self.user.is_staff = True
+        self.user.save()
         response = self.client.patch(self.url(self.user.pk), {"email": "b@example.com"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.user.refresh_from_db()
@@ -79,11 +87,13 @@ class UserDetailTests(APITestCase):
         self.assertEqual(board.created_by, self.other)
         self.assertFalse(BoardMember.objects.filter(board=board, user=self.other).exists())
 
-    def test_delete_removes_board_without_members(self):
+    def test_delete_preserves_board_without_members(self):
         board = Board.objects.create(title="Solo", created_by=self.user)
         board_id = board.pk
         self.client.delete(self.url(self.user.pk))
-        self.assertFalse(Board.objects.filter(pk=board_id).exists())
+        board.refresh_from_db()
+        self.assertTrue(Board.objects.filter(pk=board_id).exists())
+        self.assertTrue(board.title.startswith("[Deleted User]"))
 
     def test_delete_removes_memberships(self):
         board = Board.objects.create(title="Other", created_by=self.other)

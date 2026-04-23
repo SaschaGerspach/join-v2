@@ -110,8 +110,8 @@ def user_detail(request, pk):
         return Response(serialize_user(user))
 
     if request.method == "DELETE":
-        if not request.user.is_staff:
-            return Response({"detail": "Only admins can delete accounts."}, status=status.HTTP_403_FORBIDDEN)
+        if request.user.pk != pk and not request.user.is_staff:
+            return Response({"detail": "Only admins can delete other accounts."}, status=status.HTTP_403_FORBIDDEN)
 
         # Transfer ownership to the longest-standing member; if no members exist, delete the board entirely.
         with transaction.atomic():

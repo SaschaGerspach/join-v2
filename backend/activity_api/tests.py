@@ -23,21 +23,23 @@ class ActivityListTests(APITestCase):
         ActivityEntry.objects.create(board=self.board, user=self.owner, action="created", entity_type="task", entity_title="My Task")
         response = self.client.get(self.url, {"board": self.board.pk})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["entity_title"], "My Task")
-        self.assertEqual(response.data[0]["action"], "created")
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["entity_title"], "My Task")
+        self.assertEqual(results[0]["action"], "created")
 
     def test_list_empty(self):
         response = self.client.get(self.url, {"board": self.board.pk})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, [])
+        self.assertEqual(response.data["results"], [])
+        self.assertFalse(response.data["has_more"])
 
     def test_list_as_member(self):
         ActivityEntry.objects.create(board=self.board, user=self.owner, action="created", entity_type="task", entity_title="Task")
         self.client.force_authenticate(user=self.member)
         response = self.client.get(self.url, {"board": self.board.pk})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_list_forbidden_for_outsider(self):
         self.client.force_authenticate(user=self.outsider)
@@ -61,14 +63,16 @@ class ActivityListTests(APITestCase):
         e1 = ActivityEntry.objects.create(board=self.board, user=self.owner, action="created", entity_type="task", entity_title="First")
         e2 = ActivityEntry.objects.create(board=self.board, user=self.owner, action="updated", entity_type="task", entity_title="Second")
         response = self.client.get(self.url, {"board": self.board.pk})
-        self.assertEqual(response.data[0]["id"], e2.pk)
-        self.assertEqual(response.data[1]["id"], e1.pk)
+        results = response.data["results"]
+        self.assertEqual(results[0]["id"], e2.pk)
+        self.assertEqual(results[1]["id"], e1.pk)
 
-    def test_list_max_100(self):
-        for i in range(105):
+    def test_list_max_50(self):
+        for i in range(55):
             ActivityEntry.objects.create(board=self.board, user=self.owner, action="created", entity_type="task", entity_title=f"T{i}")
         response = self.client.get(self.url, {"board": self.board.pk})
-        self.assertEqual(len(response.data), 100)
+        self.assertEqual(len(response.data["results"]), 50)
+        self.assertTrue(response.data["has_more"])
 
     def test_user_name_in_response(self):
         self.owner.first_name = "Max"
@@ -76,14 +80,14 @@ class ActivityListTests(APITestCase):
         self.owner.save()
         ActivityEntry.objects.create(board=self.board, user=self.owner, action="created", entity_type="task", entity_title="T")
         response = self.client.get(self.url, {"board": self.board.pk})
-        self.assertEqual(response.data[0]["user_name"], "Max Mustermann")
+        self.assertEqual(response.data["results"][0]["user_name"], "Max Mustermann")
 
     def test_deleted_user_name(self):
         temp = User.objects.create_user(email="temp@example.com", password="pass")
         ActivityEntry.objects.create(board=self.board, user=temp, action="created", entity_type="task", entity_title="T")
         temp.delete()
         response = self.client.get(self.url, {"board": self.board.pk})
-        self.assertEqual(response.data[0]["user_name"], "Deleted user")
+        self.assertEqual(response.data["results"][0]["user_name"], "Deleted user")
 
 
 class ActivityModelTests(APITestCase):
