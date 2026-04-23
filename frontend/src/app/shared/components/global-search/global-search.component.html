@@ -20,7 +20,7 @@
             <span class="result-title">{{ result.title }}</span>
             <span class="result-board">{{ result.board_title }}</span>
             @if (result.priority === 'urgent' || result.priority === 'high') {
-              <span class="result-priority" [class]="result.priority">{{ result.priority }}</span>
+              <span class="result-priority" [class]="result.priority">{{ 'BOARD_DETAIL.' + result.priority.toUpperCase() | translate }}</span>
             }
           </button>
         }

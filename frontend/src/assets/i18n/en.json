@@ -73,7 +73,10 @@
     "EMAIL_VERIFIED": "Email verified!",
     "ACCOUNT_ACTIVE": "Your account is now active. You can log in.",
     "VERIFICATION_FAILED": "Verification failed",
-    "TOGGLE_PASSWORD": "Toggle password visibility"
+    "TOGGLE_PASSWORD": "Toggle password visibility",
+    "STRENGTH_WEAK": "weak",
+    "STRENGTH_MEDIUM": "medium",
+    "STRENGTH_STRONG": "strong"
   },
   "BOARDS": {
     "MY_BOARDS": "My Boards",

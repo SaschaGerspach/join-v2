@@ -73,7 +73,10 @@
     "EMAIL_VERIFIED": "E-Mail bestätigt!",
     "ACCOUNT_ACTIVE": "Dein Konto ist jetzt aktiv. Du kannst dich anmelden.",
     "VERIFICATION_FAILED": "Bestätigung fehlgeschlagen",
-    "TOGGLE_PASSWORD": "Passwort ein-/ausblenden"
+    "TOGGLE_PASSWORD": "Passwort ein-/ausblenden",
+    "STRENGTH_WEAK": "schwach",
+    "STRENGTH_MEDIUM": "mittel",
+    "STRENGTH_STRONG": "stark"
   },
   "BOARDS": {
     "MY_BOARDS": "Meine Boards",

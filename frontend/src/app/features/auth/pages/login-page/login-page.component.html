@@ -14,7 +14,7 @@
     <form #f="ngForm" (ngSubmit)="login(f)">
       @if (!requires2fa()) {
         <div class="form-group">
-          <label for="login-email" class="visually-hidden">Email</label>
+          <label for="login-email" class="visually-hidden">{{ 'AUTH.EMAIL' | translate }}</label>
           <input
             id="login-email"
             class="form-input"
@@ -38,7 +38,7 @@
 
         <div class="form-group">
           <div class="password-wrapper">
-            <label for="login-password" class="visually-hidden">Password</label>
+            <label for="login-password" class="visually-hidden">{{ 'AUTH.PASSWORD' | translate }}</label>
             <input
               id="login-password"
               class="form-input"
@@ -62,7 +62,7 @@
       } @else {
         <div class="form-group">
           <p class="totp-hint">{{ 'AUTH.TOTP_HINT' | translate }}</p>
-          <label for="login-totp" class="visually-hidden">Authentication code</label>
+          <label for="login-totp" class="visually-hidden">{{ 'AUTH.TOTP_CODE' | translate }}</label>
           <input
             id="login-totp"
             class="form-input totp-input"

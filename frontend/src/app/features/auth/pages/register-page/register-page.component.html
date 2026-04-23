@@ -13,7 +13,7 @@
 
     <form #f="ngForm" (ngSubmit)="register(f)">
       <div class="form-group">
-        <label for="register-first-name" class="visually-hidden">First name</label>
+        <label for="register-first-name" class="visually-hidden">{{ 'AUTH.FIRST_NAME' | translate }}</label>
         <input
           id="register-first-name"
           class="form-input"
@@ -32,7 +32,7 @@
       </div>
 
       <div class="form-group">
-        <label for="register-last-name" class="visually-hidden">Last name</label>
+        <label for="register-last-name" class="visually-hidden">{{ 'AUTH.LAST_NAME' | translate }}</label>
         <input
           id="register-last-name"
           class="form-input"
@@ -51,7 +51,7 @@
       </div>
 
       <div class="form-group">
-        <label for="register-email" class="visually-hidden">Email</label>
+        <label for="register-email" class="visually-hidden">{{ 'AUTH.EMAIL' | translate }}</label>
         <input
           id="register-email"
           class="form-input"
@@ -75,7 +75,7 @@
 
       <div class="form-group">
         <div class="password-wrapper">
-          <label for="register-password" class="visually-hidden">Password</label>
+          <label for="register-password" class="visually-hidden">{{ 'AUTH.PASSWORD' | translate }}</label>
           <input
             id="register-password"
             class="form-input"
@@ -101,7 +101,7 @@
               <div class="bar" [class.filled]="passwordStrength() === 'medium' || passwordStrength() === 'strong'" [class]="passwordStrength() === 'medium' || passwordStrength() === 'strong' ? passwordStrength()! : ''"></div>
               <div class="bar" [class.filled]="passwordStrength() === 'strong'" [class]="passwordStrength() === 'strong' ? 'strong' : ''"></div>
             </div>
-            <span class="strength-label strength-{{ passwordStrength() }}">{{ passwordStrength() }}</span>
+            <span class="strength-label strength-{{ passwordStrength() }}">{{ 'AUTH.STRENGTH_' + passwordStrength()!.toUpperCase() | translate }}</span>
           </div>
         }
         @if (passwordField.invalid && (passwordField.touched || f.submitted)) {
