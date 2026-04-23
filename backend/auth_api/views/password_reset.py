@@ -54,6 +54,7 @@ def password_reset_request(request):
 )
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([AuthRateThrottle])
 def password_reset_confirm(request):
     serializer = PasswordResetConfirmSerializer(data=request.data)
     if not serializer.is_valid():

@@ -51,7 +51,10 @@ def avatar_upload(request):
     if user.avatar:
         user.avatar.delete(save=False)
 
-    user.avatar = _resize_avatar(file)
+    try:
+        user.avatar = _resize_avatar(file)
+    except Exception:
+        return Response({"detail": "Invalid image file."}, status=status.HTTP_400_BAD_REQUEST)
     user.save(update_fields=["avatar"])
 
     return Response({"avatar_url": request.build_absolute_uri(user.avatar.url)})

@@ -28,6 +28,10 @@ def board_import_csv(request, pk):
     if not file:
         return Response({"detail": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
 
+    MAX_FILE_SIZE = 1 * 1024 * 1024
+    if file.size > MAX_FILE_SIZE:
+        return Response({"detail": "File too large (max 1 MB)."}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
         text = file.read().decode("utf-8-sig")
     except UnicodeDecodeError:
