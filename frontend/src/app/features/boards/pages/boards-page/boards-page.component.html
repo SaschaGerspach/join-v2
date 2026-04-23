@@ -116,7 +116,7 @@
 
 @if (managingBoard()) {
   <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="members-modal-title" (click)="managingBoard.set(null)">
-    <div class="members-modal" (click)="$event.stopPropagation()">
+    <div class="members-modal" appFocusTrap (click)="$event.stopPropagation()">
       <div class="members-modal-header">
         <h2 id="members-modal-title">{{ 'BOARDS.MEMBERS' | translate }} — {{ managingBoard()!.title }}</h2>
         <button class="btn-icon" [attr.aria-label]="'COMMON.CLOSE' | translate" (click)="managingBoard.set(null)">&#10005;</button>

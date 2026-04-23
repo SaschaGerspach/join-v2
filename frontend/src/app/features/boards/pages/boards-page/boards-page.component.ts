@@ -8,11 +8,12 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { FocusTrapDirective } from '../../../../shared/directives/focus-trap.directive';
 
 @Component({
   selector: 'app-boards-page',
   standalone: true,
-  imports: [FormsModule, NgTemplateOutlet, LoadingSpinnerComponent, ConfirmDialogComponent, TranslateModule],
+  imports: [FormsModule, NgTemplateOutlet, LoadingSpinnerComponent, ConfirmDialogComponent, TranslateModule, FocusTrapDirective],
   templateUrl: './boards-page.component.html',
   styleUrl: './boards-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -15,11 +15,12 @@ import { TaskDependenciesComponent } from '../task-dependencies/task-dependencie
 import { TaskCustomFieldsComponent } from '../task-custom-fields/task-custom-fields.component';
 import { TaskTimeTrackingComponent } from '../task-time-tracking/task-time-tracking.component';
 import { TaskHistoryComponent } from '../task-history/task-history.component';
+import { FocusTrapDirective } from '../../../../shared/directives/focus-trap.directive';
 
 @Component({
   selector: 'app-task-detail-modal',
   standalone: true,
-  imports: [FormsModule, TranslateModule, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent, TaskDependenciesComponent, TaskCustomFieldsComponent, TaskTimeTrackingComponent, TaskHistoryComponent],
+  imports: [FormsModule, TranslateModule, FocusTrapDirective, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent, TaskDependenciesComponent, TaskCustomFieldsComponent, TaskTimeTrackingComponent, TaskHistoryComponent],
   templateUrl: './task-detail-modal.component.html',
   styleUrl: './task-detail-modal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

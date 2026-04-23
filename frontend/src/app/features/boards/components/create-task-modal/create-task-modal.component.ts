@@ -4,11 +4,12 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { Contact } from '../../../../core/contacts/contacts-api.service';
 import { CreateTaskPayload } from '../../../../core/tasks/tasks-api.service';
+import { FocusTrapDirective } from '../../../../shared/directives/focus-trap.directive';
 
 @Component({
   selector: 'app-create-task-modal',
   standalone: true,
-  imports: [FormsModule, TranslateModule],
+  imports: [FormsModule, TranslateModule, FocusTrapDirective],
   templateUrl: './create-task-modal.component.html',
   styleUrl: './create-task-modal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

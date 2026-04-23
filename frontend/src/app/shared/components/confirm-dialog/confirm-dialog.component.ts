@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, HostListener, input, output } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { FocusTrapDirective } from '../../../shared/directives/focus-trap.directive';
 
 @Component({
   selector: 'app-confirm-dialog',
   standalone: true,
-  imports: [TranslateModule],
+  imports: [TranslateModule, FocusTrapDirective],
   templateUrl: './confirm-dialog.component.html',
   styleUrl: './confirm-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

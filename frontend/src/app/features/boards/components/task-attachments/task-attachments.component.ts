@@ -4,12 +4,13 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Attachment, AttachmentsApiService } from '../../../../core/tasks/attachments-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { FocusTrapDirective } from '../../../../shared/directives/focus-trap.directive';
 import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-attachments',
   standalone: true,
-  imports: [TranslateModule, ConfirmDialogComponent],
+  imports: [TranslateModule, ConfirmDialogComponent, FocusTrapDirective],
   templateUrl: './task-attachments.component.html',
   styleUrl: './task-attachments.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

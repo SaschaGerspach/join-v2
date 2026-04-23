@@ -1,5 +1,5 @@
 <div class="modal-backdrop" role="dialog" aria-modal="true" [attr.aria-label]="'TASK.TASK_DETAILS' | translate" (click)="close()">
-  <div class="modal-card" (click)="$event.stopPropagation()">
+  <div class="modal-card" appFocusTrap (click)="$event.stopPropagation()">
 
     <div class="modal-header">
       <input

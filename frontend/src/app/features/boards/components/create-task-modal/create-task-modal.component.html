@@ -1,5 +1,5 @@
 <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="create-task-title" (click)="cancelled.emit()">
-  <div class="modal-card" (click)="$event.stopPropagation()">
+  <div class="modal-card" appFocusTrap (click)="$event.stopPropagation()">
 
     <div class="modal-header">
       <h2 id="create-task-title">{{ 'TASK.NEW_TASK' | translate }}</h2>
