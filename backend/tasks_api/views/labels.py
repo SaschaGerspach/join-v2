@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from boards_api.permissions import can_access_board, get_board_or_404
+from boards_api.permissions import can_access_board, can_edit_board, get_board_or_404
 from config.serializers import DetailSerializer
 from ..models import Label
 from ..serializers import (
@@ -32,6 +32,9 @@ def label_list(request, board_pk):
 
     if request.method == "GET":
         return Response([serialize_label(label) for label in board.labels.all()])
+
+    if not can_edit_board(board, request.user):
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
     serializer = LabelCreateSerializer(data=request.data)
     if not serializer.is_valid():
@@ -64,6 +67,9 @@ def label_detail(request, board_pk, pk):
 
     if not can_access_board(label.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not can_edit_board(label.board, request.user):
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":
         serializer = LabelUpdateSerializer(data=request.data)

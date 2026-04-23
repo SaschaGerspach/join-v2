@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from boards_api.permissions import can_access_board
+from boards_api.permissions import can_access_board, can_edit_board
 from boards_api.ws_events import send_board_event
 from config.serializers import DetailSerializer
 from ..models import Task, Attachment
@@ -66,6 +66,9 @@ def attachment_list(request, task_pk):
     if request.method == "GET":
         return Response([serialize_attachment(a, request) for a in task.attachments.all()])
 
+    if not can_edit_board(task.board, request.user):
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
     file = request.FILES.get("file")
     if not file:
         return Response({"detail": "File is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -96,6 +99,9 @@ def attachment_detail(request, task_pk, pk):
 
     if not can_access_board(att.task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not can_edit_board(att.task.board, request.user):
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
     task = att.task
     att.file.delete()
