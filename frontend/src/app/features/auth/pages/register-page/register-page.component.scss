@@ -16,7 +16,7 @@
       height: 4px;
       flex: 1;
       border-radius: 2px;
-      background: $color-border;
+      background: var(--color-border);
 
       &.filled {
         &.weak   { background: #ff3d00; }

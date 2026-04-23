@@ -76,7 +76,7 @@
 
 .stat-icon {
   font-size: 2rem;
-  color: $color-muted;
+  color: var(--color-muted);
   flex-shrink: 0;
 }
 
@@ -95,7 +95,7 @@
 
 .stat-label {
   font-size: 0.85rem;
-  color: $color-muted;
+  color: var(--color-muted);
 }
 
 .deadline-date {

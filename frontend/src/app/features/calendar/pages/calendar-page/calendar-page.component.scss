@@ -51,7 +51,7 @@
 
 .loading-hint {
   text-align: center;
-  color: $color-muted;
+  color: var(--color-muted);
   padding: 3rem 0;
 }
 
@@ -71,7 +71,7 @@
   text-align: center;
   font-size: 0.8rem;
   font-weight: 700;
-  color: $color-muted;
+  color: var(--color-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 
@@ -114,7 +114,7 @@
 .day-number {
   font-size: 0.85rem;
   font-weight: 600;
-  color: $color-muted;
+  color: var(--color-muted);
   margin-bottom: 0.3rem;
   display: inline-block;
 }

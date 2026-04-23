@@ -2,13 +2,13 @@
 
 .comments-section {
   padding: 1rem 1.5rem;
-  border-top: 1px solid $color-border;
+  border-top: 1px solid var(--color-border);
 }
 
 .section-label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: $color-muted;
+  color: var(--color-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 0.75rem;
@@ -22,7 +22,7 @@
 }
 
 .comment-item {
-  background: $color-bg;
+  background: var(--color-bg);
   border-radius: 10px;
   padding: 0.6rem 0.75rem;
 }
@@ -34,7 +34,7 @@
   margin-bottom: 0.25rem;
 
   .comment-author { font-weight: 600; font-size: 0.82rem; color: var(--color-text); }
-  .comment-date { font-size: 0.75rem; color: $color-muted; flex: 1; }
+  .comment-date { font-size: 0.75rem; color: var(--color-muted); flex: 1; }
 }
 
 .btn-comment-action {
@@ -42,7 +42,7 @@
   border: none;
   font-size: 0.75rem;
   cursor: pointer;
-  color: $color-muted;
+  color: var(--color-muted);
   padding: 0;
 
   &:hover { color: var(--color-text); }
@@ -58,7 +58,7 @@
 
 .comments-empty {
   font-size: 0.82rem;
-  color: $color-muted;
+  color: var(--color-muted);
   font-style: italic;
 }
 
@@ -75,7 +75,7 @@
 
 .comment-textarea {
   width: 100%;
-  border: 1px solid $color-border;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 0.5rem 0.75rem;
   font-size: 0.85rem;
@@ -94,7 +94,7 @@
   left: 0;
   right: 0;
   background: var(--color-surface, $color-white);
-  border: 1px solid $color-border;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   max-height: 200px;
@@ -119,11 +119,11 @@
   &:hover, &.selected { background: var(--color-bg, $color-bg); }
 
   .mention-name { font-weight: 600; }
-  .mention-email { color: $color-muted; font-size: 0.75rem; }
+  .mention-email { color: var(--color-muted); font-size: 0.75rem; }
 }
 
 .btn-add-comment {
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
   border: none;
   border-radius: 10px;
@@ -140,7 +140,7 @@
   margin-top: 0.5rem;
   margin-left: 1.25rem;
   padding-left: 0.75rem;
-  border-left: 2px solid $color-border;
+  border-left: 2px solid var(--color-border);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;

@@ -25,13 +25,13 @@
 
 .archive-hint {
   font-size: 0.82rem;
-  color: $color-muted;
+  color: var(--color-muted);
   margin-top: 0.25rem;
 }
 
 .loading-hint, .empty-hint {
   text-align: center;
-  color: $color-muted;
+  color: var(--color-muted);
   padding: 3rem 0;
   font-style: italic;
 }
@@ -70,7 +70,7 @@
   color: $color-white;
   align-self: flex-start;
 
-  &.priority-low { background-color: $priority-low; color: $color-dark; }
+  &.priority-low { background-color: $priority-low; color: var(--color-dark); }
   &.priority-medium { background-color: $priority-medium; }
   &.priority-high { background-color: $priority-high; }
   &.priority-urgent { background-color: $priority-urgent; }
@@ -84,7 +84,7 @@
 
 .task-description {
   font-size: 0.82rem;
-  color: $color-muted;
+  color: var(--color-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -104,5 +104,5 @@
   flex-shrink: 0;
   transition: background-color 0.15s ease;
 
-  &:hover { background: $color-dark; }
+  &:hover { background: var(--color-dark); }
 }

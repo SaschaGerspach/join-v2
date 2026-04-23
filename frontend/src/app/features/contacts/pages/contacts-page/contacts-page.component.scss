@@ -49,7 +49,7 @@
 }
 
 .btn-add-contact {
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
   border: none;
   border-radius: 10px;
@@ -74,7 +74,7 @@
 }
 
 .contacts-empty {
-  color: $color-muted;
+  color: var(--color-muted);
   font-size: 0.9rem;
   padding: 1rem 0;
 }
@@ -82,11 +82,11 @@
 .contact-group-header {
   font-size: 0.8rem;
   font-weight: 700;
-  color: $color-muted;
+  color: var(--color-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 0.75rem 0 0.25rem;
-  border-bottom: 1px solid $color-border;
+  border-bottom: 1px solid var(--color-border);
   margin-bottom: 0.25rem;
 }
 
@@ -104,7 +104,7 @@
   }
 
   &.active {
-    background: $color-dark;
+    background: var(--color-dark);
 
     .contact-list-name { color: $color-white; }
     .contact-list-email { color: rgba($color-white, 0.6); }
@@ -116,7 +116,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
   display: flex;
   align-items: center;
@@ -145,7 +145,7 @@
 
 .contact-list-email {
   font-size: 0.8rem;
-  color: $color-muted;
+  color: var(--color-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -163,7 +163,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $color-muted;
+  color: var(--color-muted);
   font-size: 1rem;
 }
 
@@ -189,7 +189,7 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
   display: flex;
   align-items: center;
@@ -221,7 +221,7 @@
 .detail-label {
   font-size: 0.75rem;
   font-weight: 700;
-  color: $color-muted;
+  color: var(--color-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -285,18 +285,18 @@
   label {
     font-size: 0.8rem;
     font-weight: 700;
-    color: $color-muted;
+    color: var(--color-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
 }
 
 .field-input {
-  border: 1px solid $color-border;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 0.55rem 0.9rem;
   font-size: 0.95rem;
-  color: $color-dark;
+  color: var(--color-dark);
   background: $color-white;
   width: 100%;
   box-sizing: border-box;
@@ -316,9 +316,9 @@
 // ─── Shared Buttons ──────────────────────────────────────────────────────────
 
 .btn-edit {
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
-  border: 2px solid $color-dark;
+  border: 2px solid var(--color-dark);
   border-radius: 8px;
   padding: 0.5rem 1.25rem;
   font-weight: 700;
@@ -352,20 +352,20 @@
 .btn-cancel {
   background: var(--color-surface);
   color: var(--color-text);
-  border: 2px solid $color-dark;
+  border: 2px solid var(--color-dark);
   border-radius: 8px;
   padding: 0.5rem 1.25rem;
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
 
-  &:hover { background: $color-bg; }
+  &:hover { background: var(--color-bg); }
 }
 
 .btn-save {
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
-  border: 2px solid $color-dark;
+  border: 2px solid var(--color-dark);
   border-radius: 8px;
   padding: 0.5rem 1.25rem;
   font-weight: 700;

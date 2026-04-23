@@ -47,7 +47,7 @@
   background: none;
   border: none;
   font-size: 1.1rem;
-  color: $color-muted;
+  color: var(--color-muted);
   cursor: pointer;
   padding: 4px 8px;
 
@@ -90,7 +90,7 @@
 .field-input,
 .field-select,
 .field-textarea {
-  border: 1px solid $color-border;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 0.55rem 0.9rem;
   font-size: 0.9rem;
@@ -131,9 +131,9 @@
   opacity: 0.5;
   transition: opacity 0.15s, border-color 0.15s;
 
-  &.active { opacity: 1; border-color: $color-dark; }
+  &.active { opacity: 1; border-color: var(--color-dark); }
 
-  &.priority-low    { background: #7ae229; color: $color-dark; }
+  &.priority-low    { background: #7ae229; color: var(--color-dark); }
   &.priority-medium { background: #ffa800; }
   &.priority-high   { background: #ff3d00; }
   &.priority-urgent { background: #ff3d00; }
@@ -149,7 +149,7 @@
 .btn-cancel {
   background: var(--color-surface);
   color: var(--color-text);
-  border: 2px solid $color-dark;
+  border: 2px solid var(--color-dark);
   border-radius: 8px;
   padding: 0.5rem 1.25rem;
   font-size: 0.9rem;
@@ -160,9 +160,9 @@
 }
 
 .btn-save {
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
-  border: 2px solid $color-dark;
+  border: 2px solid var(--color-dark);
   border-radius: 8px;
   padding: 0.5rem 1.25rem;
   font-size: 0.9rem;

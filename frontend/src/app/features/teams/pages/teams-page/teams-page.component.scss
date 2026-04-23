@@ -28,7 +28,7 @@
 }
 
 .btn-create {
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
   font-weight: 700;
   font-size: 0.95rem;
@@ -63,7 +63,7 @@
 
 .form-input {
   flex: 1;
-  border: 1px solid $color-border;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 0.7rem 1rem;
   font-size: 0.95rem;
@@ -76,12 +76,12 @@
   }
 
   &::placeholder {
-    color: $color-border;
+    color: var(--color-border);
   }
 }
 
 .btn-confirm {
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
   border: none;
   border-radius: 10px;
@@ -100,7 +100,7 @@
 .btn-cancel {
   background: var(--color-surface);
   color: var(--color-text);
-  border: 2px solid $color-border;
+  border: 2px solid var(--color-border);
   border-radius: 10px;
   padding: 0.6rem 1.2rem;
   font-weight: 700;
@@ -108,7 +108,7 @@
   cursor: pointer;
 
   &:hover {
-    border-color: $color-dark;
+    border-color: var(--color-dark);
   }
 }
 
@@ -121,11 +121,11 @@
 }
 
 .empty-state {
-  border: 1px dashed $color-muted;
+  border: 1px dashed var(--color-muted);
   border-radius: 16px;
   padding: 3rem;
   text-align: center;
-  color: $color-muted;
+  color: var(--color-muted);
   font-size: 1rem;
 }
 
@@ -170,7 +170,7 @@
 
 .team-meta {
   font-size: 0.82rem;
-  color: $color-muted;
+  color: var(--color-muted);
 }
 
 .team-actions {
@@ -186,7 +186,7 @@
   cursor: pointer;
   padding: 4px 6px;
   border-radius: 6px;
-  color: $color-muted;
+  color: var(--color-muted);
   transition: color 0.15s ease, background-color 0.15s ease;
 
   &.danger:hover {
@@ -202,7 +202,7 @@
 
 .expand-arrow {
   font-size: 0.75rem;
-  color: $color-muted;
+  color: var(--color-muted);
 }
 
 // ─── Team Detail ─────────────────────────────────────────────────────────────
@@ -251,7 +251,7 @@
 
 .member-email {
   font-size: 0.8rem;
-  color: $color-muted;
+  color: var(--color-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -260,9 +260,9 @@
 .role-badge {
   font-size: 0.75rem;
   font-weight: 600;
-  color: $color-muted;
+  color: var(--color-muted);
   background: var(--color-surface);
-  border: 1px solid $color-border;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 3px 8px;
   text-transform: capitalize;
@@ -275,7 +275,7 @@
 }
 
 .role-select {
-  border: 1px solid $color-border;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 3px 6px;
   font-size: 0.82rem;

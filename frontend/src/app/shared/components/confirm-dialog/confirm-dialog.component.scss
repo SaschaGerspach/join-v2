@@ -38,7 +38,7 @@
 .btn-cancel {
   background: var(--color-surface);
   color: var(--color-text);
-  border: 2px solid $color-dark;
+  border: 2px solid var(--color-dark);
   border-radius: 8px;
   padding: 0.5rem 1.5rem;
   font-size: 0.9rem;

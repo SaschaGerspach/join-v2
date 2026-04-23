@@ -42,7 +42,7 @@
   top: 1.25rem;
   right: 1.5rem;
   background: var(--color-surface);
-  border: 1px solid $color-border;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 4px 6px;
   font-size: 0.8rem;
@@ -63,7 +63,7 @@
 
 .auth-divider {
   height: 2px;
-  background-color: $color-border;
+  background-color: var(--color-border);
   margin-bottom: 1.5rem;
 }
 
@@ -75,7 +75,7 @@
 
   .form-input {
     width: 100%;
-    border: 1px solid $color-border;
+    border: 1px solid var(--color-border);
     border-radius: 10px;
     padding: 0.8rem 1.5rem;
     font-size: 1rem;
@@ -84,7 +84,7 @@
     transition: border-color 0.2s ease;
 
     &::placeholder {
-      color: $color-border;
+      color: var(--color-border);
     }
 
     &:focus {
@@ -131,7 +131,7 @@
   font-size: 1rem;
   padding: 0;
   line-height: 1;
-  color: $color-border;
+  color: var(--color-border);
 
   &:hover {
     color: var(--color-text);
@@ -179,7 +179,7 @@
   .btn-secondary {
     background-color: var(--color-surface);
     color: var(--color-text);
-    border: 2px solid $color-dark;
+    border: 2px solid var(--color-dark);
 
     &:hover {
       background-color: $color-primary;

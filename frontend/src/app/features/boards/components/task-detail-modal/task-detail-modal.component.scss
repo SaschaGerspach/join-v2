@@ -35,7 +35,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid $color-border;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .modal-title-input {
@@ -55,7 +55,7 @@
 .btn-close {
   background: none;
   border: none;
-  color: $color-muted;
+  color: var(--color-muted);
   font-size: 1rem;
   cursor: pointer;
   padding: 4px 6px;
@@ -86,18 +86,18 @@
 .field-label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: $color-muted;
+  color: var(--color-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .field-input {
-  border: 1px solid $color-border;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 0.55rem 0.9rem;
   font-size: 0.95rem;
   color: var(--color-text);
-  background: $color-bg;
+  background: var(--color-bg);
   width: 100%;
   box-sizing: border-box;
 
@@ -153,14 +153,14 @@
 
   &.active {
     opacity: 1;
-    border-color: $color-dark;
+    border-color: var(--color-dark);
   }
 
   &:hover { opacity: 0.8; }
 
   &.priority-urgent, &.priority-high { background: $priority-high; }
   &.priority-medium { background: $priority-medium; }
-  &.priority-low    { background: $priority-low; color: $color-dark; }
+  &.priority-low    { background: $priority-low; color: var(--color-dark); }
 }
 
 .modal-footer {
@@ -168,7 +168,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  border-top: 1px solid $color-border;
+  border-top: 1px solid var(--color-border);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -218,7 +218,7 @@
 .btn-cancel {
   background: var(--color-surface);
   color: var(--color-text);
-  border: 2px solid $color-dark;
+  border: 2px solid var(--color-dark);
   border-radius: 8px;
   padding: 0.45rem 1rem;
   font-size: 0.9rem;
@@ -226,14 +226,14 @@
   cursor: pointer;
 
   &:hover {
-    background: $color-bg;
+    background: var(--color-bg);
   }
 }
 
 .btn-save {
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
-  border: 2px solid $color-dark;
+  border: 2px solid var(--color-dark);
   border-radius: 8px;
   padding: 0.45rem 1rem;
   font-size: 0.9rem;

@@ -35,7 +35,7 @@ $bp-tablet: 1024px;
   .search-input {
     flex: 0 0 220px;
     padding: 0.4rem 0.75rem;
-    border: 1px solid $color-border;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     font-size: 0.9rem;
     outline: none;
@@ -53,7 +53,7 @@ $bp-tablet: 1024px;
   .filter-select {
     flex: 0 0 auto;
     padding: 0.4rem 0.75rem;
-    border: 1px solid $color-border;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     font-size: 0.9rem;
     color: var(--color-text);
@@ -174,7 +174,7 @@ $bp-tablet: 1024px;
 
 .btn-add-column {
   margin-left: auto;
-  background-color: $color-dark;
+  background-color: var(--color-dark);
   color: $color-white;
   font-weight: 700;
   font-size: 1rem;
@@ -210,7 +210,7 @@ $bp-tablet: 1024px;
 
   .form-input {
     flex: 1;
-    border: 1px solid $color-border;
+    border: 1px solid var(--color-border);
     border-radius: 10px;
     padding: 0.6rem 1rem;
     font-size: 1rem;
@@ -221,7 +221,7 @@ $bp-tablet: 1024px;
     }
 
     &::placeholder {
-      color: $color-border;
+      color: var(--color-border);
     }
   }
 }
@@ -300,8 +300,8 @@ $bp-tablet: 1024px;
   .wip-badge {
     font-size: 0.75rem;
     font-weight: 700;
-    color: $color-muted;
-    background: $color-bg;
+    color: var(--color-muted);
+    background: var(--color-bg);
     padding: 1px 6px;
     border-radius: 8px;
     white-space: nowrap;
@@ -316,7 +316,7 @@ $bp-tablet: 1024px;
   .wip-limit-input {
     width: 42px;
     padding: 2px 4px;
-    border: 1px solid $color-border;
+    border: 1px solid var(--color-border);
     border-radius: 6px;
     font-size: 0.75rem;
     text-align: center;
@@ -327,7 +327,7 @@ $bp-tablet: 1024px;
 
     &:focus { border-color: $color-primary; }
 
-    &::placeholder { color: $color-muted; font-size: 0.7rem; }
+    &::placeholder { color: var(--color-muted); font-size: 0.7rem; }
 
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -426,7 +426,7 @@ $bp-tablet: 1024px;
     cursor: pointer;
 
     &:disabled { opacity: 0.5; cursor: not-allowed; }
-    &:hover:not(:disabled) { background: $color-bg; }
+    &:hover:not(:disabled) { background: var(--color-bg); }
   }
 
   .btn-bulk-delete {
@@ -451,7 +451,7 @@ $bp-tablet: 1024px;
   border-radius: 8px;
   color: $color-white;
 
-  &.priority-low    { background-color: $priority-low; color: $color-dark; }
+  &.priority-low    { background-color: $priority-low; color: var(--color-dark); }
   &.priority-medium { background-color: $priority-medium; }
   &.priority-high   { background-color: $priority-high; }
   &.priority-urgent { background-color: $priority-urgent; }
@@ -481,7 +481,7 @@ $bp-tablet: 1024px;
 
 .task-description {
   font-size: 0.85rem;
-  color: $color-muted;
+  color: var(--color-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -494,7 +494,7 @@ $bp-tablet: 1024px;
   align-items: center;
   gap: 0.3rem;
   font-size: 0.78rem;
-  color: $color-muted;
+  color: var(--color-muted);
 
   &.overdue {
     color: $color-error;
@@ -523,7 +523,7 @@ $bp-tablet: 1024px;
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
   font-size: 0.65rem;
   font-weight: 700;
@@ -559,7 +559,7 @@ $bp-tablet: 1024px;
 .subtask-progress-bar {
   flex: 1;
   height: 6px;
-  background: $color-border;
+  background: var(--color-border);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -573,7 +573,7 @@ $bp-tablet: 1024px;
 
 .subtask-progress-label {
   font-size: 0.75rem;
-  color: $color-muted;
+  color: var(--color-muted);
   white-space: nowrap;
 }
 
@@ -588,7 +588,7 @@ $bp-tablet: 1024px;
 
 .attachment-badge {
   font-size: 0.75rem;
-  color: $color-muted;
+  color: var(--color-muted);
   white-space: nowrap;
   margin-left: 0.5rem;
 }
@@ -606,7 +606,7 @@ $bp-tablet: 1024px;
 
   .form-input {
     width: 100%;
-    border: 1px solid $color-border;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
@@ -626,9 +626,9 @@ $bp-tablet: 1024px;
 
 .btn-add-task {
   background: none;
-  border: 1px dashed $color-muted;
+  border: 1px dashed var(--color-muted);
   border-radius: 12px;
-  color: $color-muted;
+  color: var(--color-muted);
   font-size: 0.9rem;
   padding: 0.6rem;
   width: 100%;
@@ -662,7 +662,7 @@ $bp-tablet: 1024px;
 .btn-icon {
   background: none;
   border: none;
-  color: $color-muted;
+  color: var(--color-muted);
   font-size: 0.9rem;
   cursor: pointer;
   padding: 4px 6px;
@@ -683,7 +683,7 @@ $bp-tablet: 1024px;
 .btn-cancel {
   background: var(--color-surface);
   color: var(--color-text);
-  border: 2px solid $color-dark;
+  border: 2px solid var(--color-dark);
   border-radius: 8px;
   padding: 0.4rem 0.9rem;
   font-size: 0.85rem;
@@ -699,9 +699,9 @@ $bp-tablet: 1024px;
 }
 
 .btn-confirm {
-  background: $color-dark;
+  background: var(--color-dark);
   color: $color-white;
-  border: 2px solid $color-dark;
+  border: 2px solid var(--color-dark);
   border-radius: 8px;
   padding: 0.4rem 0.9rem;
   font-size: 0.85rem;
@@ -743,17 +743,17 @@ $bp-tablet: 1024px;
 // ─── Empty State ─────────────────────────────────────────────────────────────
 
 .board-empty {
-  border: 1px dashed $color-muted;
+  border: 1px dashed var(--color-muted);
   border-radius: 16px;
   padding: 3rem;
   text-align: center;
-  color: $color-muted;
+  color: var(--color-muted);
   min-width: 272px;
 }
 
 .column-empty {
   font-size: 0.82rem;
-  color: $color-muted;
+  color: var(--color-muted);
   text-align: center;
   padding: 1rem 0.5rem;
   font-style: italic;

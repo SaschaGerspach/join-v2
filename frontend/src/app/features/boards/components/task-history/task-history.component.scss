@@ -9,7 +9,7 @@
 .field-label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: $color-muted;
+  color: var(--color-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -26,13 +26,13 @@
 
 .toggle-icon {
   font-size: 0.75rem;
-  color: $color-muted;
+  color: var(--color-muted);
 }
 
 .history-count {
   font-size: 0.7rem;
-  background: $color-border;
-  color: $color-muted;
+  background: var(--color-border);
+  color: var(--color-muted);
   border-radius: 10px;
   padding: 0 0.4rem;
   font-weight: 700;
@@ -54,7 +54,7 @@
   font-size: 0.8rem;
   color: var(--color-text);
   padding: 0.25rem 0;
-  border-bottom: 1px solid $color-border;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .history-user {
@@ -66,23 +66,23 @@
 }
 
 .history-entity {
-  color: $color-muted;
+  color: var(--color-muted);
 }
 
 .history-details {
-  color: $color-muted;
+  color: var(--color-muted);
   font-style: italic;
 }
 
 .history-time {
   margin-left: auto;
   font-size: 0.7rem;
-  color: $color-muted;
+  color: var(--color-muted);
   white-space: nowrap;
 }
 
 .history-empty {
   font-size: 0.82rem;
-  color: $color-muted;
+  color: var(--color-muted);
   font-style: italic;
 }
