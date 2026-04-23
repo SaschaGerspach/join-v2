@@ -151,7 +151,7 @@
             type="number"
             min="1"
             [attr.aria-label]="'BOARD_DETAIL.WIP_LIMIT' | translate"
-            [title]="'BOARD_DETAIL.WIP_LIMIT' | translate"
+            [title]="'BOARD_DETAIL.WIP_LIMIT_TOOLTIP' | translate"
             [value]="column.wip_limit ?? ''"
             [placeholder]="'BOARD_DETAIL.WIP_LIMIT' | translate"
             (change)="onWipLimitChange(column.id, $event)"

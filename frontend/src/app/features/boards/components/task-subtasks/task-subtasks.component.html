@@ -41,7 +41,7 @@
 
 @if (pendingDeleteSubtask()) {
   <app-confirm-dialog
-    message="Delete this subtask?"
+    [message]="'TASK.CONFIRM_DELETE_SUBTASK' | translate"
     (confirmed)="confirmDeleteSubtask()"
     (cancelled)="pendingDeleteSubtask.set(null)"
   />

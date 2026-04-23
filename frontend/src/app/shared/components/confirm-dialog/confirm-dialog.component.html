@@ -2,8 +2,8 @@
   <div class="dialog" (click)="$event.stopPropagation()">
     <p class="message" id="confirm-dialog-msg">{{ message() }}</p>
     <div class="actions">
-      <button class="btn-cancel" (click)="cancelled.emit()">Cancel</button>
-      <button class="btn-delete" (click)="confirmed.emit()">Delete</button>
+      <button class="btn-cancel" (click)="cancelled.emit()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button class="btn-delete" (click)="confirmed.emit()">{{ 'COMMON.DELETE' | translate }}</button>
     </div>
   </div>
 </div>

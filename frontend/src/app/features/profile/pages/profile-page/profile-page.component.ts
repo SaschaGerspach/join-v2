@@ -12,7 +12,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { UserAvatarComponent } from '../../../../shared/components/user-avatar/user-avatar.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-profile-page',
@@ -23,7 +23,7 @@ import { TranslateModule } from '@ngx-translate/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfilePageComponent implements OnInit {
-  private readonly auth = inject(AuthService);
+  readonly auth = inject(AuthService);
   private readonly authApi = inject(AuthApiService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly usersApi = inject(UsersApiService);
@@ -31,6 +31,7 @@ export class ProfilePageComponent implements OnInit {
   private readonly boardsApi = inject(BoardsApiService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
 
   loading = signal(true);
   firstName = signal('');
@@ -58,6 +59,8 @@ export class ProfilePageComponent implements OnInit {
   totpDisablePassword = signal('');
   totpError = signal('');
 
+  isAdmin = computed(() => this.auth.user()?.is_staff ?? false);
+
   initials = computed(() => {
     const f = this.firstName()[0] ?? '';
     const l = this.lastName()[0] ?? '';
@@ -81,7 +84,7 @@ export class ProfilePageComponent implements OnInit {
         this.email.set(profile.email);
         this.loading.set(false);
       },
-      error: () => { this.toast.show('Failed to load profile.', 'error'); this.loading.set(false); },
+      error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_PROFILE'), 'error'); this.loading.set(false); },
     });
 
     this.notificationsApi.getPreferences().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -112,9 +115,9 @@ export class ProfilePageComponent implements OnInit {
     this.authApi.revokeSession(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.sessions.update(list => list.filter(s => s.id !== id));
-        this.toast.show('Session revoked.');
+        this.toast.show(this.translate.instant('TOAST.SESSION_REVOKED'));
       },
-      error: () => this.toast.show('Failed to revoke session.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REVOKE_SESSION'), 'error'),
     });
   }
 
@@ -122,9 +125,9 @@ export class ProfilePageComponent implements OnInit {
     this.authApi.revokeAllSessions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.sessions.update(list => list.filter(s => s.is_current));
-        this.toast.show('All other sessions revoked.');
+        this.toast.show(this.translate.instant('TOAST.ALL_SESSIONS_REVOKED'));
       },
-      error: () => this.toast.show('Failed to revoke sessions.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REVOKE_SESSIONS'), 'error'),
     });
   }
 
@@ -138,9 +141,9 @@ export class ProfilePageComponent implements OnInit {
         a.download = 'my-data-export.json';
         a.click();
         URL.revokeObjectURL(url);
-        this.toast.show('Data exported.');
+        this.toast.show(this.translate.instant('TOAST.DATA_EXPORTED'));
       },
-      error: () => this.toast.show('Failed to export data.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_EXPORT_DATA'), 'error'),
     });
   }
 
@@ -151,19 +154,21 @@ export class ProfilePageComponent implements OnInit {
     const confirm = this.confirmPassword().trim();
 
     if (pw && pw.length < 8) {
-      this.errorMessage.set('Password must be at least 8 characters.');
+      this.errorMessage.set(this.translate.instant('ERROR.PASSWORD_MIN_LENGTH'));
       return;
     }
     if (pw && pw !== confirm) {
-      this.errorMessage.set('Passwords do not match.');
+      this.errorMessage.set(this.translate.instant('ERROR.PASSWORDS_NO_MATCH'));
       return;
     }
 
     const payload: Record<string, string> = {
       first_name: this.firstName().trim(),
       last_name: this.lastName().trim(),
-      email: this.email().trim(),
     };
+    if (this.isAdmin()) {
+      payload['email'] = this.email().trim();
+    }
 
     if (pw) payload['password'] = pw;
 
@@ -173,10 +178,10 @@ export class ProfilePageComponent implements OnInit {
         this.newPassword.set('');
         this.confirmPassword.set('');
         this.saving.set(false);
-        this.toast.show('Profile updated successfully.');
+        this.toast.show(this.translate.instant('TOAST.PROFILE_UPDATED'));
       },
       error: (err) => {
-        this.errorMessage.set(err?.error?.detail ?? 'Something went wrong.');
+        this.errorMessage.set(err?.error?.detail ?? this.translate.instant('ERROR.SOMETHING_WRONG'));
         this.saving.set(false);
       },
     });
@@ -188,7 +193,7 @@ export class ProfilePageComponent implements OnInit {
         this.auth.clearUser();
         this.router.navigate(['/login']);
       },
-      error: () => this.toast.show('Failed to delete account.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_ACCOUNT'), 'error'),
     });
   }
 
@@ -223,22 +228,22 @@ export class ProfilePageComponent implements OnInit {
     this.totpError.set('');
     this.authApi.totpSetup().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => this.totpSetup.set(res),
-      error: () => this.toast.show('Failed to start 2FA setup.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_TOTP_SETUP'), 'error'),
     });
   }
 
   confirmTotp(): void {
     const code = this.totpConfirmCode().trim();
-    if (code.length !== 6) { this.totpError.set('Enter a 6-digit code.'); return; }
+    if (code.length !== 6) { this.totpError.set(this.translate.instant('ERROR.ENTER_6_DIGIT')); return; }
     this.totpError.set('');
     this.authApi.totpConfirm(code).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.totpEnabled.set(true);
         this.totpSetup.set(null);
         this.totpConfirmCode.set('');
-        this.toast.show('2FA enabled.');
+        this.toast.show(this.translate.instant('TOAST.TOTP_ENABLED'));
       },
-      error: () => this.totpError.set('Invalid code. Try again.'),
+      error: () => this.totpError.set(this.translate.instant('TOAST.INVALID_TOTP_CODE')),
     });
   }
 
@@ -251,17 +256,17 @@ export class ProfilePageComponent implements OnInit {
   disableTotp(): void {
     const code = this.totpDisableCode().trim();
     const password = this.totpDisablePassword().trim();
-    if (!password) { this.totpError.set('Password is required.'); return; }
-    if (code.length !== 6) { this.totpError.set('Enter a 6-digit code.'); return; }
+    if (!password) { this.totpError.set(this.translate.instant('ERROR.PASSWORD_REQUIRED')); return; }
+    if (code.length !== 6) { this.totpError.set(this.translate.instant('ERROR.ENTER_6_DIGIT')); return; }
     this.totpError.set('');
     this.authApi.totpDisable(password, code).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.totpEnabled.set(false);
         this.totpDisableCode.set('');
         this.totpDisablePassword.set('');
-        this.toast.show('2FA disabled.');
+        this.toast.show(this.translate.instant('TOAST.TOTP_DISABLED'));
       },
-      error: (err) => this.totpError.set(err?.error?.detail ?? 'Failed to disable 2FA.'),
+      error: (err) => this.totpError.set(err?.error?.detail ?? this.translate.instant('TOAST.FAILED_DISABLE_TOTP')),
     });
   }
 
@@ -272,9 +277,9 @@ export class ProfilePageComponent implements OnInit {
       next: res => {
         this.avatarUrl.set(res.avatar_url);
         this.auth.init();
-        this.toast.show('Avatar updated.');
+        this.toast.show(this.translate.instant('TOAST.AVATAR_UPDATED'));
       },
-      error: (err) => this.toast.show(err?.error?.detail ?? 'Failed to upload avatar.', 'error'),
+      error: (err) => this.toast.show(err?.error?.detail ?? this.translate.instant('TOAST.FAILED_UPLOAD_AVATAR'), 'error'),
     });
   }
 
@@ -283,9 +288,9 @@ export class ProfilePageComponent implements OnInit {
       next: () => {
         this.avatarUrl.set(null);
         this.auth.init();
-        this.toast.show('Avatar removed.');
+        this.toast.show(this.translate.instant('TOAST.AVATAR_REMOVED'));
       },
-      error: () => this.toast.show('Failed to remove avatar.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REMOVE_AVATAR'), 'error'),
     });
   }
 
@@ -295,7 +300,7 @@ export class ProfilePageComponent implements OnInit {
       muted_boards: [...this.mutedBoardIds()],
       email_delivery: this.emailDelivery(),
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      error: () => this.toast.show('Failed to save notification settings.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_SAVE_NOTIFICATIONS'), 'error'),
     });
   }
 }

@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, HostListener, input, output } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-confirm-dialog',
   standalone: true,
+  imports: [TranslateModule],
   templateUrl: './confirm-dialog.component.html',
   styleUrl: './confirm-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

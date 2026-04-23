@@ -2,6 +2,7 @@ import { DestroyRef, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { forkJoin } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 import { Column, ColumnsApiService } from '../../../core/columns/columns-api.service';
 import { Task, TasksApiService } from '../../../core/tasks/tasks-api.service';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -10,6 +11,7 @@ export function handleColumnDrop(
   columns: WritableSignal<Column[]>,
   columnsApi: ColumnsApiService,
   toast: ToastService,
+  translate: TranslateService,
   destroyRef: DestroyRef,
   event: CdkDragDrop<Column[]>,
 ): void {
@@ -26,7 +28,7 @@ export function handleColumnDrop(
     .subscribe({
       error: () => {
         columns.set(snapshot);
-        toast.show('Failed to reorder columns.', 'error');
+        toast.show(translate.instant('TOAST.FAILED_REORDER_COLUMNS'), 'error');
       },
     });
 }
@@ -36,6 +38,7 @@ export function handleTaskDrop(
   filteredForColumn: (columnId: number) => Task[],
   tasksApi: TasksApiService,
   toast: ToastService,
+  translate: TranslateService,
   destroyRef: DestroyRef,
   event: CdkDragDrop<Task[]>,
   targetColumnId: number,
@@ -58,7 +61,7 @@ export function handleTaskDrop(
       .subscribe({
         error: () => {
           tasks.set(snapshot);
-          toast.show('Failed to reorder tasks.', 'error');
+          toast.show(translate.instant('TOAST.FAILED_REORDER_TASKS'), 'error');
         },
       });
   } else {
@@ -83,7 +86,7 @@ export function handleTaskDrop(
     ]).pipe(takeUntilDestroyed(destroyRef)).subscribe({
       error: () => {
         tasks.set(snapshot);
-        toast.show('Failed to move task.', 'error');
+        toast.show(translate.instant('TOAST.FAILED_MOVE_TASK'), 'error');
       },
     });
   }

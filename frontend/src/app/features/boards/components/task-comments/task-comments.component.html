@@ -92,7 +92,7 @@
 
 @if (pendingDeleteCommentId() !== null) {
   <app-confirm-dialog
-    message="Delete this comment?"
+    [message]="'TASK.CONFIRM_DELETE_COMMENT' | translate"
     (confirmed)="confirmDeleteComment()"
     (cancelled)="pendingDeleteCommentId.set(null)"
   />

@@ -75,7 +75,7 @@
 
 @if (pendingDeleteTeamId() !== null) {
   <app-confirm-dialog
-    message="Delete this team? Boards won't be deleted but will lose their team assignment."
+    [message]="'TEAMS.CONFIRM_DELETE' | translate"
     (confirmed)="confirmDeleteTeam()"
     (cancelled)="pendingDeleteTeamId.set(null)"
   />

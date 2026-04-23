@@ -33,49 +33,73 @@
     <div class="boards-empty">
       <p>{{ 'BOARDS.NO_BOARDS' | translate }}</p>
     </div>
-  } @else if (!loading()) {
-    <div class="boards-grid">
-      @for (board of boards(); track board.id) {
-        <div class="board-card" role="button" tabindex="0" [style.border-left]="'4px solid ' + board.color" (click)="openBoard(board.id)" (keydown.enter)="openBoard(board.id)">
-          <div class="board-card-body">
-            <h2>{{ board.title }}</h2>
-            @if (board.team_name) {
-              <span class="shared-badge">{{ board.team_name }}</span>
-            } @else if (!board.is_owner) {
-              <span class="shared-badge">{{ 'BOARDS.SHARED' | translate }}</span>
-            }
-          </div>
-          <div class="board-card-actions">
-            <button
-              class="btn-favorite"
-              [class.active]="board.is_favorite"
-              [attr.aria-label]="board.is_favorite ? 'Remove from favorites' : 'Add to favorites'"
-              [title]="board.is_favorite ? 'Remove from favorites' : 'Add to favorites'"
-              (click)="toggleFavorite(board, $event)"
-            >{{ board.is_favorite ? '&#9733;' : '&#9734;' }}</button>
-            @if (board.is_owner) {
-              <input
-                class="color-picker"
-                type="color"
-                aria-label="Board color"
-                [value]="board.color"
-                (click)="$event.stopPropagation()"
-                (change)="changeColor(board, inputValue($event))"
-                title="Board color"
-              />
-              <button class="btn-members" aria-label="Manage members" (click)="openMembers(board, $event)" title="Manage members">&#128101;</button>
-              <button class="btn-delete" aria-label="Delete board" (click)="deleteBoard(board.id, $event)" title="Delete board">&#10005;</button>
-            }
-          </div>
-        </div>
-      }
-    </div>
+  } @else {
+    @if (ownedBoards().length > 0) {
+      <div class="boards-grid">
+        @for (board of ownedBoards(); track board.id) {
+          <ng-container *ngTemplateOutlet="boardCard; context: { $implicit: board }" />
+        }
+      </div>
+    }
+
+    @if (sharedBoards().length > 0) {
+      <h2 class="section-title">{{ 'BOARDS.SHARED_BOARDS' | translate }}</h2>
+      <div class="boards-grid">
+        @for (board of sharedBoards(); track board.id) {
+          <ng-container *ngTemplateOutlet="boardCard; context: { $implicit: board }" />
+        }
+      </div>
+    }
+
+    @if (adminBoards().length > 0) {
+      <h2 class="section-title">{{ 'BOARDS.ALL_BOARDS' | translate }}</h2>
+      <div class="boards-grid">
+        @for (board of adminBoards(); track board.id) {
+          <ng-container *ngTemplateOutlet="boardCard; context: { $implicit: board }" />
+        }
+      </div>
+    }
   }
 </div>
 
+<ng-template #boardCard let-board>
+  <div class="board-card" role="button" tabindex="0" [style.border-left]="'4px solid ' + board.color" (click)="openBoard(board.id)" (keydown.enter)="openBoard(board.id)">
+    <div class="board-card-body">
+      <h2>{{ board.title }}</h2>
+      @if (board.team_name) {
+        <span class="shared-badge">{{ board.team_name }}</span>
+      } @else if (!board.is_owner) {
+        <span class="shared-badge">{{ 'BOARDS.SHARED' | translate }}</span>
+      }
+    </div>
+    <div class="board-card-actions">
+      <button
+        class="btn-favorite"
+        [class.active]="board.is_favorite"
+        [attr.aria-label]="board.is_favorite ? 'Remove from favorites' : 'Add to favorites'"
+        [title]="board.is_favorite ? 'Remove from favorites' : 'Add to favorites'"
+        (click)="toggleFavorite(board, $event)"
+      >{{ board.is_favorite ? '&#9733;' : '&#9734;' }}</button>
+      @if (board.is_owner) {
+        <input
+          class="color-picker"
+          type="color"
+          aria-label="Board color"
+          [value]="board.color"
+          (click)="$event.stopPropagation()"
+          (change)="changeColor(board, inputValue($event))"
+          title="Board color"
+        />
+        <button class="btn-members" aria-label="Manage members" (click)="openMembers(board, $event)" title="Manage members">&#128101;</button>
+        <button class="btn-delete" aria-label="Delete board" (click)="deleteBoard(board.id, $event)" title="Delete board">&#10005;</button>
+      }
+    </div>
+  </div>
+</ng-template>
+
 @if (pendingDeleteId() !== null) {
   <app-confirm-dialog
-    message="Delete this board? All columns and tasks will be lost."
+    [message]="'BOARDS.CONFIRM_DELETE' | translate"
     (confirmed)="confirmDelete()"
     (cancelled)="pendingDeleteId.set(null)"
   />
@@ -83,7 +107,7 @@
 
 @if (pendingRemoveMemberId() !== null) {
   <app-confirm-dialog
-    message="Remove this member from the board?"
+    [message]="'BOARDS.CONFIRM_REMOVE_MEMBER' | translate"
     (confirmed)="confirmRemoveMember()"
     (cancelled)="pendingRemoveMemberId.set(null)"
   />

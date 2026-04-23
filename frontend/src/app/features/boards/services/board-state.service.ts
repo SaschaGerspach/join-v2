@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../core/auth/auth.service';
 import { BoardsApiService, Board } from '../../../core/boards/boards-api.service';
 import { ColumnsApiService, Column } from '../../../core/columns/columns-api.service';
@@ -30,6 +31,7 @@ export class BoardStateService {
   private readonly tasksApi = inject(TasksApiService);
   private readonly contactsApi = inject(ContactsApiService);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private readonly boardWs = inject(BoardWsService);
   private readonly titleService = inject(Title);
   private readonly destroyRef = inject(DestroyRef);
@@ -244,7 +246,7 @@ export class BoardStateService {
     if (!trimmed) return;
     this.columnsApi.create(this.boardId(), trimmed).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: col => this.columns.update(c => c.some(x => x.id === col.id) ? c : [...c, col]),
-      error: () => this.toast.show('Failed to create column.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_COLUMN'), 'error'),
     });
   }
 
@@ -253,7 +255,7 @@ export class BoardStateService {
     if (!trimmed) { this.editingBoardTitle.set(false); return; }
     this.boardsApi.patch(this.boardId(), { title: trimmed }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => { this.board.set(updated); this.editingBoardTitle.set(false); },
-      error: () => this.toast.show('Failed to rename board.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_RENAME_BOARD'), 'error'),
     });
   }
 
@@ -268,7 +270,7 @@ export class BoardStateService {
   setWipLimit(id: number, value: number | null): void {
     this.columnsApi.patch(id, { wip_limit: value }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => this.columns.update(cols => cols.map(c => c.id === id ? updated : c)),
-      error: () => this.toast.show('Failed to update WIP limit.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPDATE_WIP'), 'error'),
     });
   }
 
@@ -277,7 +279,7 @@ export class BoardStateService {
     if (!trimmed) { this.editingColumnId.set(null); return; }
     this.columnsApi.patch(id, { title: trimmed }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => { this.columns.update(cols => cols.map(c => c.id === id ? updated : c)); this.editingColumnId.set(null); },
-      error: () => this.toast.show('Failed to rename column.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_RENAME_COLUMN'), 'error'),
     });
   }
 
@@ -289,9 +291,9 @@ export class BoardStateService {
         this.columns.update(c => c.filter(col => col.id !== id));
         this.tasks.update(t => t.filter(task => task.column !== id));
         this.pendingDeleteColumnId.set(null);
-        this.toast.show('Column deleted');
+        this.toast.show(this.translate.instant('TOAST.COLUMN_DELETED'));
       },
-      error: () => this.toast.show('Failed to delete column.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_COLUMN'), 'error'),
     });
   }
 
@@ -300,9 +302,9 @@ export class BoardStateService {
       next: task => {
         this.tasks.update(t => t.some(x => x.id === task.id) ? t : [...t, task]);
         this.addingTaskForColumn.set(null);
-        this.toast.show('Task created');
+        this.toast.show(this.translate.instant('TOAST.TASK_CREATED'));
       },
-      error: () => this.toast.show('Failed to create task.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_TASK'), 'error'),
     });
   }
 
@@ -325,18 +327,18 @@ export class BoardStateService {
       next: () => {
         this.tasks.update(t => t.filter(task => task.id !== id));
         this.pendingDeleteTaskId.set(null);
-        this.toast.show('Task deleted');
+        this.toast.show(this.translate.instant('TOAST.TASK_DELETED'));
       },
-      error: () => this.toast.show('Failed to delete task.', 'error'),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_TASK'), 'error'),
     });
   }
 
   dropColumn(event: CdkDragDrop<Column[]>): void {
-    handleColumnDrop(this.columns, this.columnsApi, this.toast, this.destroyRef, event);
+    handleColumnDrop(this.columns, this.columnsApi, this.toast, this.translate, this.destroyRef, event);
   }
 
   drop(event: CdkDragDrop<Task[]>, targetColumnId: number): void {
-    handleTaskDrop(this.tasks, col => this.tasksForColumn(col), this.tasksApi, this.toast, this.destroyRef, event, targetColumnId);
+    handleTaskDrop(this.tasks, col => this.tasksForColumn(col), this.tasksApi, this.toast, this.translate, this.destroyRef, event, targetColumnId);
   }
 
   toggleTaskSelection(taskId: number, event: Event): void {
@@ -358,11 +360,11 @@ export class BoardStateService {
   }
 
   bulkMove(): void {
-    bulkMoveTasks(this.selectedTaskIds, this.bulkMoveTarget, this.tasks, this.tasksApi, this.toast, this.destroyRef);
+    bulkMoveTasks(this.selectedTaskIds, this.bulkMoveTarget, this.tasks, this.tasksApi, this.toast, this.translate, this.destroyRef);
   }
 
   confirmBulkDelete(): void {
-    bulkDeleteTasks(this.selectedTaskIds, this.pendingBulkDelete, this.tasks, this.tasksApi, this.toast, this.destroyRef);
+    bulkDeleteTasks(this.selectedTaskIds, this.pendingBulkDelete, this.tasks, this.tasksApi, this.toast, this.translate, this.destroyRef);
   }
 
   priorityClass(priority: string): string {
@@ -398,7 +400,7 @@ export class BoardStateService {
         this.contacts.set(contacts);
         this.loading.set(false);
       },
-      error: () => { this.toast.show('Failed to load board.', 'error'); this.loading.set(false); },
+      error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARD'), 'error'); this.loading.set(false); },
     });
   }
 }

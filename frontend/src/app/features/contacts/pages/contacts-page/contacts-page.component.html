@@ -102,7 +102,7 @@
 
 @if (pendingDeleteId() !== null) {
   <app-confirm-dialog
-    message="Delete this contact?"
+    [message]="'CONTACTS.CONFIRM_DELETE' | translate"
     (confirmed)="confirmDeleteContact()"
     (cancelled)="pendingDeleteId.set(null)"
   />

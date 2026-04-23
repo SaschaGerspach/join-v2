@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Attachment, AttachmentsApiService } from '../../../../core/tasks/attachments-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -17,6 +17,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 export class TaskAttachmentsComponent implements OnInit {
   private readonly attachmentsApi = inject(AttachmentsApiService);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly sanitizer = inject(DomSanitizer);
 
@@ -55,13 +56,13 @@ export class TaskAttachmentsComponent implements OnInit {
     const file = input.files?.[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      this.toast.show('File too large (max 5MB).', 'error');
+      this.toast.show(this.translate.instant('TOAST.FILE_TOO_LARGE'), 'error');
       input.value = '';
       return;
     }
     const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
     if (!this.allowedExtensions.has(ext)) {
-      this.toast.show('File type not allowed.', 'error');
+      this.toast.show(this.translate.instant('TOAST.FILE_TYPE_NOT_ALLOWED'), 'error');
       input.value = '';
       return;
     }
@@ -69,7 +70,7 @@ export class TaskAttachmentsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: att => this.attachments.update(list => [...list, att]),
-        error: () => this.toast.show('Failed to upload file.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPLOAD_FILE'), 'error'),
       });
     input.value = '';
   }
@@ -86,7 +87,7 @@ export class TaskAttachmentsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.attachments.update(list => list.filter(a => a.id !== att.id)),
-        error: () => this.toast.show('Failed to delete file.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_FILE'), 'error'),
       });
   }
 
@@ -131,7 +132,7 @@ export class TaskAttachmentsComponent implements OnInit {
           a.click();
           URL.revokeObjectURL(url);
         },
-        error: () => this.toast.show('Download failed.', 'error'),
+        error: () => this.toast.show(this.translate.instant('TOAST.DOWNLOAD_FAILED'), 'error'),
       });
   }
 

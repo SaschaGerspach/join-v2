@@ -134,7 +134,7 @@
 
 @if (showDeleteConfirm()) {
   <app-confirm-dialog
-    message="Delete this task? This cannot be undone."
+    [message]="'TASK.CONFIRM_DELETE_TASK' | translate"
     (confirmed)="confirmDeleteTask()"
     (cancelled)="showDeleteConfirm.set(false)"
   />
