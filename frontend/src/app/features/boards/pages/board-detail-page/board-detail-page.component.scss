@@ -174,18 +174,20 @@ $bp-tablet: 1024px;
 
 .btn-add-column {
   margin-left: auto;
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font-weight: 700;
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 10px;
-  border: 1px solid var(--color-border);
+  background: none;
+  color: $color-primary;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid $color-primary;
   cursor: pointer;
+  white-space: nowrap;
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: var(--color-bg);
+    background: $color-primary;
+    color: $color-white;
   }
 
   @media (max-width: $bp-mobile) {
