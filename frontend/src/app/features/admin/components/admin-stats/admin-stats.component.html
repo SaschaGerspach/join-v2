@@ -1,0 +1,49 @@
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (stats()) {
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-value">{{ stats()!.users.total }}</span>
+      <span class="stat-label">{{ 'ADMIN.USERS' | translate }}</span>
+      <span class="stat-trend">
+        +{{ stats()!.users.this_week }} {{ 'ADMIN.THIS_WEEK' | translate }}
+        <span class="stat-vs">({{ stats()!.users.last_week }} {{ 'ADMIN.VS_LAST_WEEK' | translate }})</span>
+      </span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats()!.boards.total }}</span>
+      <span class="stat-label">{{ 'ADMIN.BOARDS' | translate }}</span>
+      <span class="stat-trend">
+        +{{ stats()!.boards.this_week }} {{ 'ADMIN.THIS_WEEK' | translate }}
+        <span class="stat-vs">({{ stats()!.boards.last_week }} {{ 'ADMIN.VS_LAST_WEEK' | translate }})</span>
+      </span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats()!.tasks.total }}</span>
+      <span class="stat-label">{{ 'ADMIN.TASKS' | translate }}</span>
+      <span class="stat-trend">
+        +{{ stats()!.tasks.this_week }} {{ 'ADMIN.THIS_WEEK' | translate }}
+        <span class="stat-vs">({{ stats()!.tasks.last_week }} {{ 'ADMIN.VS_LAST_WEEK' | translate }})</span>
+      </span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats()!.contacts }}</span>
+      <span class="stat-label">{{ 'ADMIN.CONTACTS' | translate }}</span>
+    </div>
+  </div>
+
+  <div class="stats-grid secondary">
+    <div class="stat-card warn">
+      <span class="stat-value">{{ stats()!.unverified_users }}</span>
+      <span class="stat-label">{{ 'ADMIN.UNVERIFIED' | translate }}</span>
+    </div>
+    <div class="stat-card warn">
+      <span class="stat-value">{{ stats()!.inactive_users }}</span>
+      <span class="stat-label">{{ 'ADMIN.INACTIVE' | translate }}</span>
+    </div>
+    <div class="stat-card warn">
+      <span class="stat-value">{{ stats()!.never_logged_in }}</span>
+      <span class="stat-label">{{ 'ADMIN.NEVER_LOGGED_IN' | translate }}</span>
+    </div>
+  </div>
+}

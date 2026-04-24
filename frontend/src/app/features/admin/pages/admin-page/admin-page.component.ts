@@ -1,44 +1,18 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { HttpClient } from '@angular/common/http';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { environment } from '../../../../../environments/environment';
-import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
-import { ToastService } from '../../../../shared/services/toast.service';
-
-type AdminStats = {
-  users: number;
-  boards: number;
-  tasks: number;
-  contacts: number;
-};
+import { AdminStatsComponent } from '../../components/admin-stats/admin-stats.component';
+import { AdminAuditLogComponent } from '../../components/admin-audit-log/admin-audit-log.component';
+import { AdminBoardActivityComponent } from '../../components/admin-board-activity/admin-board-activity.component';
 
 @Component({
   selector: 'app-admin-page',
   standalone: true,
-  imports: [LoadingSpinnerComponent, TranslateModule],
+  imports: [TranslateModule, AdminStatsComponent, AdminAuditLogComponent, AdminBoardActivityComponent],
   templateUrl: './admin-page.component.html',
   styleUrl: './admin-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminPageComponent implements OnInit {
-  private readonly http = inject(HttpClient);
-  private readonly toast = inject(ToastService);
-  private readonly translate = inject(TranslateService);
-  private readonly destroyRef = inject(DestroyRef);
-
-  stats = signal<AdminStats | null>(null);
-  loading = signal(true);
-
+export class AdminPageComponent {
   readonly djangoAdminUrl = `${environment.apiUrl}/manage/`;
-
-  ngOnInit(): void {
-    this.http
-      .get<AdminStats>(`${environment.apiUrl}/admin-api/stats/`, { withCredentials: true })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: s => { this.stats.set(s); this.loading.set(false); },
-        error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_STATS'), 'error'); this.loading.set(false); },
-      });
-  }
 }

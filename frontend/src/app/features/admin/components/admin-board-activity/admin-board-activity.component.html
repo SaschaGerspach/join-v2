@@ -1,0 +1,46 @@
+<div class="boards-section">
+  <h2>{{ 'ADMIN.BOARD_ACTIVITY' | translate }}</h2>
+
+  @if (loading()) {
+    <app-loading-spinner />
+  } @else if (data()) {
+    <div class="boards-overview">
+      <div class="mini-card active">
+        <span class="mini-value">{{ data()!.active_boards }}</span>
+        <span class="mini-label">{{ 'ADMIN.ACTIVE_BOARDS' | translate }}</span>
+      </div>
+      <div class="mini-card inactive">
+        <span class="mini-value">{{ data()!.inactive_boards }}</span>
+        <span class="mini-label">{{ 'ADMIN.INACTIVE_BOARDS' | translate }}</span>
+      </div>
+    </div>
+
+    <div class="boards-lists">
+      <div class="board-list">
+        <h3>{{ 'ADMIN.TOP_BOARDS' | translate }}</h3>
+        @for (b of data()!.top_boards; track b.id) {
+          <div class="board-item">
+            <span class="board-color" [style.background]="b.color"></span>
+            <span class="board-title">{{ b.title }}</span>
+            <span class="board-meta">{{ 'ADMIN.TASKS_COUNT' | translate:{ count: b.task_count } }}</span>
+          </div>
+        } @empty {
+          <p class="empty">—</p>
+        }
+      </div>
+
+      <div class="board-list">
+        <h3>{{ 'ADMIN.RECENT_BOARDS' | translate }}</h3>
+        @for (b of data()!.recent_boards; track b.id) {
+          <div class="board-item">
+            <span class="board-color" [style.background]="b.color"></span>
+            <span class="board-title">{{ b.title }}</span>
+            <span class="board-meta">{{ b.last_activity | date:'short' }}</span>
+          </div>
+        } @empty {
+          <p class="empty">—</p>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -75,6 +75,8 @@ def login_view(request):
             )
 
     log_audit("login_success", user=user, request=request)
+    from django.contrib.auth.models import update_last_login
+    update_last_login(None, user)
     refresh, access = issue_tokens_for(user)
     response = Response({
         "id": user.pk,

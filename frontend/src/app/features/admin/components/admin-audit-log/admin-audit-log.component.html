@@ -1,0 +1,47 @@
+<div class="audit-section">
+  <div class="section-header">
+    <h2>{{ 'ADMIN.AUDIT_LOG' | translate }}</h2>
+    <select
+      class="filter-select"
+      [attr.aria-label]="'ADMIN.FILTER_EVENT_TYPE' | translate"
+      [ngModel]="selectedType()"
+      (ngModelChange)="onFilterChange($event)"
+    >
+      <option value="">{{ 'ADMIN.ALL_EVENTS' | translate }}</option>
+      @for (t of eventTypes(); track t) {
+        <option [value]="t">{{ t }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner />
+  } @else if (entries().length === 0) {
+    <p class="empty">{{ 'ADMIN.NO_AUDIT_EVENTS' | translate }}</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'ADMIN.TIMESTAMP' | translate }}</th>
+            <th>{{ 'ADMIN.USER_EMAIL' | translate }}</th>
+            <th>{{ 'ADMIN.EVENT_TYPE' | translate }}</th>
+            <th>{{ 'ADMIN.IP_ADDRESS' | translate }}</th>
+            <th>{{ 'ADMIN.DETAIL' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of entries(); track e.id) {
+            <tr>
+              <td>{{ e.timestamp | date:'short' }}</td>
+              <td>{{ e.user_email ?? '—' }}</td>
+              <td><span class="event-badge">{{ e.event_type }}</span></td>
+              <td>{{ e.ip_address ?? '—' }}</td>
+              <td class="detail-cell">{{ e.detail || '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'activity_api',
     'teams_api',
     'audit_api',
+    'admin_api',
 ]
 
 MIDDLEWARE = [

@@ -2,30 +2,11 @@
   <div class="admin-header">
     <h1>{{ 'ADMIN.TITLE' | translate }}</h1>
     <a [href]="djangoAdminUrl" target="_blank" rel="noopener" class="btn-django-admin">
-      {{ 'ADMIN.OPEN_DJANGO' | translate }} ↗
+      {{ 'ADMIN.OPEN_DJANGO' | translate }}
     </a>
   </div>
 
-  @if (loading()) {
-    <app-loading-spinner />
-  } @else if (stats()) {
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="stat-value">{{ stats()!.users }}</span>
-        <span class="stat-label">{{ 'ADMIN.USERS' | translate }}</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ stats()!.boards }}</span>
-        <span class="stat-label">{{ 'ADMIN.BOARDS' | translate }}</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ stats()!.tasks }}</span>
-        <span class="stat-label">{{ 'ADMIN.TASKS' | translate }}</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ stats()!.contacts }}</span>
-        <span class="stat-label">{{ 'ADMIN.CONTACTS' | translate }}</span>
-      </div>
-    </div>
-  }
+  <app-admin-stats />
+  <app-admin-board-activity />
+  <app-admin-audit-log />
 </div>
