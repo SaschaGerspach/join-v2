@@ -231,9 +231,9 @@
 }
 
 .btn-save {
-  background: var(--color-primary);
-  color: #ffffff;
-  border: 2px solid var(--color-primary);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
   border-radius: 8px;
   padding: 0.45rem 1rem;
   font-size: 0.9rem;
@@ -242,7 +242,6 @@
   transition: background-color 0.15s ease;
 
   &:hover {
-    background: #1a7ba3;
-    border-color: #1a7ba3;
+    background: var(--color-bg);
   }
 }
