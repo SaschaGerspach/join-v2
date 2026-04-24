@@ -261,6 +261,7 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'true').lower() == 'true'
+    SECURE_REDIRECT_EXEMPT = [r'^health/$']
 
 _secure_cookies_default = 'false' if DEBUG else 'true'
 _samesite_default = 'Lax' if DEBUG else 'None'
