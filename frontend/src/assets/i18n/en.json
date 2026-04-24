@@ -355,7 +355,22 @@
     "INACTIVE_BOARDS": "Inactive",
     "TOP_BOARDS": "Top Boards by Tasks",
     "RECENT_BOARDS": "Recently Active",
-    "TASKS_COUNT": "{{count}} tasks"
+    "TASKS_COUNT": "{{count}} tasks",
+    "EVENT": {
+      "LOGIN_SUCCESS": "Login successful",
+      "LOGIN_FAILED": "Login failed",
+      "PASSWORD_RESET": "Password reset",
+      "TOTP_ENABLED": "2FA enabled",
+      "TOTP_DISABLED": "2FA disabled",
+      "BOARD_MEMBER_ADDED": "Member added",
+      "BOARD_MEMBER_REMOVED": "Member removed",
+      "BOARD_MEMBER_ROLE_CHANGED": "Member role changed",
+      "TEAM_MEMBER_ADDED": "Team member added",
+      "TEAM_MEMBER_REMOVED": "Team member removed",
+      "TEAM_MEMBER_ROLE_CHANGED": "Team role changed",
+      "ACCOUNT_DELETED": "Account deleted",
+      "ADMIN_ACTION": "Admin action"
+    }
   },
   "STATS": {
     "BACK": "Back to board",

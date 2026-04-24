@@ -9,14 +9,26 @@ export type Trend = {
   last_week: number;
 };
 
+export type WarnUser = {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+};
+
+export type WarnGroup = {
+  count: number;
+  list: WarnUser[];
+};
+
 export type AdminStats = {
   users: Trend;
   boards: Trend;
   tasks: Trend;
   contacts: number;
-  unverified_users: number;
-  inactive_users: number;
-  never_logged_in: number;
+  unverified_users: WarnGroup;
+  inactive_users: WarnGroup;
+  never_logged_in: WarnGroup;
 };
 
 export type AuditLogEntry = {

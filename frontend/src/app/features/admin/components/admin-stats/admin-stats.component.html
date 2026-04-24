@@ -33,17 +33,55 @@
   </div>
 
   <div class="stats-grid secondary">
-    <div class="stat-card warn">
-      <span class="stat-value">{{ stats()!.unverified_users }}</span>
-      <span class="stat-label">{{ 'ADMIN.UNVERIFIED' | translate }}</span>
+    <div class="warn-card" [class.expanded]="expandedCard() === 'unverified'">
+      <button class="warn-header" (click)="toggleCard('unverified')">
+        <span class="warn-value">{{ stats()!.unverified_users.count }}</span>
+        <span class="warn-label">{{ 'ADMIN.UNVERIFIED' | translate }}</span>
+        <span class="warn-toggle">{{ expandedCard() === 'unverified' ? '▲' : '▼' }}</span>
+      </button>
+      @if (expandedCard() === 'unverified') {
+        <ul class="warn-list">
+          @for (u of stats()!.unverified_users.list; track u.id) {
+            <li>{{ u.first_name }} {{ u.last_name }} <span class="warn-email">{{ u.email }}</span></li>
+          } @empty {
+            <li class="warn-empty">—</li>
+          }
+        </ul>
+      }
     </div>
-    <div class="stat-card warn">
-      <span class="stat-value">{{ stats()!.inactive_users }}</span>
-      <span class="stat-label">{{ 'ADMIN.INACTIVE' | translate }}</span>
+
+    <div class="warn-card" [class.expanded]="expandedCard() === 'inactive'">
+      <button class="warn-header" (click)="toggleCard('inactive')">
+        <span class="warn-value">{{ stats()!.inactive_users.count }}</span>
+        <span class="warn-label">{{ 'ADMIN.INACTIVE' | translate }}</span>
+        <span class="warn-toggle">{{ expandedCard() === 'inactive' ? '▲' : '▼' }}</span>
+      </button>
+      @if (expandedCard() === 'inactive') {
+        <ul class="warn-list">
+          @for (u of stats()!.inactive_users.list; track u.id) {
+            <li>{{ u.first_name }} {{ u.last_name }} <span class="warn-email">{{ u.email }}</span></li>
+          } @empty {
+            <li class="warn-empty">—</li>
+          }
+        </ul>
+      }
     </div>
-    <div class="stat-card warn">
-      <span class="stat-value">{{ stats()!.never_logged_in }}</span>
-      <span class="stat-label">{{ 'ADMIN.NEVER_LOGGED_IN' | translate }}</span>
+
+    <div class="warn-card" [class.expanded]="expandedCard() === 'never'">
+      <button class="warn-header" (click)="toggleCard('never')">
+        <span class="warn-value">{{ stats()!.never_logged_in.count }}</span>
+        <span class="warn-label">{{ 'ADMIN.NEVER_LOGGED_IN' | translate }}</span>
+        <span class="warn-toggle">{{ expandedCard() === 'never' ? '▲' : '▼' }}</span>
+      </button>
+      @if (expandedCard() === 'never') {
+        <ul class="warn-list">
+          @for (u of stats()!.never_logged_in.list; track u.id) {
+            <li>{{ u.first_name }} {{ u.last_name }} <span class="warn-email">{{ u.email }}</span></li>
+          } @empty {
+            <li class="warn-empty">—</li>
+          }
+        </ul>
+      }
     </div>
   </div>
 }

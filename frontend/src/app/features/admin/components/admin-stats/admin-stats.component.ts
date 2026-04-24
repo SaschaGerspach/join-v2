@@ -21,6 +21,7 @@ export class AdminStatsComponent implements OnInit {
 
   stats = signal<AdminStats | null>(null);
   loading = signal(true);
+  expandedCard = signal<string | null>(null);
 
   ngOnInit(): void {
     this.api.getStats()
@@ -29,5 +30,9 @@ export class AdminStatsComponent implements OnInit {
         next: s => { this.stats.set(s); this.loading.set(false); },
         error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_STATS'), 'error'); this.loading.set(false); },
       });
+  }
+
+  toggleCard(key: string): void {
+    this.expandedCard.set(this.expandedCard() === key ? null : key);
   }
 }

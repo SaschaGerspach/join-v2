@@ -7,14 +7,26 @@ class TrendSerializer(serializers.Serializer):
     last_week = serializers.IntegerField()
 
 
+class WarnUserSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    email = serializers.EmailField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+
+
+class WarnGroupSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+    list = WarnUserSerializer(many=True)
+
+
 class AdminStatsSerializer(serializers.Serializer):
     users = TrendSerializer()
     boards = TrendSerializer()
     tasks = TrendSerializer()
     contacts = serializers.IntegerField()
-    unverified_users = serializers.IntegerField()
-    inactive_users = serializers.IntegerField()
-    never_logged_in = serializers.IntegerField()
+    unverified_users = WarnGroupSerializer()
+    inactive_users = WarnGroupSerializer()
+    never_logged_in = WarnGroupSerializer()
 
 
 class AuditLogEntrySerializer(serializers.Serializer):

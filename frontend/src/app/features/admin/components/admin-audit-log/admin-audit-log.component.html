@@ -9,7 +9,7 @@
     >
       <option value="">{{ 'ADMIN.ALL_EVENTS' | translate }}</option>
       @for (t of eventTypes(); track t) {
-        <option [value]="t">{{ t }}</option>
+        <option [value]="t">{{ eventLabel(t) }}</option>
       }
     </select>
   </div>
@@ -35,7 +35,7 @@
             <tr>
               <td>{{ e.timestamp | date:'short' }}</td>
               <td>{{ e.user_email ?? '—' }}</td>
-              <td><span class="event-badge">{{ e.event_type }}</span></td>
+              <td><span class="event-badge">{{ eventLabel(e.event_type) }}</span></td>
               <td>{{ e.ip_address ?? '—' }}</td>
               <td class="detail-cell">{{ e.detail || '—' }}</td>
             </tr>

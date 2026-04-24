@@ -30,6 +30,10 @@ export class AdminAuditLogComponent implements OnInit {
     this.load();
   }
 
+  eventLabel(type: string): string {
+    return this.translate.instant(`ADMIN.EVENT.${type.toUpperCase()}`);
+  }
+
   onFilterChange(value: string): void {
     this.selectedType.set(value);
     this.load();

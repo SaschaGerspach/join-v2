@@ -48,20 +48,24 @@ def admin_stats(request):
     now = timezone.now()
     thirty_days_ago = now - timedelta(days=30)
 
+    def _user_list(qs):
+        return [
+            {"id": u.pk, "email": u.email, "first_name": u.first_name, "last_name": u.last_name}
+            for u in qs[:20]
+        ]
+
+    unverified_qs = User.objects.filter(is_verified=False)
+    inactive_qs = User.objects.filter(last_login__lt=thirty_days_ago)
+    never_qs = User.objects.filter(last_login__isnull=True).exclude(date_joined__gte=thirty_days_ago)
+
     return Response({
         "users": _trend(User.objects.all(), "date_joined", now),
         "boards": _trend(Board.objects.all(), "created_at", now),
         "tasks": _trend(Task.objects.all(), "created_at", now),
         "contacts": Contact.objects.count(),
-        "unverified_users": User.objects.filter(is_verified=False).count(),
-        "inactive_users": User.objects.filter(
-            last_login__lt=thirty_days_ago,
-        ).count(),
-        "never_logged_in": User.objects.filter(
-            last_login__isnull=True,
-        ).exclude(
-            date_joined__gte=thirty_days_ago,
-        ).count(),
+        "unverified_users": {"count": unverified_qs.count(), "list": _user_list(unverified_qs)},
+        "inactive_users": {"count": inactive_qs.count(), "list": _user_list(inactive_qs)},
+        "never_logged_in": {"count": never_qs.count(), "list": _user_list(never_qs)},
     })
 
 
