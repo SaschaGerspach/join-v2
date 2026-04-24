@@ -2,16 +2,13 @@
 
 A fullstack Kanban board application built with **Angular 17** and **Django REST Framework**. Features real-time collaboration via WebSockets, drag-and-drop task management, and a responsive PWA-ready interface.
 
-<!-- TODO: Add screenshots here -->
-<!-- ![Board View](docs/screenshots/board.png) -->
-
 ## Features
 
 **Boards & Tasks**
 - Drag-and-drop columns and tasks with Angular CDK
 - Task priority, due dates, assignees (multi-select), subtasks, and descriptions
 - Color-coded labels (Many-to-Many) for task categorization
-- File attachments with upload/download (max 5 MB)
+- File attachments with upload/download (max 5 MB, MIME validation)
 - Task comments with edit/delete and @-mention autocomplete
 - Markdown rendering in descriptions and comments (via marked + DOMPurify)
 - Bulk select, move, and delete tasks
@@ -26,9 +23,15 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 **Boards**
 - Board templates (Kanban, Scrum, Bug Tracking) with pre-configured columns
 - Favorite boards (star/unstar, favorites sorted first)
-- CSV export (all active tasks with columns, priority, assignees, labels, due date)
+- CSV export and import
 - Swimlane grouping within columns (by priority or assignee)
+- Saved filters (persist filter combinations per board)
 - Board activity log tracking tasks, columns, and comments (created, moved, updated, deleted)
+
+**Teams**
+- Create and manage teams with member invitations
+- Team roles: admin and member
+- Assign teams to boards for shared access
 
 **Collaboration**
 - Real-time board updates via WebSockets (Django Channels + Redis)
@@ -39,6 +42,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Account deletion with automatic board ownership transfer to next admin/editor
 
 **Views & Filters**
+- Global search across boards, tasks, and contacts
 - Monthly calendar view for tasks with due dates
 - Search, filter by priority, assignee, and due date
 - Board statistics with Chart.js (tasks per column, priority distribution)
@@ -47,39 +51,50 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 **Notifications & Automation**
 - In-app notification center with types: assignment, comment, mention
 - Real-time push via WebSocket (no page reload needed)
+- Notification preferences (in-app, email per event, daily digest)
+- Daily digest emails (Celery Beat, summary of unread notifications)
 - Automated due-date reminders (Celery Beat, hourly check, 24h window configurable via `DUE_DATE_REMINDER_HOURS`)
+
+**Admin Dashboard**
+- Overview stats with weekly trends (users, boards, tasks)
+- Warning cards for unverified, inactive, and never-logged-in users (expandable lists)
+- Audit log with filterable event types and human-readable labels
+- Board activity overview (active/inactive boards, top boards by task count)
+- Django Admin at `/manage/` (env-gated via `DJANGO_ADMIN_ENABLED`)
 
 **User Experience**
 - Dark mode with toggle and `prefers-color-scheme` detection
 - Keyboard shortcuts (`?` to show overview)
 - Board accent color picker
 - Loading spinners and error states
-- Toast notifications
+- Toast notifications with i18n (DE/EN)
 - PWA — installable with service worker
 
 **User Management**
 - User profile editing (name, email, password)
+- User avatars with upload, resize (256×256), and JPEG conversion
+- Two-factor authentication (TOTP) with QR code setup
 - Account deletion with board ownership transfer
 - Contact management (shared address book for assignees)
 
 **Authentication & Security**
-- Session-based auth with CSRF protection (HttpOnly, Secure, SameSite)
+- JWT auth with HttpOnly refresh cookie and CSRF protection
+- Two-factor authentication (TOTP/2FA) with encrypted secrets
 - Email verification on registration (with resend option)
 - Password reset via email with token-based confirmation
-- Nginx rate limiting (API: 10r/s burst 20, Auth: 3r/s burst 5)
-- Security headers: HSTS, CSP, X-Frame-Options DENY, Referrer-Policy
-- Django Admin at `/manage/` (IP-restricted via Nginx, env-gated)
+- Audit logging (login, password reset, 2FA, member changes, account deletion)
+- Security headers: HSTS, X-Frame-Options DENY, Referrer-Policy
 - Private media storage for attachments (not publicly accessible)
 
 **Infrastructure**
-- Docker Compose: Nginx, Django (Daphne/ASGI), PostgreSQL, Redis, Celery Worker, Celery Beat, Backup
+- Docker Compose: Traefik, Django (Daphne/ASGI), PostgreSQL, Redis, Celery Worker, Celery Beat, Backup
 - Resource limits per container (memory + CPU caps)
 - Automated daily PostgreSQL backups (pg_dump in dedicated container)
 - HTTPS via Traefik + Let's Encrypt (automatic certificate renewal)
 - GitHub Actions CI: ruff lint, pip-audit, npm audit, backend tests, frontend production build
 - Health check endpoint (`/health/`) for container orchestration
 - OpenAPI schema + Swagger UI + ReDoc (dev mode)
-- Lazy-loaded routes (initial bundle ~300 kB)
+- Lazy-loaded routes (initial bundle ~410 kB)
 - Gzip compression for all text assets (CSS, JS, JSON, SVG, fonts)
 
 ## Tech Stack
@@ -91,9 +106,9 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 | Task Queue | Celery 5.4 with Redis broker, Celery Beat for scheduling |
 | Database | PostgreSQL 16 |
 | Cache/WS | Redis 7 |
-| Proxy | Nginx with rate limiting and SSL termination |
+| Proxy | Traefik with automatic HTTPS via Let's Encrypt |
 | CI/CD | GitHub Actions |
-| Testing | Django TestCase (205+ tests), Playwright (E2E) |
+| Testing | Django TestCase (207 tests), Playwright (10 E2E specs) |
 
 ## Architecture
 
@@ -103,9 +118,9 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
                     └──────┬───────┘
                            │ HTTPS
                     ┌──────▼───────┐
-                    │    Nginx     │
-                    │  (SSL, Rate  │
-                    │   Limiting)  │
+                    │   Traefik    │
+                    │  (SSL, Auto  │
+                    │   Certs)     │
                     └──┬───────┬───┘
               /api/    │       │   /ws/
           ┌────────────▼─┐  ┌─▼────────────┐
@@ -184,18 +199,25 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/auth/register/` | Create account |
-| POST | `/auth/login/` | Log in (session) |
+| POST | `/auth/login/` | Log in |
 | POST | `/auth/logout/` | Log out |
+| POST | `/auth/token/refresh/` | Refresh access token |
 | GET | `/auth/me/` | Current user |
 | POST | `/auth/verify-email/` | Verify email token |
 | POST | `/auth/resend-verification/` | Resend verification email |
 | POST | `/auth/password-reset/` | Request password reset |
 | POST | `/auth/password-reset/confirm/` | Confirm reset with token |
+| POST/DELETE | `/auth/avatar/` | Upload / remove avatar |
+| POST | `/auth/totp/setup/` | Setup 2FA |
+| POST | `/auth/totp/confirm/` | Confirm 2FA setup |
+| POST | `/auth/totp/disable/` | Disable 2FA |
 | GET/PATCH/DELETE | `/users/:id/` | Profile / update / delete account |
+| GET | `/users/export/` | Export personal data |
 | GET/POST | `/boards/` | List / create boards |
 | GET/PATCH/DELETE | `/boards/:id/` | Board detail |
 | POST/DELETE | `/boards/:id/favorite/` | Favorite / unfavorite |
 | GET | `/boards/:id/export/csv/` | CSV export |
+| POST | `/boards/:id/import/csv/` | CSV import |
 | GET/POST | `/boards/:id/members/` | Board members |
 | PATCH/DELETE | `/boards/:id/members/:userId/` | Change role / remove member |
 | DELETE | `/boards/:id/members/leave/` | Leave board |
@@ -218,7 +240,16 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 | GET/POST | `/tasks/:id/time/` | Time entries |
 | DELETE | `/tasks/:id/time/:id/` | Delete time entry |
 | GET/POST | `/contacts/` | Contacts (CRUD) |
+| GET/POST | `/teams/` | List / create teams |
+| GET/PATCH/DELETE | `/teams/:id/` | Team detail |
+| GET/POST | `/teams/:id/members/` | Team members |
+| PATCH/DELETE | `/teams/:id/members/:userId/` | Member role / removal |
 | GET | `/notifications/` | User notifications |
+| POST/PATCH | `/notifications/preferences/` | Notification preferences |
+| GET | `/activity/?board=:id` | Board activity log |
+| GET | `/admin-api/stats/` | Admin stats with trends |
+| GET | `/admin-api/audit-log/` | Audit log (filterable) |
+| GET | `/admin-api/boards/` | Board activity overview |
 | GET | `/health/` | Health check |
 | WS | `/ws/board/:id/` | Real-time board events |
 | WS | `/ws/notifications/` | Real-time notification push |
@@ -228,7 +259,7 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 Frontend and backend are deployed separately:
 
 - **Frontend** (Angular build) is served as static files on the frontend host (e.g. all-inkl).
-- **Backend** (Django + Postgres + Redis + Nginx reverse proxy) runs via Docker Compose on its own server (e.g. Hostinger).
+- **Backend** (Django + Postgres + Redis + Traefik reverse proxy) runs via Docker Compose on its own server (e.g. Hostinger).
 
 The Angular app calls the backend by the absolute URL in `frontend/src/environments/environment.prod.ts`.
 
