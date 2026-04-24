@@ -81,6 +81,9 @@ def login_view(request):
         "email": user.email,
         "first_name": user.first_name,
         "last_name": user.last_name,
+        "is_staff": user.is_staff,
+        "totp_enabled": user.totp_enabled,
+        "avatar_url": request.build_absolute_uri(user.avatar.url) if user.avatar else None,
         "access": str(access),
     })
     set_refresh_cookie(response, refresh)

@@ -30,7 +30,7 @@ class MeSerializer(UserSerializer):
     avatar_url = serializers.CharField(allow_null=True)
 
 
-class LoginResponseSerializer(UserSerializer):
+class LoginResponseSerializer(MeSerializer):
     access = serializers.CharField()
 
 
