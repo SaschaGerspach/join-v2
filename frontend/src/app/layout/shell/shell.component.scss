@@ -245,7 +245,8 @@ $bp-tablet:         1024px;
   position: absolute;
   top: calc(100% + 0.5rem);
   right: 0;
-  background-color: var(--color-dark);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 0.5rem 0;
   min-width: 140px;
@@ -256,7 +257,7 @@ $bp-tablet:         1024px;
     display: block;
     width: 100%;
     padding: 0.6rem 1.2rem;
-    color: $color-white;
+    color: var(--color-text);
     font-size: 0.9rem;
     text-align: left;
     background: none;
@@ -266,7 +267,7 @@ $bp-tablet:         1024px;
     transition: background-color 0.15s ease;
 
     &:hover {
-      background-color: $color-dark-hover;
+      background-color: var(--color-bg);
     }
   }
 }
