@@ -10,13 +10,20 @@ from notifications_api.models import Notification
 from ..models import Comment
 
 
+_UNSUBSCRIBE_HINT = (
+    "\n\n---\n"
+    "To change your notification settings, visit your profile: "
+    f"{settings.FRONTEND_URL}/profile"
+)
+
+
 def _notify(subject, body, recipients):
     recipients = [r for r in {r.strip().lower() for r in recipients if r} if r]
     if not recipients:
         return
     send_mail_async(
         subject=subject,
-        message=body,
+        message=body + _UNSUBSCRIBE_HINT,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipients,
     )

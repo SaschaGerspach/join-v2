@@ -62,6 +62,9 @@
         <li>{{ 'PRIVACY.RIGHT_OBJECTION' | translate }}</li>
       </ul>
 
+      <h2>{{ 'PRIVACY.THIRD_PARTY_DATA_TITLE' | translate }}</h2>
+      <p>{{ 'PRIVACY.THIRD_PARTY_DATA_TEXT' | translate }}</p>
+
       <h2>{{ 'PRIVACY.THIRD_PARTIES_TITLE' | translate }}</h2>
       <p>{{ 'PRIVACY.THIRD_PARTIES_TEXT' | translate }}</p>
 
@@ -70,7 +73,7 @@
     </div>
 
     <div class="legal-actions">
-      <a routerLink="/login" class="btn-back">{{ 'PRIVACY.BACK' | translate }}</a>
+      <button class="btn-back" (click)="goBack()">{{ 'PRIVACY.BACK' | translate }}</button>
     </div>
   </div>
 </div>

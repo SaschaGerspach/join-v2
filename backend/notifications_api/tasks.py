@@ -35,6 +35,8 @@ def send_daily_digest():
             f"You have {len(lines)} unread notification(s) from the last 24 hours:\n\n"
             + "\n".join(lines)
             + f"\n\nLog in to see details: {settings.FRONTEND_URL}/boards"
+            + f"\n\n---\nTo change your notification settings, visit your profile: "
+            f"{settings.FRONTEND_URL}/profile"
         )
 
         send_mail_async(

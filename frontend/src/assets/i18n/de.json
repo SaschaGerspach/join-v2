@@ -574,6 +574,8 @@
     "RIGHT_DELETION": "Löschung — Löschung Ihres Kontos und Ihrer Daten",
     "RIGHT_PORTABILITY": "Datenübertragbarkeit — Export Ihrer Daten (verfügbar in Ihrem Profil)",
     "RIGHT_OBJECTION": "Widerspruch — Widerspruch gegen die Datenverarbeitung",
+    "THIRD_PARTY_DATA_TITLE": "Daten Dritter (Kontakte)",
+    "THIRD_PARTY_DATA_TEXT": "Die App ermöglicht es Ihnen, Kontaktdaten anderer Personen (Name, E-Mail, Telefon) zu speichern. Sie sind dafür verantwortlich, dass Sie die Einwilligung der betroffenen Personen haben oder eine andere Rechtsgrundlage für die Eingabe dieser Daten besteht. Bei Löschung Ihres Kontos werden auch alle von Ihnen angelegten Kontakte gelöscht.",
     "THIRD_PARTIES_TITLE": "Weitergabe an Dritte",
     "THIRD_PARTIES_TEXT": "Ihre Daten werden nicht an Dritte weitergegeben. Die Anwendung verwendet keine externen Analyse-, Tracking- oder Werbedienste.",
     "CONTACT_TITLE": "Kontakt",

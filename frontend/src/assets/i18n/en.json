@@ -574,6 +574,8 @@
     "RIGHT_DELETION": "Erasure — Delete your account and data",
     "RIGHT_PORTABILITY": "Data portability — Export your data (available in your profile)",
     "RIGHT_OBJECTION": "Objection — Object to data processing",
+    "THIRD_PARTY_DATA_TITLE": "Third-Party Data (Contacts)",
+    "THIRD_PARTY_DATA_TEXT": "The app allows you to store contact data of other people (name, email, phone). You are responsible for ensuring that you have the consent of the persons concerned or another legal basis for entering this data. When your account is deleted, all contacts you created are also deleted.",
     "THIRD_PARTIES_TITLE": "Third Parties",
     "THIRD_PARTIES_TEXT": "Your data is not shared with third parties. The application does not use any external analytics, tracking, or advertising services.",
     "CONTACT_TITLE": "Contact",
