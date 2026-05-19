@@ -172,9 +172,7 @@
     }
 
 <div class="form-actions">
-      @if (isAdmin()) {
-        <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">{{ 'PROFILE.DELETE_ACCOUNT' | translate }}</button>
-      }
+      <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">{{ 'PROFILE.DELETE_ACCOUNT' | translate }}</button>
       <button class="btn-export" (click)="exportData()">{{ 'PROFILE.EXPORT_DATA' | translate }}</button>
       <button class="btn-save" [disabled]="saving()" (click)="save()">
         {{ saving() ? ('PROFILE.SAVING' | translate) : ('PROFILE.SAVE' | translate) }}

@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken as RefreshTokenClass
 
+import uuid
+
 from auth_api.views._helpers import clear_refresh_cookie
 from boards_api.models import Board, BoardMember
 from config.serializers import DetailSerializer
@@ -110,10 +112,10 @@ def user_detail(request, pk):
         return Response(serialize_user(user))
 
     if request.method == "DELETE":
-        if not request.user.is_staff:
-            return Response({"detail": "Only admins can delete accounts."}, status=status.HTTP_403_FORBIDDEN)
+        if request.user.pk != pk and not request.user.is_staff:
+            return Response({"detail": "You can only delete your own account."}, status=status.HTTP_403_FORBIDDEN)
 
-        # Transfer ownership to the longest-standing member; if no members exist, delete the board entirely.
+        original_email = user.email
         with transaction.atomic():
             for board in Board.objects.select_for_update().filter(created_by=user):
                 successor = (
@@ -125,15 +127,35 @@ def user_detail(request, pk):
                 if successor:
                     board.created_by = successor.user
                     board.save(update_fields=["created_by"])
-                    # Remove membership row since the successor is now the owner (implicit role).
                     successor.delete()
                 else:
                     board.title = f"[Deleted User] {board.title}"
                     board.save(update_fields=["title"])
             BoardMember.objects.filter(user=user).delete()
+
+            from teams_api.models import Team, TeamMember
+            for team in Team.objects.select_for_update().filter(created_by=user):
+                successor = TeamMember.objects.filter(team=team).order_by("joined_at").first()
+                if successor:
+                    team.created_by = successor.user
+                    team.save(update_fields=["created_by"])
+                    successor.delete()
+                else:
+                    team.delete()
+            TeamMember.objects.filter(user=user).delete()
+
+            anon_id = uuid.uuid4().hex[:8]
+            user.email = f"deleted-{anon_id}@anonymized.local"
+            user.first_name = "Deleted"
+            user.last_name = "User"
             user.is_active = False
-            user.save(update_fields=["is_active"])
-        log_audit("account_deleted", user=user, request=request, detail=f"email={user.email}")
+            user.set_unusable_password()
+            if hasattr(user, "totp_secret"):
+                user.totp_secret = ""
+            if hasattr(user, "avatar"):
+                user.avatar = ""
+            user.save()
+        log_audit("account_deleted", user=user, request=request, detail=f"email={original_email}")
 
         for token in OutstandingToken.objects.filter(user=user):
             try:
