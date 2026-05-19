@@ -112,6 +112,22 @@
         }
       </div>
 
+      <div class="form-group consent-group">
+        <label class="consent-label">
+          <input
+            type="checkbox"
+            [(ngModel)]="acceptedPrivacy"
+            name="acceptedPrivacy"
+            required
+            #privacyField="ngModel"
+          />
+          <span [innerHTML]="'AUTH.ACCEPT_PRIVACY' | translate"></span>
+        </label>
+        @if (privacyField.invalid && (privacyField.touched || f.submitted)) {
+          <span class="field-error">{{ 'AUTH.PRIVACY_REQUIRED' | translate }}</span>
+        }
+      </div>
+
       @if (error()) {
         <p class="error-message" role="alert">{{ error() }}</p>
       }

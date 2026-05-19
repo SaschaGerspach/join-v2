@@ -76,7 +76,9 @@
     "TOGGLE_PASSWORD": "Passwort ein-/ausblenden",
     "STRENGTH_WEAK": "schwach",
     "STRENGTH_MEDIUM": "mittel",
-    "STRENGTH_STRONG": "stark"
+    "STRENGTH_STRONG": "stark",
+    "ACCEPT_PRIVACY": "Ich habe die <a href='/privacy' target='_blank'>Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Daten zu.",
+    "PRIVACY_REQUIRED": "Sie müssen der Datenschutzerklärung zustimmen."
   },
   "BOARDS": {
     "MY_BOARDS": "Meine Boards",

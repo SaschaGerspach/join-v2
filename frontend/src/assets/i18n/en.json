@@ -76,7 +76,9 @@
     "TOGGLE_PASSWORD": "Toggle password visibility",
     "STRENGTH_WEAK": "weak",
     "STRENGTH_MEDIUM": "medium",
-    "STRENGTH_STRONG": "strong"
+    "STRENGTH_STRONG": "strong",
+    "ACCEPT_PRIVACY": "I have read the <a href='/privacy' target='_blank'>Privacy Policy</a> and agree to the processing of my data.",
+    "PRIVACY_REQUIRED": "You must accept the privacy policy."
   },
   "BOARDS": {
     "MY_BOARDS": "My Boards",

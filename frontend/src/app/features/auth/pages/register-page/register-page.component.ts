@@ -27,6 +27,7 @@ export class RegisterPageComponent {
   lastName = '';
   email = '';
   password = '';
+  acceptedPrivacy = false;
   error = signal<string | null>(null);
   showPassword = signal(false);
   submitting = signal(false);
