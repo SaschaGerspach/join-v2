@@ -152,8 +152,11 @@ def user_detail(request, pk):
             user.set_unusable_password()
             if hasattr(user, "totp_secret"):
                 user.totp_secret = ""
-            if hasattr(user, "avatar"):
-                user.avatar = ""
+            if user.avatar:
+                try:
+                    user.avatar.delete(save=False)
+                except Exception:
+                    logger.warning("Failed to delete avatar file for user %s", user.pk)
             user.save()
         log_audit("account_deleted", user=user, request=request, detail=f"email={original_email}")
 

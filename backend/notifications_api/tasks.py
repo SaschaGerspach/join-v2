@@ -39,11 +39,16 @@ def send_daily_digest():
             f"{settings.FRONTEND_URL}/profile"
         )
 
+        profile_url = f"{settings.FRONTEND_URL}/profile"
         send_mail_async(
             subject=f"Your daily digest — {len(lines)} notification(s) | Join",
             message=body,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[pref.user.email],
+            headers={
+                "List-Unsubscribe": f"<{profile_url}>",
+                "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            },
         )
         sent_count += 1
 

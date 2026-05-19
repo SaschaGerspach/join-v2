@@ -10,11 +10,15 @@ from notifications_api.models import Notification
 from ..models import Comment
 
 
+_PROFILE_URL = f"{settings.FRONTEND_URL}/profile"
 _UNSUBSCRIBE_HINT = (
     "\n\n---\n"
-    "To change your notification settings, visit your profile: "
-    f"{settings.FRONTEND_URL}/profile"
+    f"To change your notification settings, visit your profile: {_PROFILE_URL}"
 )
+_UNSUBSCRIBE_HEADERS = {
+    "List-Unsubscribe": f"<{_PROFILE_URL}>",
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+}
 
 
 def _notify(subject, body, recipients):
@@ -26,6 +30,7 @@ def _notify(subject, body, recipients):
         message=body + _UNSUBSCRIBE_HINT,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipients,
+        headers=_UNSUBSCRIBE_HEADERS,
     )
 
 

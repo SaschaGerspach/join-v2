@@ -565,6 +565,8 @@
     "COOKIE_CSRF": "CSRF-Cookie — zum Schutz vor Cross-Site-Request-Forgery",
     "COOKIE_REFRESH": "Refresh-Token-Cookie — für die automatische Sitzungsverlängerung",
     "COOKIES_NO_TRACKING": "Es werden keine Tracking- oder Analyse-Cookies verwendet.",
+    "LOCAL_STORAGE_TITLE": "Lokaler Speicher (localStorage)",
+    "LOCAL_STORAGE_TEXT": "Join speichert Ihre Sprach- und Darstellungseinstellungen sowie Filter-Präferenzen lokal in Ihrem Browser. Bei fehlender Internetverbindung werden ausstehende Änderungen temporär im Browser zwischengespeichert und nach Wiederherstellung der Verbindung automatisch synchronisiert und gelöscht. Es werden keine personenbezogenen Daten dauerhaft im Browser gespeichert.",
     "STORAGE_TITLE": "Speicherdauer",
     "STORAGE_TEXT": "Ihre Daten werden gespeichert, solange Ihr Konto aktiv ist. Audit-Protokolle werden nach 90 Tagen automatisch gelöscht. Bei Kontolöschung werden Ihre personenbezogenen Daten anonymisiert.",
     "RIGHTS_TITLE": "Ihre Rechte",

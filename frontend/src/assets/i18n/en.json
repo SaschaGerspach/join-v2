@@ -565,6 +565,8 @@
     "COOKIE_CSRF": "CSRF cookie — for protection against cross-site request forgery",
     "COOKIE_REFRESH": "Refresh token cookie — for automatic session renewal",
     "COOKIES_NO_TRACKING": "No tracking or analytics cookies are used.",
+    "LOCAL_STORAGE_TITLE": "Local Storage",
+    "LOCAL_STORAGE_TEXT": "Join stores your language and display preferences as well as filter settings locally in your browser. When offline, pending changes are temporarily stored in the browser and automatically synchronized and deleted once the connection is restored. No personal data is permanently stored in the browser.",
     "STORAGE_TITLE": "Data Retention",
     "STORAGE_TEXT": "Your data is stored as long as your account is active. Audit logs are automatically deleted after 90 days. When you delete your account, your personal data is anonymized.",
     "RIGHTS_TITLE": "Your Rights",
