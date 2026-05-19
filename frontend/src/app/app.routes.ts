@@ -11,6 +11,9 @@ export const routes: Routes = [
     {path: 'verify-email-sent', title: 'Verify Email | Join', loadComponent: () => import('./features/auth/pages/verify-email-sent-page/verify-email-sent-page.component').then(m => m.VerifyEmailSentPageComponent)},
     {path: 'verify-email/:uid/:token', title: 'Verify Email | Join', loadComponent: () => import('./features/auth/pages/verify-email-page/verify-email-page.component').then(m => m.VerifyEmailPageComponent)},
 
+    {path: 'privacy', title: 'Privacy Policy | Join', loadComponent: () => import('./features/legal/privacy-page.component').then(m => m.PrivacyPageComponent)},
+    {path: 'legal', title: 'Legal Notice | Join', loadComponent: () => import('./features/legal/legal-notice-page.component').then(m => m.LegalNoticePageComponent)},
+
     {
         path: '',
         component: ShellComponent,

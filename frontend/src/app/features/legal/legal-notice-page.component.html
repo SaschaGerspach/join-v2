@@ -1,0 +1,33 @@
+<div class="legal-page">
+  <div class="legal-logo">
+    <span>Join</span>
+  </div>
+
+  <div class="legal-card">
+    <select class="legal-lang-select" [ngModel]="lang.currentLang()" (ngModelChange)="lang.setLanguage($event)">
+      <option value="en">EN</option>
+      <option value="de">DE</option>
+    </select>
+
+    <h1>{{ 'LEGAL.TITLE' | translate }}</h1>
+    <div class="legal-divider"></div>
+
+    <div class="legal-content">
+      <h2>{{ 'LEGAL.RESPONSIBLE_TITLE' | translate }}</h2>
+      <p [innerHTML]="'LEGAL.RESPONSIBLE_TEXT' | translate"></p>
+
+      <h2>{{ 'LEGAL.CONTACT_TITLE' | translate }}</h2>
+      <p [innerHTML]="'LEGAL.CONTACT_TEXT' | translate"></p>
+
+      <h2>{{ 'LEGAL.DISCLAIMER_TITLE' | translate }}</h2>
+      <p>{{ 'LEGAL.DISCLAIMER_TEXT' | translate }}</p>
+
+      <h2>{{ 'LEGAL.COPYRIGHT_TITLE' | translate }}</h2>
+      <p>{{ 'LEGAL.COPYRIGHT_TEXT' | translate }}</p>
+    </div>
+
+    <div class="legal-actions">
+      <a routerLink="/login" class="btn-back">{{ 'LEGAL.BACK' | translate }}</a>
+    </div>
+  </div>
+</div>

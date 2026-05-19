@@ -188,3 +188,22 @@
     }
   }
 }
+
+.auth-legal-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+
+  a {
+    font-size: 0.8rem;
+    color: var(--color-muted, #999);
+    text-decoration: none;
+
+    &:hover {
+      color: $color-primary;
+    }
+  }
+}

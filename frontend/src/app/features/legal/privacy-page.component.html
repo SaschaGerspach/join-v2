@@ -1,0 +1,76 @@
+<div class="legal-page">
+  <div class="legal-logo">
+    <span>Join</span>
+  </div>
+
+  <div class="legal-card">
+    <select class="legal-lang-select" [ngModel]="lang.currentLang()" (ngModelChange)="lang.setLanguage($event)">
+      <option value="en">EN</option>
+      <option value="de">DE</option>
+    </select>
+
+    <h1>{{ 'PRIVACY.TITLE' | translate }}</h1>
+    <div class="legal-divider"></div>
+
+    <div class="legal-content">
+      <p class="legal-updated">{{ 'PRIVACY.LAST_UPDATED' | translate }}</p>
+
+      <h2>{{ 'PRIVACY.RESPONSIBLE_TITLE' | translate }}</h2>
+      <p [innerHTML]="'PRIVACY.RESPONSIBLE_TEXT' | translate"></p>
+
+      <h2>{{ 'PRIVACY.DATA_COLLECTION_TITLE' | translate }}</h2>
+      <p>{{ 'PRIVACY.DATA_COLLECTION_TEXT' | translate }}</p>
+      <ul>
+        <li>{{ 'PRIVACY.DATA_NAME' | translate }}</li>
+        <li>{{ 'PRIVACY.DATA_EMAIL' | translate }}</li>
+        <li>{{ 'PRIVACY.DATA_PASSWORD' | translate }}</li>
+        <li>{{ 'PRIVACY.DATA_IP' | translate }}</li>
+        <li>{{ 'PRIVACY.DATA_USAGE' | translate }}</li>
+      </ul>
+
+      <h2>{{ 'PRIVACY.PURPOSE_TITLE' | translate }}</h2>
+      <p>{{ 'PRIVACY.PURPOSE_TEXT' | translate }}</p>
+      <ul>
+        <li>{{ 'PRIVACY.PURPOSE_ACCOUNT' | translate }}</li>
+        <li>{{ 'PRIVACY.PURPOSE_SERVICE' | translate }}</li>
+        <li>{{ 'PRIVACY.PURPOSE_SECURITY' | translate }}</li>
+        <li>{{ 'PRIVACY.PURPOSE_NOTIFICATIONS' | translate }}</li>
+      </ul>
+
+      <h2>{{ 'PRIVACY.LEGAL_BASIS_TITLE' | translate }}</h2>
+      <p [innerHTML]="'PRIVACY.LEGAL_BASIS_TEXT' | translate"></p>
+
+      <h2>{{ 'PRIVACY.COOKIES_TITLE' | translate }}</h2>
+      <p>{{ 'PRIVACY.COOKIES_TEXT' | translate }}</p>
+      <ul>
+        <li>{{ 'PRIVACY.COOKIE_SESSION' | translate }}</li>
+        <li>{{ 'PRIVACY.COOKIE_CSRF' | translate }}</li>
+        <li>{{ 'PRIVACY.COOKIE_REFRESH' | translate }}</li>
+      </ul>
+      <p>{{ 'PRIVACY.COOKIES_NO_TRACKING' | translate }}</p>
+
+      <h2>{{ 'PRIVACY.STORAGE_TITLE' | translate }}</h2>
+      <p>{{ 'PRIVACY.STORAGE_TEXT' | translate }}</p>
+
+      <h2>{{ 'PRIVACY.RIGHTS_TITLE' | translate }}</h2>
+      <p>{{ 'PRIVACY.RIGHTS_TEXT' | translate }}</p>
+      <ul>
+        <li>{{ 'PRIVACY.RIGHT_ACCESS' | translate }}</li>
+        <li>{{ 'PRIVACY.RIGHT_RECTIFICATION' | translate }}</li>
+        <li>{{ 'PRIVACY.RIGHT_DELETION' | translate }}</li>
+        <li>{{ 'PRIVACY.RIGHT_PORTABILITY' | translate }}</li>
+        <li>{{ 'PRIVACY.RIGHT_OBJECTION' | translate }}</li>
+      </ul>
+
+      <h2>{{ 'PRIVACY.THIRD_PARTIES_TITLE' | translate }}</h2>
+      <p>{{ 'PRIVACY.THIRD_PARTIES_TEXT' | translate }}</p>
+
+      <h2>{{ 'PRIVACY.CONTACT_TITLE' | translate }}</h2>
+      <p [innerHTML]="'PRIVACY.CONTACT_TEXT' | translate"></p>
+    </div>
+
+    <div class="legal-actions">
+      <a routerLink="/login" class="btn-back">{{ 'PRIVACY.BACK' | translate }}</a>
+    </div>
+  </div>
+</div>
