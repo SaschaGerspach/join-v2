@@ -172,14 +172,18 @@ def user_detail(request, pk):
 @api_view(["GET"])
 def data_export(request):
     user = request.user
-    from tasks_api.models import Task, Comment
+    from tasks_api.models import Task, Comment, TimeEntry
     from contacts_api.models import Contact
     from notifications_api.models import Notification
+    from teams_api.models import Team, TeamMember
+    from activity_api.models import ActivityEntry
+    from audit_api.models import AuditLog
 
     boards = list(Board.objects.filter(Q(created_by=user) | Q(members__user=user)).distinct().values(
         "id", "title", "color", "created_at"
     ))
-    tasks = list(Task.objects.filter(board__in=[b["id"] for b in boards]).values(
+    board_ids = [b["id"] for b in boards]
+    tasks = list(Task.objects.filter(board__in=board_ids).values(
         "id", "board_id", "title", "description", "priority", "due_date", "created_at"
     ))
     comments = list(Comment.objects.filter(author=user).values(
@@ -190,6 +194,23 @@ def data_export(request):
     ))
     notifications = list(Notification.objects.filter(recipient=user).order_by("-created_at")[:200].values(
         "id", "type", "message", "is_read", "created_at"
+    ))
+    time_entries = list(TimeEntry.objects.filter(user=user).values(
+        "id", "task_id", "duration_minutes", "note", "logged_at"
+    ))
+    team_ids = list(
+        TeamMember.objects.filter(user=user).values_list("team_id", flat=True)
+    ) + list(
+        Team.objects.filter(created_by=user).values_list("id", flat=True)
+    )
+    teams = list(Team.objects.filter(id__in=set(team_ids)).values(
+        "id", "name", "created_at"
+    ))
+    activity = list(ActivityEntry.objects.filter(user=user).order_by("-created_at")[:500].values(
+        "id", "board_id", "action", "entity_type", "entity_title", "details", "created_at"
+    ))
+    audit_logs = list(AuditLog.objects.filter(user=user).order_by("-created_at")[:500].values(
+        "id", "event_type", "detail", "created_at"
     ))
 
     data = {
@@ -205,5 +226,9 @@ def data_export(request):
         "comments": comments,
         "contacts": contacts,
         "notifications": notifications,
+        "time_entries": time_entries,
+        "teams": teams,
+        "activity": activity,
+        "audit_logs": audit_logs,
     }
     return Response(data)
