@@ -160,7 +160,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do pg_dump -h db -U $$POSTGRES_USER $$POSTGRES_DB > /backups/backup_$$(date +%Y%m%d_%H%M%S).sql; sleep 24h & wait $${!}; done;'"
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do pg_dump -h db -U $$POSTGRES_USER $$POSTGRES_DB > /backups/backup_$$(date +%Y%m%d_%H%M%S).sql; find /backups -name \"backup_*.sql\" -mtime +30 -delete; sleep 24h & wait $${!}; done;'"
 
 networks:
   default:
