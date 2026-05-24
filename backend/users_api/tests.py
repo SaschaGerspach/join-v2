@@ -70,9 +70,10 @@ class UserDetailTests(APITestCase):
         self.user.refresh_from_db()
         self.assertEqual(self.user.email, "a@example.com")
 
-    def test_delete_requires_staff(self):
+    def test_delete_own_account(self):
         response = self.client.delete(self.url(self.user.pk))
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(User.objects.get(pk=self.user.pk).is_active)
 
     def test_delete_other_account_forbidden(self):
         response = self.client.delete(self.url(self.other.pk))
