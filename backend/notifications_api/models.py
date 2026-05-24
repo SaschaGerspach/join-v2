@@ -7,6 +7,7 @@ class Notification(models.Model):
         ASSIGNMENT = "assignment"
         COMMENT = "comment"
         MENTION = "mention"
+        AUTOMATION = "automation"
 
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL,

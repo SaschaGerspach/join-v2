@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from automations_api import views as automation_views
 from tasks_api import views as task_views
 
 app_name = "boards_api"
@@ -17,4 +18,8 @@ urlpatterns = [
     path("<int:board_pk>/labels/<int:pk>/", task_views.label_detail, name="label-detail"),
     path("<int:board_pk>/fields/", task_views.custom_field_list, name="custom-field-list"),
     path("<int:board_pk>/fields/<int:pk>/", task_views.custom_field_detail, name="custom-field-detail"),
+    path("<int:board_pk>/automations/", automation_views.rule_list, name="automation-list"),
+    path("<int:board_pk>/automations/logs/", automation_views.automation_logs, name="automation-logs"),
+    path("<int:board_pk>/automations/<int:pk>/", automation_views.rule_detail, name="automation-detail"),
+    path("<int:board_pk>/automations/<int:pk>/toggle/", automation_views.rule_toggle, name="automation-toggle"),
 ]

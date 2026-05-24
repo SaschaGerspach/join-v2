@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'teams_api',
     'audit_api',
     'admin_api',
+    'automations_api',
 ]
 
 MIDDLEWARE = [
@@ -387,6 +388,10 @@ CELERY_BEAT_SCHEDULE = {
     'cleanup-audit-logs': {
         'task': 'audit_api.tasks.cleanup_old_audit_logs',
         'schedule': crontab(hour=3, minute=0),
+    },
+    'check-automation-deadlines': {
+        'task': 'automations_api.tasks.check_deadline_rules',
+        'schedule': 900,
     },
 }
 

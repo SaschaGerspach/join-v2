@@ -110,6 +110,8 @@ def board_list(request):
         Column.objects.bulk_create([
             Column(board=board, title=t, order=i) for i, t in enumerate(columns)
         ])
+    from automations_api.defaults import create_default_rules
+    create_default_rules(board, request.user)
     return Response(serialize_board(board), status=status.HTTP_201_CREATED)
 
 

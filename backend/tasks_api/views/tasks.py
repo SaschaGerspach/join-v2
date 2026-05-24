@@ -20,6 +20,7 @@ from ..serializers import (
     TaskUpdateSerializer,
 )
 from activity_api.helpers import log_activity
+from ..signals import task_created as task_created_signal, task_moved, task_priority_changed, task_label_added
 from ._helpers import create_next_recurring_task, serialize_task
 from ._notifications import _notify_assignments
 
@@ -90,6 +91,7 @@ def task_list(request):
     log_activity(board, request.user, "created", "task", task.title, task=task)
     data = serialize_task(task)
     send_board_event(board.pk, "task_created", data)
+    task_created_signal.send(sender=Task, task=task)
     return Response(data, status=status.HTTP_201_CREATED)
 
 
@@ -138,6 +140,7 @@ def task_detail(request, pk):
                 return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
         previous_assignee_ids = set(task.assignees.values_list("pk", flat=True))
         previous_column_id = task.column_id
+        previous_priority = task.priority
         changed_fields = []
         for field in ["title", "description", "priority", "column", "due_date", "recurrence", "order"]:
             key = f"{field}_id" if field == "column" else field
@@ -150,6 +153,7 @@ def task_detail(request, pk):
             new_assignee_ids = set(data["assigned_to"])
             task.assignees.set(new_assignee_ids)
             _notify_assignments(task, previous_assignee_ids, new_assignee_ids, request.user)
+        previous_label_ids = set(task.labels.values_list("pk", flat=True)) if "label_ids" in data else set()
         if "label_ids" in data:
             task.labels.set(Label.objects.filter(pk__in=data["label_ids"], board=task.board))
         if task.column_id != previous_column_id:
@@ -158,6 +162,14 @@ def task_detail(request, pk):
             log_activity(task.board, request.user, "updated", "task", task.title, task=task)
         data = serialize_task(task)
         send_board_event(task.board_id, "task_updated", data)
+        if task.column_id != previous_column_id:
+            task_moved.send(sender=Task, task=task, column_id=task.column_id)
+        if "priority" in changed_fields and task.priority != previous_priority:
+            task_priority_changed.send(sender=Task, task=task, priority=task.priority)
+        if "label_ids" in request.data:
+            new_label_ids = set(task.labels.values_list("pk", flat=True))
+            for lid in new_label_ids - previous_label_ids:
+                task_label_added.send(sender=Task, task=task, label_id=lid)
         return Response(data)
 
     # Soft-delete: archive instead of destroying so tasks can be restored.
@@ -206,6 +218,7 @@ def task_reorder(request):
         for col_id, bid in Column.objects.filter(board_id__in=board_ids).values_list("pk", "board_id"):
             columns_by_board.setdefault(bid, set()).add(col_id)
 
+        previous_columns = {t.pk: t.column_id for t in fetched}
         for item in items:
             task = tasks.get(item.get("id"))
             if not task:
@@ -229,6 +242,10 @@ def task_reorder(request):
     for bid in board_ids:
         board_tasks = [serialize_task(refreshed[pk]) for pk in tasks if refreshed[pk].board_id == bid]
         send_board_event(bid, "tasks_reordered", board_tasks)
+
+    for pk, t in refreshed.items():
+        if t.column_id != previous_columns.get(pk):
+            task_moved.send(sender=Task, task=t, column_id=t.column_id)
 
     return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -287,6 +304,7 @@ def task_duplicate(request, pk):
     log_activity(task.board, request.user, "created", "task", new_task.title, task=new_task)
     data = serialize_task(new_task)
     send_board_event(task.board_id, "task_created", data)
+    task_created_signal.send(sender=Task, task=new_task)
     return Response(data, status=status.HTTP_201_CREATED)
 
 

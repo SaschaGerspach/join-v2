@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from boards_api.permissions import can_access_board, can_edit_board
 from config.serializers import DetailSerializer
 from ..models import Task, Subtask
+from ..signals import all_subtasks_completed
 from ..serializers import (
     SubtaskCreateSerializer,
     SubtaskSerializer,
@@ -87,6 +88,8 @@ def subtask_detail(request, task_pk, pk):
         if "done" in data:
             subtask.done = data["done"]
         subtask.save()
+        if subtask.done and not subtask.task.subtasks.filter(done=False).exists():
+            all_subtasks_completed.send(sender=Subtask, task=subtask.task)
         return Response(serialize_subtask(subtask))
 
     subtask.delete()
