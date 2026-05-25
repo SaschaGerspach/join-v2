@@ -461,6 +461,15 @@
     "NAV_TASKS": "Zwischen Aufgaben navigieren",
     "OPEN_TASK": "Fokussierte Aufgabe öffnen"
   },
+  "SW_UPDATE": {
+    "AVAILABLE": "Eine neue Version ist verfügbar.",
+    "RELOAD": "Jetzt aktualisieren"
+  },
+  "INSTALL": {
+    "PROMPT": "Installiere Join als App für schnellen Zugriff.",
+    "INSTALL": "Installieren",
+    "DISMISS": "Nicht jetzt"
+  },
   "COMMON": {
     "CANCEL": "Abbrechen",
     "DELETE": "Löschen",

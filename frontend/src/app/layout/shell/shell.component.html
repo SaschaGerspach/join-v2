@@ -142,6 +142,8 @@
 
 <app-toast />
 <app-offline-banner />
+<app-sw-update-banner />
+<app-install-prompt />
 
 @if (showShortcuts()) {
   <app-keyboard-shortcuts-modal (closed)="showShortcuts.set(false)" />

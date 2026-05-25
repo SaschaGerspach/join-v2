@@ -57,6 +57,36 @@
         "strategy": "freshness",
         "timeout": "5s"
       }
+    },
+    {
+      "name": "api-columns",
+      "urls": ["/boards/*/columns/"],
+      "cacheConfig": {
+        "maxSize": 100,
+        "maxAge": "1h",
+        "strategy": "freshness",
+        "timeout": "5s"
+      }
+    },
+    {
+      "name": "api-labels",
+      "urls": ["/boards/*/labels/"],
+      "cacheConfig": {
+        "maxSize": 100,
+        "maxAge": "1h",
+        "strategy": "freshness",
+        "timeout": "5s"
+      }
+    },
+    {
+      "name": "api-teams",
+      "urls": ["/teams/", "/teams/*/"],
+      "cacheConfig": {
+        "maxSize": 20,
+        "maxAge": "1h",
+        "strategy": "freshness",
+        "timeout": "5s"
+      }
     }
   ]
 }

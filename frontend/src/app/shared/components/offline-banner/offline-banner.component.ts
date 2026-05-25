@@ -10,8 +10,8 @@ import { OfflineQueueService } from '../../../core/offline/offline-queue.service
     @if (offline()) {
       <div class="offline-banner" role="alert">
         {{ 'COMMON.OFFLINE' | translate }}
-        @if (queue.pendingCount > 0) {
-          <span class="queue-count">({{ queue.pendingCount }} {{ 'COMMON.PENDING' | translate }})</span>
+        @if (queue.pendingCount() > 0) {
+          <span class="queue-count">({{ queue.pendingCount() }} {{ 'COMMON.PENDING' | translate }})</span>
         }
       </div>
     }

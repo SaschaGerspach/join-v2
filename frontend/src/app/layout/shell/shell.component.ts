@@ -10,13 +10,15 @@ import { NotificationService } from '../../core/notifications/notification.servi
 import { KeyboardShortcutsModalComponent } from '../../shared/components/keyboard-shortcuts-modal/keyboard-shortcuts-modal.component';
 import { GlobalSearchComponent } from '../../shared/components/global-search/global-search.component';
 import { OfflineBannerComponent } from '../../shared/components/offline-banner/offline-banner.component';
+import { SwUpdateBannerComponent } from '../../shared/components/sw-update-banner/sw-update-banner.component';
+import { InstallPromptComponent } from '../../shared/components/install-prompt/install-prompt.component';
 import { UserAvatarComponent } from '../../shared/components/user-avatar/user-avatar.component';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterModule, DatePipe, FormsModule, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent, OfflineBannerComponent, UserAvatarComponent, TranslateModule],
+  imports: [RouterModule, DatePipe, FormsModule, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent, OfflineBannerComponent, SwUpdateBannerComponent, InstallPromptComponent, UserAvatarComponent, TranslateModule],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

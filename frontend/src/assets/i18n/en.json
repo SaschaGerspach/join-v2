@@ -461,6 +461,15 @@
     "NAV_TASKS": "Navigate between tasks",
     "OPEN_TASK": "Open focused task"
   },
+  "SW_UPDATE": {
+    "AVAILABLE": "A new version is available.",
+    "RELOAD": "Update now"
+  },
+  "INSTALL": {
+    "PROMPT": "Install Join as an app for quick access.",
+    "INSTALL": "Install",
+    "DISMISS": "Not now"
+  },
   "COMMON": {
     "CANCEL": "Cancel",
     "DELETE": "Delete",
