@@ -29,7 +29,10 @@ export class TaskLabelsComponent implements OnInit {
   ngOnInit(): void {
     this.labelsApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(labels => this.boardLabels.set(labels));
+      .subscribe({
+        next: labels => this.boardLabels.set(labels),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_LABELS'), 'error'),
+      });
   }
 
   toggleLabel(labelId: number): void {

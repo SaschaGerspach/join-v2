@@ -2,6 +2,6 @@
 
 @if (!auth.authChecked()) {
   <div class="app-loading-overlay">
-    <p>Session wird geprüft…</p>
+    <p>{{ 'COMMON.SESSION_CHECK' | translate }}</p>
   </div>
 }

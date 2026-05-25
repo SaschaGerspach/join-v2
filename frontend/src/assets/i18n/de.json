@@ -530,7 +530,8 @@
     "MONTH": "Monat",
     "NO_DATED_TASKS": "Keine Aufgaben mit Datum gefunden. Setze Start- oder Fälligkeitsdaten, um sie hier zu sehen.",
     "UNSCHEDULED": "Ungeplante Aufgaben",
-    "TODAY": "Heute"
+    "TODAY": "Heute",
+    "TASK_HEADER": "Aufgabe"
   },
   "SW_UPDATE": {
     "AVAILABLE": "Eine neue Version ist verfügbar.",
@@ -559,6 +560,7 @@
     "EDIT": "Bearbeiten",
     "ADD": "Hinzufügen",
     "LOADING": "Laden…",
+    "SESSION_CHECK": "Sitzung wird geprüft…",
     "CONFIRM": "Bestätigen",
     "OFFLINE": "Du bist offline — Änderungen werden automatisch synchronisiert.",
     "PENDING": "ausstehend"
@@ -688,7 +690,24 @@
     "FAILED_SAVE_TEMPLATE": "Fehler beim Speichern der Vorlage.",
     "TEMPLATE_DELETED": "Vorlage gelöscht.",
     "FAILED_DELETE_TEMPLATE": "Fehler beim Löschen der Vorlage.",
-    "FAILED_REORDER_SUBTASKS": "Fehler beim Sortieren der Teilaufgaben."
+    "FAILED_REORDER_SUBTASKS": "Fehler beim Sortieren der Teilaufgaben.",
+    "FAILED_LOAD_WORKLOAD": "Auslastungsdaten konnten nicht geladen werden.",
+    "FAILED_LOAD_WEBHOOKS": "Webhooks konnten nicht geladen werden.",
+    "FAILED_TOGGLE_WEBHOOK": "Webhook konnte nicht umgeschaltet werden.",
+    "FAILED_LOAD_DELIVERIES": "Zustellungen konnten nicht geladen werden.",
+    "FAILED_LOAD_EVENTS": "Events konnten nicht geladen werden.",
+    "FAILED_LOAD_TIME_ENTRIES": "Zeiteinträge konnten nicht geladen werden.",
+    "FAILED_LOAD_HISTORY": "Verlauf konnte nicht geladen werden.",
+    "FAILED_LOAD_LABELS": "Labels konnten nicht geladen werden.",
+    "FAILED_LOAD_DEPENDENCIES": "Abhängigkeiten konnten nicht geladen werden.",
+    "FAILED_LOAD_ATTACHMENTS": "Anhänge konnten nicht geladen werden.",
+    "FAILED_PREVIEW_FILE": "Vorschau konnte nicht geladen werden.",
+    "FAILED_TOGGLE_REACTION": "Reaktion konnte nicht geändert werden.",
+    "FAILED_LOAD_SUBTASKS": "Teilaufgaben konnten nicht geladen werden.",
+    "FAILED_LOAD_COMMENTS": "Kommentare konnten nicht geladen werden.",
+    "FAILED_WATCH_TASK": "Beobachtungsstatus konnte nicht geändert werden.",
+    "FAILED_LOAD_BOARD_DATA": "Board-Daten konnten nicht geladen werden.",
+    "FAILED_LOAD_COLUMNS": "Spalten konnten nicht geladen werden."
   },
   "PRIVACY": {
     "TITLE": "Datenschutzerklärung",

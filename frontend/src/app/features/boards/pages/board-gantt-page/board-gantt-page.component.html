@@ -17,7 +17,7 @@
   } @else {
     <div class="gantt-container">
       <div class="gantt-sidebar">
-        <div class="sidebar-header">Task</div>
+        <div class="sidebar-header">{{ 'GANTT.TASK_HEADER' | translate }}</div>
         @for (bar of ganttBars(); track bar.task.id) {
           <div
             class="sidebar-row"

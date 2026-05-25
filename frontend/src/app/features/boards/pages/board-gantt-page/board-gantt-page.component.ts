@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, compute
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { PRIORITY_COLORS, BRAND_COLOR } from '../../../../shared/constants/colors';
@@ -32,6 +33,8 @@ export class BoardGanttPageComponent implements OnInit {
   private readonly boardsApi = inject(BoardsApiService);
   private readonly tasksApi = inject(TasksApiService);
   private readonly columnsApi = inject(ColumnsApiService);
+  private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
 
   boardId = signal(0);
   boardTitle = signal('Board');
@@ -194,15 +197,21 @@ export class BoardGanttPageComponent implements OnInit {
     this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
     this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(b => this.boardTitle.set(b.title));
+      .subscribe({
+        next: b => this.boardTitle.set(b.title),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARD'), 'error'),
+      });
 
     forkJoin([
       this.tasksApi.getByBoard(this.boardId()),
       this.columnsApi.getByBoard(this.boardId()),
-    ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([tasks, columns]) => {
-      this.tasks.set(tasks);
-      this.columns.set(columns);
-      this.loading.set(false);
+    ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: ([tasks, columns]) => {
+        this.tasks.set(tasks);
+        this.columns.set(columns);
+        this.loading.set(false);
+      },
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARD_DATA'), 'error'),
     });
   }
 

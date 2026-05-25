@@ -34,7 +34,10 @@ export class TaskSubtasksComponent implements OnInit {
   ngOnInit(): void {
     this.subtasksApi.getByTask(this.taskId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(subs => this.subtasks.set(subs));
+      .subscribe({
+        next: subs => this.subtasks.set(subs),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_SUBTASKS'), 'error'),
+      });
   }
 
   addSubtask(): void {

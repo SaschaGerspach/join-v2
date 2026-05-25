@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TasksApiService, WorkloadTask, WorkloadContact } from '../../../../core/tasks/tasks-api.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 type HeatmapCell = {
   date: string;
@@ -25,6 +26,8 @@ type ContactRow = {
 })
 export class WorkloadPageComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
+  private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   loading = signal(true);
@@ -130,10 +133,13 @@ export class WorkloadPageComponent implements OnInit {
   ngOnInit(): void {
     this.tasksApi.getWorkload()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(res => {
-        this.contacts.set(res.contacts);
-        this.tasks.set(res.tasks);
-        this.loading.set(false);
+      .subscribe({
+        next: res => {
+          this.contacts.set(res.contacts);
+          this.tasks.set(res.tasks);
+          this.loading.set(false);
+        },
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_WORKLOAD'), 'error'),
       });
   }
 

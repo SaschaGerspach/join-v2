@@ -32,9 +32,12 @@ export class TaskDependenciesComponent implements OnInit {
   ngOnInit(): void {
     this.tasksApi.getDependencies(this.taskId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(deps => {
-        this.dependencies.set(deps);
-        this.updateAvailable();
+      .subscribe({
+        next: deps => {
+          this.dependencies.set(deps);
+          this.updateAvailable();
+        },
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_DEPENDENCIES'), 'error'),
       });
   }
 

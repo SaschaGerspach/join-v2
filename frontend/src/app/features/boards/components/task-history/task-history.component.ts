@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HistoryEntry, TasksApiService } from '../../../../core/tasks/tasks-api.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-history',
@@ -14,6 +15,8 @@ import { HistoryEntry, TasksApiService } from '../../../../core/tasks/tasks-api.
 })
 export class TaskHistoryComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
+  private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   taskId = input.required<number>();
@@ -24,6 +27,9 @@ export class TaskHistoryComponent implements OnInit {
   ngOnInit(): void {
     this.tasksApi.getHistory(this.taskId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(entries => this.entries.set(entries));
+      .subscribe({
+        next: entries => this.entries.set(entries),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_HISTORY'), 'error'),
+      });
   }
 }

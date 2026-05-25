@@ -172,7 +172,25 @@
       "Bash(DJANGO_SECRET_KEY=test DJANGO_DEBUG=true python manage.py makemigrations tasks_api --name=add_task_dependency)",
       "Bash(DJANGO_SECRET_KEY=test DJANGO_DEBUG=true python *)",
       "Bash(grep -E \"\\\\.py$|^d\")",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(docker volume *)",
+      "Bash(grep *)",
+      "Bash(sort -k4 -n)",
+      "Bash(awk '{print $5, $9}')",
+      "Bash(DJANGO_SECRET_KEY=temp-key-for-migration python manage.py makemigrations tasks_api --name add_comment_task_created_index)",
+      "Bash(DJANGO_SECRET_KEY=temp-key-for-migration DJANGO_DEBUG=true python manage.py makemigrations tasks_api --name add_comment_task_created_index)",
+      "PowerShell(git add *)",
+      "PowerShell(git commit *)",
+      "PowerShell(git push *)",
+      "PowerShell(cd backend; $env:DJANGO_SECRET_KEY=\"test-secret-key-for-running-tests\"; $env:DJANGO_DEBUG=\"true\"; python manage.py test users_api.tests.UserDetailTests 2>&1)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Anwender\\\\OneDrive\\\\Dokumente\\\\Projekte\\\\join-v2\\\\backend\" | Where-Object {$_.PSIsContainer -and $_.Name -notin @\\('.pytest_cache', '.ruff_cache', '.venv', 'config', 'logs', 'private_media', 'staticfiles', 'migrations'\\)} | Select-Object Name | Format-Table -AutoSize)",
+      "PowerShell($env:DJANGO_SECRET_KEY=\"test-secret-key-for-running-tests\"; $env:DJANGO_DEBUG=\"true\"; python manage.py makemigrations automations_api)",
+      "PowerShell(pip install *)",
+      "PowerShell($env:DJANGO_SECRET_KEY=\"test-secret-key-for-running-tests\"; $env:DJANGO_DEBUG=\"true\"; python manage.py makemigrations notifications_api)",
+      "PowerShell($env:DJANGO_SECRET_KEY=\"test-secret-key-for-running-tests\"; $env:DJANGO_DEBUG=\"true\"; python manage.py check)",
+      "PowerShell($env:DJANGO_SECRET_KEY=\"test-secret-key-for-running-tests\"; $env:DJANGO_DEBUG=\"true\"; python manage.py test --verbosity 1 2>&1 | Select-Object -Last 20)",
+      "PowerShell($env:DJANGO_SECRET_KEY = \"test-secret-key-for-running-tests\"; Set-Location \"C:\\\\Users\\\\Anwender\\\\OneDrive\\\\Dokumente\\\\Projekte\\\\join-v2\\\\backend\"; python manage.py test --verbosity=1 2>&1 | Select-Object -Last 20)",
+      "PowerShell($env:DJANGO_SECRET_KEY = \"test-secret-key\"; $env:DJANGO_DEBUG = \"true\"; Set-Location \"C:\\\\Users\\\\Anwender\\\\OneDrive\\\\Dokumente\\\\Projekte\\\\join-v2\\\\backend\"; python manage.py test --verbosity=1 2>&1 | Select-Object -Last 25)"
     ]
   }
 }

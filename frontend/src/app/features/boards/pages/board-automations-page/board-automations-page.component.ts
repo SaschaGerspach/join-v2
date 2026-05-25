@@ -73,19 +73,31 @@ export class BoardAutomationsPageComponent implements OnInit {
 
     this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(b => this.boardTitle.set(b.title));
+      .subscribe({
+        next: b => this.boardTitle.set(b.title),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARD'), 'error'),
+      });
 
     this.columnsApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(c => this.columns.set(c));
+      .subscribe({
+        next: c => this.columns.set(c),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_COLUMNS'), 'error'),
+      });
 
     this.boardsApi.getMembers(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(m => this.members.set(m));
+      .subscribe({
+        next: m => this.members.set(m),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_MEMBERS'), 'error'),
+      });
 
     this.labelsApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(l => this.labels.set(l));
+      .subscribe({
+        next: l => this.labels.set(l),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_LABELS'), 'error'),
+      });
 
     this.loadRules();
     this.loadLogs();

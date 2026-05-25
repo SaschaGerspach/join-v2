@@ -49,7 +49,10 @@ export class TaskAttachmentsComponent implements OnInit {
   ngOnInit(): void {
     this.attachmentsApi.getByTask(this.taskId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(atts => this.attachments.set(atts));
+      .subscribe({
+        next: atts => this.attachments.set(atts),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_ATTACHMENTS'), 'error'),
+      });
   }
 
   onFileSelected(event: Event): void {
@@ -109,6 +112,7 @@ export class TaskAttachmentsComponent implements OnInit {
             const url = URL.createObjectURL(blob);
             this.previewBlobUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
           },
+          error: () => this.toast.show(this.translate.instant('TOAST.FAILED_PREVIEW_FILE'), 'error'),
         });
     }
   }

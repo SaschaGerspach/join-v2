@@ -33,9 +33,12 @@ export class TaskTimeTrackingComponent implements OnInit {
   load(): void {
     this.tasksApi.getTimeEntries(this.taskId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(data => {
-        this.entries.set(data.entries);
-        this.totalMinutes.set(data.total_minutes);
+      .subscribe({
+        next: data => {
+          this.entries.set(data.entries);
+          this.totalMinutes.set(data.total_minutes);
+        },
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_TIME_ENTRIES'), 'error'),
       });
   }
 

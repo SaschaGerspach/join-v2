@@ -44,11 +44,17 @@ export class BoardWebhooksPageComponent implements OnInit {
     this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
     this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(b => this.boardTitle.set(b.title));
+      .subscribe({
+        next: b => this.boardTitle.set(b.title),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARD'), 'error'),
+      });
 
     this.webhooksApi.getAvailableEvents()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(events => this.availableEvents.set(events));
+      .subscribe({
+        next: events => this.availableEvents.set(events),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_EVENTS'), 'error'),
+      });
 
     this.loadWebhooks();
   }
@@ -56,9 +62,12 @@ export class BoardWebhooksPageComponent implements OnInit {
   loadWebhooks(): void {
     this.webhooksApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(wh => {
-        this.webhooks.set(wh);
-        this.loading.set(false);
+      .subscribe({
+        next: wh => {
+          this.webhooks.set(wh);
+          this.loading.set(false);
+        },
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_WEBHOOKS'), 'error'),
       });
   }
 
@@ -135,7 +144,10 @@ export class BoardWebhooksPageComponent implements OnInit {
   toggleActive(wh: Webhook): void {
     this.webhooksApi.update(wh.id, { is_active: !wh.is_active })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.loadWebhooks());
+      .subscribe({
+        next: () => this.loadWebhooks(),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_TOGGLE_WEBHOOK'), 'error'),
+      });
   }
 
   viewDeliveries(webhookId: number): void {
@@ -147,7 +159,10 @@ export class BoardWebhooksPageComponent implements OnInit {
     this.selectedWebhookId.set(webhookId);
     this.webhooksApi.getDeliveries(webhookId)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(d => this.deliveries.set(d));
+      .subscribe({
+        next: d => this.deliveries.set(d),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_DELIVERIES'), 'error'),
+      });
   }
 
   cancelForm(): void {

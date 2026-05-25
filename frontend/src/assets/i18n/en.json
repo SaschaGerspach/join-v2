@@ -496,7 +496,8 @@
     "MONTH": "Month",
     "NO_DATED_TASKS": "No tasks with dates found. Set start or due dates on your tasks to see them here.",
     "UNSCHEDULED": "Unscheduled tasks",
-    "TODAY": "Today"
+    "TODAY": "Today",
+    "TASK_HEADER": "Task"
   },
   "TEMPLATES": {
     "TITLE": "Templates",
@@ -559,6 +560,7 @@
     "EDIT": "Edit",
     "ADD": "Add",
     "LOADING": "Loading…",
+    "SESSION_CHECK": "Checking session…",
     "CONFIRM": "Confirm",
     "OFFLINE": "You are offline — changes will sync automatically when reconnected.",
     "PENDING": "pending"
@@ -688,7 +690,24 @@
     "FAILED_SAVE_TEMPLATE": "Failed to save template.",
     "TEMPLATE_DELETED": "Template deleted.",
     "FAILED_DELETE_TEMPLATE": "Failed to delete template.",
-    "FAILED_REORDER_SUBTASKS": "Failed to reorder subtasks."
+    "FAILED_REORDER_SUBTASKS": "Failed to reorder subtasks.",
+    "FAILED_LOAD_WORKLOAD": "Failed to load workload data.",
+    "FAILED_LOAD_WEBHOOKS": "Failed to load webhooks.",
+    "FAILED_TOGGLE_WEBHOOK": "Failed to toggle webhook.",
+    "FAILED_LOAD_DELIVERIES": "Failed to load deliveries.",
+    "FAILED_LOAD_EVENTS": "Failed to load events.",
+    "FAILED_LOAD_TIME_ENTRIES": "Failed to load time entries.",
+    "FAILED_LOAD_HISTORY": "Failed to load history.",
+    "FAILED_LOAD_LABELS": "Failed to load labels.",
+    "FAILED_LOAD_DEPENDENCIES": "Failed to load dependencies.",
+    "FAILED_LOAD_ATTACHMENTS": "Failed to load attachments.",
+    "FAILED_PREVIEW_FILE": "Failed to load preview.",
+    "FAILED_TOGGLE_REACTION": "Failed to toggle reaction.",
+    "FAILED_LOAD_SUBTASKS": "Failed to load subtasks.",
+    "FAILED_LOAD_COMMENTS": "Failed to load comments.",
+    "FAILED_WATCH_TASK": "Failed to update watch status.",
+    "FAILED_LOAD_BOARD_DATA": "Failed to load board data.",
+    "FAILED_LOAD_COLUMNS": "Failed to load columns."
   },
   "PRIVACY": {
     "TITLE": "Privacy Policy",

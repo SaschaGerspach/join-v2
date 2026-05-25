@@ -64,7 +64,10 @@ export class TaskCommentsComponent implements OnInit {
   ngOnInit(): void {
     this.commentsApi.getAll(this.taskId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(comments => this.comments.set(comments));
+      .subscribe({
+        next: comments => this.comments.set(comments),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_COMMENTS'), 'error'),
+      });
   }
 
   addComment(): void {
@@ -213,6 +216,7 @@ export class TaskCommentsComponent implements OnInit {
         next: reactions => this.comments.update(list =>
           list.map(c => c.id === commentId ? { ...c, reactions } : c)
         ),
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_TOGGLE_REACTION'), 'error'),
       });
   }
 

@@ -86,10 +86,16 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.coverImageUrl.set(t.cover_image_url ?? '');
     this.selectedLabelIds.set(new Set(t.labels?.map(l => l.id) ?? []));
 
-    this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(contacts => this.contacts.set(contacts));
-    this.tasksApi.getWatchStatus(t.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
-      this.isWatching.set(res.is_watching);
-      this.watcherCount.set(res.watcher_count);
+    this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: contacts => this.contacts.set(contacts),
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_CONTACTS'), 'error'),
+    });
+    this.tasksApi.getWatchStatus(t.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: res => {
+        this.isWatching.set(res.is_watching);
+        this.watcherCount.set(res.watcher_count);
+      },
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_WATCH_TASK'), 'error'),
     });
   }
 
@@ -155,9 +161,12 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     const req = this.isWatching()
       ? this.tasksApi.unwatch(this.task().id)
       : this.tasksApi.watch(this.task().id);
-    req.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
-      this.isWatching.set(res.is_watching);
-      this.watcherCount.set(res.watcher_count);
+    req.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: res => {
+        this.isWatching.set(res.is_watching);
+        this.watcherCount.set(res.watcher_count);
+      },
+      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_WATCH_TASK'), 'error'),
     });
   }
 

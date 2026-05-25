@@ -41,9 +41,15 @@ export class GlobalSearchComponent {
         return this.tasksApi.searchTasks(q);
       }),
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe(results => {
-      this.results.set(results);
-      this.loading.set(false);
+    ).subscribe({
+      next: results => {
+        this.results.set(results);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.results.set([]);
+        this.loading.set(false);
+      },
     });
   }
 
