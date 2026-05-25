@@ -47,6 +47,19 @@ class BoardMember(models.Model):
         return f"{self.user.email} → {self.board.title}"
 
 
+class BoardInviteLink(models.Model):
+    board = models.OneToOneField(Board, on_delete=models.CASCADE, related_name="invite_link")
+    token = models.CharField(max_length=64, unique=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Invite for {self.board.title}"
+
+
 class BoardFavorite(models.Model):
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="favorites")
     user = models.ForeignKey(

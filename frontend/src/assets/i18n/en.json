@@ -517,6 +517,15 @@
     "INSTALL": "Install",
     "DISMISS": "Not now"
   },
+  "INVITE": {
+    "SHARE": "Share invite link",
+    "LINK_COPIED": "Invite link copied to clipboard",
+    "LINK_FAILED": "Failed to create invite link",
+    "JOINED": "You joined the board \"{{ board }}\"",
+    "ALREADY_MEMBER": "You are already a member of \"{{ board }}\"",
+    "INVALID_LINK": "Invalid invite link",
+    "LINK_EXPIRED": "This invite link is invalid or has expired."
+  },
   "COMMON": {
     "CANCEL": "Cancel",
     "DELETE": "Delete",

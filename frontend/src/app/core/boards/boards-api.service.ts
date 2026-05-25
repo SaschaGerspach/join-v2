@@ -84,6 +84,22 @@ export class BoardsApiService {
     return this.http.post<void>(`${this.baseUrl}/boards/favorites/reorder/`, { ids: boardIds }, { withCredentials: true });
   }
 
+  getInviteLink(boardId: number): Observable<{ token: string | null }> {
+    return this.http.get<{ token: string | null }>(`${this.baseUrl}/boards/${boardId}/invite-link/`, { withCredentials: true });
+  }
+
+  createInviteLink(boardId: number): Observable<{ token: string }> {
+    return this.http.post<{ token: string }>(`${this.baseUrl}/boards/${boardId}/invite-link/`, {}, { withCredentials: true });
+  }
+
+  deleteInviteLink(boardId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/boards/${boardId}/invite-link/`, { withCredentials: true });
+  }
+
+  joinViaLink(token: string): Observable<{ board_id: number; board_title: string; already_member: boolean }> {
+    return this.http.post<{ board_id: number; board_title: string; already_member: boolean }>(`${this.baseUrl}/boards/join/${token}/`, {}, { withCredentials: true });
+  }
+
   exportCsv(boardId: number): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/boards/${boardId}/export/csv/`, {
       withCredentials: true,

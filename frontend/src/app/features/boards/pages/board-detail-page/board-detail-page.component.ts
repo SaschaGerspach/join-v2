@@ -101,6 +101,20 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
     return (event.target as HTMLInputElement).value;
   }
 
+  shareInviteLink(): void {
+    this.boardsApi.createInviteLink(this.state.boardId())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: res => {
+          const url = `${window.location.origin}/boards/join/${res.token}`;
+          navigator.clipboard.writeText(url).then(() => {
+            this.toast.show(this.translate.instant('INVITE.LINK_COPIED'));
+          });
+        },
+        error: () => this.toast.show(this.translate.instant('INVITE.LINK_FAILED'), 'error'),
+      });
+  }
+
   exportCsv(): void {
     this.boardsApi.exportCsv(this.state.boardId()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: blob => {

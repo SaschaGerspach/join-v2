@@ -517,6 +517,15 @@
     "INSTALL": "Installieren",
     "DISMISS": "Nicht jetzt"
   },
+  "INVITE": {
+    "SHARE": "Einladungslink teilen",
+    "LINK_COPIED": "Einladungslink in Zwischenablage kopiert",
+    "LINK_FAILED": "Einladungslink konnte nicht erstellt werden",
+    "JOINED": "Du bist dem Board \"{{ board }}\" beigetreten",
+    "ALREADY_MEMBER": "Du bist bereits Mitglied von \"{{ board }}\"",
+    "INVALID_LINK": "Ungültiger Einladungslink",
+    "LINK_EXPIRED": "Dieser Einladungslink ist ungültig oder abgelaufen."
+  },
   "COMMON": {
     "CANCEL": "Abbrechen",
     "DELETE": "Löschen",
