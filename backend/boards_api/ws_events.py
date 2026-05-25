@@ -18,3 +18,8 @@ def send_board_event(board_id, event_type, data):
             },
         },
     )
+    try:
+        from webhooks_api.dispatch import dispatch_event
+        dispatch_event(board_id, event_type, safe_data)
+    except Exception:
+        pass

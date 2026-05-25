@@ -33,6 +33,7 @@ urlpatterns = [
     path("notifications/", include("notifications_api.urls")),
     path("activity/", include("activity_api.urls")),
     path("teams/", include("teams_api.urls")),
+    path("webhooks/", include("webhooks_api.urls")),
 ]
 
 if settings.DEBUG or os.environ.get('DJANGO_ADMIN_ENABLED', 'false').lower() == 'true':

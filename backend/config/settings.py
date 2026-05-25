@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'audit_api',
     'admin_api',
     'automations_api',
+    'webhooks_api',
 ]
 
 MIDDLEWARE = [
