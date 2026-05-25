@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, compute
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterModule } from '@angular/router';
 import { SlicePipe } from '@angular/common';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -12,7 +13,7 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-summary-page',
   standalone: true,
-  imports: [SlicePipe, RouterModule, LoadingSpinnerComponent, TranslateModule],
+  imports: [SlicePipe, RouterModule, LoadingSpinnerComponent, TranslateModule, DragDropModule],
   templateUrl: './summary-page.component.html',
   styleUrl: './summary-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -76,5 +77,17 @@ export class SummaryPageComponent implements OnInit {
 
   goToBoards(): void {
     this.router.navigate(['/boards']);
+  }
+
+  dropFavorite(event: CdkDragDrop<Board[]>): void {
+    const favs = [...this.favoriteBoards()];
+    moveItemInArray(favs, event.previousIndex, event.currentIndex);
+    const all = this.boards();
+    const nonFavs = all.filter(b => !b.is_favorite);
+    this.boards.set([...favs, ...nonFavs]);
+    const ids = favs.map(b => b.id);
+    this.boardsApi.reorderFavorites(ids)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 }

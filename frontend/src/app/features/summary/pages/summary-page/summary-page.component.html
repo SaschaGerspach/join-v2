@@ -67,9 +67,10 @@
   @if (favoriteBoards().length > 0) {
     <div class="favorites-section">
       <h2 class="section-title">{{ 'SUMMARY.FAVORITE_BOARDS' | translate }}</h2>
-      <div class="favorites-grid">
+      <div class="favorites-grid" cdkDropList (cdkDropListDropped)="dropFavorite($event)">
         @for (board of favoriteBoards(); track board.id) {
-          <a class="favorite-card" [routerLink]="['/boards', board.id]" [style.borderLeftColor]="board.color || '#4f46e5'">
+          <a class="favorite-card" cdkDrag [routerLink]="['/boards', board.id]" [style.borderLeftColor]="board.color || '#4f46e5'">
+            <span class="drag-handle" cdkDragHandle>&#9776;</span>
             <span class="favorite-title">{{ board.title }}</span>
           </a>
         }

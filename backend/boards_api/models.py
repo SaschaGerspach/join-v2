@@ -54,9 +54,11 @@ class BoardFavorite(models.Model):
         on_delete=models.CASCADE,
         related_name="board_favorites",
     )
+    order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["board", "user"], name="unique_board_favorite"),
         ]
+        ordering = ["order", "created_at"]

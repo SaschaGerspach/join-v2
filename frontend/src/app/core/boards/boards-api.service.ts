@@ -80,6 +80,10 @@ export class BoardsApiService {
     return this.http.delete<void>(`${this.baseUrl}/boards/${boardId}/favorite/`, { withCredentials: true });
   }
 
+  reorderFavorites(boardIds: number[]): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/boards/favorites/reorder/`, { ids: boardIds }, { withCredentials: true });
+  }
+
   exportCsv(boardId: number): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/boards/${boardId}/export/csv/`, {
       withCredentials: true,

@@ -11,6 +11,7 @@ urlpatterns = [
     path("<int:pk>/export/csv/", views.board_export_csv, name="board-export-csv"),
     path("<int:pk>/import/csv/", views.board_import_csv, name="board-import-csv"),
     path("<int:pk>/favorite/", views.board_favorite, name="board-favorite"),
+    path("favorites/reorder/", views.favorite_reorder, name="favorite-reorder"),
     path("<int:pk>/members/", views.board_members, name="board-members"),
     path("<int:pk>/members/leave/", views.board_leave, name="board-leave"),
     path("<int:pk>/members/<int:user_pk>/", views.board_member_detail, name="board-member-detail"),
