@@ -168,3 +168,75 @@
   gap: 0.5rem;
   align-items: center;
 }
+
+.reactions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+  align-items: center;
+}
+
+.reaction-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+
+  &:hover { background: var(--color-surface); }
+  &.reacted {
+    border-color: $color-primary;
+    background: rgba($color-primary, 0.08);
+  }
+}
+
+.reaction-picker-wrapper {
+  position: relative;
+}
+
+.btn-add-reaction {
+  background: none;
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+  width: 24px;
+  height: 24px;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover { color: var(--color-text); border-color: var(--color-text); }
+}
+
+.reaction-picker {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  display: flex;
+  gap: 0.15rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.3rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 400;
+}
+
+.emoji-btn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.3rem;
+  border-radius: 6px;
+
+  &:hover { background: var(--color-bg); }
+}

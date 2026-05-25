@@ -6,12 +6,28 @@ from rest_framework.response import Response
 from activity_api.helpers import log_activity
 from boards_api.permissions import can_access_board
 from config.serializers import DetailSerializer
-from ..models import Task, Comment
-from ..serializers import CommentCreateSerializer, CommentSerializer
+from collections import defaultdict
+
+from ..models import Task, Comment, CommentReaction
+from ..serializers import CommentCreateSerializer, CommentSerializer, ReactionToggleSerializer
 from ._notifications import _notify_comment, _notify_mentions
 
 
-def serialize_comment(comment, request=None):
+def _build_reactions(comment_ids):
+    reactions = CommentReaction.objects.filter(comment_id__in=comment_ids)
+    grouped = defaultdict(lambda: defaultdict(list))
+    for r in reactions:
+        grouped[r.comment_id][r.emoji].append(r.user_id)
+    result = {}
+    for cid, emojis in grouped.items():
+        result[cid] = [
+            {"emoji": emoji, "count": len(users), "users": users}
+            for emoji, users in emojis.items()
+        ]
+    return result
+
+
+def serialize_comment(comment, request=None, reactions=None):
     avatar_url = None
     if comment.author.avatar:
         avatar_url = request.build_absolute_uri(comment.author.avatar.url) if request else comment.author.avatar.url
@@ -25,6 +41,7 @@ def serialize_comment(comment, request=None):
         "text": comment.text,
         "created_at": comment.created_at,
         "updated_at": comment.updated_at,
+        "reactions": reactions or [],
     }
 
 
@@ -48,7 +65,9 @@ def comment_list(request, task_pk):
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
-        return Response([serialize_comment(c, request) for c in task.comments.select_related("author").all()])
+        comments = list(task.comments.select_related("author").all())
+        reaction_map = _build_reactions([c.pk for c in comments])
+        return Response([serialize_comment(c, request, reaction_map.get(c.pk, [])) for c in comments])
 
     serializer = CommentCreateSerializer(data=request.data)
     if not serializer.is_valid():
@@ -97,3 +116,28 @@ def comment_detail(request, task_pk, pk):
 
     comment.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["POST"])
+def comment_reaction(request, task_pk, pk):
+    try:
+        comment = Comment.objects.select_related("task__board").get(pk=pk, task_id=task_pk)
+    except Comment.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not can_access_board(comment.task.board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    ser = ReactionToggleSerializer(data=request.data)
+    if not ser.is_valid():
+        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    emoji = ser.validated_data["emoji"]
+    existing = CommentReaction.objects.filter(comment=comment, user=request.user, emoji=emoji)
+    if existing.exists():
+        existing.delete()
+    else:
+        CommentReaction.objects.create(comment=comment, user=request.user, emoji=emoji)
+
+    reaction_map = _build_reactions([comment.pk])
+    return Response(reaction_map.get(comment.pk, []))

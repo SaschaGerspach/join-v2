@@ -3,6 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export type Reaction = {
+  emoji: string;
+  count: number;
+  users: number[];
+};
+
 export type Comment = {
   id: number;
   task: number;
@@ -13,6 +19,7 @@ export type Comment = {
   text: string;
   created_at: string;
   updated_at: string;
+  reactions: Reaction[];
 };
 
 @Injectable({ providedIn: 'root' })
@@ -36,5 +43,9 @@ export class CommentsApiService {
 
   delete(taskId: number, commentId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/tasks/${taskId}/comments/${commentId}/`, { withCredentials: true });
+  }
+
+  toggleReaction(taskId: number, commentId: number, emoji: string): Observable<Reaction[]> {
+    return this.http.post<Reaction[]>(`${this.baseUrl}/tasks/${taskId}/comments/${commentId}/reactions/`, { emoji }, { withCredentials: true });
   }
 }

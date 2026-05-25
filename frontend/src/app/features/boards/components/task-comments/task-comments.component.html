@@ -20,6 +20,24 @@
           <div class="comment-text markdown-content" [innerHTML]="c.text | markdown"></div>
         }
 
+        <div class="reactions-row">
+          @for (r of c.reactions; track r.emoji) {
+            <button class="reaction-chip" [class.reacted]="hasReacted(r)" (click)="addReaction(c.id, r.emoji)">
+              {{ r.emoji }} {{ r.count }}
+            </button>
+          }
+          <div class="reaction-picker-wrapper">
+            <button class="btn-add-reaction" (click)="toggleReactionPicker(c.id)">+</button>
+            @if (reactionPickerFor() === c.id) {
+              <div class="reaction-picker">
+                @for (emoji of quickEmojis; track emoji) {
+                  <button class="emoji-btn" (click)="addReaction(c.id, emoji)">{{ emoji }}</button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
         @if (repliesFor(c.id).length > 0) {
           <div class="comment-replies">
             @for (reply of repliesFor(c.id); track reply.id) {
@@ -38,6 +56,24 @@
                 } @else {
                   <div class="comment-text markdown-content" [innerHTML]="reply.text | markdown"></div>
                 }
+
+                <div class="reactions-row">
+                  @for (r of reply.reactions; track r.emoji) {
+                    <button class="reaction-chip" [class.reacted]="hasReacted(r)" (click)="addReaction(reply.id, r.emoji)">
+                      {{ r.emoji }} {{ r.count }}
+                    </button>
+                  }
+                  <div class="reaction-picker-wrapper">
+                    <button class="btn-add-reaction" (click)="toggleReactionPicker(reply.id)">+</button>
+                    @if (reactionPickerFor() === reply.id) {
+                      <div class="reaction-picker">
+                        @for (emoji of quickEmojis; track emoji) {
+                          <button class="emoji-btn" (click)="addReaction(reply.id, emoji)">{{ emoji }}</button>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
               </div>
             }
           </div>

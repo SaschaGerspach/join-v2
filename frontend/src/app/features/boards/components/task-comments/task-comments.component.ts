@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SlicePipe } from '@angular/common';
-import { Comment, CommentsApiService } from '../../../../core/tasks/comments-api.service';
+import { Comment, Reaction, CommentsApiService } from '../../../../core/tasks/comments-api.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { Contact } from '../../../../core/contacts/contacts-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -196,5 +196,27 @@ export class TaskCommentsComponent implements OnInit {
       textarea.focus();
       textarea.setSelectionRange(newPos, newPos);
     });
+  }
+
+  readonly quickEmojis = ['\u{1F44D}', '\u{1F44E}', '\u{2764}\u{FE0F}', '\u{1F604}', '\u{1F389}', '\u{1F914}'];
+  reactionPickerFor = signal<number | null>(null);
+
+  toggleReactionPicker(commentId: number): void {
+    this.reactionPickerFor.update(v => v === commentId ? null : commentId);
+  }
+
+  addReaction(commentId: number, emoji: string): void {
+    this.reactionPickerFor.set(null);
+    this.commentsApi.toggleReaction(this.taskId(), commentId, emoji)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: reactions => this.comments.update(list =>
+          list.map(c => c.id === commentId ? { ...c, reactions } : c)
+        ),
+      });
+  }
+
+  hasReacted(reaction: Reaction): boolean {
+    return reaction.users.includes(this.auth.user()?.id ?? 0);
   }
 }

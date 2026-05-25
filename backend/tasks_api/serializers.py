@@ -123,6 +123,16 @@ class CommentCreateSerializer(serializers.Serializer):
     parent_id = serializers.IntegerField(required=False, allow_null=True)
 
 
+class ReactionSerializer(serializers.Serializer):
+    emoji = serializers.CharField()
+    count = serializers.IntegerField()
+    users = serializers.ListField(child=serializers.IntegerField())
+
+
+class ReactionToggleSerializer(serializers.Serializer):
+    emoji = serializers.CharField(max_length=10)
+
+
 class AttachmentSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     filename = serializers.CharField()
