@@ -8,3 +8,4 @@ from .dependencies import dependency_list as dependency_list, dependency_detail 
 from .custom_fields import custom_field_list as custom_field_list, custom_field_detail as custom_field_detail, task_field_values as task_field_values
 from .time_tracking import time_entry_list as time_entry_list, time_entry_detail as time_entry_detail
 from .templates import template_list as template_list, template_detail as template_detail, template_create_task as template_create_task
+from .watchers import task_watch as task_watch

@@ -186,6 +186,8 @@
     "SAVE": "Speichern",
     "DUPLICATE": "Duplizieren",
     "COPY_LINK": "Link kopieren",
+    "WATCH": "Beobachten",
+    "UNWATCH": "Nicht mehr beobachten",
     "LABELS": "Labels",
     "NEW_LABEL": "Neues Label…",
     "LABEL_COLOR": "Label-Farbe",

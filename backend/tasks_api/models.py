@@ -198,6 +198,21 @@ class CommentReaction(models.Model):
         ]
 
 
+class TaskWatcher(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="watchers")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="watched_tasks",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["task", "user"], name="unique_task_watcher"),
+        ]
+
+
 class TimeEntry(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="time_entries")
     user = models.ForeignKey(

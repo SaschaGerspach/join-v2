@@ -144,6 +144,12 @@
       <button class="btn-danger" (click)="deleteTask()">{{ 'COMMON.DELETE' | translate }}</button>
       <button class="btn-duplicate" (click)="duplicateTask()">{{ 'TASK.DUPLICATE' | translate }}</button>
       <button class="btn-copy-link" (click)="copyLink()">{{ 'TASK.COPY_LINK' | translate }}</button>
+      <button class="btn-watch" [class.watching]="isWatching()" (click)="toggleWatch()">
+        {{ isWatching() ? ('TASK.UNWATCH' | translate) : ('TASK.WATCH' | translate) }}
+        @if (watcherCount() > 0) {
+          <span class="watcher-count">{{ watcherCount() }}</span>
+        }
+      </button>
       <div class="footer-right">
         <button class="btn-cancel" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
         <button class="btn-save" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>

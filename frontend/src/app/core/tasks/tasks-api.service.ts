@@ -110,6 +110,18 @@ export class TasksApiService {
     return this.http.post<Task>(`${this.baseUrl}/tasks/${id}/duplicate/`, {}, { withCredentials: true });
   }
 
+  getWatchStatus(id: number): Observable<{ is_watching: boolean; watcher_count: number }> {
+    return this.http.get<{ is_watching: boolean; watcher_count: number }>(`${this.baseUrl}/tasks/${id}/watch/`, { withCredentials: true });
+  }
+
+  watch(id: number): Observable<{ is_watching: boolean; watcher_count: number }> {
+    return this.http.post<{ is_watching: boolean; watcher_count: number }>(`${this.baseUrl}/tasks/${id}/watch/`, {}, { withCredentials: true });
+  }
+
+  unwatch(id: number): Observable<{ is_watching: boolean; watcher_count: number }> {
+    return this.http.delete<{ is_watching: boolean; watcher_count: number }>(`${this.baseUrl}/tasks/${id}/watch/`, { withCredentials: true });
+  }
+
   reorder(items: { id: number; order: number; column: number | null }[]): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/tasks/reorder/`, items, { withCredentials: true });
   }

@@ -56,6 +56,8 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   selectedLabelIds = signal<Set<number>>(new Set());
   showDeleteConfirm = signal(false);
   descriptionPreview = signal(false);
+  isWatching = signal(false);
+  watcherCount = signal(0);
 
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
   readonly recurrenceOptions = [
@@ -83,6 +85,10 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.selectedLabelIds.set(new Set(t.labels?.map(l => l.id) ?? []));
 
     this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(contacts => this.contacts.set(contacts));
+    this.tasksApi.getWatchStatus(t.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
+      this.isWatching.set(res.is_watching);
+      this.watcherCount.set(res.watcher_count);
+    });
   }
 
   save(): void {
@@ -139,6 +145,16 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
         this.toast.show(this.translate.instant('TOAST.TASK_DUPLICATED'));
       },
       error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DUPLICATE_TASK'), 'error'),
+    });
+  }
+
+  toggleWatch(): void {
+    const req = this.isWatching()
+      ? this.tasksApi.unwatch(this.task().id)
+      : this.tasksApi.watch(this.task().id);
+    req.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
+      this.isWatching.set(res.is_watching);
+      this.watcherCount.set(res.watcher_count);
     });
   }
 

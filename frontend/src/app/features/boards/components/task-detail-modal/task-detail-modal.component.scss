@@ -238,7 +238,7 @@
   }
 }
 
-.btn-duplicate, .btn-copy-link {
+.btn-duplicate, .btn-copy-link, .btn-watch {
   background: none;
   border: 2px solid var(--color-border, #d1d1d1);
   color: var(--color-text);
@@ -252,6 +252,19 @@
   &:hover {
     background: var(--color-bg, #f6f7f8);
   }
+
+  &.watching {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+}
+
+.watcher-count {
+  background: var(--color-bg);
+  border-radius: 50%;
+  font-size: 0.72rem;
+  padding: 0 0.35rem;
+  margin-left: 0.25rem;
 }
 
 .btn-cancel {

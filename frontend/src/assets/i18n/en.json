@@ -186,6 +186,8 @@
     "SAVE": "Save",
     "DUPLICATE": "Duplicate",
     "COPY_LINK": "Copy link",
+    "WATCH": "Watch",
+    "UNWATCH": "Unwatch",
     "LABELS": "Labels",
     "NEW_LABEL": "New label…",
     "LABEL_COLOR": "Label color",
