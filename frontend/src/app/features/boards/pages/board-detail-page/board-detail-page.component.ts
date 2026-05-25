@@ -58,6 +58,10 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.state.init(Number(this.route.snapshot.paramMap.get('id')));
+    const taskId = this.route.snapshot.paramMap.get('taskId');
+    if (taskId) {
+      this.state.openTaskById(Number(taskId));
+    }
   }
 
   ngOnDestroy(): void {

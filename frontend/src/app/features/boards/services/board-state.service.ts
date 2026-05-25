@@ -116,11 +116,17 @@ export class BoardStateService {
     return map;
   });
 
+  private pendingTaskId: number | null = null;
+
   init(boardId: number): void {
     this.boardId.set(boardId);
     this.loadData(boardId);
     this.loadSavedFilters();
     connectBoardWebSocket(boardId, this.boardWs, this.tasks, this.columns, this.onlineUsers, this.destroyRef);
+  }
+
+  openTaskById(taskId: number): void {
+    this.pendingTaskId = taskId;
   }
 
   cleanup(): void {
@@ -399,6 +405,11 @@ export class BoardStateService {
         this.tasks.set(tasks);
         this.contacts.set(contacts);
         this.loading.set(false);
+        if (this.pendingTaskId) {
+          const task = tasks.find(t => t.id === this.pendingTaskId);
+          if (task) this.selectedTask.set(task);
+          this.pendingTaskId = null;
+        }
       },
       error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARD'), 'error'); this.loading.set(false); },
     });

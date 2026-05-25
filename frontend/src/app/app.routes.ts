@@ -23,6 +23,7 @@ export const routes: Routes = [
                 {path: 'summary', title: 'Summary | Join', loadComponent: () => import('./features/summary/pages/summary-page/summary-page.component').then(m => m.SummaryPageComponent)},
                 {path: 'boards', title: 'Boards | Join', loadComponent: () => import('./features/boards/pages/boards-page/boards-page.component').then(m => m.BoardsPageComponent)},
                 {path: 'boards/:id', title: 'Board | Join', loadComponent: () => import('./features/boards/pages/board-detail-page/board-detail-page.component').then(m => m.BoardDetailPageComponent)},
+                {path: 'boards/:id/tasks/:taskId', title: 'Task | Join', loadComponent: () => import('./features/boards/pages/board-detail-page/board-detail-page.component').then(m => m.BoardDetailPageComponent)},
                 {path: 'boards/:id/stats', title: 'Board Stats | Join', loadComponent: () => import('./features/boards/pages/board-stats-page/board-stats-page.component').then(m => m.BoardStatsPageComponent)},
                 {path: 'boards/:id/activity', title: 'Activity | Join', loadComponent: () => import('./features/boards/pages/board-activity-page/board-activity-page.component').then(m => m.BoardActivityPageComponent)},
                 {path: 'boards/:id/archive', title: 'Archive | Join', loadComponent: () => import('./features/boards/pages/board-archive-page/board-archive-page.component').then(m => m.BoardArchivePageComponent)},
