@@ -1,16 +1,18 @@
 # Join — Kanban Project Management
 
-A fullstack Kanban board application built with **Angular 17** and **Django REST Framework**. Features real-time collaboration via WebSockets, drag-and-drop task management, and a responsive PWA-ready interface.
+A fullstack Kanban board application built with **Angular 17** and **Django REST Framework**. Features real-time collaboration via WebSockets, drag-and-drop task management, a Gantt timeline, workload heatmaps, board time-travel, automation rules, and a responsive PWA-ready interface.
 
 ## Features
 
 **Boards & Tasks**
 - Drag-and-drop columns and tasks with Angular CDK
-- Task priority, due dates, assignees (multi-select), subtasks, and descriptions
+- Task priority, start/due dates, assignees (multi-select), subtasks, and descriptions
 - Color-coded labels (Many-to-Many) for task categorization
+- Priority color strips on task cards (border-left by priority)
+- Cover images on task cards (URL-based)
 - File attachments with upload/download (max 5 MB, MIME validation)
-- Task comments with edit/delete and @-mention autocomplete
-- Markdown rendering in descriptions and comments (via marked + DOMPurify)
+- Task comments with edit/delete, @-mention autocomplete, and emoji reactions
+- Markdown rendering in descriptions and comments with edit/preview toggle
 - Bulk select, move, and delete tasks
 - Inline rename for boards and columns (double-click)
 - Task dependencies — "blocked by" relationships with transitive circular detection
@@ -18,57 +20,73 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Custom fields per board (text, number, date, select) with per-task values
 - Time tracking — log minutes per task with notes and total sum
 - WIP limits per column (visual warning when exceeded)
+- Task watchers — watch/unwatch with watcher count
+- Task deep-links (`/boards/:id/tasks/:taskId`) and copy-link button
 - Task archive with restore functionality
+- Task templates — reusable presets with subtasks, priority, labels; create task from template
 
 **Boards**
 - Board templates (Kanban, Scrum, Bug Tracking) with pre-configured columns
-- Favorite boards (star/unstar, favorites sorted first)
+- Favorite boards with drag-and-drop reorder on summary page
+- Board invite links — token-based sharing via clipboard
 - CSV export and import
 - Swimlane grouping within columns (by priority or assignee)
 - Saved filters (persist filter combinations per board)
-- Board activity log tracking tasks, columns, and comments (created, moved, updated, deleted)
+- Board activity log tracking tasks, columns, and comments
 
-**Teams**
+**Views & Analytics**
+- Global search across boards, tasks, and contacts
+- Monthly calendar view for tasks with due dates
+- **Gantt Chart** — timeline view with zoom levels (day/week/month), dependency arrows (SVG), today-line, unscheduled section, and task info panel
+- **Workload Heatmap** — cross-board GitHub-style contribution graph showing assignee workload per day with color intensity, range selector (1/3/6 months), and hover detail panel
+- **Board Time-Travel** — animated timeline slider to replay board evolution over time, play/pause controls, mini Kanban snapshot at any past date, activity feed around selected time
+- Board statistics with Chart.js (tasks per column, priority distribution, creation trend, activity timeline, assignee workload)
+- Search, filter by priority, assignee, and due date
+- Overdue and due-soon highlighting
+
+**Automations**
+- Rule-based automation engine: when X happens, do Y
+- Triggers: task created, task moved to column, priority changed, label added
+- Actions: move to column, set priority, add label, send notification
+- Custom signal chaining for complex workflows
+- Per-board automation management UI
+
+**Webhooks**
+- Outgoing webhooks with configurable event subscriptions
+- HMAC-signed payloads for verification
+- Delivery history with response status tracking
+- Celery-based async delivery with retry logic
+
+**Teams & Collaboration**
 - Create and manage teams with member invitations
 - Team roles: admin and member
 - Assign teams to boards for shared access
-
-**Collaboration**
 - Real-time board updates via WebSockets (Django Channels + Redis)
 - Real-time notification push via dedicated WebSocket (`/ws/notifications/`)
-- Board sharing — invite members by email (with notification email)
-- Granular roles: owner (full control), admin (manage members), editor (modify tasks), viewer (read-only)
-- Role management UI with dropdown per member
-- Account deletion with automatic board ownership transfer to next admin/editor
+- Board sharing — invite members by email or via invite link
+- Granular roles: owner, admin, editor, viewer
+- Account deletion with automatic board ownership transfer
 
-**Views & Filters**
-- Global search across boards, tasks, and contacts
-- Monthly calendar view for tasks with due dates
-- Search, filter by priority, assignee, and due date
-- Board statistics with Chart.js (tasks per column, priority distribution)
-- Overdue and due-soon highlighting
-
-**Notifications & Automation**
+**Notifications & Scheduling**
 - In-app notification center with types: assignment, comment, mention
-- Real-time push via WebSocket (no page reload needed)
+- Real-time push via WebSocket
 - Notification preferences (in-app, email per event, daily digest)
-- Daily digest emails (Celery Beat, summary of unread notifications)
-- Automated due-date reminders (Celery Beat, hourly check, 24h window configurable via `DUE_DATE_REMINDER_HOURS`)
+- Daily digest emails (Celery Beat)
+- Automated due-date reminders (Celery Beat, configurable window)
 
 **Admin Dashboard**
 - Overview stats with weekly trends (users, boards, tasks)
-- Warning cards for unverified, inactive, and never-logged-in users (expandable lists)
-- Audit log with filterable event types and human-readable labels
-- Board activity overview (active/inactive boards, top boards by task count)
-- Django Admin at `/manage/` (env-gated via `DJANGO_ADMIN_ENABLED`)
+- Warning cards for unverified, inactive, and never-logged-in users
+- Audit log with filterable event types
+- Board activity overview
 
 **User Experience**
 - Dark mode with toggle and `prefers-color-scheme` detection
+- PWA — installable with service worker, offline support via IndexedDB queue, update banner
 - Keyboard shortcuts (`?` to show overview)
 - Board accent color picker
 - Loading spinners and error states
 - Toast notifications with i18n (DE/EN)
-- PWA — installable with service worker
 
 **User Management**
 - User profile editing (name, email, password)
@@ -89,13 +107,13 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 **Infrastructure**
 - Docker Compose: Traefik, Django (Daphne/ASGI), PostgreSQL, Redis, Celery Worker, Celery Beat, Backup
 - Resource limits per container (memory + CPU caps)
-- Automated daily PostgreSQL backups (pg_dump in dedicated container)
+- Automated daily PostgreSQL backups with 30-day retention
 - HTTPS via Traefik + Let's Encrypt (automatic certificate renewal)
 - GitHub Actions CI: ruff lint, pip-audit, npm audit, backend tests, frontend production build
 - Health check endpoint (`/health/`) for container orchestration
 - OpenAPI schema + Swagger UI + ReDoc (dev mode)
-- Lazy-loaded routes (initial bundle ~410 kB)
-- Gzip compression for all text assets (CSS, JS, JSON, SVG, fonts)
+- Lazy-loaded routes
+- Gzip compression for all text assets
 
 ## Tech Stack
 
@@ -108,7 +126,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 | Cache/WS | Redis 7 |
 | Proxy | Traefik with automatic HTTPS via Let's Encrypt |
 | CI/CD | GitHub Actions |
-| Testing | Django TestCase (207 tests), Playwright (10 E2E specs) |
+| Testing | Django TestCase (139 tests), Playwright (26 E2E specs) |
 
 ## Architecture
 
@@ -216,29 +234,48 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 | GET/POST | `/boards/` | List / create boards |
 | GET/PATCH/DELETE | `/boards/:id/` | Board detail |
 | POST/DELETE | `/boards/:id/favorite/` | Favorite / unfavorite |
+| POST | `/boards/:id/favorites/reorder/` | Reorder favorites |
+| GET/POST/DELETE | `/boards/:id/invite-link/` | Manage invite link |
+| POST | `/boards/join/:token/` | Join board via invite link |
 | GET | `/boards/:id/export/csv/` | CSV export |
 | POST | `/boards/:id/import/csv/` | CSV import |
 | GET/POST | `/boards/:id/members/` | Board members |
 | PATCH/DELETE | `/boards/:id/members/:userId/` | Change role / remove member |
 | DELETE | `/boards/:id/members/leave/` | Leave board |
 | GET/POST | `/boards/:id/labels/` | Board labels |
-| GET/POST | `/boards/:id/fields/` | Custom fields (CRUD) |
+| GET/POST | `/boards/:id/fields/` | Custom fields |
 | PATCH/DELETE | `/boards/:id/fields/:id/` | Custom field detail |
+| GET/POST | `/boards/:id/automations/` | Automation rules |
+| PATCH/DELETE | `/boards/:id/automations/:id/` | Automation detail |
 | GET/POST | `/columns/?board=:id` | List / create columns |
 | GET/POST | `/tasks/?board=:id` | List / create tasks |
 | GET | `/tasks/my/` | All my tasks across boards |
+| GET | `/tasks/workload/` | Cross-board workload data |
 | GET | `/tasks/archive/?board=:id` | Archived tasks |
 | PATCH/DELETE | `/tasks/:id/` | Update / archive task |
+| POST | `/tasks/:id/duplicate/` | Duplicate task |
 | POST | `/tasks/:id/restore/` | Restore archived task |
+| GET/POST/DELETE | `/tasks/:id/watch/` | Watch / unwatch task |
+| GET | `/tasks/:id/history/` | Task change history |
 | POST | `/tasks/reorder/` | Bulk reorder tasks |
 | GET/POST | `/tasks/:id/subtasks/` | Subtasks |
+| POST | `/tasks/:id/subtasks/reorder/` | Reorder subtasks |
 | GET/POST | `/tasks/:id/comments/` | Comments |
+| PATCH/DELETE | `/tasks/:id/comments/:id/` | Edit / delete comment |
+| POST | `/tasks/:id/comments/:id/reactions/` | Toggle emoji reaction |
 | GET/POST | `/tasks/:id/attachments/` | File attachments |
 | GET/POST | `/tasks/:id/dependencies/` | Task dependencies |
 | DELETE | `/tasks/:id/dependencies/:id/` | Remove dependency |
 | GET/PUT | `/tasks/:id/fields/` | Task custom field values |
 | GET/POST | `/tasks/:id/time/` | Time entries |
 | DELETE | `/tasks/:id/time/:id/` | Delete time entry |
+| GET/POST | `/tasks/templates/?board=:id` | Task templates |
+| PATCH/DELETE | `/tasks/templates/:id/` | Template detail |
+| POST | `/tasks/templates/:id/create-task/` | Create task from template |
+| GET/POST | `/webhooks/?board=:id` | Webhooks |
+| PATCH/DELETE | `/webhooks/:id/` | Webhook detail |
+| GET | `/webhooks/:id/deliveries/` | Delivery history |
+| GET | `/webhooks/events/` | Available event types |
 | GET/POST | `/contacts/` | Contacts (CRUD) |
 | GET/POST | `/teams/` | List / create teams |
 | GET/PATCH/DELETE | `/teams/:id/` | Team detail |
