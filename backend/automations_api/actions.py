@@ -82,7 +82,6 @@ def _action_notify_creator(task, config, triggered_by):
 
 
 def _action_notify_assignees(task, config, triggered_by):
-    from contacts_api.models import Contact
     contacts = task.assignees.filter(user__isnull=False).select_related("user")
     for contact in contacts:
         create_notification(
