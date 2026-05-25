@@ -26,6 +26,7 @@ def serialize_task(task):
         "description": task.description,
         "priority": task.priority,
         "assigned_to": [a.pk for a in task.assignees.all()],
+        "start_date": task.start_date,
         "due_date": task.due_date,
         "recurrence": task.recurrence,
         "created_at": task.created_at,

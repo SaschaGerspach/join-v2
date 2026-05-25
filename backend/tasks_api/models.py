@@ -35,6 +35,7 @@ class Task(models.Model):
         blank=True,
         related_name="assigned_tasks",
     )
+    start_date = models.DateField(null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
     recurrence = models.CharField(max_length=10, choices=Recurrence.choices, null=True, blank=True, default=None)
     labels = models.ManyToManyField('Label', blank=True, related_name="tasks")

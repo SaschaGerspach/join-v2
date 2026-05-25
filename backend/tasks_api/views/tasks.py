@@ -82,6 +82,7 @@ def task_list(request):
         description=data.get("description", ""),
         priority=data.get("priority", Task.Priority.MEDIUM),
         column_id=column_id,
+        start_date=data.get("start_date"),
         due_date=data.get("due_date"),
         recurrence=data.get("recurrence"),
     )
@@ -142,7 +143,7 @@ def task_detail(request, pk):
         previous_column_id = task.column_id
         previous_priority = task.priority
         changed_fields = []
-        for field in ["title", "description", "priority", "column", "due_date", "recurrence", "order"]:
+        for field in ["title", "description", "priority", "column", "start_date", "due_date", "recurrence", "order"]:
             key = f"{field}_id" if field == "column" else field
             if field in data:
                 setattr(task, key, data[field])
@@ -292,6 +293,7 @@ def task_duplicate(request, pk):
         title=f"{task.title} (copy)",
         description=task.description,
         priority=task.priority,
+        start_date=task.start_date,
         due_date=task.due_date,
         recurrence=task.recurrence,
         order=task.order + 1,
