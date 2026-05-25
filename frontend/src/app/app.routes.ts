@@ -36,6 +36,7 @@ export const routes: Routes = [
                 {path: 'profile', title: 'Profile | Join', loadComponent: () => import('./features/profile/pages/profile-page/profile-page.component').then(m => m.ProfilePageComponent)},
                 {path: 'teams', title: 'Teams | Join', loadComponent: () => import('./features/teams/pages/teams-page/teams-page.component').then(m => m.TeamsPageComponent)},
                 {path: 'calendar', title: 'Calendar | Join', loadComponent: () => import('./features/calendar/pages/calendar-page/calendar-page.component').then(m => m.CalendarPageComponent)},
+                {path: 'workload', title: 'Workload | Join', loadComponent: () => import('./features/workload/pages/workload-page/workload-page.component').then(m => m.WorkloadPageComponent)},
                 {path: 'admin', title: 'Admin | Join', loadComponent: () => import('./features/admin/pages/admin-page/admin-page.component').then(m => m.AdminPageComponent), canActivate: [adminGuard]},
         ],
     },

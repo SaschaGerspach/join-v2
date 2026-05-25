@@ -1,0 +1,79 @@
+<div class="workload-page">
+
+  <div class="workload-header">
+    <h1>{{ 'WORKLOAD.TITLE' | translate }}</h1>
+    <div class="range-controls">
+      <button [class.active]="weeksToShow() === 4" (click)="setWeeks(4)">{{ 'WORKLOAD.MONTH' | translate }}</button>
+      <button [class.active]="weeksToShow() === 12" (click)="setWeeks(12)">{{ 'WORKLOAD.QUARTER' | translate }}</button>
+      <button [class.active]="weeksToShow() === 26" (click)="setWeeks(26)">{{ 'WORKLOAD.HALF_YEAR' | translate }}</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-hint">{{ 'COMMON.LOADING' | translate }}</p>
+  } @else if (contactRows().length === 0) {
+    <p class="empty-hint">{{ 'WORKLOAD.NO_DATA' | translate }}</p>
+  } @else {
+
+    <div class="legend">
+      <span class="legend-label">{{ 'WORKLOAD.LESS' | translate }}</span>
+      <span class="legend-cell intensity-0"></span>
+      <span class="legend-cell intensity-1"></span>
+      <span class="legend-cell intensity-2"></span>
+      <span class="legend-cell intensity-3"></span>
+      <span class="legend-cell intensity-4"></span>
+      <span class="legend-label">{{ 'WORKLOAD.MORE' | translate }}</span>
+    </div>
+
+    <div class="heatmap-container">
+      <div class="heatmap-sidebar">
+        <div class="sidebar-header-spacer"></div>
+        @for (row of contactRows(); track row.contact.id) {
+          <div class="sidebar-row">
+            <span class="contact-name">{{ row.contact.name }}</span>
+            <span class="contact-count">{{ row.totalTasks }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="heatmap-scroll">
+        <div class="week-header">
+          @for (w of weekLabels(); track $index) {
+            <div class="week-label" [style.grid-column]="'span ' + w.span">{{ w.label }}</div>
+          }
+        </div>
+
+        @for (row of contactRows(); track row.contact.id) {
+          <div class="heatmap-row">
+            @for (cell of row.cells; track cell.date) {
+              <div
+                class="heatmap-cell"
+                [class]="'heatmap-cell intensity-' + cellIntensity(cell.count)"
+                [class.today]="isToday(cell.date)"
+                [title]="cell.date + ': ' + cell.count + ' tasks'"
+                (mouseenter)="onCellHover(row.contact.id, cell.date)"
+                (mouseleave)="onCellLeave()"
+              ></div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (hoveredInfo(); as info) {
+      <div class="tooltip-panel">
+        <div class="tooltip-header">
+          <strong>{{ info.contact }}</strong> &mdash; {{ info.date }}
+        </div>
+        @for (t of info.tasks; track t.id) {
+          <div class="tooltip-task">
+            <span class="priority-dot priority-{{ t.priority }}"></span>
+            <span class="tooltip-task-title">{{ t.title }}</span>
+            <span class="tooltip-board">{{ t.board_title }}</span>
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>

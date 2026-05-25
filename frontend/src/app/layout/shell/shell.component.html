@@ -32,6 +32,10 @@
         <span class="nav-icon" aria-hidden="true">&#128197;</span>
         {{ 'NAV.CALENDAR' | translate }}
       </a>
+      <a routerLink="/workload" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="nav-icon" aria-hidden="true">&#128200;</span>
+        {{ 'NAV.WORKLOAD' | translate }}
+      </a>
       @if (auth.user()?.is_staff) {
         <a routerLink="/admin" routerLinkActive="active" (click)="closeSidebar()">
           <span class="nav-icon" aria-hidden="true">&#9881;</span>
@@ -129,6 +133,10 @@
     <a routerLink="/calendar" routerLinkActive="active">
       <span aria-hidden="true">&#128197;</span>
       <span>{{ 'NAV.CALENDAR' | translate }}</span>
+    </a>
+    <a routerLink="/workload" routerLinkActive="active">
+      <span aria-hidden="true">&#128200;</span>
+      <span>{{ 'NAV.WORKLOAD' | translate }}</span>
     </a>
     @if (auth.user()?.is_staff) {
       <a routerLink="/admin" routerLinkActive="active">

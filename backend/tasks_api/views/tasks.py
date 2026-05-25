@@ -334,3 +334,38 @@ def task_history(request, pk):
             "created_at": entry.created_at,
         })
     return Response(result)
+
+
+@extend_schema(responses={200: None})
+@api_view(["GET"])
+def task_workload(request):
+    user = request.user
+    boards = Board.objects.filter(
+        Q(created_by=user) | Q(members__user=user) | Q(team__members__user=user) | Q(team__created_by=user)
+    ).distinct()
+
+    tasks = (
+        Task.objects.filter(board__in=boards, archived_at__isnull=True)
+        .select_related("board")
+        .prefetch_related("assignees")
+    )
+
+    contacts_qs = Contact.objects.filter(user=user)
+    contacts = [{"id": c.pk, "name": f"{c.first_name} {c.last_name}".strip()} for c in contacts_qs]
+
+    result = []
+    for t in tasks:
+        assignee_ids = [a.pk for a in t.assignees.all()]
+        if not assignee_ids:
+            continue
+        result.append({
+            "id": t.pk,
+            "title": t.title,
+            "priority": t.priority,
+            "start_date": t.start_date,
+            "due_date": t.due_date,
+            "assigned_to": assignee_ids,
+            "board_title": t.board.title,
+        })
+
+    return Response({"contacts": contacts, "tasks": result})

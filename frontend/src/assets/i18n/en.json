@@ -10,7 +10,8 @@
     "MAIN_NAV": "Main navigation",
     "MOBILE_NAV": "Mobile navigation",
     "PRIVACY_POLICY": "Privacy Policy",
-    "LEGAL_NOTICE": "Legal Notice"
+    "LEGAL_NOTICE": "Legal Notice",
+    "WORKLOAD": "Workload"
   },
   "TOPBAR": {
     "TITLE": "Kanban Project Management Tool",
@@ -467,6 +468,15 @@
     "NAV_COLUMNS": "Navigate between columns",
     "NAV_TASKS": "Navigate between tasks",
     "OPEN_TASK": "Open focused task"
+  },
+  "WORKLOAD": {
+    "TITLE": "Workload Heatmap",
+    "MONTH": "1 Month",
+    "QUARTER": "3 Months",
+    "HALF_YEAR": "6 Months",
+    "NO_DATA": "No assigned tasks with dates found.",
+    "LESS": "Less",
+    "MORE": "More"
   },
   "GANTT": {
     "TITLE": "Gantt Chart",

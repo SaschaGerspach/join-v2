@@ -10,7 +10,8 @@
     "MAIN_NAV": "Hauptnavigation",
     "MOBILE_NAV": "Mobile Navigation",
     "PRIVACY_POLICY": "Datenschutz",
-    "LEGAL_NOTICE": "Impressum"
+    "LEGAL_NOTICE": "Impressum",
+    "WORKLOAD": "Auslastung"
   },
   "TOPBAR": {
     "TITLE": "Kanban-Projektmanagement-Tool",
@@ -501,6 +502,15 @@
     "TIME": "Zeit",
     "EMPTY": "Keine Webhooks konfiguriert. Erstelle einen, um HTTP-Benachrichtigungen für Board-Events zu erhalten.",
     "CONFIRM_DELETE": "Diesen Webhook löschen?"
+  },
+  "WORKLOAD": {
+    "TITLE": "Auslastungs-Heatmap",
+    "MONTH": "1 Monat",
+    "QUARTER": "3 Monate",
+    "HALF_YEAR": "6 Monate",
+    "NO_DATA": "Keine zugewiesenen Aufgaben mit Datum gefunden.",
+    "LESS": "Weniger",
+    "MORE": "Mehr"
   },
   "GANTT": {
     "TITLE": "Gantt-Diagramm",

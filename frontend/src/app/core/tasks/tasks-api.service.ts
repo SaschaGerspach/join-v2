@@ -33,6 +33,26 @@ export type TimeEntry = {
   logged_at: string;
 };
 
+export type WorkloadTask = {
+  id: number;
+  title: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  start_date: string | null;
+  due_date: string | null;
+  assigned_to: number[];
+  board_title: string;
+};
+
+export type WorkloadContact = {
+  id: number;
+  name: string;
+};
+
+export type WorkloadResponse = {
+  contacts: WorkloadContact[];
+  tasks: WorkloadTask[];
+};
+
 export type HistoryEntry = {
   id: number;
   user_name: string;
@@ -180,6 +200,10 @@ export class TasksApiService {
 
   deleteTimeEntry(taskId: number, entryId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/tasks/${taskId}/time/${entryId}/`, { withCredentials: true });
+  }
+
+  getWorkload(): Observable<WorkloadResponse> {
+    return this.http.get<WorkloadResponse>(`${this.baseUrl}/tasks/workload/`, { withCredentials: true });
   }
 
   getHistory(taskId: number): Observable<HistoryEntry[]> {
