@@ -11,7 +11,6 @@ from ..signals import task_created as task_created_signal
 from activity_api.helpers import log_activity
 from boards_api.ws_events import send_board_event
 from ._helpers import serialize_task
-from ._notifications import _notify_assignments
 
 
 @extend_schema(

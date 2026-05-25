@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from boards_api.permissions import can_edit_board, get_board_or_404
 from config.serializers import DetailSerializer
-from .models import Webhook, WebhookDelivery, ALL_EVENTS
+from .models import Webhook, ALL_EVENTS
 from .serializers import WebhookSerializer, WebhookUpdateSerializer, WebhookDeliverySerializer
 
 

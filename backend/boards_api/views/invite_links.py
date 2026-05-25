@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from ..models import Board, BoardInviteLink, BoardMember
+from ..models import BoardInviteLink, BoardMember
 from ..permissions import get_board_or_404, can_manage_members
 
 
