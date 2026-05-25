@@ -16,14 +16,24 @@
     <div class="modal-body">
 
       <div class="field-group">
-        <label class="field-label">{{ 'TASK.DESCRIPTION' | translate }}</label>
-        <textarea
-          class="field-textarea"
-          rows="3"
-          [ngModel]="description()"
-          (ngModelChange)="description.set($event)"
-          [placeholder]="'TASK.DESCRIPTION_PLACEHOLDER' | translate"
-        ></textarea>
+        <div class="field-label-row">
+          <label class="field-label">{{ 'TASK.DESCRIPTION' | translate }}</label>
+          <div class="preview-toggle">
+            <button class="toggle-btn" [class.active]="!descriptionPreview()" (click)="descriptionPreview.set(false)">{{ 'TASK.EDIT' | translate }}</button>
+            <button class="toggle-btn" [class.active]="descriptionPreview()" (click)="descriptionPreview.set(true)">{{ 'TASK.PREVIEW' | translate }}</button>
+          </div>
+        </div>
+        @if (descriptionPreview()) {
+          <div class="description-preview markdown-content" [innerHTML]="description() | markdown"></div>
+        } @else {
+          <textarea
+            class="field-textarea"
+            rows="3"
+            [ngModel]="description()"
+            (ngModelChange)="description.set($event)"
+            [placeholder]="'TASK.DESCRIPTION_PLACEHOLDER' | translate"
+          ></textarea>
+        }
       </div>
 
       <div class="field-row">

@@ -222,6 +222,7 @@
     "ADD_COMMENT": "Kommentar hinzufügen… (@ für Erwähnung)",
     "POST": "Senden",
     "EDIT": "Bearbeiten",
+    "PREVIEW": "Vorschau",
     "REPLY": "Antworten",
     "WRITE_REPLY": "Antwort schreiben…",
     "CONFIRM_DELETE_COMMENT": "Diesen Kommentar löschen?",

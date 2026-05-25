@@ -91,6 +91,45 @@
   letter-spacing: 0.05em;
 }
 
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.preview-toggle {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-muted);
+
+  &.active {
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+}
+
+.description-preview {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background: var(--color-bg);
+  min-height: 4rem;
+  line-height: 1.5;
+}
+
 .field-input {
   border: 1px solid var(--color-border);
   border-radius: 10px;

@@ -222,6 +222,7 @@
     "ADD_COMMENT": "Add a comment… (type @ to mention)",
     "POST": "Post",
     "EDIT": "Edit",
+    "PREVIEW": "Preview",
     "REPLY": "Reply",
     "WRITE_REPLY": "Write a reply…",
     "CONFIRM_DELETE_COMMENT": "Delete this comment?",
