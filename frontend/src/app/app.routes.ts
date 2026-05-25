@@ -26,6 +26,7 @@ export const routes: Routes = [
                 {path: 'boards/:id/stats', title: 'Board Stats | Join', loadComponent: () => import('./features/boards/pages/board-stats-page/board-stats-page.component').then(m => m.BoardStatsPageComponent)},
                 {path: 'boards/:id/activity', title: 'Activity | Join', loadComponent: () => import('./features/boards/pages/board-activity-page/board-activity-page.component').then(m => m.BoardActivityPageComponent)},
                 {path: 'boards/:id/archive', title: 'Archive | Join', loadComponent: () => import('./features/boards/pages/board-archive-page/board-archive-page.component').then(m => m.BoardArchivePageComponent)},
+                {path: 'boards/:id/automations', title: 'Automations | Join', loadComponent: () => import('./features/boards/pages/board-automations-page/board-automations-page.component').then(m => m.BoardAutomationsPageComponent)},
                 {path: 'contacts', title: 'Contacts | Join', loadComponent: () => import('./features/contacts/pages/contacts-page/contacts-page.component').then(m => m.ContactsPageComponent)},
                 {path: 'profile', title: 'Profile | Join', loadComponent: () => import('./features/profile/pages/profile-page/profile-page.component').then(m => m.ProfilePageComponent)},
                 {path: 'teams', title: 'Teams | Join', loadComponent: () => import('./features/teams/pages/teams-page/teams-page.component').then(m => m.TeamsPageComponent)},

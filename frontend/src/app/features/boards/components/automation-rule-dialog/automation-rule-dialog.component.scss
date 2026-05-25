@@ -1,0 +1,221 @@
+@use 'variables' as *;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-card {
+  background: var(--color-surface);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-border, $color-border);
+
+  h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text, $color-dark);
+    margin: 0;
+  }
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--color-muted);
+  padding: 0.25rem;
+
+  &:hover { color: var(--color-text, $color-dark); }
+}
+
+.modal-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text, $color-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field-input, .field-select {
+  border: 1px solid var(--color-border, $color-border);
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--color-text, $color-dark);
+  background: var(--color-surface);
+  width: 100%;
+
+  &:focus { border-color: $color-primary; outline: none; }
+}
+
+.field-error { border-color: $color-error; }
+
+// Sections
+.section {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  margin-top: 0.35rem;
+  flex-shrink: 0;
+  min-width: 65px;
+  text-align: center;
+}
+
+.when-label {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.condition-label {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.then-label {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.section-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.config-select {
+  margin-top: 0.25rem;
+}
+
+.inline-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.small-input {
+  width: 80px;
+}
+
+.field-hint {
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+// Dynamic rows
+.dynamic-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  .field-select { flex: 1; }
+  .config-select { flex: 1; margin-top: 0; }
+}
+
+.btn-remove-row {
+  background: none;
+  border: 1px solid var(--color-border, $color-border);
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--color-muted);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover { border-color: $color-error; color: $color-error; }
+  &:disabled { opacity: 0.3; cursor: not-allowed; }
+}
+
+.btn-add-row {
+  background: none;
+  border: none;
+  color: $color-primary;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  align-self: flex-start;
+
+  &:hover { text-decoration: underline; }
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--color-border, $color-border);
+}
+
+.btn-cancel {
+  background: var(--color-surface);
+  color: var(--color-text, $color-dark);
+  border: 2px solid var(--color-dark);
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover { background: $color-primary; color: $color-white; border-color: $color-primary; }
+}
+
+.btn-save {
+  background: var(--color-dark);
+  color: $color-white;
+  border: 2px solid var(--color-dark);
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover { background: $color-primary; border-color: $color-primary; }
+}

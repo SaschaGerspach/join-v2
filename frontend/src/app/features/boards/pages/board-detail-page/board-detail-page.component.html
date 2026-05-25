@@ -76,6 +76,7 @@
     @if (state.canViewArchive()) {
       <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'archive']">{{ 'BOARD_DETAIL.ARCHIVE' | translate }}</a>
     }
+    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'automations']">{{ 'AUTOMATIONS.TITLE' | translate }}</a>
     <button class="btn-stats" (click)="exportCsv()">{{ 'BOARD_DETAIL.EXPORT_CSV' | translate }}</button>
     <label class="btn-stats import-label">
       {{ 'BOARD_DETAIL.IMPORT_CSV' | translate }}

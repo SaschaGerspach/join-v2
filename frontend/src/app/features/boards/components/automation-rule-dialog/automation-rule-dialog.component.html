@@ -1,0 +1,189 @@
+<div class="modal-backdrop" role="dialog" aria-modal="true" (click)="cancelled.emit()">
+  <div class="modal-card" appFocusTrap (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ rule() ? ('COMMON.EDIT' | translate) : ('COMMON.CREATE' | translate) }} — {{ 'AUTOMATIONS.TITLE' | translate }}</h2>
+      <button class="btn-close" (click)="cancelled.emit()">&#10005;</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Name -->
+      <div class="field-group">
+        <label class="field-label">{{ 'AUTOMATIONS.RULE_NAME' | translate }} *</label>
+        <input
+          class="field-input"
+          type="text"
+          [(ngModel)]="name"
+          [class.field-error]="submitted && !name.trim()"
+        />
+      </div>
+
+      <!-- WENN (Trigger) -->
+      <div class="section">
+        <span class="section-label when-label">{{ 'AUTOMATIONS.WHEN' | translate }}</span>
+        <div class="section-content">
+          <select class="field-select" [ngModel]="triggerType()" (ngModelChange)="onTriggerTypeChange($event)">
+            @for (t of triggerTypes; track t) {
+              <option [value]="t">{{ triggerLabelMap[t] | translate }}</option>
+            }
+          </select>
+
+          @switch (triggerType()) {
+            @case ('task_moved_to_column') {
+              <select class="field-select config-select" [ngModel]="triggerConfig()['column_id'] ?? ''" (ngModelChange)="updateTriggerConfig('column_id', +$event)">
+                <option value="">{{ 'AUTOMATIONS.SELECT_COLUMN' | translate }}</option>
+                @for (col of columns(); track col.id) {
+                  <option [value]="col.id">{{ col.title }}</option>
+                }
+              </select>
+            }
+            @case ('priority_set') {
+              <select class="field-select config-select" [ngModel]="triggerConfig()['priority'] ?? ''" (ngModelChange)="updateTriggerConfig('priority', $event)">
+                <option value="">{{ 'AUTOMATIONS.SELECT_PRIORITY' | translate }}</option>
+                @for (p of priorities; track p) {
+                  <option [value]="p">{{ 'BOARD_DETAIL.' + p.toUpperCase() | translate }}</option>
+                }
+              </select>
+            }
+            @case ('label_added') {
+              <select class="field-select config-select" [ngModel]="triggerConfig()['label_id'] ?? ''" (ngModelChange)="updateTriggerConfig('label_id', +$event)">
+                <option value="">{{ 'AUTOMATIONS.SELECT_LABEL' | translate }}</option>
+                @for (l of labels(); track l.id) {
+                  <option [value]="l.id">{{ l.name }}</option>
+                }
+              </select>
+            }
+            @case ('deadline_approaching') {
+              <div class="inline-field">
+                <input class="field-input small-input" type="number" min="1" [ngModel]="triggerConfig()['hours'] ?? 24" (ngModelChange)="updateTriggerConfig('hours', +$event)" />
+                <span class="field-hint">{{ 'AUTOMATIONS.HOURS' | translate }}</span>
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- NUR WENN (Conditions) -->
+      <div class="section">
+        <span class="section-label condition-label">{{ 'AUTOMATIONS.ONLY_IF' | translate }}</span>
+        <div class="section-content">
+          @for (cond of conditions(); track $index) {
+            <div class="dynamic-row">
+              <select class="field-select" [ngModel]="cond.condition_type" (ngModelChange)="updateConditionType($index, $event)">
+                @for (ct of conditionTypes; track ct) {
+                  <option [value]="ct">{{ conditionLabelMap[ct] | translate }}</option>
+                }
+              </select>
+
+              @switch (cond.condition_type) {
+                @case ('priority_equals') {
+                  <select class="field-select config-select" [ngModel]="cond.config['priority'] ?? ''" (ngModelChange)="updateConditionConfig($index, 'priority', $event)">
+                    <option value="">{{ 'AUTOMATIONS.SELECT_PRIORITY' | translate }}</option>
+                    @for (p of priorities; track p) {
+                      <option [value]="p">{{ 'BOARD_DETAIL.' + p.toUpperCase() | translate }}</option>
+                    }
+                  </select>
+                }
+                @case ('label_set') {
+                  <select class="field-select config-select" [ngModel]="cond.config['label_id'] ?? ''" (ngModelChange)="updateConditionConfig($index, 'label_id', +$event)">
+                    <option value="">{{ 'AUTOMATIONS.SELECT_LABEL' | translate }}</option>
+                    @for (l of labels(); track l.id) {
+                      <option [value]="l.id">{{ l.name }}</option>
+                    }
+                  </select>
+                }
+                @case ('assignee_equals') {
+                  <select class="field-select config-select" [ngModel]="cond.config['assignee_id'] ?? ''" (ngModelChange)="updateConditionConfig($index, 'assignee_id', +$event)">
+                    <option value="">{{ 'AUTOMATIONS.SELECT_USER' | translate }}</option>
+                    @for (m of members(); track m.user_id) {
+                      <option [value]="m.user_id">{{ m.first_name }} {{ m.last_name }}</option>
+                    }
+                  </select>
+                }
+              }
+
+              <button class="btn-remove-row" (click)="removeCondition($index)">&#10005;</button>
+            </div>
+          }
+          <button class="btn-add-row" (click)="addCondition()">{{ 'AUTOMATIONS.ADD_CONDITION' | translate }}</button>
+        </div>
+      </div>
+
+      <!-- DANN (Actions) -->
+      <div class="section">
+        <span class="section-label then-label">{{ 'AUTOMATIONS.THEN' | translate }}</span>
+        <div class="section-content">
+          @for (act of actions(); track $index) {
+            <div class="dynamic-row">
+              <select class="field-select" [ngModel]="act.action_type" (ngModelChange)="updateActionType($index, $event)">
+                @for (at of actionTypes; track at) {
+                  <option [value]="at">{{ actionLabelMap[at] | translate }}</option>
+                }
+              </select>
+
+              @switch (act.action_type) {
+                @case ('move_to_column') {
+                  <select class="field-select config-select" [ngModel]="act.config['column_id'] ?? ''" (ngModelChange)="updateActionConfig($index, 'column_id', +$event)">
+                    <option value="">{{ 'AUTOMATIONS.SELECT_COLUMN' | translate }}</option>
+                    @for (col of columns(); track col.id) {
+                      <option [value]="col.id">{{ col.title }}</option>
+                    }
+                  </select>
+                }
+                @case ('set_priority') {
+                  <select class="field-select config-select" [ngModel]="act.config['priority'] ?? ''" (ngModelChange)="updateActionConfig($index, 'priority', $event)">
+                    <option value="">{{ 'AUTOMATIONS.SELECT_PRIORITY' | translate }}</option>
+                    @for (p of priorities; track p) {
+                      <option [value]="p">{{ 'BOARD_DETAIL.' + p.toUpperCase() | translate }}</option>
+                    }
+                  </select>
+                }
+                @case ('assign_user') {
+                  <select class="field-select config-select" [ngModel]="act.config['assignee_id'] ?? ''" (ngModelChange)="updateActionConfig($index, 'assignee_id', +$event)">
+                    <option value="">{{ 'AUTOMATIONS.SELECT_USER' | translate }}</option>
+                    @for (m of members(); track m.user_id) {
+                      <option [value]="m.user_id">{{ m.first_name }} {{ m.last_name }}</option>
+                    }
+                  </select>
+                }
+                @case ('set_label') {
+                  <select class="field-select config-select" [ngModel]="act.config['label_id'] ?? ''" (ngModelChange)="updateActionConfig($index, 'label_id', +$event)">
+                    <option value="">{{ 'AUTOMATIONS.SELECT_LABEL' | translate }}</option>
+                    @for (l of labels(); track l.id) {
+                      <option [value]="l.id">{{ l.name }}</option>
+                    }
+                  </select>
+                }
+                @case ('remove_label') {
+                  <select class="field-select config-select" [ngModel]="act.config['label_id'] ?? ''" (ngModelChange)="updateActionConfig($index, 'label_id', +$event)">
+                    <option value="">{{ 'AUTOMATIONS.SELECT_LABEL' | translate }}</option>
+                    @for (l of labels(); track l.id) {
+                      <option [value]="l.id">{{ l.name }}</option>
+                    }
+                  </select>
+                }
+                @case ('notify_user') {
+                  <select class="field-select config-select" [ngModel]="act.config['user_id'] ?? ''" (ngModelChange)="updateActionConfig($index, 'user_id', +$event)">
+                    <option value="">{{ 'AUTOMATIONS.SELECT_USER' | translate }}</option>
+                    @for (m of members(); track m.user_id) {
+                      <option [value]="m.user_id">{{ m.first_name }} {{ m.last_name }}</option>
+                    }
+                  </select>
+                }
+              }
+
+              <button class="btn-remove-row" [disabled]="actions().length <= 1" (click)="removeAction($index)">&#10005;</button>
+            </div>
+          }
+          <button class="btn-add-row" (click)="addAction()">{{ 'AUTOMATIONS.ADD_ACTION' | translate }}</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelled.emit()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button class="btn-save" (click)="submit()">{{ 'COMMON.SAVE' | translate }}</button>
+    </div>
+  </div>
+</div>

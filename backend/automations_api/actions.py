@@ -31,6 +31,8 @@ def _action_move_to_column(task, config, triggered_by):
     task.column = column
     task.save(update_fields=["column"])
     send_board_event(task.board_id, "task_updated", serialize_task(task))
+    from tasks_api.signals import task_moved
+    task_moved.send(sender=task.__class__, task=task, column_id=column_id)
 
 
 def _action_set_priority(task, config, triggered_by):
@@ -40,6 +42,8 @@ def _action_set_priority(task, config, triggered_by):
     task.priority = priority
     task.save(update_fields=["priority"])
     send_board_event(task.board_id, "task_updated", serialize_task(task))
+    from tasks_api.signals import task_priority_changed
+    task_priority_changed.send(sender=task.__class__, task=task, priority=priority)
 
 
 def _action_assign_user(task, config, triggered_by):
@@ -56,6 +60,8 @@ def _action_set_label(task, config, triggered_by):
         return
     task.labels.add(label_id)
     send_board_event(task.board_id, "task_updated", serialize_task(task))
+    from tasks_api.signals import task_label_added
+    task_label_added.send(sender=task.__class__, task=task, label_id=label_id)
 
 
 def _action_remove_label(task, config, triggered_by):

@@ -1,0 +1,98 @@
+<div class="automations-page">
+  <div class="automations-header">
+    <a [routerLink]="['/boards', boardId]" class="back-link">&larr; {{ 'AUTOMATIONS.BACK' | translate }}</a>
+    <h1>{{ boardTitle() }} — {{ 'AUTOMATIONS.TITLE' | translate }}</h1>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn" [class.active]="activeTab() === 'rules'" (click)="activeTab.set('rules')">{{ 'AUTOMATIONS.RULES' | translate }}</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'logs'" (click)="activeTab.set('logs')">{{ 'AUTOMATIONS.LOGS' | translate }}</button>
+  </div>
+
+  @if (activeTab() === 'rules') {
+    <div class="rules-toolbar">
+      <button class="btn-new-rule" (click)="openCreateDialog()">{{ 'AUTOMATIONS.NEW_RULE' | translate }}</button>
+    </div>
+
+    @if (loading()) {
+      <p class="loading-hint">{{ 'COMMON.LOADING' | translate }}</p>
+    } @else if (rules().length === 0) {
+      <p class="empty-hint">{{ 'AUTOMATIONS.NO_RULES' | translate }}</p>
+    } @else {
+      <div class="rules-list">
+        @for (rule of rules(); track rule.id) {
+          <div class="rule-card" [class.inactive]="!rule.is_active">
+            <div class="rule-card-header">
+              <span class="rule-name">{{ rule.name }}</span>
+              @if (rule.is_default) {
+                <span class="badge-default">{{ 'AUTOMATIONS.DEFAULT_BADGE' | translate }}</span>
+              }
+              <label class="toggle-switch">
+                <input type="checkbox" [checked]="rule.is_active" (change)="toggleRule(rule)" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="rule-card-body">
+              <div class="rule-summary">
+                <span class="rule-trigger">{{ 'AUTOMATIONS.WHEN' | translate }}: {{ triggerLabels[rule.trigger_type] | translate }}</span>
+                <span class="rule-actions">{{ 'AUTOMATIONS.THEN' | translate }}: {{ actionSummary(rule) }}</span>
+              </div>
+            </div>
+            <div class="rule-card-actions">
+              <button class="btn-edit" (click)="openEditDialog(rule)">{{ 'COMMON.EDIT' | translate }}</button>
+              <button class="btn-delete" (click)="pendingDeleteRuleId.set(rule.id)">{{ 'COMMON.DELETE' | translate }}</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  @if (activeTab() === 'logs') {
+    @if (logs().length === 0) {
+      <p class="empty-hint">{{ 'AUTOMATIONS.NO_LOGS' | translate }}</p>
+    } @else {
+      <div class="logs-table-wrap">
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th>{{ 'AUTOMATIONS.EXECUTED_AT' | translate }}</th>
+              <th>{{ 'AUTOMATIONS.RULE' | translate }}</th>
+              <th>{{ 'AUTOMATIONS.TASK' | translate }}</th>
+              <th>{{ 'AUTOMATIONS.ACTIONS_EXECUTED' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (log of logs(); track log.id) {
+              <tr>
+                <td>{{ log.executed_at | date:'short' }}</td>
+                <td>{{ log.rule_name }}</td>
+                <td>{{ log.task_title }}</td>
+                <td>{{ logActionSummary(log.actions_executed) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>
+
+@if (showRuleDialog()) {
+  <app-automation-rule-dialog
+    [rule]="editingRule()"
+    [columns]="columns()"
+    [members]="members()"
+    [labels]="labels()"
+    (saved)="onRuleSaved($event)"
+    (cancelled)="showRuleDialog.set(false)"
+  />
+}
+
+@if (pendingDeleteRuleId() !== null) {
+  <app-confirm-dialog
+    [message]="'AUTOMATIONS.CONFIRM_DELETE' | translate"
+    (confirmed)="confirmDeleteRule()"
+    (cancelled)="pendingDeleteRuleId.set(null)"
+  />
+}
