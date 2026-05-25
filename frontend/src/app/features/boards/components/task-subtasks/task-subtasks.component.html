@@ -14,7 +14,8 @@
           <input
             class="subtask-edit-input"
             type="text"
-            [(ngModel)]="editingSubtaskTitle"
+            [ngModel]="editingSubtaskTitle()"
+            (ngModelChange)="editingSubtaskTitle.set($event)"
             (keyup.enter)="confirmEditSubtask(sub)"
             (keyup.escape)="editingSubtaskId.set(null)"
             (blur)="confirmEditSubtask(sub)"

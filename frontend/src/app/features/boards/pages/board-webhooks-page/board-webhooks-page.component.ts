@@ -25,7 +25,7 @@ export class BoardWebhooksPageComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
 
-  boardId = 0;
+  boardId = signal(0);
   boardTitle = signal('Board');
   loading = signal(true);
   webhooks = signal<Webhook[]>([]);
@@ -41,8 +41,8 @@ export class BoardWebhooksPageComponent implements OnInit {
   deleteTarget = signal<number | null>(null);
 
   ngOnInit(): void {
-    this.boardId = Number(this.route.snapshot.paramMap.get('id'));
-    this.boardsApi.getById(this.boardId)
+    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
+    this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(b => this.boardTitle.set(b.title));
 
@@ -54,7 +54,7 @@ export class BoardWebhooksPageComponent implements OnInit {
   }
 
   loadWebhooks(): void {
-    this.webhooksApi.getByBoard(this.boardId)
+    this.webhooksApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(wh => {
         this.webhooks.set(wh);
@@ -101,7 +101,7 @@ export class BoardWebhooksPageComponent implements OnInit {
     const id = this.editingId();
     const obs = id
       ? this.webhooksApi.update(id, payload)
-      : this.webhooksApi.create(this.boardId, payload);
+      : this.webhooksApi.create(this.boardId(), payload);
 
     obs.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {

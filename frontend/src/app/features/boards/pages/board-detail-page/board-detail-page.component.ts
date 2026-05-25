@@ -35,9 +35,9 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   protected readonly state = inject(BoardStateService);
 
   showColumnForm = signal(false);
-  newColumnTitle = '';
-  editingColumnTitle = '';
-  boardTitleInput = '';
+  newColumnTitle = signal('');
+  editingColumnTitle = signal('');
+  boardTitleInput = signal('');
 
   focusedColumnIndex = signal(-1);
   focusedTaskIndex = signal(-1);
@@ -69,27 +69,27 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   }
 
   createColumn(): void {
-    this.state.createColumn(this.newColumnTitle);
-    this.newColumnTitle = '';
+    this.state.createColumn(this.newColumnTitle());
+    this.newColumnTitle.set('');
     this.showColumnForm.set(false);
   }
 
   startRenameBoardTitle(): void {
-    this.boardTitleInput = this.state.board()?.title ?? '';
+    this.boardTitleInput.set(this.state.board()?.title ?? '');
     this.state.editingBoardTitle.set(true);
   }
 
   confirmRenameBoardTitle(): void {
-    this.state.renameBoard(this.boardTitleInput);
+    this.state.renameBoard(this.boardTitleInput());
   }
 
   startRenameColumn(col: Column): void {
     this.state.editingColumnId.set(col.id);
-    this.editingColumnTitle = col.title;
+    this.editingColumnTitle.set(col.title);
   }
 
   confirmRenameColumn(id: number): void {
-    this.state.renameColumn(id, this.editingColumnTitle);
+    this.state.renameColumn(id, this.editingColumnTitle());
   }
 
   onWipLimitChange(columnId: number, event: Event): void {

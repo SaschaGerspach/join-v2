@@ -21,9 +21,9 @@ export class LoginPageComponent {
   private readonly translate = inject(TranslateService);
   readonly lang = inject(LanguageService);
 
-  email = '';
-  password = '';
-  totpCode = '';
+  email = signal('');
+  password = signal('');
+  totpCode = signal('');
   error = signal<string | null>(null);
   showPassword = signal(false);
   submitting = signal(false);
@@ -45,14 +45,14 @@ export class LoginPageComponent {
     this.unverifiedEmail.set(null);
     this.submitting.set(true);
 
-    const code = this.requires2fa() ? this.totpCode : undefined;
-    this.auth.login(this.email, this.password, code).subscribe({
+    const code = this.requires2fa() ? this.totpCode() : undefined;
+    this.auth.login(this.email(), this.password(), code).subscribe({
       next: () => this.router.navigate(['/boards']),
       error: (err) => {
         if (err?.status === 206 && err?.error?.requires_2fa) {
           this.requires2fa.set(true);
         } else if (err?.error?.code === 'email_not_verified') {
-          this.unverifiedEmail.set(this.email);
+          this.unverifiedEmail.set(this.email());
         } else if (this.requires2fa()) {
           this.error.set(this.translate.instant('ERROR.INVALID_2FA'));
         } else {
@@ -65,7 +65,7 @@ export class LoginPageComponent {
 
   back(): void {
     this.requires2fa.set(false);
-    this.totpCode = '';
+    this.totpCode.set('');
     this.error.set(null);
   }
 }

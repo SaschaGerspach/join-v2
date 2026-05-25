@@ -1,6 +1,6 @@
 <div class="archive-page">
   <div class="archive-header">
-    <a [routerLink]="['/boards', boardId]" class="back-link">&larr; {{ 'ARCHIVE.BACK' | translate }}</a>
+    <a [routerLink]="['/boards', boardId()]" class="back-link">&larr; {{ 'ARCHIVE.BACK' | translate }}</a>
     <h1>{{ boardTitle() }} — {{ 'ARCHIVE.TITLE' | translate }}</h1>
     <p class="archive-hint">{{ 'ARCHIVE.HINT' | translate }}</p>
   </div>

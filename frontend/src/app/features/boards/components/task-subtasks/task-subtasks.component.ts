@@ -28,7 +28,7 @@ export class TaskSubtasksComponent implements OnInit {
   subtasks = signal<Subtask[]>([]);
   newSubtaskTitle = signal('');
   editingSubtaskId = signal<number | null>(null);
-  editingSubtaskTitle = '';
+  editingSubtaskTitle = signal('');
   pendingDeleteSubtask = signal<Subtask | null>(null);
 
   ngOnInit(): void {
@@ -85,11 +85,11 @@ export class TaskSubtasksComponent implements OnInit {
 
   startEditSubtask(sub: Subtask): void {
     this.editingSubtaskId.set(sub.id);
-    this.editingSubtaskTitle = sub.title;
+    this.editingSubtaskTitle.set(sub.title);
   }
 
   confirmEditSubtask(sub: Subtask): void {
-    const title = this.editingSubtaskTitle.trim();
+    const title = this.editingSubtaskTitle().trim();
     this.editingSubtaskId.set(null);
     if (!title || title === sub.title) return;
     this.subtasksApi.patch(this.taskId(), sub.id, { title })

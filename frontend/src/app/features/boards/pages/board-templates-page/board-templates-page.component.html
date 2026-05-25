@@ -1,7 +1,7 @@
 <div class="templates-page">
 
   <div class="templates-header">
-    <a class="back-link" [routerLink]="['/boards', boardId]">&larr; {{ 'TEMPLATES.BACK' | translate }}</a>
+    <a class="back-link" [routerLink]="['/boards', boardId()]">&larr; {{ 'TEMPLATES.BACK' | translate }}</a>
     <h1>{{ boardTitle() }} — {{ 'TEMPLATES.TITLE' | translate }}</h1>
   </div>
 

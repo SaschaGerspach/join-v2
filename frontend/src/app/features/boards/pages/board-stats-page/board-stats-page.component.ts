@@ -30,7 +30,7 @@ export class BoardStatsPageComponent implements OnInit {
   private readonly activityApi = inject(ActivityApiService);
   private readonly contactsApi = inject(ContactsApiService);
 
-  boardId = 0;
+  boardId = signal(0);
   boardTitle = signal('Board');
   loading = signal(true);
 
@@ -73,15 +73,15 @@ export class BoardStatsPageComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.boardId = Number(this.route.snapshot.paramMap.get('id'));
-    this.boardsApi.getById(this.boardId)
+    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
+    this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(b => this.boardTitle.set(b.title));
 
     forkJoin([
-      this.columnsApi.getByBoard(this.boardId),
-      this.tasksApi.getByBoard(this.boardId),
-      this.activityApi.getByBoard(this.boardId),
+      this.columnsApi.getByBoard(this.boardId()),
+      this.tasksApi.getByBoard(this.boardId()),
+      this.activityApi.getByBoard(this.boardId()),
       this.contactsApi.getAll(),
     ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([columns, tasks, activity, contacts]) => {
       this.buildKpis(columns, tasks);

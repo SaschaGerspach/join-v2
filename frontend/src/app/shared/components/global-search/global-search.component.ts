@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, signal, HostListener } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 import { Task, TasksApiService } from '../../../core/tasks/tasks-api.service';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -27,10 +27,8 @@ export class GlobalSearchComponent {
   open = signal(false);
   loading = signal(false);
 
-  private readonly search$ = new Subject<string>();
-
   constructor() {
-    this.search$.pipe(
+    toObservable(this.query).pipe(
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(q => {
@@ -52,7 +50,6 @@ export class GlobalSearchComponent {
   onInput(value: string): void {
     this.query.set(value);
     this.open.set(true);
-    this.search$.next(value);
   }
 
   openResult(result: SearchResult): void {

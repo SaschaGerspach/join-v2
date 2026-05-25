@@ -15,7 +15,7 @@
           <button class="btn-comment-action" (click)="startReply(c.id)">{{ 'TASK.REPLY' | translate }}</button>
         </div>
         @if (editingCommentId() === c.id) {
-          <textarea class="comment-textarea" [(ngModel)]="editingCommentText" rows="2" (blur)="confirmEditComment(c)"></textarea>
+          <textarea class="comment-textarea" [ngModel]="editingCommentText()" (ngModelChange)="editingCommentText.set($event)" rows="2" (blur)="confirmEditComment(c)"></textarea>
         } @else {
           <div class="comment-text markdown-content" [innerHTML]="c.text | markdown"></div>
         }
@@ -52,7 +52,7 @@
                   }
                 </div>
                 @if (editingCommentId() === reply.id) {
-                  <textarea class="comment-textarea" [(ngModel)]="editingCommentText" rows="2" (blur)="confirmEditComment(reply)"></textarea>
+                  <textarea class="comment-textarea" [ngModel]="editingCommentText()" (ngModelChange)="editingCommentText.set($event)" rows="2" (blur)="confirmEditComment(reply)"></textarea>
                 } @else {
                   <div class="comment-text markdown-content" [innerHTML]="reply.text | markdown"></div>
                 }

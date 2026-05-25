@@ -33,7 +33,7 @@ export class TaskCommentsComponent implements OnInit {
   comments = signal<Comment[]>([]);
   newCommentText = signal('');
   editingCommentId = signal<number | null>(null);
-  editingCommentText = '';
+  editingCommentText = signal('');
   pendingDeleteCommentId = signal<number | null>(null);
   replyingTo = signal<number | null>(null);
   replyText = signal('');
@@ -108,11 +108,11 @@ export class TaskCommentsComponent implements OnInit {
 
   startEditComment(c: Comment): void {
     this.editingCommentId.set(c.id);
-    this.editingCommentText = c.text;
+    this.editingCommentText.set(c.text);
   }
 
   confirmEditComment(c: Comment): void {
-    const text = this.editingCommentText.trim();
+    const text = this.editingCommentText().trim();
     this.editingCommentId.set(null);
     if (!text || text === c.text) return;
     this.commentsApi.patch(this.taskId(), c.id, text)

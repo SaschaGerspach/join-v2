@@ -20,18 +20,18 @@ export class BoardActivityPageComponent implements OnInit {
   private readonly boardsApi = inject(BoardsApiService);
   private readonly activityApi = inject(ActivityApiService);
 
-  boardId = 0;
+  boardId = signal(0);
   boardTitle = signal('Board');
   loading = signal(true);
   entries = signal<ActivityEntry[]>([]);
 
   ngOnInit(): void {
-    this.boardId = Number(this.route.snapshot.paramMap.get('id'));
-    this.boardsApi.getById(this.boardId)
+    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
+    this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(b => this.boardTitle.set(b.title));
 
-    this.activityApi.getByBoard(this.boardId)
+    this.activityApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(entries => {
         this.entries.set(entries);

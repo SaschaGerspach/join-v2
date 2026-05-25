@@ -33,7 +33,7 @@ export class BoardGanttPageComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly columnsApi = inject(ColumnsApiService);
 
-  boardId = 0;
+  boardId = signal(0);
   boardTitle = signal('Board');
   loading = signal(true);
   tasks = signal<Task[]>([]);
@@ -191,14 +191,14 @@ export class BoardGanttPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.boardId = Number(this.route.snapshot.paramMap.get('id'));
-    this.boardsApi.getById(this.boardId)
+    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
+    this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(b => this.boardTitle.set(b.title));
 
     forkJoin([
-      this.tasksApi.getByBoard(this.boardId),
-      this.columnsApi.getByBoard(this.boardId),
+      this.tasksApi.getByBoard(this.boardId()),
+      this.columnsApi.getByBoard(this.boardId()),
     ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([tasks, columns]) => {
       this.tasks.set(tasks);
       this.columns.set(columns);

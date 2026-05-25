@@ -24,7 +24,7 @@ export class BoardTemplatesPageComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
 
-  boardId = 0;
+  boardId = signal(0);
   boardTitle = signal('Board');
   loading = signal(true);
   templates = signal<TaskTemplate[]>([]);
@@ -42,15 +42,15 @@ export class BoardTemplatesPageComponent implements OnInit {
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
 
   ngOnInit(): void {
-    this.boardId = Number(this.route.snapshot.paramMap.get('id'));
-    this.boardsApi.getById(this.boardId)
+    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
+    this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(b => this.boardTitle.set(b.title));
     this.loadTemplates();
   }
 
   loadTemplates(): void {
-    this.templatesApi.getByBoard(this.boardId)
+    this.templatesApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(t => {
         this.templates.set(t);
@@ -107,7 +107,7 @@ export class BoardTemplatesPageComponent implements OnInit {
     const id = this.editingId();
     const obs = id
       ? this.templatesApi.update(id, payload)
-      : this.templatesApi.create(this.boardId, payload);
+      : this.templatesApi.create(this.boardId(), payload);
 
     obs.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {

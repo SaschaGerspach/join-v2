@@ -1,6 +1,6 @@
 <div class="activity-page">
   <div class="activity-header">
-    <a [routerLink]="['/boards', boardId]" class="back-link">&larr; {{ 'ACTIVITY.BACK' | translate }}</a>
+    <a [routerLink]="['/boards', boardId()]" class="back-link">&larr; {{ 'ACTIVITY.BACK' | translate }}</a>
     <h1>{{ boardTitle() }} — {{ 'ACTIVITY.TITLE' | translate }}</h1>
   </div>
 

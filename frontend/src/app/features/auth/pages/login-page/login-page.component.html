@@ -19,7 +19,8 @@
             id="login-email"
             class="form-input"
             type="email"
-            [(ngModel)]="email"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
             name="email"
             [placeholder]="'AUTH.EMAIL' | translate"
             required
@@ -43,7 +44,8 @@
               id="login-password"
               class="form-input"
               [type]="showPassword() ? 'text' : 'password'"
-              [(ngModel)]="password"
+              [ngModel]="password()"
+              (ngModelChange)="password.set($event)"
               name="password"
               [placeholder]="'AUTH.PASSWORD' | translate"
               required
@@ -67,7 +69,8 @@
             id="login-totp"
             class="form-input totp-input"
             type="text"
-            [(ngModel)]="totpCode"
+            [ngModel]="totpCode()"
+            (ngModelChange)="totpCode.set($event)"
             name="totpCode"
             [placeholder]="'PROFILE.TOTP_PLACEHOLDER' | translate"
             required

@@ -34,7 +34,7 @@ export class BoardAutomationsPageComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
 
-  boardId = 0;
+  boardId = signal(0);
   boardTitle = signal('Board');
   loading = signal(true);
   activeTab = signal<'rules' | 'logs'>('rules');
@@ -69,21 +69,21 @@ export class BoardAutomationsPageComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.boardId = Number(this.route.snapshot.paramMap.get('id'));
+    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
 
-    this.boardsApi.getById(this.boardId)
+    this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(b => this.boardTitle.set(b.title));
 
-    this.columnsApi.getByBoard(this.boardId)
+    this.columnsApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(c => this.columns.set(c));
 
-    this.boardsApi.getMembers(this.boardId)
+    this.boardsApi.getMembers(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(m => this.members.set(m));
 
-    this.labelsApi.getByBoard(this.boardId)
+    this.labelsApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(l => this.labels.set(l));
 
@@ -92,7 +92,7 @@ export class BoardAutomationsPageComponent implements OnInit {
   }
 
   loadRules(): void {
-    this.automationsApi.getByBoard(this.boardId)
+    this.automationsApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: rules => {
@@ -104,7 +104,7 @@ export class BoardAutomationsPageComponent implements OnInit {
   }
 
   loadLogs(): void {
-    this.automationsApi.getLogs(this.boardId)
+    this.automationsApi.getLogs(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: logs => this.logs.set(logs),
@@ -113,7 +113,7 @@ export class BoardAutomationsPageComponent implements OnInit {
   }
 
   toggleRule(rule: AutomationRule): void {
-    this.automationsApi.toggle(this.boardId, rule.id)
+    this.automationsApi.toggle(this.boardId(), rule.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: updated => this.rules.update(r => r.map(x => x.id === updated.id ? updated : x)),
@@ -134,7 +134,7 @@ export class BoardAutomationsPageComponent implements OnInit {
   onRuleSaved(payload: CreateRulePayload): void {
     const editing = this.editingRule();
     if (editing) {
-      this.automationsApi.patch(this.boardId, editing.id, payload)
+      this.automationsApi.patch(this.boardId(), editing.id, payload)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: updated => {
@@ -145,7 +145,7 @@ export class BoardAutomationsPageComponent implements OnInit {
           error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPDATE_RULE'), 'error'),
         });
     } else {
-      this.automationsApi.create(this.boardId, payload)
+      this.automationsApi.create(this.boardId(), payload)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: created => {
@@ -162,7 +162,7 @@ export class BoardAutomationsPageComponent implements OnInit {
     const id = this.pendingDeleteRuleId();
     if (id === null) return;
     this.pendingDeleteRuleId.set(null);
-    this.automationsApi.delete(this.boardId, id)
+    this.automationsApi.delete(this.boardId(), id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

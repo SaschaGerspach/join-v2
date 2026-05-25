@@ -1,6 +1,6 @@
 <div class="automations-page">
   <div class="automations-header">
-    <a [routerLink]="['/boards', boardId]" class="back-link">&larr; {{ 'AUTOMATIONS.BACK' | translate }}</a>
+    <a [routerLink]="['/boards', boardId()]" class="back-link">&larr; {{ 'AUTOMATIONS.BACK' | translate }}</a>
     <h1>{{ boardTitle() }} — {{ 'AUTOMATIONS.TITLE' | translate }}</h1>
   </div>
 

@@ -26,7 +26,7 @@ export class BoardTimetravelPageComponent implements OnInit {
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly activityApi = inject(ActivityApiService);
 
-  boardId = 0;
+  boardId = signal(0);
   boardTitle = signal('Board');
   loading = signal(true);
   allTasks = signal<Task[]>([]);
@@ -106,16 +106,16 @@ export class BoardTimetravelPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.boardId = Number(this.route.snapshot.paramMap.get('id'));
-    this.boardsApi.getById(this.boardId)
+    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
+    this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(b => this.boardTitle.set(b.title));
 
     forkJoin([
-      this.tasksApi.getByBoard(this.boardId),
-      this.tasksApi.getArchive(this.boardId),
-      this.columnsApi.getByBoard(this.boardId),
-      this.activityApi.getByBoard(this.boardId),
+      this.tasksApi.getByBoard(this.boardId()),
+      this.tasksApi.getArchive(this.boardId()),
+      this.columnsApi.getByBoard(this.boardId()),
+      this.activityApi.getByBoard(this.boardId()),
     ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([tasks, archived, columns, activities]) => {
       this.allTasks.set([...tasks, ...archived]);
       this.columns.set(columns);

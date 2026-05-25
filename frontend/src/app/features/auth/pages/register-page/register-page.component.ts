@@ -23,11 +23,11 @@ export class RegisterPageComponent {
   private readonly translate = inject(TranslateService);
   readonly lang = inject(LanguageService);
 
-  firstName = '';
-  lastName = '';
-  email = '';
-  password = '';
-  acceptedPrivacy = false;
+  firstName = signal('');
+  lastName = signal('');
+  email = signal('');
+  password = signal('');
+  acceptedPrivacy = signal(false);
   error = signal<string | null>(null);
   showPassword = signal(false);
   submitting = signal(false);
@@ -35,7 +35,7 @@ export class RegisterPageComponent {
   passwordStrength = signal<'weak' | 'medium' | 'strong' | null>(null);
 
   onPasswordChange(value: string): void {
-    this.password = value;
+    this.password.set(value);
     if (!value) { this.passwordStrength.set(null); return; }
     const hasUpper = /[A-Z]/.test(value);
     const hasDigit = /\d/.test(value);
@@ -49,13 +49,13 @@ export class RegisterPageComponent {
     this.error.set(null);
     this.submitting.set(true);
     this.api.register({
-      email: this.email,
-      password: this.password,
-      first_name: this.firstName,
-      last_name: this.lastName,
+      email: this.email(),
+      password: this.password(),
+      first_name: this.firstName(),
+      last_name: this.lastName(),
     }).subscribe({
       next: () => {
-        this.pendingEmail.set(this.email);
+        this.pendingEmail.set(this.email());
         this.router.navigate(['/verify-email-sent']);
       },
       error: (err) => {

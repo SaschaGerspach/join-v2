@@ -23,14 +23,14 @@ export class BoardArchivePageComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
 
-  boardId = 0;
+  boardId = signal(0);
   boardTitle = signal('Board');
   loading = signal(true);
   tasks = signal<Task[]>([]);
 
   ngOnInit(): void {
-    this.boardId = Number(this.route.snapshot.paramMap.get('id'));
-    this.boardsApi.getById(this.boardId)
+    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
+    this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(b => this.boardTitle.set(b.title));
 
@@ -48,7 +48,7 @@ export class BoardArchivePageComponent implements OnInit {
   }
 
   private loadArchive(): void {
-    this.tasksApi.getArchive(this.boardId)
+    this.tasksApi.getArchive(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: tasks => {

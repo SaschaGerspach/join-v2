@@ -18,7 +18,8 @@
           id="register-first-name"
           class="form-input"
           type="text"
-          [(ngModel)]="firstName"
+          [ngModel]="firstName()"
+          (ngModelChange)="firstName.set($event)"
           name="firstName"
           [placeholder]="'AUTH.FIRST_NAME' | translate"
           required
@@ -37,7 +38,8 @@
           id="register-last-name"
           class="form-input"
           type="text"
-          [(ngModel)]="lastName"
+          [ngModel]="lastName()"
+          (ngModelChange)="lastName.set($event)"
           name="lastName"
           [placeholder]="'AUTH.LAST_NAME' | translate"
           required
@@ -56,7 +58,8 @@
           id="register-email"
           class="form-input"
           type="email"
-          [(ngModel)]="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
           name="email"
           [placeholder]="'AUTH.EMAIL' | translate"
           required
@@ -80,7 +83,7 @@
             id="register-password"
             class="form-input"
             [type]="showPassword() ? 'text' : 'password'"
-            [ngModel]="password"
+            [ngModel]="password()"
             (ngModelChange)="onPasswordChange($event)"
             name="password"
             [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate"
@@ -116,7 +119,8 @@
         <label class="consent-label">
           <input
             type="checkbox"
-            [(ngModel)]="acceptedPrivacy"
+            [ngModel]="acceptedPrivacy()"
+            (ngModelChange)="acceptedPrivacy.set($event)"
             name="acceptedPrivacy"
             required
             #privacyField="ngModel"
