@@ -36,7 +36,7 @@ import { LanguageService } from '../../../../shared/services/language.service';
       </div>
     </div>
   `,
-  styleUrls: ['../login-page/login-page.component.scss'],
+  styleUrl: '../login-page/login-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VerifyEmailSentPageComponent implements OnInit {
