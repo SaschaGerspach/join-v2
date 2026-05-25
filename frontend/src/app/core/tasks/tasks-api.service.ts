@@ -50,6 +50,7 @@ export type Task = {
   description: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
   assigned_to: number[];
+  start_date: string | null;
   due_date: string | null;
   recurrence: Recurrence;
   order: number;
@@ -66,6 +67,7 @@ export type CreateTaskPayload = {
   description?: string;
   priority?: string;
   column?: number | null;
+  start_date?: string | null;
   due_date?: string | null;
   recurrence?: Recurrence;
   assigned_to?: number[];

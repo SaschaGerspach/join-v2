@@ -47,6 +47,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   title = signal('');
   description = signal('');
   priority = signal<'low' | 'medium' | 'high' | 'urgent'>('medium');
+  startDate = signal('');
   dueDate = signal('');
   columnId = signal<number | null>(null);
   assignedTo = signal<number[]>([]);
@@ -72,6 +73,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.title.set(t.title);
     this.description.set(t.description ?? '');
     this.priority.set(t.priority);
+    this.startDate.set(t.start_date ?? '');
     this.dueDate.set(t.due_date ?? '');
     this.columnId.set(t.column);
     this.assignedTo.set(t.assigned_to ?? []);
@@ -86,6 +88,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       title: this.title().trim(),
       description: this.description().trim(),
       priority: this.priority(),
+      start_date: this.startDate() || null,
       due_date: this.dueDate() || null,
       recurrence: this.recurrence(),
       column: this.columnId(),

@@ -43,6 +43,16 @@
         </div>
 
         <div class="field-group">
+          <label class="field-label">{{ 'TASK.START_DATE' | translate }}</label>
+          <input
+            class="field-input"
+            type="date"
+            [ngModel]="startDate()"
+            (ngModelChange)="startDate.set($event)"
+          />
+        </div>
+
+        <div class="field-group">
           <label class="field-label">{{ 'TASK.DUE_DATE' | translate }}</label>
           <input
             class="field-input"

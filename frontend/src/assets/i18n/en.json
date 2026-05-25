@@ -170,6 +170,7 @@
     "TITLE_REQUIRED": "Title is required.",
     "DESCRIPTION": "Description",
     "PRIORITY": "Priority",
+    "START_DATE": "Start date",
     "DUE_DATE": "Due date",
     "REPEAT": "Repeat",
     "NONE": "None",
@@ -460,6 +461,16 @@
     "NAV_COLUMNS": "Navigate between columns",
     "NAV_TASKS": "Navigate between tasks",
     "OPEN_TASK": "Open focused task"
+  },
+  "GANTT": {
+    "TITLE": "Gantt Chart",
+    "BACK": "Back to board",
+    "DAY": "Day",
+    "WEEK": "Week",
+    "MONTH": "Month",
+    "NO_DATED_TASKS": "No tasks with dates found. Set start or due dates on your tasks to see them here.",
+    "UNSCHEDULED": "Unscheduled tasks",
+    "TODAY": "Today"
   },
   "SW_UPDATE": {
     "AVAILABLE": "A new version is available.",

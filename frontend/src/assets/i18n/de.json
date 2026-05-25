@@ -170,6 +170,7 @@
     "TITLE_REQUIRED": "Titel ist erforderlich.",
     "DESCRIPTION": "Beschreibung",
     "PRIORITY": "Priorität",
+    "START_DATE": "Startdatum",
     "DUE_DATE": "Fälligkeitsdatum",
     "REPEAT": "Wiederholung",
     "NONE": "Keine",
@@ -460,6 +461,16 @@
     "NAV_COLUMNS": "Zwischen Spalten navigieren",
     "NAV_TASKS": "Zwischen Aufgaben navigieren",
     "OPEN_TASK": "Fokussierte Aufgabe öffnen"
+  },
+  "GANTT": {
+    "TITLE": "Gantt-Diagramm",
+    "BACK": "Zurück zum Board",
+    "DAY": "Tag",
+    "WEEK": "Woche",
+    "MONTH": "Monat",
+    "NO_DATED_TASKS": "Keine Aufgaben mit Datum gefunden. Setze Start- oder Fälligkeitsdaten, um sie hier zu sehen.",
+    "UNSCHEDULED": "Ungeplante Aufgaben",
+    "TODAY": "Heute"
   },
   "SW_UPDATE": {
     "AVAILABLE": "Eine neue Version ist verfügbar.",
