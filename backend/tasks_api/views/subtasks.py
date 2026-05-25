@@ -9,6 +9,7 @@ from ..models import Task, Subtask
 from ..signals import all_subtasks_completed
 from ..serializers import (
     SubtaskCreateSerializer,
+    SubtaskReorderSerializer,
     SubtaskSerializer,
     SubtaskUpdateSerializer,
 )
@@ -20,6 +21,7 @@ def serialize_subtask(subtask):
         "task": subtask.task_id,
         "title": subtask.title,
         "done": subtask.done,
+        "order": subtask.order,
     }
 
 
@@ -52,7 +54,8 @@ def subtask_list(request, task_pk):
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    subtask = Subtask.objects.create(task=task, title=serializer.validated_data["title"])
+    max_order = task.subtasks.count()
+    subtask = Subtask.objects.create(task=task, title=serializer.validated_data["title"], order=max_order)
     return Response(serialize_subtask(subtask), status=status.HTTP_201_CREATED)
 
 
@@ -93,4 +96,31 @@ def subtask_detail(request, task_pk, pk):
         return Response(serialize_subtask(subtask))
 
     subtask.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(
+    request=SubtaskReorderSerializer,
+    responses={204: None, 404: DetailSerializer},
+)
+@api_view(["POST"])
+def subtask_reorder(request, task_pk):
+    try:
+        task = Task.objects.select_related("board").get(pk=task_pk)
+    except Task.DoesNotExist:
+        return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not can_edit_board(task.board, request.user):
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
+    serializer = SubtaskReorderSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    ids = serializer.validated_data["ids"]
+    subtasks = {s.pk: s for s in task.subtasks.filter(pk__in=ids)}
+    for i, pk in enumerate(ids):
+        if pk in subtasks:
+            subtasks[pk].order = i
+    Subtask.objects.bulk_update(subtasks.values(), ["order"])
     return Response(status=status.HTTP_204_NO_CONTENT)

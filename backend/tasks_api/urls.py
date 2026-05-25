@@ -14,6 +14,7 @@ urlpatterns = [
     path("<int:pk>/restore/", views.task_restore, name="task-restore"),
     path("<int:task_pk>/subtasks/", views.subtask_list, name="subtask-list"),
     path("<int:task_pk>/subtasks/<int:pk>/", views.subtask_detail, name="subtask-detail"),
+    path("<int:task_pk>/subtasks/reorder/", views.subtask_reorder, name="subtask-reorder"),
     path("<int:task_pk>/comments/", views.comment_list, name="comment-list"),
     path("<int:task_pk>/comments/<int:pk>/", views.comment_detail, name="comment-detail"),
     path("<int:task_pk>/attachments/", views.attachment_list, name="attachment-list"),

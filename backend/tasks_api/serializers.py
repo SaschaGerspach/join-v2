@@ -91,6 +91,11 @@ class SubtaskSerializer(serializers.Serializer):
     task = serializers.IntegerField()
     title = serializers.CharField()
     done = serializers.BooleanField()
+    order = serializers.IntegerField()
+
+
+class SubtaskReorderSerializer(serializers.Serializer):
+    ids = serializers.ListField(child=serializers.IntegerField())
 
 
 class SubtaskCreateSerializer(serializers.Serializer):
