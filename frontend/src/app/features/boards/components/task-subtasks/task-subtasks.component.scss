@@ -41,6 +41,19 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  background: var(--color-surface, #fff);
+  border-radius: 8px;
+  padding: 0.25rem 0.4rem;
+  transition: box-shadow 0.15s;
+
+  &.cdk-drag-preview {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+  }
+
+  &.cdk-drag-placeholder {
+    opacity: 0.3;
+  }
 
   input[type="checkbox"] {
     accent-color: $color-primary;
@@ -72,6 +85,20 @@
     background: transparent;
     color: var(--color-text);
   }
+}
+
+.drag-handle {
+  cursor: grab;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  user-select: none;
+  flex-shrink: 0;
+  opacity: 0.5;
+  &:hover { opacity: 1; }
+}
+
+.cdk-drop-list-dragging .subtask-item:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 .btn-remove-sub {

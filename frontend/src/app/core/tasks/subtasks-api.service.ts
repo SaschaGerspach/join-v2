@@ -8,6 +8,7 @@ export type Subtask = {
   task: number;
   title: string;
   done: boolean;
+  order: number;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -34,6 +35,14 @@ export class SubtasksApiService {
   delete(taskId: number, subtaskId: number): Observable<void> {
     return this.http.delete<void>(
       `${this.baseUrl}/tasks/${taskId}/subtasks/${subtaskId}/`,
+      { withCredentials: true }
+    );
+  }
+
+  reorder(taskId: number, ids: number[]): Observable<void> {
+    return this.http.post<void>(
+      `${this.baseUrl}/tasks/${taskId}/subtasks/reorder/`,
+      { ids },
       { withCredentials: true }
     );
   }

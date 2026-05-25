@@ -651,7 +651,8 @@
     "TEMPLATE_SAVED": "Template saved.",
     "FAILED_SAVE_TEMPLATE": "Failed to save template.",
     "TEMPLATE_DELETED": "Template deleted.",
-    "FAILED_DELETE_TEMPLATE": "Failed to delete template."
+    "FAILED_DELETE_TEMPLATE": "Failed to delete template.",
+    "FAILED_REORDER_SUBTASKS": "Failed to reorder subtasks."
   },
   "PRIVACY": {
     "TITLE": "Privacy Policy",

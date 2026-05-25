@@ -651,7 +651,8 @@
     "TEMPLATE_SAVED": "Vorlage gespeichert.",
     "FAILED_SAVE_TEMPLATE": "Fehler beim Speichern der Vorlage.",
     "TEMPLATE_DELETED": "Vorlage gelöscht.",
-    "FAILED_DELETE_TEMPLATE": "Fehler beim Löschen der Vorlage."
+    "FAILED_DELETE_TEMPLATE": "Fehler beim Löschen der Vorlage.",
+    "FAILED_REORDER_SUBTASKS": "Fehler beim Sortieren der Teilaufgaben."
   },
   "PRIVACY": {
     "TITLE": "Datenschutzerklärung",

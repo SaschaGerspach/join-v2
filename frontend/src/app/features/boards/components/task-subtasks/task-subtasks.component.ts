@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, output, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -9,7 +10,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 @Component({
   selector: 'app-task-subtasks',
   standalone: true,
-  imports: [FormsModule, TranslateModule, ConfirmDialogComponent],
+  imports: [FormsModule, DragDropModule, TranslateModule, ConfirmDialogComponent],
   templateUrl: './task-subtasks.component.html',
   styleUrl: './task-subtasks.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -96,6 +97,19 @@ export class TaskSubtasksComponent implements OnInit {
       .subscribe({
         next: updated => this.subtasks.update(s => s.map(x => x.id === updated.id ? updated : x)),
         error: () => this.toast.show(this.translate.instant('TOAST.FAILED_RENAME_SUBTASK'), 'error'),
+      });
+  }
+
+  dropSubtask(event: CdkDragDrop<Subtask[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+    const reordered = [...this.subtasks()];
+    const [moved] = reordered.splice(event.previousIndex, 1);
+    reordered.splice(event.currentIndex, 0, moved);
+    this.subtasks.set(reordered);
+    this.subtasksApi.reorder(this.taskId(), reordered.map(s => s.id))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REORDER_SUBTASKS'), 'error'),
       });
   }
 
