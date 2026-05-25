@@ -1,0 +1,108 @@
+<div class="gantt-page">
+
+  <div class="gantt-header">
+    <a class="back-link" [routerLink]="['/boards', boardId]">← {{ 'GANTT.BACK' | translate }}</a>
+    <h1>{{ boardTitle() }} — {{ 'GANTT.TITLE' | translate }}</h1>
+    <div class="zoom-controls">
+      <button [class.active]="zoom() === 'day'" (click)="setZoom('day')">{{ 'GANTT.DAY' | translate }}</button>
+      <button [class.active]="zoom() === 'week'" (click)="setZoom('week')">{{ 'GANTT.WEEK' | translate }}</button>
+      <button [class.active]="zoom() === 'month'" (click)="setZoom('month')">{{ 'GANTT.MONTH' | translate }}</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-hint">{{ 'COMMON.LOADING' | translate }}</p>
+  } @else if (datedTasks().length === 0) {
+    <p class="empty-hint">{{ 'GANTT.NO_DATED_TASKS' | translate }}</p>
+  } @else {
+    <div class="gantt-container">
+      <div class="gantt-sidebar">
+        <div class="sidebar-header">Task</div>
+        @for (bar of ganttBars(); track bar.task.id) {
+          <div
+            class="sidebar-row"
+            [class.selected]="selectedTask()?.id === bar.task.id"
+            (click)="selectTask(bar.task)"
+          >
+            <span class="task-title">{{ bar.task.title }}</span>
+            <span class="task-column">{{ bar.columnTitle }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="gantt-timeline" [style.--timeline-width.px]="timelineWidth()">
+        <div class="timeline-header">
+          @for (h of timelineHeaders(); track $index) {
+            <div class="timeline-header-cell" [style.flex]="h.span">{{ h.label }}</div>
+          }
+        </div>
+
+        <div class="timeline-body">
+          @if (todayPosition() >= 0) {
+            <div class="today-line" [style.left.%]="todayPosition()"></div>
+          }
+
+          <svg class="dependency-lines" [attr.viewBox]="'0 0 ' + timelineWidth() + ' ' + (ganttBars().length * 44)">
+            @for (line of dependencyLines(); track $index) {
+              <path
+                [attr.d]="'M ' + (line.x1 / 100 * timelineWidth()) + ' ' + line.y1 + ' C ' + ((line.x1 / 100 * timelineWidth()) + 30) + ' ' + line.y1 + ' ' + ((line.x2 / 100 * timelineWidth()) - 30) + ' ' + line.y2 + ' ' + (line.x2 / 100 * timelineWidth()) + ' ' + line.y2"
+                class="dep-arrow"
+              />
+              <circle
+                [attr.cx]="line.x2 / 100 * timelineWidth()"
+                [attr.cy]="line.y2"
+                r="3"
+                class="dep-dot"
+              />
+            }
+          </svg>
+
+          @for (bar of ganttBars(); track bar.task.id) {
+            <div class="timeline-row">
+              <div
+                class="gantt-bar"
+                [class.selected]="selectedTask()?.id === bar.task.id"
+                [style.left.%]="bar.left"
+                [style.width.%]="bar.width"
+                [style.background-color]="bar.color"
+                [title]="bar.task.title"
+                (click)="selectTask(bar.task)"
+              ></div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (undatedTasks().length > 0) {
+    <div class="unscheduled-section">
+      <h3>{{ 'GANTT.UNSCHEDULED' | translate }} ({{ undatedTasks().length }})</h3>
+      <div class="unscheduled-list">
+        @for (t of undatedTasks(); track t.id) {
+          <div class="unscheduled-item">
+            <span class="priority-dot priority-{{ t.priority }}"></span>
+            {{ t.title }}
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (selectedTask(); as task) {
+    <div class="task-info-panel">
+      <h3>{{ task.title }}</h3>
+      <div class="info-row"><strong>{{ 'TASK.PRIORITY' | translate }}:</strong> {{ task.priority }}</div>
+      @if (task.start_date) {
+        <div class="info-row"><strong>{{ 'TASK.START_DATE' | translate }}:</strong> {{ task.start_date }}</div>
+      }
+      @if (task.due_date) {
+        <div class="info-row"><strong>{{ 'TASK.DUE_DATE' | translate }}:</strong> {{ task.due_date }}</div>
+      }
+      @if (task.description) {
+        <div class="info-row"><strong>{{ 'TASK.DESCRIPTION' | translate }}:</strong> {{ task.description }}</div>
+      }
+    </div>
+  }
+
+</div>
