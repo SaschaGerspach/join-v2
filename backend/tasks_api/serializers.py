@@ -184,3 +184,23 @@ class TimeEntrySerializer(serializers.Serializer):
 class TimeEntryCreateSerializer(serializers.Serializer):
     duration_minutes = serializers.IntegerField(min_value=1, max_value=1440)
     note = serializers.CharField(required=False, allow_blank=True, max_length=255, default="")
+
+
+class TaskTemplateSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(max_length=100)
+    title = serializers.CharField(required=False, allow_blank=True, max_length=255, default="")
+    description = serializers.CharField(required=False, allow_blank=True, default="")
+    priority = serializers.ChoiceField(choices=PRIORITY_CHOICES, required=False, default="medium")
+    subtasks = serializers.ListField(child=serializers.CharField(max_length=255), required=False, default=list)
+    label_ids = serializers.ListField(child=serializers.IntegerField(), required=False, default=list)
+    created_at = serializers.DateTimeField(read_only=True)
+
+
+class TaskTemplateUpdateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False, max_length=100)
+    title = serializers.CharField(required=False, allow_blank=True, max_length=255)
+    description = serializers.CharField(required=False, allow_blank=True)
+    priority = serializers.ChoiceField(choices=PRIORITY_CHOICES, required=False)
+    subtasks = serializers.ListField(child=serializers.CharField(max_length=255), required=False)
+    label_ids = serializers.ListField(child=serializers.IntegerField(), required=False)

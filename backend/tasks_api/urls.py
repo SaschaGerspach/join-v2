@@ -25,4 +25,7 @@ urlpatterns = [
     path("<int:task_pk>/fields/", views.task_field_values, name="task-field-values"),
     path("<int:task_pk>/time/", views.time_entry_list, name="time-entry-list"),
     path("<int:task_pk>/time/<int:pk>/", views.time_entry_detail, name="time-entry-detail"),
+    path("templates/", views.template_list, name="template-list"),
+    path("templates/<int:pk>/", views.template_detail, name="template-detail"),
+    path("templates/<int:pk>/create-task/", views.template_create_task, name="template-create-task"),
 ]

@@ -158,6 +158,26 @@ class TaskFieldValue(models.Model):
         ]
 
 
+class TaskTemplate(models.Model):
+    board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="task_templates")
+    name = models.CharField(max_length=100)
+    title = models.CharField(max_length=255, blank=True, default="")
+    description = models.TextField(blank=True, default="")
+    priority = models.CharField(max_length=10, blank=True, default="medium")
+    subtasks = models.JSONField(default=list, blank=True)
+    label_ids = models.JSONField(default=list, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["board", "name"], name="unique_template_per_board"),
+        ]
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class TimeEntry(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="time_entries")
     user = models.ForeignKey(
