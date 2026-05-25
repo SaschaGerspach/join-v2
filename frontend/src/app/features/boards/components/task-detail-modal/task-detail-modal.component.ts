@@ -142,6 +142,13 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     });
   }
 
+  copyLink(): void {
+    const url = `${window.location.origin}/boards/${this.task().board}/tasks/${this.task().id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.toast.show(this.translate.instant('TOAST.LINK_COPIED'));
+    });
+  }
+
   onSubtaskCountChanged(counts: { total: number; done: number }): void {
     this.taskUpdated.emit({
       ...this.task(),
