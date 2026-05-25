@@ -188,6 +188,8 @@
     "COPY_LINK": "Copy link",
     "WATCH": "Watch",
     "UNWATCH": "Unwatch",
+    "COVER_IMAGE": "Cover image",
+    "COVER_IMAGE_PLACEHOLDER": "Paste image URL…",
     "LABELS": "Labels",
     "NEW_LABEL": "New label…",
     "LABEL_COLOR": "Label color",

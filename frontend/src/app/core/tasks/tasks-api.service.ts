@@ -53,6 +53,7 @@ export type Task = {
   start_date: string | null;
   due_date: string | null;
   recurrence: Recurrence;
+  cover_image_url: string;
   order: number;
   created_at: string;
   subtask_count: number;
@@ -76,6 +77,7 @@ export type CreateTaskPayload = {
 export type UpdateTaskPayload = Partial<CreateTaskPayload> & {
   order?: number;
   label_ids?: number[];
+  cover_image_url?: string;
 };
 
 @Injectable({ providedIn: 'root' })

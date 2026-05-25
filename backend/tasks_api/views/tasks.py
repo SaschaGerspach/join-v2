@@ -143,7 +143,7 @@ def task_detail(request, pk):
         previous_column_id = task.column_id
         previous_priority = task.priority
         changed_fields = []
-        for field in ["title", "description", "priority", "column", "start_date", "due_date", "recurrence", "order"]:
+        for field in ["title", "description", "priority", "column", "start_date", "due_date", "recurrence", "cover_image_url", "order"]:
             key = f"{field}_id" if field == "column" else field
             if field in data:
                 setattr(task, key, data[field])

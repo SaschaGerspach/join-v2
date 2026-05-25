@@ -45,6 +45,7 @@ class TaskSerializer(serializers.Serializer):
     start_date = serializers.DateField(allow_null=True)
     due_date = serializers.DateField(allow_null=True)
     recurrence = serializers.CharField(allow_null=True)
+    cover_image_url = serializers.CharField(allow_blank=True)
     created_at = serializers.DateTimeField()
     order = serializers.IntegerField()
     subtask_count = serializers.IntegerField()
@@ -76,6 +77,7 @@ class TaskUpdateSerializer(serializers.Serializer):
     start_date = serializers.DateField(required=False, allow_null=True)
     due_date = serializers.DateField(required=False, allow_null=True)
     recurrence = serializers.ChoiceField(choices=RECURRENCE_CHOICES, required=False, allow_null=True)
+    cover_image_url = serializers.URLField(required=False, allow_blank=True, max_length=500)
     order = serializers.IntegerField(required=False, min_value=0)
     label_ids = serializers.ListField(child=serializers.IntegerField(), required=False)
 

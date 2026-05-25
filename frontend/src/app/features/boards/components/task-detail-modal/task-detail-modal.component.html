@@ -116,6 +116,20 @@
         </div>
       </div>
 
+      <div class="field-group">
+        <label class="field-label">{{ 'TASK.COVER_IMAGE' | translate }}</label>
+        @if (coverImageUrl()) {
+          <img class="cover-preview" [src]="coverImageUrl()" alt="" />
+        }
+        <input
+          class="field-input"
+          type="url"
+          [ngModel]="coverImageUrl()"
+          (ngModelChange)="coverImageUrl.set($event)"
+          [placeholder]="'TASK.COVER_IMAGE_PLACEHOLDER' | translate"
+        />
+      </div>
+
       <app-task-labels
         [boardId]="task().board"
         [(selectedLabelIds)]="selectedLabelIds"

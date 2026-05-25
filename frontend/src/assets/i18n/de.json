@@ -188,6 +188,8 @@
     "COPY_LINK": "Link kopieren",
     "WATCH": "Beobachten",
     "UNWATCH": "Nicht mehr beobachten",
+    "COVER_IMAGE": "Titelbild",
+    "COVER_IMAGE_PLACEHOLDER": "Bild-URL einfügen…",
     "LABELS": "Labels",
     "NEW_LABEL": "Neues Label…",
     "LABEL_COLOR": "Label-Farbe",

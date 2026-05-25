@@ -54,6 +54,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   assignedTo = signal<number[]>([]);
   recurrence = signal<Recurrence>(null);
   selectedLabelIds = signal<Set<number>>(new Set());
+  coverImageUrl = signal('');
   showDeleteConfirm = signal(false);
   descriptionPreview = signal(false);
   isWatching = signal(false);
@@ -82,6 +83,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.columnId.set(t.column);
     this.assignedTo.set(t.assigned_to ?? []);
     this.recurrence.set(t.recurrence ?? null);
+    this.coverImageUrl.set(t.cover_image_url ?? '');
     this.selectedLabelIds.set(new Set(t.labels?.map(l => l.id) ?? []));
 
     this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(contacts => this.contacts.set(contacts));
@@ -99,6 +101,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       start_date: this.startDate() || null,
       due_date: this.dueDate() || null,
       recurrence: this.recurrence(),
+      cover_image_url: this.coverImageUrl(),
       column: this.columnId(),
       assigned_to: this.assignedTo(),
       label_ids: [...this.selectedLabelIds()],

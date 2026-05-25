@@ -29,6 +29,7 @@ def serialize_task(task):
         "start_date": task.start_date,
         "due_date": task.due_date,
         "recurrence": task.recurrence,
+        "cover_image_url": task.cover_image_url,
         "created_at": task.created_at,
         "order": task.order,
         "subtask_count": len(subtasks),

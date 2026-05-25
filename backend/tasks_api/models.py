@@ -39,6 +39,7 @@ class Task(models.Model):
     due_date = models.DateField(null=True, blank=True)
     recurrence = models.CharField(max_length=10, choices=Recurrence.choices, null=True, blank=True, default=None)
     labels = models.ManyToManyField('Label', blank=True, related_name="tasks")
+    cover_image_url = models.URLField(max_length=500, blank=True, default="")
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     archived_at = models.DateTimeField(null=True, blank=True, default=None)
