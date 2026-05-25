@@ -1,0 +1,77 @@
+<div class="timetravel-page">
+
+  <div class="timetravel-header">
+    <a class="back-link" [routerLink]="['/boards', boardId]">← {{ 'TIME_TRAVEL.BACK' | translate }}</a>
+    <h1>{{ boardTitle() }} — {{ 'TIME_TRAVEL.TITLE' | translate }}</h1>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-hint">{{ 'COMMON.LOADING' | translate }}</p>
+  } @else if (allTasks().length === 0) {
+    <p class="empty-hint">{{ 'TIME_TRAVEL.NO_TASKS' | translate }}</p>
+  } @else {
+
+    <div class="controls">
+      <button class="btn-play" (click)="togglePlay()" [attr.aria-label]="playing() ? ('TIME_TRAVEL.PAUSE' | translate) : ('TIME_TRAVEL.PLAY' | translate)">
+        {{ playing() ? '⏸' : '▶' }}
+      </button>
+      <input
+        type="range"
+        class="timeline-slider"
+        min="0"
+        max="100"
+        step="0.1"
+        [value]="sliderValue()"
+        (input)="onSliderChange($event)"
+        [attr.aria-label]="'TIME_TRAVEL.SLIDER' | translate"
+      />
+      <span class="current-date">{{ formattedDate() }}</span>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-value">{{ stats().visible }}</span>
+        <span class="stat-label">/ {{ stats().total }} {{ 'TIME_TRAVEL.TASKS_VISIBLE' | translate }}</span>
+      </div>
+      <div class="progress-ring">
+        <div class="progress-fill" [style.width.%]="stats().percentage"></div>
+      </div>
+    </div>
+
+    <div class="board-snapshot">
+      @for (col of columns(); track col.id) {
+        <div class="snapshot-column">
+          <div class="column-header">
+            <span class="column-title">{{ col.title }}</span>
+            <span class="column-count">{{ (tasksByColumn().get(col.id) ?? []).length }}</span>
+          </div>
+          <div class="column-tasks">
+            @for (task of tasksByColumn().get(col.id) ?? []; track task.id) {
+              <div class="snapshot-task" [style.border-left-color]="priorityColor(task.priority)">
+                <span class="task-title">{{ task.title }}</span>
+                @if (task.due_date) {
+                  <span class="task-due">{{ task.due_date }}</span>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (nearbyActivities().length > 0) {
+      <div class="activity-ticker">
+        <h3>{{ 'TIME_TRAVEL.ACTIVITY_AROUND' | translate }}</h3>
+        @for (a of nearbyActivities(); track a.id) {
+          <div class="activity-item">
+            <span class="activity-action">{{ a.action }}</span>
+            <span class="activity-entity">{{ a.entity_title }}</span>
+            <span class="activity-user">{{ a.user_name }}</span>
+            <span class="activity-time">{{ a.created_at | date:'short' }}</span>
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>

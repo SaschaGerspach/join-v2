@@ -29,6 +29,7 @@ export const routes: Routes = [
                 {path: 'boards/:id/archive', title: 'Archive | Join', loadComponent: () => import('./features/boards/pages/board-archive-page/board-archive-page.component').then(m => m.BoardArchivePageComponent)},
                 {path: 'boards/:id/automations', title: 'Automations | Join', loadComponent: () => import('./features/boards/pages/board-automations-page/board-automations-page.component').then(m => m.BoardAutomationsPageComponent)},
                 {path: 'boards/:id/gantt', title: 'Gantt | Join', loadComponent: () => import('./features/boards/pages/board-gantt-page/board-gantt-page.component').then(m => m.BoardGanttPageComponent)},
+                {path: 'boards/:id/time-travel', title: 'Time Travel | Join', loadComponent: () => import('./features/boards/pages/board-timetravel-page/board-timetravel-page.component').then(m => m.BoardTimetravelPageComponent)},
                 {path: 'boards/:id/webhooks', title: 'Webhooks | Join', loadComponent: () => import('./features/boards/pages/board-webhooks-page/board-webhooks-page.component').then(m => m.BoardWebhooksPageComponent)},
                 {path: 'boards/:id/templates', title: 'Templates | Join', loadComponent: () => import('./features/boards/pages/board-templates-page/board-templates-page.component').then(m => m.BoardTemplatesPageComponent)},
                 {path: 'boards/join/:token', title: 'Join Board | Join', loadComponent: () => import('./features/boards/pages/board-join-page/board-join-page.component').then(m => m.BoardJoinPageComponent)},

@@ -503,6 +503,16 @@
     "EMPTY": "Keine Webhooks konfiguriert. Erstelle einen, um HTTP-Benachrichtigungen für Board-Events zu erhalten.",
     "CONFIRM_DELETE": "Diesen Webhook löschen?"
   },
+  "TIME_TRAVEL": {
+    "TITLE": "Zeitreise",
+    "BACK": "Zurück zum Board",
+    "NO_TASKS": "Keine Aufgaben auf diesem Board gefunden.",
+    "PLAY": "Timeline abspielen",
+    "PAUSE": "Timeline pausieren",
+    "SLIDER": "Timeline-Position",
+    "TASKS_VISIBLE": "Aufgaben sichtbar",
+    "ACTIVITY_AROUND": "Aktivität um diesen Zeitpunkt"
+  },
   "WORKLOAD": {
     "TITLE": "Auslastungs-Heatmap",
     "MONTH": "1 Monat",

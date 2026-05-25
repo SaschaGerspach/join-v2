@@ -469,6 +469,16 @@
     "NAV_TASKS": "Navigate between tasks",
     "OPEN_TASK": "Open focused task"
   },
+  "TIME_TRAVEL": {
+    "TITLE": "Time Travel",
+    "BACK": "Back to board",
+    "NO_TASKS": "No tasks found on this board.",
+    "PLAY": "Play timeline",
+    "PAUSE": "Pause timeline",
+    "SLIDER": "Timeline position",
+    "TASKS_VISIBLE": "tasks visible",
+    "ACTIVITY_AROUND": "Activity around this time"
+  },
   "WORKLOAD": {
     "TITLE": "Workload Heatmap",
     "MONTH": "1 Month",

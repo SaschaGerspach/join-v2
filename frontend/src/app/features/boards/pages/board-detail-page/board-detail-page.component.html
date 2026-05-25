@@ -78,6 +78,7 @@
     }
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'automations']">{{ 'AUTOMATIONS.TITLE' | translate }}</a>
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'gantt']">{{ 'GANTT.TITLE' | translate }}</a>
+    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'time-travel']">{{ 'TIME_TRAVEL.TITLE' | translate }}</a>
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'webhooks']">{{ 'WEBHOOKS.TITLE' | translate }}</a>
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'templates']">{{ 'TEMPLATES.TITLE' | translate }}</a>
     <button class="btn-stats" (click)="shareInviteLink()">{{ 'INVITE.SHARE' | translate }}</button>
