@@ -472,6 +472,21 @@
     "UNSCHEDULED": "Unscheduled tasks",
     "TODAY": "Today"
   },
+  "TEMPLATES": {
+    "TITLE": "Templates",
+    "BACK": "Back to board",
+    "ADD": "Add template",
+    "EDIT": "Edit template",
+    "TEMPLATE_NAME": "Template name",
+    "NAME_PLACEHOLDER": "e.g. Bug Report, Feature Request",
+    "TASK_TITLE": "Default task title",
+    "TITLE_PLACEHOLDER": "Leave empty to use template name",
+    "SUBTASKS": "Subtasks",
+    "SUBTASK_PLACEHOLDER": "Add subtask…",
+    "USE": "Create task from template",
+    "EMPTY": "No templates yet. Create one to quickly add tasks with predefined content.",
+    "CONFIRM_DELETE": "Delete this template?"
+  },
   "WEBHOOKS": {
     "TITLE": "Webhooks",
     "BACK": "Back to board",
@@ -632,7 +647,11 @@
     "WEBHOOK_SAVED": "Webhook saved.",
     "FAILED_SAVE_WEBHOOK": "Failed to save webhook.",
     "WEBHOOK_DELETED": "Webhook deleted.",
-    "FAILED_DELETE_WEBHOOK": "Failed to delete webhook."
+    "FAILED_DELETE_WEBHOOK": "Failed to delete webhook.",
+    "TEMPLATE_SAVED": "Template saved.",
+    "FAILED_SAVE_TEMPLATE": "Failed to save template.",
+    "TEMPLATE_DELETED": "Template deleted.",
+    "FAILED_DELETE_TEMPLATE": "Failed to delete template."
   },
   "PRIVACY": {
     "TITLE": "Privacy Policy",

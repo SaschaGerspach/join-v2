@@ -462,6 +462,21 @@
     "NAV_TASKS": "Zwischen Aufgaben navigieren",
     "OPEN_TASK": "Fokussierte Aufgabe öffnen"
   },
+  "TEMPLATES": {
+    "TITLE": "Vorlagen",
+    "BACK": "Zurück zum Board",
+    "ADD": "Vorlage erstellen",
+    "EDIT": "Vorlage bearbeiten",
+    "TEMPLATE_NAME": "Vorlagenname",
+    "NAME_PLACEHOLDER": "z.B. Bug-Report, Feature-Request",
+    "TASK_TITLE": "Standard-Aufgabentitel",
+    "TITLE_PLACEHOLDER": "Leer lassen, um Vorlagenname zu verwenden",
+    "SUBTASKS": "Teilaufgaben",
+    "SUBTASK_PLACEHOLDER": "Teilaufgabe hinzufügen…",
+    "USE": "Aufgabe aus Vorlage erstellen",
+    "EMPTY": "Noch keine Vorlagen. Erstelle eine, um schnell Aufgaben mit vordefiniertem Inhalt anzulegen.",
+    "CONFIRM_DELETE": "Diese Vorlage löschen?"
+  },
   "WEBHOOKS": {
     "TITLE": "Webhooks",
     "BACK": "Zurück zum Board",
@@ -632,7 +647,11 @@
     "WEBHOOK_SAVED": "Webhook gespeichert.",
     "FAILED_SAVE_WEBHOOK": "Fehler beim Speichern des Webhooks.",
     "WEBHOOK_DELETED": "Webhook gelöscht.",
-    "FAILED_DELETE_WEBHOOK": "Fehler beim Löschen des Webhooks."
+    "FAILED_DELETE_WEBHOOK": "Fehler beim Löschen des Webhooks.",
+    "TEMPLATE_SAVED": "Vorlage gespeichert.",
+    "FAILED_SAVE_TEMPLATE": "Fehler beim Speichern der Vorlage.",
+    "TEMPLATE_DELETED": "Vorlage gelöscht.",
+    "FAILED_DELETE_TEMPLATE": "Fehler beim Löschen der Vorlage."
   },
   "PRIVACY": {
     "TITLE": "Datenschutzerklärung",

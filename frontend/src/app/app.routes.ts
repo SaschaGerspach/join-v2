@@ -29,6 +29,7 @@ export const routes: Routes = [
                 {path: 'boards/:id/automations', title: 'Automations | Join', loadComponent: () => import('./features/boards/pages/board-automations-page/board-automations-page.component').then(m => m.BoardAutomationsPageComponent)},
                 {path: 'boards/:id/gantt', title: 'Gantt | Join', loadComponent: () => import('./features/boards/pages/board-gantt-page/board-gantt-page.component').then(m => m.BoardGanttPageComponent)},
                 {path: 'boards/:id/webhooks', title: 'Webhooks | Join', loadComponent: () => import('./features/boards/pages/board-webhooks-page/board-webhooks-page.component').then(m => m.BoardWebhooksPageComponent)},
+                {path: 'boards/:id/templates', title: 'Templates | Join', loadComponent: () => import('./features/boards/pages/board-templates-page/board-templates-page.component').then(m => m.BoardTemplatesPageComponent)},
                 {path: 'contacts', title: 'Contacts | Join', loadComponent: () => import('./features/contacts/pages/contacts-page/contacts-page.component').then(m => m.ContactsPageComponent)},
                 {path: 'profile', title: 'Profile | Join', loadComponent: () => import('./features/profile/pages/profile-page/profile-page.component').then(m => m.ProfilePageComponent)},
                 {path: 'teams', title: 'Teams | Join', loadComponent: () => import('./features/teams/pages/teams-page/teams-page.component').then(m => m.TeamsPageComponent)},

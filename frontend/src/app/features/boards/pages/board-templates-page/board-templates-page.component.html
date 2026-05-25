@@ -1,0 +1,133 @@
+<div class="templates-page">
+
+  <div class="templates-header">
+    <a class="back-link" [routerLink]="['/boards', boardId]">&larr; {{ 'TEMPLATES.BACK' | translate }}</a>
+    <h1>{{ boardTitle() }} — {{ 'TEMPLATES.TITLE' | translate }}</h1>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-hint">{{ 'COMMON.LOADING' | translate }}</p>
+  } @else {
+
+    <div class="templates-actions">
+      <button class="btn-primary" (click)="openCreateForm()">{{ 'TEMPLATES.ADD' | translate }}</button>
+    </div>
+
+    @if (showForm()) {
+      <div class="template-form card">
+        <h3>{{ editingId() ? ('TEMPLATES.EDIT' | translate) : ('TEMPLATES.ADD' | translate) }}</h3>
+
+        <div class="field-group">
+          <label class="field-label">{{ 'TEMPLATES.TEMPLATE_NAME' | translate }}</label>
+          <input
+            class="field-input"
+            type="text"
+            [ngModel]="formName()"
+            (ngModelChange)="formName.set($event)"
+            [placeholder]="'TEMPLATES.NAME_PLACEHOLDER' | translate"
+          />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">{{ 'TEMPLATES.TASK_TITLE' | translate }}</label>
+          <input
+            class="field-input"
+            type="text"
+            [ngModel]="formTitle()"
+            (ngModelChange)="formTitle.set($event)"
+            [placeholder]="'TEMPLATES.TITLE_PLACEHOLDER' | translate"
+          />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">{{ 'TASK.DESCRIPTION' | translate }}</label>
+          <textarea
+            class="field-textarea"
+            rows="3"
+            [ngModel]="formDescription()"
+            (ngModelChange)="formDescription.set($event)"
+          ></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">{{ 'TASK.PRIORITY' | translate }}</label>
+          <div class="priority-options">
+            @for (p of priorities; track p) {
+              <button
+                class="priority-btn"
+                [class]="'priority-' + p"
+                [class.active]="formPriority() === p"
+                (click)="formPriority.set(p)"
+              >{{ 'BOARD_DETAIL.' + p.toUpperCase() | translate }}</button>
+            }
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">{{ 'TEMPLATES.SUBTASKS' | translate }}</label>
+          @for (sub of formSubtasks(); track $index) {
+            <div class="subtask-row">
+              <span>{{ sub }}</span>
+              <button class="btn-remove" (click)="removeSubtask($index)">&times;</button>
+            </div>
+          }
+          <div class="subtask-add-row">
+            <input
+              class="field-input"
+              type="text"
+              [ngModel]="newSubtask()"
+              (ngModelChange)="newSubtask.set($event)"
+              (keyup.enter)="addSubtask()"
+              [placeholder]="'TEMPLATES.SUBTASK_PLACEHOLDER' | translate"
+            />
+            <button class="btn-add" (click)="addSubtask()">+</button>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-cancel" (click)="cancelForm()">{{ 'COMMON.CANCEL' | translate }}</button>
+          <button class="btn-save" (click)="saveTemplate()">{{ 'COMMON.SAVE' | translate }}</button>
+        </div>
+      </div>
+    }
+
+    @if (templates().length === 0 && !showForm()) {
+      <p class="empty-hint">{{ 'TEMPLATES.EMPTY' | translate }}</p>
+    }
+
+    <div class="templates-grid">
+      @for (t of templates(); track t.id) {
+        <div class="template-card card">
+          <div class="template-card-header">
+            <h3>{{ t.name }}</h3>
+            <div class="template-card-actions">
+              <button class="btn-icon" (click)="editTemplate(t)" [title]="'COMMON.EDIT' | translate">&#9998;</button>
+              <button class="btn-icon btn-danger-icon" (click)="confirmDelete(t.id)" [title]="'COMMON.DELETE' | translate">&#128465;</button>
+            </div>
+          </div>
+          @if (t.title) {
+            <p class="template-task-title">{{ t.title }}</p>
+          }
+          <div class="template-meta">
+            <span class="priority-badge priority-{{ t.priority }}">{{ t.priority }}</span>
+            @if (t.subtasks.length > 0) {
+              <span class="meta-item">{{ t.subtasks.length }} {{ 'TEMPLATES.SUBTASKS' | translate }}</span>
+            }
+          </div>
+          @if (t.description) {
+            <p class="template-desc">{{ t.description }}</p>
+          }
+          <button class="btn-use" (click)="useTemplate(t)">{{ 'TEMPLATES.USE' | translate }}</button>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (deleteTarget()) {
+  <app-confirm-dialog
+    [message]="'TEMPLATES.CONFIRM_DELETE' | translate"
+    (confirmed)="doDelete()"
+    (cancelled)="deleteTarget.set(null)"
+  />
+}
