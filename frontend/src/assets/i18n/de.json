@@ -462,6 +462,25 @@
     "NAV_TASKS": "Zwischen Aufgaben navigieren",
     "OPEN_TASK": "Fokussierte Aufgabe öffnen"
   },
+  "WEBHOOKS": {
+    "TITLE": "Webhooks",
+    "BACK": "Zurück zum Board",
+    "ADD": "Webhook hinzufügen",
+    "EDIT": "Webhook bearbeiten",
+    "URL": "Payload-URL",
+    "SECRET": "Secret",
+    "SECRET_PLACEHOLDER": "Optionaler HMAC-Schlüssel zur Signaturprüfung",
+    "EVENTS": "Events",
+    "ACTIVE": "Aktiv",
+    "DELIVERIES": "Zustellungen",
+    "NO_DELIVERIES": "Noch keine Zustellungen.",
+    "EVENT": "Event",
+    "STATUS": "Status",
+    "RESPONSE": "Antwort",
+    "TIME": "Zeit",
+    "EMPTY": "Keine Webhooks konfiguriert. Erstelle einen, um HTTP-Benachrichtigungen für Board-Events zu erhalten.",
+    "CONFIRM_DELETE": "Diesen Webhook löschen?"
+  },
   "GANTT": {
     "TITLE": "Gantt-Diagramm",
     "BACK": "Zurück zum Board",
@@ -609,7 +628,11 @@
     "FAILED_DELETE_RULE": "Fehler beim Löschen der Regel.",
     "FAILED_TOGGLE_RULE": "Fehler beim Umschalten der Regel.",
     "FAILED_LOAD_RULES": "Fehler beim Laden der Regeln.",
-    "FAILED_LOAD_LOGS": "Fehler beim Laden der Protokolle."
+    "FAILED_LOAD_LOGS": "Fehler beim Laden der Protokolle.",
+    "WEBHOOK_SAVED": "Webhook gespeichert.",
+    "FAILED_SAVE_WEBHOOK": "Fehler beim Speichern des Webhooks.",
+    "WEBHOOK_DELETED": "Webhook gelöscht.",
+    "FAILED_DELETE_WEBHOOK": "Fehler beim Löschen des Webhooks."
   },
   "PRIVACY": {
     "TITLE": "Datenschutzerklärung",

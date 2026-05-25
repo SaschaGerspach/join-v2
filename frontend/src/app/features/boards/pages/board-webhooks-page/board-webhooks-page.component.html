@@ -1,0 +1,125 @@
+<div class="webhooks-page">
+
+  <div class="webhooks-header">
+    <a class="back-link" [routerLink]="['/boards', boardId]">&larr; {{ 'WEBHOOKS.BACK' | translate }}</a>
+    <h1>{{ boardTitle() }} — {{ 'WEBHOOKS.TITLE' | translate }}</h1>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-hint">{{ 'COMMON.LOADING' | translate }}</p>
+  } @else {
+
+    <div class="webhooks-actions">
+      <button class="btn-primary" (click)="openCreateForm()">{{ 'WEBHOOKS.ADD' | translate }}</button>
+    </div>
+
+    @if (showForm()) {
+      <div class="webhook-form card">
+        <h3>{{ editingId() ? ('WEBHOOKS.EDIT' | translate) : ('WEBHOOKS.ADD' | translate) }}</h3>
+
+        <div class="field-group">
+          <label class="field-label">{{ 'WEBHOOKS.URL' | translate }}</label>
+          <input
+            class="field-input"
+            type="url"
+            [ngModel]="formUrl()"
+            (ngModelChange)="formUrl.set($event)"
+            placeholder="https://example.com/webhook"
+          />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">{{ 'WEBHOOKS.SECRET' | translate }}</label>
+          <input
+            class="field-input"
+            type="text"
+            [ngModel]="formSecret()"
+            (ngModelChange)="formSecret.set($event)"
+            [placeholder]="'WEBHOOKS.SECRET_PLACEHOLDER' | translate"
+          />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">{{ 'WEBHOOKS.EVENTS' | translate }}</label>
+          <div class="event-checkboxes">
+            @for (event of availableEvents(); track event) {
+              <label class="event-check">
+                <input type="checkbox" [checked]="formEvents().has(event)" (change)="toggleEvent(event)" />
+                {{ event }}
+              </label>
+            }
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-cancel" (click)="cancelForm()">{{ 'COMMON.CANCEL' | translate }}</button>
+          <button class="btn-save" (click)="saveWebhook()">{{ 'COMMON.SAVE' | translate }}</button>
+        </div>
+      </div>
+    }
+
+    @if (webhooks().length === 0 && !showForm()) {
+      <p class="empty-hint">{{ 'WEBHOOKS.EMPTY' | translate }}</p>
+    }
+
+    @for (wh of webhooks(); track wh.id) {
+      <div class="webhook-card card">
+        <div class="webhook-row">
+          <div class="webhook-info">
+            <span class="webhook-url">{{ wh.url }}</span>
+            <span class="webhook-events">{{ wh.events.join(', ') }}</span>
+          </div>
+          <div class="webhook-actions">
+            <label class="toggle-label">
+              <input type="checkbox" [checked]="wh.is_active" (change)="toggleActive(wh)" />
+              {{ 'WEBHOOKS.ACTIVE' | translate }}
+            </label>
+            <button class="btn-icon" (click)="viewDeliveries(wh.id)" [title]="'WEBHOOKS.DELIVERIES' | translate">&#128218;</button>
+            <button class="btn-icon" (click)="editWebhook(wh)" [title]="'COMMON.EDIT' | translate">&#9998;</button>
+            <button class="btn-icon btn-danger-icon" (click)="confirmDelete(wh.id)" [title]="'COMMON.DELETE' | translate">&#128465;</button>
+          </div>
+        </div>
+
+        @if (selectedWebhookId() === wh.id) {
+          <div class="deliveries-section">
+            <h4>{{ 'WEBHOOKS.DELIVERIES' | translate }}</h4>
+            @if (deliveries().length === 0) {
+              <p class="empty-hint">{{ 'WEBHOOKS.NO_DELIVERIES' | translate }}</p>
+            } @else {
+              <table class="deliveries-table">
+                <thead>
+                  <tr>
+                    <th>{{ 'WEBHOOKS.EVENT' | translate }}</th>
+                    <th>{{ 'WEBHOOKS.STATUS' | translate }}</th>
+                    <th>{{ 'WEBHOOKS.RESPONSE' | translate }}</th>
+                    <th>{{ 'WEBHOOKS.TIME' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (d of deliveries(); track d.id) {
+                    <tr>
+                      <td>{{ d.event_type }}</td>
+                      <td>
+                        <span class="status-badge" [class]="'status-' + d.status">{{ d.status }}</span>
+                      </td>
+                      <td>{{ d.response_status ?? '—' }}</td>
+                      <td>{{ d.attempted_at | date:'short' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+@if (deleteTarget()) {
+  <app-confirm-dialog
+    [message]="'WEBHOOKS.CONFIRM_DELETE' | translate"
+    (confirmed)="doDelete()"
+    (cancelled)="deleteTarget.set(null)"
+  />
+}

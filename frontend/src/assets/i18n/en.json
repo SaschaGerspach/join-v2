@@ -472,6 +472,25 @@
     "UNSCHEDULED": "Unscheduled tasks",
     "TODAY": "Today"
   },
+  "WEBHOOKS": {
+    "TITLE": "Webhooks",
+    "BACK": "Back to board",
+    "ADD": "Add webhook",
+    "EDIT": "Edit webhook",
+    "URL": "Payload URL",
+    "SECRET": "Secret",
+    "SECRET_PLACEHOLDER": "Optional HMAC secret for signature verification",
+    "EVENTS": "Events",
+    "ACTIVE": "Active",
+    "DELIVERIES": "Deliveries",
+    "NO_DELIVERIES": "No deliveries yet.",
+    "EVENT": "Event",
+    "STATUS": "Status",
+    "RESPONSE": "Response",
+    "TIME": "Time",
+    "EMPTY": "No webhooks configured. Add one to receive HTTP notifications for board events.",
+    "CONFIRM_DELETE": "Delete this webhook?"
+  },
   "SW_UPDATE": {
     "AVAILABLE": "A new version is available.",
     "RELOAD": "Update now"
@@ -609,7 +628,11 @@
     "FAILED_DELETE_RULE": "Failed to delete rule.",
     "FAILED_TOGGLE_RULE": "Failed to toggle rule.",
     "FAILED_LOAD_RULES": "Failed to load rules.",
-    "FAILED_LOAD_LOGS": "Failed to load logs."
+    "FAILED_LOAD_LOGS": "Failed to load logs.",
+    "WEBHOOK_SAVED": "Webhook saved.",
+    "FAILED_SAVE_WEBHOOK": "Failed to save webhook.",
+    "WEBHOOK_DELETED": "Webhook deleted.",
+    "FAILED_DELETE_WEBHOOK": "Failed to delete webhook."
   },
   "PRIVACY": {
     "TITLE": "Privacy Policy",
