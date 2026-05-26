@@ -35,6 +35,12 @@ export class BoardKeyboardNavDirective {
     const columns = this.state.columns();
     if (!columns.length) return;
 
+    if (event.key === 'a' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      this.selectAllInColumn(columns);
+      return;
+    }
+
     switch (event.key) {
       case '/':
         event.preventDefault();
@@ -71,6 +77,14 @@ export class BoardKeyboardNavDirective {
         this.focusedTaskIndex.set(Math.max(this.focusedTaskIndex() - 1, 0));
         break;
       }
+      case ' ': {
+        event.preventDefault();
+        const taskId = this.focusedTaskId();
+        if (taskId !== null) {
+          this.state.toggleTaskSelection(taskId, new Event('keyboard'));
+        }
+        break;
+      }
       case 'Enter': {
         const colIdx = this.focusedColumnIndex();
         const taskIdx = this.focusedTaskIndex();
@@ -82,11 +96,33 @@ export class BoardKeyboardNavDirective {
         }
         break;
       }
+      case 'Delete':
+      case 'Backspace':
+        if (this.state.bulkMode()) {
+          event.preventDefault();
+          this.state.pendingBulkDelete.set(true);
+        }
+        break;
       case 'Escape':
-        this.focusedColumnIndex.set(-1);
-        this.focusedTaskIndex.set(-1);
+        if (this.state.bulkMode()) {
+          this.state.clearSelection();
+        } else {
+          this.focusedColumnIndex.set(-1);
+          this.focusedTaskIndex.set(-1);
+        }
         break;
     }
+  }
+
+  private selectAllInColumn(columns: { id: number }[]): void {
+    const colIdx = this.focusedColumnIndex();
+    if (colIdx < 0) return;
+    const tasks = this.state.tasksForColumn(columns[colIdx].id);
+    this.state.selectedTaskIds.update(set => {
+      const next = new Set(set);
+      for (const t of tasks) next.add(t.id);
+      return next;
+    });
   }
 
   private focusSearch(): void {
