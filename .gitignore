@@ -22,3 +22,5 @@ backend/private_media/
 backend/htmlcov/
 backend/.coverage
 frontend/coverage/
+frontend/android/
+frontend/ios/
