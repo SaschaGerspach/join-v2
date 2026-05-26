@@ -19,6 +19,19 @@ export type BoardWsEvent =
   | { event: 'presence_joined'; data: PresenceUser }
   | { event: 'presence_left'; data: { id: number } };
 
+const BOARD_WS_EVENTS = new Set<string>([
+  'task_created', 'task_updated', 'task_deleted', 'tasks_reordered',
+  'column_created', 'column_updated', 'column_deleted',
+  'presence_list', 'presence_joined', 'presence_left',
+]);
+
+export function isBoardWsEvent(value: unknown): value is BoardWsEvent {
+  return typeof value === 'object' && value !== null
+    && 'event' in value && typeof (value as Record<string, unknown>)['event'] === 'string'
+    && BOARD_WS_EVENTS.has((value as Record<string, unknown>)['event'] as string)
+    && 'data' in value;
+}
+
 @Injectable({ providedIn: 'root' })
 export class BoardWsService {
   private readonly auth = inject(AuthService);
@@ -62,7 +75,10 @@ export class BoardWsService {
 
     this.ws.onmessage = (msg) => {
       try {
-        this.events$.next(JSON.parse(msg.data));
+        const parsed: unknown = JSON.parse(msg.data);
+        if (isBoardWsEvent(parsed)) {
+          this.events$.next(parsed);
+        }
       } catch (e) {
         console.error('WebSocket: failed to parse message', e);
       }

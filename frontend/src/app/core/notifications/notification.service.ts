@@ -3,6 +3,14 @@ import { AuthService } from '../auth/auth.service';
 import { environment } from '../../../environments/environment';
 import { AppNotification, NotificationsApiService } from './notifications-api.service';
 
+type NotificationWsEvent = { event: 'new_notification'; data: AppNotification };
+
+function isNotificationWsEvent(value: unknown): value is NotificationWsEvent {
+  return typeof value === 'object' && value !== null
+    && 'event' in value && (value as Record<string, unknown>)['event'] === 'new_notification'
+    && 'data' in value;
+}
+
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private readonly api = inject(NotificationsApiService);
@@ -70,11 +78,10 @@ export class NotificationService {
 
     this.ws.onmessage = (msg) => {
       try {
-        const parsed = JSON.parse(msg.data);
-        if (parsed.event === 'new_notification') {
-          const notification: AppNotification = parsed.data;
-          this.notifications.update(list => [notification, ...list]);
-          this.showBrowserNotification(notification);
+        const parsed: unknown = JSON.parse(msg.data);
+        if (isNotificationWsEvent(parsed)) {
+          this.notifications.update(list => [parsed.data, ...list]);
+          this.showBrowserNotification(parsed.data);
         }
       } catch { /* ignore parse errors */ }
     };
