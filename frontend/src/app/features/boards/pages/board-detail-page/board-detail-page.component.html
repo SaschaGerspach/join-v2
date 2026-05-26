@@ -1,4 +1,4 @@
-<div class="board-detail">
+<div class="board-detail" appBoardKeyboardNav #keyNav="boardKeyNav">
 
   @if (state.loading()) {
     <app-loading-spinner />
@@ -135,7 +135,7 @@
     (cdkDropListDropped)="state.dropColumn($event)"
   >
     @for (column of state.columns(); track column.id) {
-      <div class="kanban-column" [class.wip-exceeded]="state.isOverWipLimit(column)" [class.focused-column]="focusedColumnId() === column.id" cdkDrag [cdkDragData]="column" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }">
+      <div class="kanban-column" [class.wip-exceeded]="state.isOverWipLimit(column)" [class.focused-column]="keyNav.focusedColumnId() === column.id" cdkDrag [cdkDragData]="column" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }">
 
         <div class="column-header" cdkDragHandle>
           @if (state.editingColumnId() === column.id) {
@@ -185,7 +185,7 @@
               <div class="swimlane-header">{{ group.label }}</div>
             }
             @for (task of group.tasks; track task.id) {
-              <div class="task-card" [class]="'task-card ' + state.priorityClass(task.priority)" [class.selected]="state.isTaskSelected(task.id)" [class.kb-focused]="focusedTaskId() === task.id" cdkDrag [cdkDragData]="task" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }" (click)="state.selectedTask.set(task)">
+              <div class="task-card" [class]="'task-card ' + state.priorityClass(task.priority)" [class.selected]="state.isTaskSelected(task.id)" [class.kb-focused]="keyNav.focusedTaskId() === task.id" cdkDrag [cdkDragData]="task" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }" (click)="state.selectedTask.set(task)">
                 @if (task.cover_image_url) {
                   <img class="task-cover" [src]="task.cover_image_url" alt="" loading="lazy" />
                 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,19 +14,19 @@ import { Column } from '../../../../core/columns/columns-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 import { UserAvatarComponent } from '../../../../shared/components/user-avatar/user-avatar.component';
+import { BoardKeyboardNavDirective } from '../../directives/board-keyboard-nav.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-board-detail-page',
   standalone: true,
-  imports: [FormsModule, DragDropModule, SlicePipe, UpperCasePipe, RouterModule, TranslateModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe, UserAvatarComponent],
+  imports: [FormsModule, DragDropModule, SlicePipe, UpperCasePipe, RouterModule, TranslateModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe, UserAvatarComponent, BoardKeyboardNavDirective],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
   providers: [BoardStateService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardDetailPageComponent implements OnInit, OnDestroy {
-  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   private readonly route = inject(ActivatedRoute);
   private readonly boardsApi = inject(BoardsApiService);
   private readonly toast = inject(ToastService);
@@ -38,23 +38,6 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   newColumnTitle = signal('');
   editingColumnTitle = signal('');
   boardTitleInput = signal('');
-
-  focusedColumnIndex = signal(-1);
-  focusedTaskIndex = signal(-1);
-
-  focusedColumnId(): number | null {
-    const cols = this.state.columns();
-    const idx = this.focusedColumnIndex();
-    return idx >= 0 && idx < cols.length ? cols[idx].id : null;
-  }
-
-  focusedTaskId(): number | null {
-    const colId = this.focusedColumnId();
-    if (colId === null) return null;
-    const tasks = this.state.tasksForColumn(colId);
-    const idx = this.focusedTaskIndex();
-    return idx >= 0 && idx < tasks.length ? tasks[idx].id : null;
-  }
 
   ngOnInit(): void {
     this.state.init(Number(this.route.snapshot.paramMap.get('id')));
@@ -156,67 +139,5 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
     const filter = this.state.savedFilters().find(f => f.name === name);
     if (filter) this.state.applySavedFilter(filter);
     (event.target as HTMLSelectElement).value = '';
-  }
-
-  @HostListener('document:keydown', ['$event'])
-  onKeydown(event: KeyboardEvent): void {
-    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) return;
-    if (this.state.selectedTask() || this.state.addingTaskForColumn() !== null) return;
-
-    const columns = this.state.columns();
-    if (!columns.length) return;
-
-    switch (event.key) {
-      case '/':
-        event.preventDefault();
-        this.searchInput?.nativeElement?.focus();
-        break;
-      case 'n': {
-        const colIdx = Math.max(0, this.focusedColumnIndex());
-        this.state.addingTaskForColumn.set(columns[colIdx].id);
-        break;
-      }
-      case 'ArrowRight': {
-        event.preventDefault();
-        const next = Math.min(this.focusedColumnIndex() + 1, columns.length - 1);
-        this.focusedColumnIndex.set(next);
-        this.focusedTaskIndex.set(0);
-        break;
-      }
-      case 'ArrowLeft': {
-        event.preventDefault();
-        const prev = Math.max(this.focusedColumnIndex() - 1, 0);
-        this.focusedColumnIndex.set(prev);
-        this.focusedTaskIndex.set(0);
-        break;
-      }
-      case 'ArrowDown': {
-        event.preventDefault();
-        const colIdx = Math.max(0, this.focusedColumnIndex());
-        const tasks = this.state.tasksForColumn(columns[colIdx].id);
-        this.focusedTaskIndex.set(Math.min(this.focusedTaskIndex() + 1, tasks.length - 1));
-        break;
-      }
-      case 'ArrowUp': {
-        event.preventDefault();
-        this.focusedTaskIndex.set(Math.max(this.focusedTaskIndex() - 1, 0));
-        break;
-      }
-      case 'Enter': {
-        const colIdx = this.focusedColumnIndex();
-        const taskIdx = this.focusedTaskIndex();
-        if (colIdx >= 0 && taskIdx >= 0) {
-          const tasks = this.state.tasksForColumn(columns[colIdx].id);
-          if (tasks[taskIdx]) {
-            this.state.selectedTask.set(tasks[taskIdx]);
-          }
-        }
-        break;
-      }
-      case 'Escape':
-        this.focusedColumnIndex.set(-1);
-        this.focusedTaskIndex.set(-1);
-        break;
-    }
   }
 }
