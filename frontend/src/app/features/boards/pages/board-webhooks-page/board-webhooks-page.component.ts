@@ -1,13 +1,13 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { WebhooksApiService, Webhook, WebhookDelivery } from '../../../../core/webhooks/webhooks-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-webhooks-page',
@@ -18,15 +18,11 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardWebhooksPageComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly boardsApi = inject(BoardsApiService);
+  protected readonly board = initBoardPage();
   private readonly webhooksApi = inject(WebhooksApiService);
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
 
-  boardId = signal(0);
-  boardTitle = signal('Board');
   loading = signal(true);
   webhooks = signal<Webhook[]>([]);
   availableEvents = signal<string[]>([]);
@@ -41,21 +37,16 @@ export class BoardWebhooksPageComponent implements OnInit {
   deleteTarget = signal<number | null>(null);
 
   ngOnInit(): void {
-    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
-    this.boardsApi.getById(this.boardId())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: b => this.boardTitle.set(b.title) });
-
     this.webhooksApi.getAvailableEvents()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntilDestroyed(this.board.destroyRef))
       .subscribe({ next: events => this.availableEvents.set(events) });
 
     this.loadWebhooks();
   }
 
   loadWebhooks(): void {
-    this.webhooksApi.getByBoard(this.boardId())
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.webhooksApi.getByBoard(this.board.boardId())
+      .pipe(takeUntilDestroyed(this.board.destroyRef))
       .subscribe({
         next: wh => {
           this.webhooks.set(wh);
@@ -103,9 +94,9 @@ export class BoardWebhooksPageComponent implements OnInit {
     const id = this.editingId();
     const obs = id
       ? this.webhooksApi.update(id, payload)
-      : this.webhooksApi.create(this.boardId(), payload);
+      : this.webhooksApi.create(this.board.boardId(), payload);
 
-    obs.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    obs.pipe(takeUntilDestroyed(this.board.destroyRef)).subscribe({
       next: () => {
         this.showForm.set(false);
         this.loadWebhooks();
@@ -122,7 +113,7 @@ export class BoardWebhooksPageComponent implements OnInit {
     const id = this.deleteTarget();
     if (!id) return;
     this.webhooksApi.delete(id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntilDestroyed(this.board.destroyRef))
       .subscribe({
         next: () => {
           this.deleteTarget.set(null);
@@ -134,7 +125,7 @@ export class BoardWebhooksPageComponent implements OnInit {
 
   toggleActive(wh: Webhook): void {
     this.webhooksApi.update(wh.id, { is_active: !wh.is_active })
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntilDestroyed(this.board.destroyRef))
       .subscribe({ next: () => this.loadWebhooks() });
   }
 
@@ -146,7 +137,7 @@ export class BoardWebhooksPageComponent implements OnInit {
     }
     this.selectedWebhookId.set(webhookId);
     this.webhooksApi.getDeliveries(webhookId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntilDestroyed(this.board.destroyRef))
       .subscribe({ next: d => this.deliveries.set(d) });
   }
 

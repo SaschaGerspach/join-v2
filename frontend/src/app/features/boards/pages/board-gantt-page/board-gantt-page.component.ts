@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
-import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { PRIORITY_COLORS, BRAND_COLOR } from '../../../../shared/constants/colors';
+import { initBoardPage } from '../../utils/board-page-init';
 
 type ZoomLevel = 'day' | 'week' | 'month';
 
@@ -27,13 +27,9 @@ type GanttBar = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardGanttPageComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly boardsApi = inject(BoardsApiService);
+  protected readonly board = initBoardPage();
   private readonly tasksApi = inject(TasksApiService);
   private readonly columnsApi = inject(ColumnsApiService);
-  boardId = signal(0);
-  boardTitle = signal('Board');
   loading = signal(true);
   tasks = signal<Task[]>([]);
   columns = signal<Column[]>([]);
@@ -190,15 +186,10 @@ export class BoardGanttPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
-    this.boardsApi.getById(this.boardId())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: b => this.boardTitle.set(b.title) });
-
     forkJoin([
-      this.tasksApi.getByBoard(this.boardId()),
-      this.columnsApi.getByBoard(this.boardId()),
-    ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      this.tasksApi.getByBoard(this.board.boardId()),
+      this.columnsApi.getByBoard(this.board.boardId()),
+    ]).pipe(takeUntilDestroyed(this.board.destroyRef)).subscribe({
       next: ([tasks, columns]) => {
         this.tasks.set(tasks);
         this.columns.set(columns);

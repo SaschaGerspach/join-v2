@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
-import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { ActivityApiService, ActivityEntry } from '../../../../core/activity/activity-api.service';
+import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-activity-page',
@@ -15,24 +15,15 @@ import { ActivityApiService, ActivityEntry } from '../../../../core/activity/act
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardActivityPageComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly boardsApi = inject(BoardsApiService);
+  protected readonly board = initBoardPage();
   private readonly activityApi = inject(ActivityApiService);
 
-  boardId = signal(0);
-  boardTitle = signal('Board');
   loading = signal(true);
   entries = signal<ActivityEntry[]>([]);
 
   ngOnInit(): void {
-    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
-    this.boardsApi.getById(this.boardId())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: b => this.boardTitle.set(b.title) });
-
-    this.activityApi.getByBoard(this.boardId())
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.activityApi.getByBoard(this.board.boardId())
+      .pipe(takeUntilDestroyed(this.board.destroyRef))
       .subscribe({
         next: entries => { this.entries.set(entries); this.loading.set(false); },
         error: () => { this.loading.set(false); },

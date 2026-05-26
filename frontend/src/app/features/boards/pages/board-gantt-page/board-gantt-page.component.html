@@ -1,8 +1,8 @@
 <div class="gantt-page">
 
   <div class="gantt-header">
-    <a class="back-link" [routerLink]="['/boards', boardId()]">← {{ 'GANTT.BACK' | translate }}</a>
-    <h1>{{ boardTitle() }} — {{ 'GANTT.TITLE' | translate }}</h1>
+    <a class="back-link" [routerLink]="['/boards', board.boardId()]">← {{ 'GANTT.BACK' | translate }}</a>
+    <h1>{{ board.boardTitle() }} — {{ 'GANTT.TITLE' | translate }}</h1>
     <div class="zoom-controls">
       <button [class.active]="zoom() === 'day'" (click)="setZoom('day')">{{ 'GANTT.DAY' | translate }}</button>
       <button [class.active]="zoom() === 'week'" (click)="setZoom('week')">{{ 'GANTT.WEEK' | translate }}</button>

@@ -1,14 +1,14 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
-import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { ActivityApiService, ActivityEntry } from '../../../../core/activity/activity-api.service';
 import { PRIORITY_COLORS, BRAND_COLOR } from '../../../../shared/constants/colors';
+import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-timetravel-page',
@@ -19,14 +19,10 @@ import { PRIORITY_COLORS, BRAND_COLOR } from '../../../../shared/constants/color
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardTimetravelPageComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly boardsApi = inject(BoardsApiService);
+  protected readonly board = initBoardPage();
   private readonly tasksApi = inject(TasksApiService);
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly activityApi = inject(ActivityApiService);
-  boardId = signal(0);
-  boardTitle = signal('Board');
   loading = signal(true);
   allTasks = signal<Task[]>([]);
   columns = signal<Column[]>([]);
@@ -105,17 +101,12 @@ export class BoardTimetravelPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
-    this.boardsApi.getById(this.boardId())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: b => this.boardTitle.set(b.title) });
-
     forkJoin([
-      this.tasksApi.getByBoard(this.boardId()),
-      this.tasksApi.getArchive(this.boardId()),
-      this.columnsApi.getByBoard(this.boardId()),
-      this.activityApi.getByBoard(this.boardId()),
-    ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      this.tasksApi.getByBoard(this.board.boardId()),
+      this.tasksApi.getArchive(this.board.boardId()),
+      this.columnsApi.getByBoard(this.board.boardId()),
+      this.activityApi.getByBoard(this.board.boardId()),
+    ]).pipe(takeUntilDestroyed(this.board.destroyRef)).subscribe({
       next: ([tasks, archived, columns, activities]) => {
         this.allTasks.set([...tasks, ...archived]);
         this.columns.set(columns);

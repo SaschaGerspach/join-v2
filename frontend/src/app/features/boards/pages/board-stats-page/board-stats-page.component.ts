@@ -1,16 +1,16 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ChartData, ChartOptions } from 'chart.js';
 import { TranslateModule } from '@ngx-translate/core';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
-import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ActivityApiService, ActivityEntry } from '../../../../core/activity/activity-api.service';
 import { ContactsApiService, Contact } from '../../../../core/contacts/contacts-api.service';
 import { BRAND_COLOR, PRIORITY_COLORS } from '../../../../shared/constants/colors';
+import { initBoardPage } from '../../utils/board-page-init';
 @Component({
   selector: 'app-board-stats-page',
   standalone: true,
@@ -21,15 +21,11 @@ import { BRAND_COLOR, PRIORITY_COLORS } from '../../../../shared/constants/color
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardStatsPageComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly boardsApi = inject(BoardsApiService);
+  protected readonly board = initBoardPage();
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly tasksApi = inject(TasksApiService);
   private readonly activityApi = inject(ActivityApiService);
   private readonly contactsApi = inject(ContactsApiService);
-  boardId = signal(0);
-  boardTitle = signal('Board');
   loading = signal(true);
 
   totalTasks = signal(0);
@@ -71,17 +67,12 @@ export class BoardStatsPageComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
-    this.boardsApi.getById(this.boardId())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: b => this.boardTitle.set(b.title) });
-
     forkJoin([
-      this.columnsApi.getByBoard(this.boardId()),
-      this.tasksApi.getByBoard(this.boardId()),
-      this.activityApi.getByBoard(this.boardId()),
+      this.columnsApi.getByBoard(this.board.boardId()),
+      this.tasksApi.getByBoard(this.board.boardId()),
+      this.activityApi.getByBoard(this.board.boardId()),
       this.contactsApi.getAll(),
-    ]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    ]).pipe(takeUntilDestroyed(this.board.destroyRef)).subscribe({
       next: ([columns, tasks, activity, contacts]) => {
         this.buildKpis(columns, tasks);
         this.buildColumnChart(columns, tasks);

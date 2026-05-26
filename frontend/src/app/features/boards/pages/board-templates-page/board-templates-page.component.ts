@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { TemplatesApiService, TaskTemplate } from '../../../../core/templates/templates-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-templates-page',
@@ -17,15 +17,11 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardTemplatesPageComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly boardsApi = inject(BoardsApiService);
+  protected readonly board = initBoardPage();
   private readonly templatesApi = inject(TemplatesApiService);
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
 
-  boardId = signal(0);
-  boardTitle = signal('Board');
   loading = signal(true);
   templates = signal<TaskTemplate[]>([]);
 
@@ -42,16 +38,12 @@ export class BoardTemplatesPageComponent implements OnInit {
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
 
   ngOnInit(): void {
-    this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
-    this.boardsApi.getById(this.boardId())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: b => this.boardTitle.set(b.title) });
     this.loadTemplates();
   }
 
   loadTemplates(): void {
-    this.templatesApi.getByBoard(this.boardId())
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.templatesApi.getByBoard(this.board.boardId())
+      .pipe(takeUntilDestroyed(this.board.destroyRef))
       .subscribe({
         next: t => { this.templates.set(t); this.loading.set(false); },
         error: () => { this.loading.set(false); },
@@ -107,9 +99,9 @@ export class BoardTemplatesPageComponent implements OnInit {
     const id = this.editingId();
     const obs = id
       ? this.templatesApi.update(id, payload)
-      : this.templatesApi.create(this.boardId(), payload);
+      : this.templatesApi.create(this.board.boardId(), payload);
 
-    obs.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    obs.pipe(takeUntilDestroyed(this.board.destroyRef)).subscribe({
       next: () => {
         this.showForm.set(false);
         this.loadTemplates();
@@ -120,7 +112,7 @@ export class BoardTemplatesPageComponent implements OnInit {
 
   useTemplate(t: TaskTemplate): void {
     this.templatesApi.createTask(t.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntilDestroyed(this.board.destroyRef))
       .subscribe({
         next: () => this.toast.show(this.translate.instant('TOAST.TASK_CREATED')),
       });
@@ -134,7 +126,7 @@ export class BoardTemplatesPageComponent implements OnInit {
     const id = this.deleteTarget();
     if (!id) return;
     this.templatesApi.delete(id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntilDestroyed(this.board.destroyRef))
       .subscribe({
         next: () => {
           this.deleteTarget.set(null);

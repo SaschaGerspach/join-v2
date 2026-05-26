@@ -1,8 +1,8 @@
 <div class="timetravel-page">
 
   <div class="timetravel-header">
-    <a class="back-link" [routerLink]="['/boards', boardId()]">← {{ 'TIME_TRAVEL.BACK' | translate }}</a>
-    <h1>{{ boardTitle() }} — {{ 'TIME_TRAVEL.TITLE' | translate }}</h1>
+    <a class="back-link" [routerLink]="['/boards', board.boardId()]">← {{ 'TIME_TRAVEL.BACK' | translate }}</a>
+    <h1>{{ board.boardTitle() }} — {{ 'TIME_TRAVEL.TITLE' | translate }}</h1>
   </div>
 
   @if (loading()) {

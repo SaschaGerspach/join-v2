@@ -1,8 +1,8 @@
 <div class="webhooks-page">
 
   <div class="webhooks-header">
-    <a class="back-link" [routerLink]="['/boards', boardId()]">&larr; {{ 'WEBHOOKS.BACK' | translate }}</a>
-    <h1>{{ boardTitle() }} — {{ 'WEBHOOKS.TITLE' | translate }}</h1>
+    <a class="back-link" [routerLink]="['/boards', board.boardId()]">&larr; {{ 'WEBHOOKS.BACK' | translate }}</a>
+    <h1>{{ board.boardTitle() }} — {{ 'WEBHOOKS.TITLE' | translate }}</h1>
   </div>
 
   @if (loading()) {

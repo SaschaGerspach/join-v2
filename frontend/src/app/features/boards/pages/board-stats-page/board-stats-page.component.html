@@ -1,7 +1,7 @@
 <div class="stats-page">
   <div class="stats-header">
-    <a [routerLink]="['/boards', boardId()]" class="back-link">&larr; {{ 'STATS.BACK' | translate }}</a>
-    <h1>{{ boardTitle() }} — {{ 'STATS.TITLE' | translate }}</h1>
+    <a [routerLink]="['/boards', board.boardId()]" class="back-link">&larr; {{ 'STATS.BACK' | translate }}</a>
+    <h1>{{ board.boardTitle() }} — {{ 'STATS.TITLE' | translate }}</h1>
   </div>
 
   @if (loading()) {
