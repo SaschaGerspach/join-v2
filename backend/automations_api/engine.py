@@ -1,16 +1,24 @@
+from __future__ import annotations
+
 import logging
 import threading
+from typing import Any, TYPE_CHECKING
 
 from .actions import execute_action
 from .conditions import check_condition
 from .models import AutomationLog, AutomationRule
+
+if TYPE_CHECKING:
+    from django.db.models import Q
+
+    from tasks_api.models import Task
 
 logger = logging.getLogger(__name__)
 
 _loop_guard = threading.local()
 
 
-def evaluate_rules(task, trigger_type, context=None):
+def evaluate_rules(task: Task, trigger_type: str, context: dict[str, Any] | None = None) -> None:
     if context is None:
         context = {}
 
@@ -44,7 +52,7 @@ def evaluate_rules(task, trigger_type, context=None):
             _loop_guard.active.discard(guard_key)
 
 
-def _trigger_matches(rule, context):
+def _trigger_matches(rule: AutomationRule, context: dict[str, Any]) -> bool:
     config = rule.trigger_config
     if not config:
         return True
@@ -64,8 +72,8 @@ def _trigger_matches(rule, context):
     return True
 
 
-def _execute_rule(rule, task):
-    executed = []
+def _execute_rule(rule: AutomationRule, task: Task) -> None:
+    executed: list[str] = []
     for action in rule.actions.all():
         if execute_action(action, task, rule.created_by):
             executed.append(action.action_type)
@@ -86,6 +94,6 @@ def _execute_rule(rule, task):
         })
 
 
-def models_q_board_or_global(board_id):
+def models_q_board_or_global(board_id: int) -> Q:
     from django.db.models import Q
     return Q(board_id=board_id) | Q(board__isnull=True)

@@ -1,15 +1,24 @@
+from __future__ import annotations
+
 import logging
+from typing import Any, TYPE_CHECKING
 
 from boards_api.ws_events import send_board_event
 from notifications_api.helpers import create_notification
 from tasks_api.views._helpers import serialize_task
 
-from .models import ActionType
+from .models import ActionType, RuleAction
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from auth_api.models import User
+    from tasks_api.models import Task
 
 logger = logging.getLogger(__name__)
 
 
-def execute_action(action, task, triggered_by):
+def execute_action(action: RuleAction, task: Task, triggered_by: User) -> bool:
     handler = _HANDLERS.get(action.action_type)
     if not handler:
         logger.warning("Unknown action type: %s", action.action_type)
@@ -22,7 +31,7 @@ def execute_action(action, task, triggered_by):
         return False
 
 
-def _action_move_to_column(task, config, triggered_by):
+def _action_move_to_column(task: Task, config: dict[str, Any], triggered_by: User) -> None:
     column_id = config.get("column_id")
     if not column_id or task.column_id == column_id:
         return
@@ -35,7 +44,7 @@ def _action_move_to_column(task, config, triggered_by):
     task_moved.send(sender=task.__class__, task=task, column_id=column_id)
 
 
-def _action_set_priority(task, config, triggered_by):
+def _action_set_priority(task: Task, config: dict[str, Any], triggered_by: User) -> None:
     priority = config.get("priority")
     if not priority or task.priority == priority:
         return
@@ -46,7 +55,7 @@ def _action_set_priority(task, config, triggered_by):
     task_priority_changed.send(sender=task.__class__, task=task, priority=priority)
 
 
-def _action_assign_user(task, config, triggered_by):
+def _action_assign_user(task: Task, config: dict[str, Any], triggered_by: User) -> None:
     assignee_id = config.get("assignee_id")
     if not assignee_id:
         return
@@ -54,7 +63,7 @@ def _action_assign_user(task, config, triggered_by):
     send_board_event(task.board_id, "task_updated", serialize_task(task))
 
 
-def _action_set_label(task, config, triggered_by):
+def _action_set_label(task: Task, config: dict[str, Any], triggered_by: User) -> None:
     label_id = config.get("label_id")
     if not label_id:
         return
@@ -64,7 +73,7 @@ def _action_set_label(task, config, triggered_by):
     task_label_added.send(sender=task.__class__, task=task, label_id=label_id)
 
 
-def _action_remove_label(task, config, triggered_by):
+def _action_remove_label(task: Task, config: dict[str, Any], triggered_by: User) -> None:
     label_id = config.get("label_id")
     if not label_id:
         return
@@ -72,7 +81,7 @@ def _action_remove_label(task, config, triggered_by):
     send_board_event(task.board_id, "task_updated", serialize_task(task))
 
 
-def _action_notify_creator(task, config, triggered_by):
+def _action_notify_creator(task: Task, config: dict[str, Any], triggered_by: User) -> None:
     user = task.board.created_by
     create_notification(
         user, "automation",
@@ -81,7 +90,7 @@ def _action_notify_creator(task, config, triggered_by):
     )
 
 
-def _action_notify_assignees(task, config, triggered_by):
+def _action_notify_assignees(task: Task, config: dict[str, Any], triggered_by: User) -> None:
     contacts = task.assignees.filter(user__isnull=False).select_related("user")
     for contact in contacts:
         create_notification(
@@ -91,7 +100,7 @@ def _action_notify_assignees(task, config, triggered_by):
         )
 
 
-def _action_notify_user(task, config, triggered_by):
+def _action_notify_user(task: Task, config: dict[str, Any], triggered_by: User) -> None:
     from auth_api.models import User
     user_id = config.get("user_id")
     if not user_id:
@@ -107,7 +116,7 @@ def _action_notify_user(task, config, triggered_by):
     )
 
 
-_HANDLERS = {
+_HANDLERS: dict[str, Callable[[Task, dict[str, Any], User], None]] = {
     ActionType.MOVE_TO_COLUMN: _action_move_to_column,
     ActionType.SET_PRIORITY: _action_set_priority,
     ActionType.ASSIGN_USER: _action_assign_user,

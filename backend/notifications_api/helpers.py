@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import json
+from typing import TYPE_CHECKING
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -6,8 +9,11 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from .models import Notification, NotificationPreference
 
+if TYPE_CHECKING:
+    from auth_api.models import User
 
-def _is_suppressed(recipient, notification_type, board_id):
+
+def _is_suppressed(recipient: User, notification_type: str, board_id: int | None) -> bool:
     try:
         prefs = recipient.notification_preferences
     except NotificationPreference.DoesNotExist:
@@ -19,7 +25,13 @@ def _is_suppressed(recipient, notification_type, board_id):
     return False
 
 
-def create_notification(recipient, notification_type, message, board_id=None, task_id=None):
+def create_notification(
+    recipient: User,
+    notification_type: str,
+    message: str,
+    board_id: int | None = None,
+    task_id: int | None = None,
+) -> Notification | None:
     if _is_suppressed(recipient, notification_type, board_id):
         return None
 
@@ -34,7 +46,7 @@ def create_notification(recipient, notification_type, message, board_id=None, ta
     return notification
 
 
-def _push_notification(notification):
+def _push_notification(notification: Notification) -> None:
     channel_layer = get_channel_layer()
     data = {
         "id": notification.pk,

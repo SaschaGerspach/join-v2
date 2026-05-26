@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import logging
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any
 
 from django.core.mail import send_mail, EmailMessage
 
@@ -8,10 +11,10 @@ logger = logging.getLogger(__name__)
 _mail_executor = ThreadPoolExecutor(max_workers=3)
 
 
-def send_mail_async(headers=None, **kwargs):
+def send_mail_async(headers: dict[str, str] | None = None, **kwargs: Any) -> None:
     kwargs.setdefault("fail_silently", False)
 
-    def _send():
+    def _send() -> None:
         try:
             if headers:
                 msg = EmailMessage(

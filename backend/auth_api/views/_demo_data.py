@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import timedelta
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.utils import timezone
@@ -8,8 +11,11 @@ from columns_api.models import Column
 from contacts_api.models import Contact
 from tasks_api.models import Task
 
+if TYPE_CHECKING:
+    from auth_api.models import User
 
-def create_demo_data(user):
+
+def create_demo_data(user: User) -> None:
     board = Board.objects.create(title="My First Board", created_by=user)
     columns = Column.objects.bulk_create([
         Column(board=board, title=t, order=i)

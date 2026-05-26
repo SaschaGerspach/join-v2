@@ -1,7 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from .models import ActionType, AutomationRule, RuleAction, TriggerType
 
+if TYPE_CHECKING:
+    from auth_api.models import User
+    from boards_api.models import Board
 
-def create_default_rules(board, user):
+
+def create_default_rules(board: Board, user: User) -> None:
     rule1 = AutomationRule.objects.create(
         board=board,
         created_by=user,

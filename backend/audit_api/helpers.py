@@ -1,11 +1,20 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.conf import settings
 
 from .models import AuditLog
 
-TRUSTED_PROXY_COUNT = getattr(settings, "TRUSTED_PROXY_COUNT", 1)
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
+    from auth_api.models import User
+
+TRUSTED_PROXY_COUNT: int = getattr(settings, "TRUSTED_PROXY_COUNT", 1)
 
 
-def get_client_ip(request):
+def get_client_ip(request: HttpRequest) -> str | None:
     xff = request.META.get("HTTP_X_FORWARDED_FOR")
     if xff:
         parts = [p.strip() for p in xff.split(",")]
@@ -19,7 +28,13 @@ def get_client_ip(request):
 MAX_DETAIL_LENGTH = 1000
 
 
-def log_audit(event_type, *, user=None, request=None, detail=""):
+def log_audit(
+    event_type: str,
+    *,
+    user: User | None = None,
+    request: HttpRequest | None = None,
+    detail: str = "",
+) -> None:
     AuditLog.objects.create(
         user=user,
         event_type=event_type,

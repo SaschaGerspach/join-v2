@@ -1,14 +1,23 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from .helpers import log_audit
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from django.http import HttpRequest, HttpResponse
 
 WRITE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 SKIP_PATHS = {"/auth/login/", "/auth/token/refresh/", "/auth/logout/"}
 
 
 class AdminAuditMiddleware:
-    def __init__(self, get_response):
+    def __init__(self, get_response: Callable[[HttpRequest], HttpResponse]) -> None:
         self.get_response = get_response
 
-    def __call__(self, request):
+    def __call__(self, request: HttpRequest) -> HttpResponse:
         response = self.get_response(request)
 
         if (

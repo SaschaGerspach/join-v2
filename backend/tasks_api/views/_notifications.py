@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import re
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -8,6 +11,10 @@ from contacts_api.models import Contact
 from notifications_api.helpers import create_notification
 from notifications_api.models import Notification
 from ..models import Comment
+
+if TYPE_CHECKING:
+    from auth_api.models import User
+    from ..models import Task
 
 
 _PROFILE_URL = f"{settings.FRONTEND_URL}/profile"
@@ -21,7 +28,7 @@ _UNSUBSCRIBE_HEADERS = {
 }
 
 
-def _notify(subject, body, recipients):
+def _notify(subject: str, body: str, recipients: list[str]) -> None:
     recipients = [r for r in {r.strip().lower() for r in recipients if r} if r]
     if not recipients:
         return
@@ -34,15 +41,15 @@ def _notify(subject, body, recipients):
     )
 
 
-def _sanitize(value):
+def _sanitize(value: str) -> str:
     return value.replace('\n', '').replace('\r', '')
 
 
-def _actor_name(user):
+def _actor_name(user: User) -> str:
     return _sanitize(user.first_name or user.email)
 
 
-def _find_user_by_email(email):
+def _find_user_by_email(email: str | None) -> User | None:
     if not email:
         return None
     User = get_user_model()
@@ -52,10 +59,10 @@ def _find_user_by_email(email):
         return None
 
 
-def _notify_comment(comment, actor):
+def _notify_comment(comment: Comment, actor: User) -> None:
     task = comment.task
-    recipients = set()
-    in_app_recipients = set()
+    recipients: set[str] = set()
+    in_app_recipients: set[int] = set()
 
     for contact in task.assignees.all():
         if contact.email:
@@ -109,7 +116,7 @@ def _notify_comment(comment, actor):
             pass
 
 
-def _notify_mentions(comment, actor):
+def _notify_mentions(comment: Comment, actor: User) -> None:
     mentioned_emails = re.findall(r'@([\w.+-]+@[\w-]+\.[\w.-]+)', comment.text)
     if not mentioned_emails:
         return
@@ -126,7 +133,7 @@ def _notify_mentions(comment, actor):
             )
 
 
-def _notify_assignments(task, old_ids, new_ids, actor):
+def _notify_assignments(task: Task, old_ids: set[int], new_ids: set[int], actor: User) -> None:
     added_ids = new_ids - old_ids
     if not added_ids:
         return

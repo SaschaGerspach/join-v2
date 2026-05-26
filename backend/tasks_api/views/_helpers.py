@@ -1,5 +1,11 @@
-from datetime import timedelta
+from __future__ import annotations
+
+from datetime import date, timedelta
+from typing import Any
+
 from dateutil.relativedelta import relativedelta
+
+from ..models import Label, Task
 
 ALLOWED_ATTACHMENT_EXTENSIONS = {
     "png", "jpg", "jpeg", "gif", "webp",
@@ -9,11 +15,11 @@ ALLOWED_ATTACHMENT_EXTENSIONS = {
 }
 
 
-def serialize_label(label):
+def serialize_label(label: Label) -> dict[str, Any]:
     return {"id": label.pk, "name": label.name, "color": label.color}
 
 
-def serialize_task(task):
+def serialize_task(task: Task) -> dict[str, Any]:
     subtasks = list(task.subtasks.all())
     attachments = list(task.attachments.all())
     labels = list(task.labels.all())
@@ -40,7 +46,7 @@ def serialize_task(task):
     }
 
 
-def next_due_date(current_date, recurrence):
+def next_due_date(current_date: date, recurrence: str) -> date | None:
     if recurrence == "daily":
         return current_date + timedelta(days=1)
     if recurrence == "weekly":
@@ -55,10 +61,9 @@ def next_due_date(current_date, recurrence):
 MAX_RECURRENCE_INSTANCES = 100
 
 
-def create_next_recurring_task(task):
+def create_next_recurring_task(task: Task) -> Task | None:
     if not task.recurrence or not task.due_date:
         return None
-    from ..models import Task
     existing_count = Task.objects.filter(board=task.board, title=task.title, recurrence=task.recurrence).count()
     if existing_count >= MAX_RECURRENCE_INSTANCES:
         return None
