@@ -130,6 +130,7 @@
     "ACTIVITY": "Aktivität",
     "ARCHIVE": "Archiv",
     "EXPORT_CSV": "CSV exportieren",
+    "EXPORT_PDF": "PDF exportieren",
     "IMPORT_CSV": "CSV importieren",
     "ADD_COLUMN": "+ Spalte hinzufügen",
     "COLUMN_TITLE": "Spaltentitel",

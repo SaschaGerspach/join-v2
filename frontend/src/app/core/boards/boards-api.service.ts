@@ -107,6 +107,13 @@ export class BoardsApiService {
     });
   }
 
+  exportPdf(boardId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/boards/${boardId}/export/pdf/`, {
+      withCredentials: true,
+      responseType: 'blob',
+    });
+  }
+
   importCsv(boardId: number, file: File): Observable<{ imported: number }> {
     const form = new FormData();
     form.append('file', file);

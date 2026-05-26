@@ -101,15 +101,23 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
 
   exportCsv(): void {
     this.boardsApi.exportCsv(this.state.boardId()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: blob => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `board-${this.state.boardId()}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
-      },
+      next: blob => this.downloadBlob(blob, `board-${this.state.boardId()}.csv`),
     });
+  }
+
+  exportPdf(): void {
+    this.boardsApi.exportPdf(this.state.boardId()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: blob => this.downloadBlob(blob, `board-${this.state.boardId()}.pdf`),
+    });
+  }
+
+  private downloadBlob(blob: Blob, filename: string): void {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   importCsv(event: Event): void {

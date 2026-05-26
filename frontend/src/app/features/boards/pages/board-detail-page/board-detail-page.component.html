@@ -98,6 +98,7 @@
     <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'templates']">{{ 'TEMPLATES.TITLE' | translate }}</a>
     <button class="btn-stats" (click)="shareInviteLink()">{{ 'INVITE.SHARE' | translate }}</button>
     <button class="btn-stats" (click)="exportCsv()">{{ 'BOARD_DETAIL.EXPORT_CSV' | translate }}</button>
+    <button class="btn-stats" (click)="exportPdf()">{{ 'BOARD_DETAIL.EXPORT_PDF' | translate }}</button>
     <label class="btn-stats import-label">
       {{ 'BOARD_DETAIL.IMPORT_CSV' | translate }}
       <input type="file" accept=".csv" hidden (change)="importCsv($event)" />

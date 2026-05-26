@@ -130,6 +130,7 @@
     "ACTIVITY": "Activity",
     "ARCHIVE": "Archive",
     "EXPORT_CSV": "Export CSV",
+    "EXPORT_PDF": "Export PDF",
     "IMPORT_CSV": "Import CSV",
     "ADD_COLUMN": "+ Add Column",
     "COLUMN_TITLE": "Column title",

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 1.5cm;
+    }
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 10px;
+      color: #2a3647;
+      line-height: 1.4;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 2px solid #29abe2;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2a3647;
+      margin: 0;
+    }
+    .header .date {
+      font-size: 9px;
+      color: #999;
+    }
+    .columns {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .column {
+      flex: 1;
+      min-width: 180px;
+      max-width: 280px;
+      background: #f6f7f8;
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .column-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #666;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #ddd;
+    }
+    .task-card {
+      background: #fff;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 6px;
+      border-left: 3px solid #999;
+      page-break-inside: avoid;
+    }
+    .task-title {
+      font-size: 10px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    .task-meta {
+      font-size: 8px;
+      color: #888;
+    }
+    .task-meta span {
+      margin-right: 8px;
+    }
+    .label-tag {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 7px;
+      font-weight: 600;
+      color: #fff;
+      margin-right: 3px;
+    }
+    .overdue {
+      color: #ff3d00;
+      font-weight: 600;
+    }
+    .empty-hint {
+      font-size: 9px;
+      color: #aaa;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>{{ board.title }}</h1>
+    <span class="date">{{ exported_at }}</span>
+  </div>
+
+  <div class="columns">
+    {% for col in columns %}
+    <div class="column">
+      <div class="column-title">{{ col.title }} ({{ col.tasks|length }})</div>
+      {% for task in col.tasks %}
+      <div class="task-card" style="border-left-color: {{ task.priority_color }};">
+        <div class="task-title">{{ task.title }}</div>
+        <div class="task-meta">
+          <span>{{ task.priority|upper }}</span>
+          {% if task.assignees %}<span>{{ task.assignees }}</span>{% endif %}
+          {% if task.due_date %}
+            <span class="{% if task.is_overdue %}overdue{% endif %}">{{ task.due_date }}</span>
+          {% endif %}
+        </div>
+        {% if task.labels %}
+        <div style="margin-top: 3px;">
+          {% for label in task.labels %}
+            <span class="label-tag" style="background: {{ label.color }};">{{ label.name }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% empty %}
+      <div class="empty-hint">No tasks</div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</body>
+</html>
