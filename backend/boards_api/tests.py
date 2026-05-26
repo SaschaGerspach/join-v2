@@ -344,3 +344,114 @@ class BoardMemberRoleTests(APITestCase):
             {"role": "superadmin"}, format="json"
         )
         self.assertEqual(response.status_code, 400)
+
+
+class BoardImportCSVTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.other = User.objects.create_user(email="b@example.com", password="pass")
+        self.viewer = User.objects.create_user(email="viewer@example.com", password="pass")
+        self.board = Board.objects.create(title="My Board", created_by=self.user)
+        BoardMember.objects.create(board=self.board, user=self.viewer, role="viewer")
+        self.col = Column.objects.create(board=self.board, title="To do", order=0)
+        self.client.force_authenticate(user=self.user)
+
+    def url(self, pk):
+        return f"/boards/{pk}/import/csv/"
+
+    def _make_csv(self, content):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        return SimpleUploadedFile("tasks.csv", content.encode("utf-8"), content_type="text/csv")
+
+    def test_import_basic(self):
+        csv_content = "Title,Column,Priority\nTask A,To do,high\nTask B,,low\n"
+        response = self.client.post(self.url(self.board.pk), {"file": self._make_csv(csv_content)}, format="multipart")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["imported"], 2)
+        self.assertTrue(Task.objects.filter(board=self.board, title="Task A").exists())
+
+    def test_import_creates_new_column(self):
+        csv_content = "Title,Column\nTask X,New Column\n"
+        self.client.post(self.url(self.board.pk), {"file": self._make_csv(csv_content)}, format="multipart")
+        self.assertTrue(Column.objects.filter(board=self.board, title="New Column").exists())
+
+    def test_import_creates_labels(self):
+        from tasks_api.models import Label
+        csv_content = "Title,Labels\nTask X,\"Bug,Feature\"\n"
+        self.client.post(self.url(self.board.pk), {"file": self._make_csv(csv_content)}, format="multipart")
+        task = Task.objects.get(board=self.board, title="Task X")
+        self.assertEqual(task.labels.count(), 2)
+        self.assertTrue(Label.objects.filter(board=self.board, name="Bug").exists())
+
+    def test_import_due_date_formats(self):
+        csv_content = "Title,Due Date\nTask ISO,2025-06-15\nTask DE,15.06.2025\nTask US,06/15/2025\n"
+        self.client.post(self.url(self.board.pk), {"file": self._make_csv(csv_content)}, format="multipart")
+        from datetime import date
+        for title in ("Task ISO", "Task DE", "Task US"):
+            task = Task.objects.get(board=self.board, title=title)
+            self.assertEqual(task.due_date, date(2025, 6, 15))
+
+    def test_import_recurrence(self):
+        csv_content = "Title,Recurrence\nTask R,weekly\nTask Bad,invalid\n"
+        self.client.post(self.url(self.board.pk), {"file": self._make_csv(csv_content)}, format="multipart")
+        self.assertEqual(Task.objects.get(title="Task R").recurrence, "weekly")
+        self.assertIsNone(Task.objects.get(title="Task Bad").recurrence)
+
+    def test_import_invalid_priority_defaults_medium(self):
+        csv_content = "Title,Priority\nTask P,invalid\n"
+        self.client.post(self.url(self.board.pk), {"file": self._make_csv(csv_content)}, format="multipart")
+        self.assertEqual(Task.objects.get(title="Task P").priority, "medium")
+
+    def test_import_skips_empty_titles(self):
+        csv_content = "Title\n\nTask Valid\n  \n"
+        response = self.client.post(self.url(self.board.pk), {"file": self._make_csv(csv_content)}, format="multipart")
+        self.assertEqual(response.data["imported"], 1)
+
+    def test_import_no_file(self):
+        response = self.client.post(self.url(self.board.pk), {}, format="multipart")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("No file", response.data["detail"])
+
+    def test_import_file_too_large(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        large = SimpleUploadedFile("big.csv", b"Title\n" + b"x" * (2 * 1024 * 1024), content_type="text/csv")
+        response = self.client.post(self.url(self.board.pk), {"file": large}, format="multipart")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("too large", response.data["detail"])
+
+    def test_import_missing_title_column(self):
+        csv_content = "Name,Column\nTask,To do\n"
+        response = self.client.post(self.url(self.board.pk), {"file": self._make_csv(csv_content)}, format="multipart")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Title", response.data["detail"])
+
+    def test_import_nonexistent_board_404(self):
+        csv_content = "Title\nTask\n"
+        response = self.client.post(self.url(9999), {"file": self._make_csv(csv_content)}, format="multipart")
+        self.assertEqual(response.status_code, 404)
+
+    def test_import_outsider_gets_404(self):
+        self.client.force_authenticate(user=self.other)
+        csv_content = "Title\nTask\n"
+        response = self.client.post(self.url(self.board.pk), {"file": self._make_csv(csv_content)}, format="multipart")
+        self.assertEqual(response.status_code, 404)
+
+    def test_import_viewer_gets_403(self):
+        self.client.force_authenticate(user=self.viewer)
+        csv_content = "Title\nTask\n"
+        response = self.client.post(self.url(self.board.pk), {"file": self._make_csv(csv_content)}, format="multipart")
+        self.assertEqual(response.status_code, 403)
+
+    def test_import_reuses_existing_column(self):
+        csv_content = "Title,Column\nTask X,To do\n"
+        self.client.post(self.url(self.board.pk), {"file": self._make_csv(csv_content)}, format="multipart")
+        task = Task.objects.get(board=self.board, title="Task X")
+        self.assertEqual(task.column, self.col)
+        self.assertEqual(Column.objects.filter(board=self.board, title__iexact="to do").count(), 1)
+
+    def test_import_non_utf8_returns_400(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        bad_file = SimpleUploadedFile("bad.csv", b"\x80\x81\x82\x83", content_type="text/csv")
+        response = self.client.post(self.url(self.board.pk), {"file": bad_file}, format="multipart")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("UTF-8", response.data["detail"])

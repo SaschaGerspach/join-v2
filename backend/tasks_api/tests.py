@@ -754,3 +754,404 @@ class TimeTrackingTests(APITestCase):
     def test_max_duration_rejected(self):
         response = self.client.post(self.url(self.task.pk), {"duration_minutes": 1441}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class TaskListPermissionTests(APITestCase):
+    url = "/tasks/"
+
+    def setUp(self):
+        self.owner = User.objects.create_user(email="owner@example.com", password="pass")
+        self.outsider = User.objects.create_user(email="outsider@example.com", password="pass")
+        self.board = Board.objects.create(title="Board", created_by=self.owner)
+        self.col = Column.objects.create(board=self.board, title="Todo", order=0)
+
+    def test_list_tasks_board_not_found(self):
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.get(self.url, {"board": 9999})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_tasks_outsider_gets_404(self):
+        self.client.force_authenticate(user=self.outsider)
+        response = self.client.get(self.url, {"board": self.board.pk})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_create_task_with_invalid_column(self):
+        self.client.force_authenticate(user=self.owner)
+        other_board = Board.objects.create(title="Other", created_by=self.owner)
+        other_col = Column.objects.create(board=other_board, title="Other Col", order=0)
+        response = self.client.post(
+            f"{self.url}?board={self.board.pk}",
+            {"title": "Task", "column": other_col.pk},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Invalid column", response.data["detail"])
+
+    def test_create_task_with_valid_column(self):
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.post(
+            f"{self.url}?board={self.board.pk}",
+            {"title": "Task", "column": self.col.pk},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["column"], self.col.pk)
+
+    def test_create_task_with_invalid_assignee(self):
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.post(
+            f"{self.url}?board={self.board.pk}",
+            {"title": "Task", "assigned_to": [9999]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Invalid contact", response.data["detail"])
+
+    def test_create_task_with_valid_assignee(self):
+        self.client.force_authenticate(user=self.owner)
+        contact = Contact.objects.create(owner=self.owner, first_name="A", last_name="B", email="ab@example.com")
+        response = self.client.post(
+            f"{self.url}?board={self.board.pk}",
+            {"title": "Task", "assigned_to": [contact.pk]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn(contact.pk, response.data["assigned_to"])
+
+    def test_create_task_viewer_cannot_create(self):
+        viewer = User.objects.create_user(email="viewer@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=viewer, role="viewer")
+        self.client.force_authenticate(user=viewer)
+        response = self.client.post(
+            f"{self.url}?board={self.board.pk}",
+            {"title": "Task"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class TaskPatchAdvancedTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.board = Board.objects.create(title="Board", created_by=self.user)
+        self.col1 = Column.objects.create(board=self.board, title="Todo", order=0)
+        self.col2 = Column.objects.create(board=self.board, title="Done", order=1)
+        self.task = Task.objects.create(board=self.board, column=self.col1, title="Task")
+        self.client.force_authenticate(user=self.user)
+
+    def url(self, pk):
+        return f"/tasks/{pk}/"
+
+    def test_patch_task_with_invalid_assignee(self):
+        response = self.client.patch(self.url(self.task.pk), {"assigned_to": [9999]}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Invalid contact", response.data["detail"])
+
+    def test_patch_task_with_valid_assignee(self):
+        contact = Contact.objects.create(owner=self.user, first_name="X", last_name="Y", email="xy@example.com")
+        response = self.client.patch(self.url(self.task.pk), {"assigned_to": [contact.pk]}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(contact.pk, response.data["assigned_to"])
+
+    def test_patch_task_with_invalid_column(self):
+        other_board = Board.objects.create(title="Other", created_by=self.user)
+        other_col = Column.objects.create(board=other_board, title="Other Col", order=0)
+        response = self.client.patch(self.url(self.task.pk), {"column": other_col.pk}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Invalid column", response.data["detail"])
+
+    def test_patch_task_move_column(self):
+        response = self.client.patch(self.url(self.task.pk), {"column": self.col2.pk}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["column"], self.col2.pk)
+
+    def test_patch_task_set_labels(self):
+        label1 = Label.objects.create(board=self.board, name="Bug", color="#ff0000")
+        label2 = Label.objects.create(board=self.board, name="Feature", color="#00ff00")
+        response = self.client.patch(
+            self.url(self.task.pk), {"label_ids": [label1.pk, label2.pk]}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        label_names = {l["name"] for l in response.data["labels"]}
+        self.assertEqual(label_names, {"Bug", "Feature"})
+
+    def test_patch_task_clear_labels(self):
+        label = Label.objects.create(board=self.board, name="Bug", color="#ff0000")
+        self.task.labels.add(label)
+        response = self.client.patch(self.url(self.task.pk), {"label_ids": []}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["labels"], [])
+
+    def test_patch_task_viewer_cannot_edit(self):
+        viewer = User.objects.create_user(email="viewer@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=viewer, role="viewer")
+        self.client.force_authenticate(user=viewer)
+        response = self.client.patch(self.url(self.task.pk), {"title": "Hacked"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class TaskReorderTests(APITestCase):
+    url = "/tasks/reorder/"
+
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.outsider = User.objects.create_user(email="b@example.com", password="pass")
+        self.board = Board.objects.create(title="Board", created_by=self.user)
+        self.col1 = Column.objects.create(board=self.board, title="Todo", order=0)
+        self.col2 = Column.objects.create(board=self.board, title="Done", order=1)
+        self.task1 = Task.objects.create(board=self.board, column=self.col1, title="T1", order=1)
+        self.task2 = Task.objects.create(board=self.board, column=self.col1, title="T2", order=2)
+        self.client.force_authenticate(user=self.user)
+
+    def test_reorder_tasks(self):
+        response = self.client.post(
+            self.url,
+            [{"id": self.task1.pk, "order": 3.0}, {"id": self.task2.pk, "order": 1.0}],
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.task1.refresh_from_db()
+        self.task2.refresh_from_db()
+        self.assertEqual(self.task1.order, 3.0)
+        self.assertEqual(self.task2.order, 1.0)
+
+    def test_reorder_move_column(self):
+        response = self.client.post(
+            self.url,
+            [{"id": self.task1.pk, "order": 1.0, "column": self.col2.pk}],
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.task1.refresh_from_db()
+        self.assertEqual(self.task1.column_id, self.col2.pk)
+
+    def test_reorder_invalid_column(self):
+        other_board = Board.objects.create(title="Other", created_by=self.user)
+        other_col = Column.objects.create(board=other_board, title="Col", order=0)
+        response = self.client.post(
+            self.url,
+            [{"id": self.task1.pk, "column": other_col.pk}],
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_invalid_data(self):
+        response = self.client.post(self.url, [{"wrong": "data"}], format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_nonexistent_task(self):
+        response = self.client.post(
+            self.url,
+            [{"id": 9999, "order": 1.0}],
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_reorder_forbidden_for_outsider(self):
+        self.client.force_authenticate(user=self.outsider)
+        response = self.client.post(
+            self.url,
+            [{"id": self.task1.pk, "order": 5.0}],
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_reorder_archived_task_not_found(self):
+        self.task1.archived_at = timezone.now()
+        self.task1.save(update_fields=["archived_at"])
+        response = self.client.post(
+            self.url,
+            [{"id": self.task1.pk, "order": 5.0}],
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class MyTasksTests(APITestCase):
+    url = "/tasks/my/"
+
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.other = User.objects.create_user(email="b@example.com", password="pass")
+        self.board = Board.objects.create(title="Board", created_by=self.user)
+        self.col = Column.objects.create(board=self.board, title="Todo", order=0)
+        self.task1 = Task.objects.create(board=self.board, column=self.col, title="My Task")
+        self.task2 = Task.objects.create(board=self.board, column=self.col, title="Another")
+        self.client.force_authenticate(user=self.user)
+
+    def test_my_tasks_returns_user_boards(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertTrue(all("board_title" in t for t in response.data))
+
+    def test_my_tasks_excludes_other_boards(self):
+        other_board = Board.objects.create(title="Other", created_by=self.other)
+        Task.objects.create(board=other_board, title="Hidden")
+        response = self.client.get(self.url)
+        titles = [t["title"] for t in response.data]
+        self.assertNotIn("Hidden", titles)
+
+    def test_my_tasks_search_filter(self):
+        response = self.client.get(self.url, {"search": "My Task"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["title"], "My Task")
+
+    def test_my_tasks_search_no_results(self):
+        response = self.client.get(self.url, {"search": "nonexistent"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+
+    def test_my_tasks_excludes_archived(self):
+        self.task1.archived_at = timezone.now()
+        self.task1.save(update_fields=["archived_at"])
+        response = self.client.get(self.url)
+        titles = [t["title"] for t in response.data]
+        self.assertNotIn("My Task", titles)
+
+    def test_my_tasks_includes_member_board(self):
+        member_board = Board.objects.create(title="Member Board", created_by=self.other)
+        BoardMember.objects.create(board=member_board, user=self.user)
+        Task.objects.create(board=member_board, title="Member Task")
+        response = self.client.get(self.url)
+        titles = [t["title"] for t in response.data]
+        self.assertIn("Member Task", titles)
+
+
+class TaskDuplicateTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.outsider = User.objects.create_user(email="b@example.com", password="pass")
+        self.board = Board.objects.create(title="Board", created_by=self.user)
+        self.col = Column.objects.create(board=self.board, title="Todo", order=0)
+        self.task = Task.objects.create(
+            board=self.board, column=self.col, title="Original",
+            description="Desc", priority="high",
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def url(self, pk):
+        return f"/tasks/{pk}/duplicate/"
+
+    def test_duplicate_task(self):
+        label = Label.objects.create(board=self.board, name="Bug", color="#ff0000")
+        self.task.labels.add(label)
+        Subtask.objects.create(task=self.task, title="Sub 1", done=True)
+        response = self.client.post(self.url(self.task.pk))
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["title"], "Original (copy)")
+        self.assertEqual(response.data["priority"], "high")
+        self.assertEqual(response.data["subtask_count"], 1)
+        self.assertEqual(response.data["subtask_done_count"], 0)
+        self.assertEqual(len(response.data["labels"]), 1)
+
+    def test_duplicate_not_found(self):
+        response = self.client.post(self.url(9999))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_duplicate_archived_not_found(self):
+        self.task.archived_at = timezone.now()
+        self.task.save(update_fields=["archived_at"])
+        response = self.client.post(self.url(self.task.pk))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_duplicate_forbidden_for_outsider(self):
+        self.client.force_authenticate(user=self.outsider)
+        response = self.client.post(self.url(self.task.pk))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_duplicate_viewer_forbidden(self):
+        viewer = User.objects.create_user(email="viewer@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=viewer, role="viewer")
+        self.client.force_authenticate(user=viewer)
+        response = self.client.post(self.url(self.task.pk))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class TaskHistoryTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.outsider = User.objects.create_user(email="b@example.com", password="pass")
+        self.board = Board.objects.create(title="Board", created_by=self.user)
+        self.col = Column.objects.create(board=self.board, title="Todo", order=0)
+        self.task = Task.objects.create(board=self.board, column=self.col, title="Task")
+        self.client.force_authenticate(user=self.user)
+
+    def url(self, pk):
+        return f"/tasks/{pk}/history/"
+
+    def test_history_returns_entries(self):
+        from activity_api.helpers import log_activity
+        log_activity(self.board, self.user, "created", "task", self.task.title, task=self.task)
+        response = self.client.get(self.url(self.task.pk))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertGreaterEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["action"], "created")
+
+    def test_history_not_found(self):
+        response = self.client.get(self.url(9999))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_history_outsider_denied(self):
+        self.client.force_authenticate(user=self.outsider)
+        response = self.client.get(self.url(self.task.pk))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_history_archived_task_accessible(self):
+        from activity_api.helpers import log_activity
+        log_activity(self.board, self.user, "deleted", "task", self.task.title, task=self.task)
+        self.task.archived_at = timezone.now()
+        self.task.save(update_fields=["archived_at"])
+        response = self.client.get(self.url(self.task.pk))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class TaskWorkloadTests(APITestCase):
+    url = "/tasks/workload/"
+
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.board = Board.objects.create(title="Board", created_by=self.user)
+        self.col = Column.objects.create(board=self.board, title="Todo", order=0)
+        self.contact = Contact.objects.create(owner=self.user, first_name="A", last_name="B", email="a@example.com")
+        self.client.force_authenticate(user=self.user)
+
+    def test_workload_returns_structure(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("contacts", response.data)
+        self.assertIn("tasks", response.data)
+
+    def test_workload_includes_assigned_tasks(self):
+        task = Task.objects.create(board=self.board, column=self.col, title="Work", priority="high")
+        task.assignees.add(self.contact)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        task_titles = [t["title"] for t in response.data["tasks"]]
+        self.assertIn("Work", task_titles)
+        t = response.data["tasks"][0]
+        self.assertEqual(t["priority"], "high")
+        self.assertIn(self.contact.pk, t["assigned_to"])
+        self.assertEqual(t["board_title"], "Board")
+
+    def test_workload_excludes_unassigned_tasks(self):
+        Task.objects.create(board=self.board, column=self.col, title="Unassigned")
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["tasks"]), 0)
+
+    def test_workload_excludes_archived_tasks(self):
+        task = Task.objects.create(
+            board=self.board, column=self.col, title="Archived",
+            archived_at=timezone.now()
+        )
+        task.assignees.add(self.contact)
+        response = self.client.get(self.url)
+        task_titles = [t["title"] for t in response.data["tasks"]]
+        self.assertNotIn("Archived", task_titles)
+
+    def test_workload_contacts_list(self):
+        response = self.client.get(self.url)
+        self.assertEqual(len(response.data["contacts"]), 1)
+        self.assertEqual(response.data["contacts"][0]["name"], "A B")

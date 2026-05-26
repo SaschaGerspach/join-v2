@@ -350,7 +350,7 @@ def task_workload(request):
         .prefetch_related("assignees")
     )
 
-    contacts_qs = Contact.objects.filter(user=user)
+    contacts_qs = Contact.objects.filter(owner=user)
     contacts = [{"id": c.pk, "name": f"{c.first_name} {c.last_name}".strip()} for c in contacts_qs]
 
     result = []
