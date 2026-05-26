@@ -1,5 +1,6 @@
-import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
@@ -26,6 +27,8 @@ export type SavedFilter = {
 @Injectable()
 export class BoardStateService {
   private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly boardsApi = inject(BoardsApiService);
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly tasksApi = inject(TasksApiService);
@@ -118,12 +121,44 @@ export class BoardStateService {
   });
 
   private pendingTaskId: number | null = null;
+  private skipUrlSync = false;
+
+  private readonly syncFiltersToUrl = effect(() => {
+    const search = this.searchQuery();
+    const priority = this.filterPriority();
+    const assignee = this.filterAssignee();
+    const due = this.filterDue();
+    const groupBy = this.groupBy();
+
+    if (this.skipUrlSync) return;
+
+    const params: Record<string, string> = {};
+    if (search) params['search'] = search;
+    if (priority) params['priority'] = priority;
+    if (assignee) params['assignee'] = String(assignee);
+    if (due) params['due'] = due;
+    if (groupBy !== 'none') params['groupBy'] = groupBy;
+
+    this.router.navigate([], { queryParams: params, replaceUrl: true, relativeTo: this.route });
+  });
 
   init(boardId: number): void {
     this.boardId.set(boardId);
+    this.restoreFiltersFromUrl();
     this.loadData(boardId);
     this.loadSavedFilters();
     connectBoardWebSocket(boardId, this.boardWs, this.tasks, this.columns, this.onlineUsers, this.destroyRef);
+  }
+
+  private restoreFiltersFromUrl(): void {
+    const params = this.route.snapshot.queryParams;
+    this.skipUrlSync = true;
+    if (params['search']) this.searchQuery.set(params['search']);
+    if (params['priority']) this.filterPriority.set(params['priority']);
+    if (params['assignee']) this.filterAssignee.set(Number(params['assignee']));
+    if (params['due']) this.filterDue.set(params['due'] as 'overdue' | 'soon');
+    if (params['groupBy']) this.groupBy.set(params['groupBy'] as 'priority' | 'assignee');
+    this.skipUrlSync = false;
   }
 
   openTaskById(taskId: number): void {
