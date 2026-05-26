@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from activity_api.helpers import log_activity
-from boards_api.permissions import can_access_board, get_board_or_404, is_board_owner
+from boards_api.permissions import can_access_board, can_edit_board, get_board_or_404
 from boards_api.ws_events import send_board_event
 from config.serializers import DetailSerializer
 from .models import Column
@@ -51,8 +51,8 @@ def column_list(request):
         columns = board.columns.all().order_by("order")
         return Response([serialize_column(c) for c in columns])
 
-    if not is_board_owner(board, request.user) and not request.user.is_staff:
-        return Response({"detail": "Only the board owner can create columns."}, status=status.HTTP_403_FORBIDDEN)
+    if not can_edit_board(board, request.user):
+        return Response({"detail": "You do not have permission to create columns."}, status=status.HTTP_403_FORBIDDEN)
 
     serializer = ColumnCreateSerializer(data=request.data)
     if not serializer.is_valid():
@@ -85,8 +85,8 @@ def column_detail(request, pk):
     if not can_access_board(column.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not is_board_owner(column.board, request.user) and not request.user.is_staff:
-        return Response({"detail": "Only the board owner can modify columns."}, status=status.HTTP_403_FORBIDDEN)
+    if not can_edit_board(column.board, request.user):
+        return Response({"detail": "You do not have permission to modify columns."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":
         serializer = ColumnUpdateSerializer(data=request.data)

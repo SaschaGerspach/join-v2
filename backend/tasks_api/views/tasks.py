@@ -210,7 +210,7 @@ def task_reorder(request):
         if len(fetched) != len(set(task_ids)):
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         for t in fetched:
-            if not can_access_board(t.board, request.user):
+            if not can_edit_board(t.board, request.user):
                 return Response({"detail": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
         tasks = {t.pk: t for t in fetched}
 
