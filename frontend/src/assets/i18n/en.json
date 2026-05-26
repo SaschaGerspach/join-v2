@@ -498,7 +498,9 @@
     "NO_DATED_TASKS": "No tasks with dates found. Set start or due dates on your tasks to see them here.",
     "UNSCHEDULED": "Unscheduled tasks",
     "TODAY": "Today",
-    "TASK_HEADER": "Task"
+    "TASK_HEADER": "Task",
+    "DRAG_DEPENDENCY": "Drag to create dependency",
+    "CONFIRM_REMOVE_DEP": "Remove dependency on"
   },
   "TEMPLATES": {
     "TITLE": "Templates",
@@ -655,6 +657,8 @@
     "FAILED_RESTORE_TASK": "Failed to restore task.",
     "FAILED_LOAD_ARCHIVE": "Failed to load archive.",
     "EXPORT_FAILED": "Export failed.",
+    "DEPENDENCY_CREATED": "Dependency created.",
+    "DEPENDENCY_REMOVED": "Dependency removed.",
     "CUSTOM_FIELDS_SAVED": "Custom fields saved.",
     "FAILED_SAVE_FIELDS": "Failed to save fields.",
     "FAILED_ADD_COMMENT": "Failed to add comment.",

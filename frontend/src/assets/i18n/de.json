@@ -532,7 +532,9 @@
     "NO_DATED_TASKS": "Keine Aufgaben mit Datum gefunden. Setze Start- oder Fälligkeitsdaten, um sie hier zu sehen.",
     "UNSCHEDULED": "Ungeplante Aufgaben",
     "TODAY": "Heute",
-    "TASK_HEADER": "Aufgabe"
+    "TASK_HEADER": "Aufgabe",
+    "DRAG_DEPENDENCY": "Ziehen, um Abhängigkeit zu erstellen",
+    "CONFIRM_REMOVE_DEP": "Abhängigkeit entfernen zu"
   },
   "SW_UPDATE": {
     "AVAILABLE": "Eine neue Version ist verfügbar.",
@@ -655,6 +657,8 @@
     "FAILED_RESTORE_TASK": "Fehler beim Wiederherstellen der Aufgabe.",
     "FAILED_LOAD_ARCHIVE": "Fehler beim Laden des Archivs.",
     "EXPORT_FAILED": "Export fehlgeschlagen.",
+    "DEPENDENCY_CREATED": "Abhängigkeit erstellt.",
+    "DEPENDENCY_REMOVED": "Abhängigkeit entfernt.",
     "CUSTOM_FIELDS_SAVED": "Benutzerdefinierte Felder gespeichert.",
     "FAILED_SAVE_FIELDS": "Fehler beim Speichern der Felder.",
     "FAILED_ADD_COMMENT": "Fehler beim Hinzufügen des Kommentars.",

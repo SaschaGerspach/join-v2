@@ -46,6 +46,11 @@
             @for (line of dependencyLines(); track $index) {
               <path
                 [attr.d]="'M ' + (line.x1 / 100 * timelineWidth()) + ' ' + line.y1 + ' C ' + ((line.x1 / 100 * timelineWidth()) + 30) + ' ' + line.y1 + ' ' + ((line.x2 / 100 * timelineWidth()) - 30) + ' ' + line.y2 + ' ' + (line.x2 / 100 * timelineWidth()) + ' ' + line.y2"
+                class="dep-arrow-hit"
+                (click)="onDepLineClick(line.taskId, line.depId, line.dependsOnTitle)"
+              />
+              <path
+                [attr.d]="'M ' + (line.x1 / 100 * timelineWidth()) + ' ' + line.y1 + ' C ' + ((line.x1 / 100 * timelineWidth()) + 30) + ' ' + line.y1 + ' ' + ((line.x2 / 100 * timelineWidth()) - 30) + ' ' + line.y2 + ' ' + (line.x2 / 100 * timelineWidth()) + ' ' + line.y2"
                 class="dep-arrow"
               />
               <circle
@@ -55,6 +60,10 @@
                 class="dep-dot"
               />
             }
+            @if (dragLine(); as dl) {
+              <line [attr.x1]="dl.x1" [attr.y1]="dl.y1" [attr.x2]="dl.x2" [attr.y2]="dl.y2" class="drag-line" />
+              <circle [attr.cx]="dl.x2" [attr.cy]="dl.y2" r="4" class="drag-dot" />
+            }
           </svg>
 
           @for (bar of ganttBars(); track bar.task.id) {
@@ -62,12 +71,20 @@
               <div
                 class="gantt-bar"
                 [class.selected]="selectedTask()?.id === bar.task.id"
+                [class.drop-target]="dragFromTaskId() !== null && dragFromTaskId() !== bar.task.id"
+                [attr.data-task-id]="bar.task.id"
                 [style.left.%]="bar.left"
                 [style.width.%]="bar.width"
                 [style.background-color]="bar.color"
                 [title]="bar.task.title"
                 (click)="selectTask(bar.task)"
-              ></div>
+              >
+                <div
+                  class="dep-handle"
+                  [title]="'GANTT.DRAG_DEPENDENCY' | translate"
+                  (mousedown)="onDragHandleDown($event, bar.task.id)"
+                ></div>
+              </div>
             </div>
           }
         </div>
@@ -102,6 +119,18 @@
       @if (task.description) {
         <div class="info-row"><strong>{{ 'TASK.DESCRIPTION' | translate }}:</strong> {{ task.description }}</div>
       }
+    </div>
+  }
+
+  @if (pendingDeleteDep(); as dep) {
+    <div class="dep-confirm-backdrop" (click)="cancelDeleteDep()">
+      <div class="dep-confirm-card" (click)="$event.stopPropagation()">
+        <p>{{ 'GANTT.CONFIRM_REMOVE_DEP' | translate }} <strong>{{ dep.dependsOnTitle }}</strong>?</p>
+        <div class="dep-confirm-actions">
+          <button class="btn-secondary" (click)="cancelDeleteDep()">{{ 'COMMON.CANCEL' | translate }}</button>
+          <button class="btn-danger" (click)="confirmDeleteDep()">{{ 'COMMON.DELETE' | translate }}</button>
+        </div>
+      </div>
     </div>
   }
 

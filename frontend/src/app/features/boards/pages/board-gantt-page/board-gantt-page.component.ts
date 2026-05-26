@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, signal, computed, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed, OnInit, ElementRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { PRIORITY_COLORS, BRAND_COLOR } from '../../../../shared/constants/colors';
+import { ToastService } from '../../../../shared/services/toast.service';
 import { initBoardPage } from '../../utils/board-page-init';
 
 type ZoomLevel = 'day' | 'week' | 'month';
@@ -30,11 +31,18 @@ export class BoardGanttPageComponent implements OnInit {
   protected readonly board = initBoardPage();
   private readonly tasksApi = inject(TasksApiService);
   private readonly columnsApi = inject(ColumnsApiService);
+  private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
+  private readonly elRef = inject(ElementRef);
   loading = signal(true);
   tasks = signal<Task[]>([]);
   columns = signal<Column[]>([]);
   zoom = signal<ZoomLevel>('week');
   selectedTask = signal<Task | null>(null);
+
+  dragFromTaskId = signal<number | null>(null);
+  dragLineEnd = signal<{ x: number; y: number } | null>(null);
+  pendingDeleteDep = signal<{ taskId: number; depId: number; dependsOnTitle: string } | null>(null);
 
   private columnMap = computed(() => {
     const map = new Map<number, string>();
@@ -156,7 +164,7 @@ export class BoardGanttPageComponent implements OnInit {
     const barIndex = new Map<number, number>();
     bars.forEach((b, i) => barIndex.set(b.task.id, i));
 
-    const lines: { x1: number; y1: number; x2: number; y2: number }[] = [];
+    const lines: { x1: number; y1: number; x2: number; y2: number; taskId: number; depId: number; dependsOnTitle: string }[] = [];
     for (const bar of bars) {
       for (const dep of bar.task.dependencies) {
         const source = barMap.get(dep.depends_on);
@@ -168,6 +176,9 @@ export class BoardGanttPageComponent implements OnInit {
           y1: sourceIdx * 44 + 22,
           x2: bar.left,
           y2: targetIdx * 44 + 22,
+          taskId: bar.task.id,
+          depId: dep.id,
+          dependsOnTitle: dep.title,
         });
       }
     }
@@ -183,6 +194,20 @@ export class BoardGanttPageComponent implements OnInit {
 
   timelineWidth = computed(() => {
     return this.dateRange().days * this.colWidth();
+  });
+
+  dragLine = computed(() => {
+    const fromId = this.dragFromTaskId();
+    const end = this.dragLineEnd();
+    if (fromId === null || !end) return null;
+    const bars = this.ganttBars();
+    const idx = bars.findIndex(b => b.task.id === fromId);
+    if (idx < 0) return null;
+    const bar = bars[idx];
+    const tw = this.timelineWidth();
+    const x1 = (bar.left + bar.width) / 100 * tw;
+    const y1 = idx * 44 + 22;
+    return { x1, y1, x2: end.x, y2: end.y };
   });
 
   ngOnInit(): void {
@@ -204,6 +229,82 @@ export class BoardGanttPageComponent implements OnInit {
 
   selectTask(task: Task): void {
     this.selectedTask.set(this.selectedTask()?.id === task.id ? null : task);
+  }
+
+  onDragHandleDown(event: MouseEvent, taskId: number): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.dragFromTaskId.set(taskId);
+
+    const timelineBody = this.elRef.nativeElement.querySelector('.timeline-body') as HTMLElement;
+    if (!timelineBody) return;
+
+    const onMove = (e: MouseEvent) => {
+      const rect = timelineBody.getBoundingClientRect();
+      this.dragLineEnd.set({
+        x: e.clientX - rect.left + timelineBody.scrollLeft,
+        y: e.clientY - rect.top + timelineBody.scrollTop,
+      });
+    };
+
+    const onUp = (e: MouseEvent) => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+
+      const targetEl = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+      const barEl = targetEl?.closest('[data-task-id]') as HTMLElement | null;
+      const targetTaskId = barEl ? Number(barEl.dataset['taskId']) : null;
+
+      if (targetTaskId && targetTaskId !== taskId) {
+        this.createDependency(taskId, targetTaskId);
+      }
+
+      this.dragFromTaskId.set(null);
+      this.dragLineEnd.set(null);
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }
+
+  onDepLineClick(taskId: number, depId: number, dependsOnTitle: string): void {
+    this.pendingDeleteDep.set({ taskId, depId, dependsOnTitle });
+  }
+
+  confirmDeleteDep(): void {
+    const dep = this.pendingDeleteDep();
+    if (!dep) return;
+    this.tasksApi.removeDependency(dep.taskId, dep.depId)
+      .pipe(takeUntilDestroyed(this.board.destroyRef))
+      .subscribe({
+        next: () => {
+          this.tasks.update(tasks => tasks.map(t => {
+            if (t.id !== dep.taskId) return t;
+            return { ...t, dependencies: t.dependencies.filter(d => d.id !== dep.depId) };
+          }));
+          this.pendingDeleteDep.set(null);
+          this.toast.show(this.translate.instant('TOAST.DEPENDENCY_REMOVED'));
+        },
+      });
+  }
+
+  cancelDeleteDep(): void {
+    this.pendingDeleteDep.set(null);
+  }
+
+  private createDependency(taskId: number, dependsOnId: number): void {
+    this.tasksApi.addDependency(taskId, dependsOnId)
+      .pipe(takeUntilDestroyed(this.board.destroyRef))
+      .subscribe({
+        next: (dep) => {
+          this.tasks.update(tasks => tasks.map(t => {
+            if (t.id !== taskId) return t;
+            if (t.dependencies.some(d => d.id === dep.id)) return t;
+            return { ...t, dependencies: [...t.dependencies, dep] };
+          }));
+          this.toast.show(this.translate.instant('TOAST.DEPENDENCY_CREATED'));
+        },
+      });
   }
 
   private formatDate(d: Date, level: ZoomLevel): string {
