@@ -45,16 +45,19 @@ export class BoardTemplatesPageComponent implements OnInit {
     this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
     this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(b => this.boardTitle.set(b.title));
+      .subscribe({
+        next: b => this.boardTitle.set(b.title),
+        error: () => this.toast.show(this.translate.instant('TOAST.SOMETHING_WRONG'), 'error'),
+      });
     this.loadTemplates();
   }
 
   loadTemplates(): void {
     this.templatesApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(t => {
-        this.templates.set(t);
-        this.loading.set(false);
+      .subscribe({
+        next: t => { this.templates.set(t); this.loading.set(false); },
+        error: () => { this.loading.set(false); this.toast.show(this.translate.instant('TOAST.SOMETHING_WRONG'), 'error'); },
       });
   }
 

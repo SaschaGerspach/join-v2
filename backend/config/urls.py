@@ -13,10 +13,10 @@ from drf_spectacular.views import (
 
 
 def health(request):
-    from django.db import connection
+    from django.db import connection, OperationalError
     try:
         connection.ensure_connection()
-    except Exception:
+    except OperationalError:
         return JsonResponse({"status": "error", "db": "unreachable"}, status=503)
     return JsonResponse({"status": "ok"})
 

@@ -86,7 +86,10 @@ def admin_audit_log(request):
     if event_type:
         qs = qs.filter(event_type=event_type)
 
-    limit = min(int(request.query_params.get("limit", 20)), 100)
+    try:
+        limit = min(int(request.query_params.get("limit", 20)), 100)
+    except (ValueError, TypeError):
+        limit = 20
     entries = qs[:limit]
 
     return Response({

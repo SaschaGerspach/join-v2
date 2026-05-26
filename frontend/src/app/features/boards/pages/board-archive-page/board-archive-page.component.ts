@@ -32,7 +32,10 @@ export class BoardArchivePageComponent implements OnInit {
     this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
     this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(b => this.boardTitle.set(b.title));
+      .subscribe({
+        next: b => this.boardTitle.set(b.title),
+        error: () => this.toast.show(this.translate.instant('TOAST.SOMETHING_WRONG'), 'error'),
+      });
 
     this.loadArchive();
   }

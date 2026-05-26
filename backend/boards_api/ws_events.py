@@ -25,4 +25,5 @@ def send_board_event(board_id: int, event_type: str, data: Any) -> None:
         from webhooks_api.dispatch import dispatch_event
         dispatch_event(board_id, event_type, safe_data)
     except Exception:
-        pass
+        import logging
+        logging.getLogger(__name__).warning("Webhook dispatch failed for board %s", board_id, exc_info=True)

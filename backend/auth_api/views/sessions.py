@@ -3,6 +3,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -38,7 +39,7 @@ def session_revoke(request, pk):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
     try:
         RefreshToken(token.token).blacklist()
-    except Exception:
+    except TokenError:
         pass
     return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -55,7 +56,7 @@ def session_revoke_all(request):
             continue
         try:
             RefreshToken(t.token).blacklist()
-        except Exception:
+        except TokenError:
             pass
     return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -66,5 +67,5 @@ def _get_current_jti(request):
         return None
     try:
         return RefreshToken(raw).payload.get("jti")
-    except Exception:
+    except TokenError:
         return None

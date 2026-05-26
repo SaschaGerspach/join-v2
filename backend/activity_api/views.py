@@ -44,7 +44,10 @@ def activity_list(request):
     before = request.query_params.get("before")
     qs = board.activity.select_related("user").order_by("-created_at")
     if before:
-        qs = qs.filter(pk__lt=before)
+        try:
+            qs = qs.filter(pk__lt=int(before))
+        except (ValueError, TypeError):
+            pass
     entries = list(qs[:PAGE_SIZE + 1])
     has_more = len(entries) > PAGE_SIZE
     entries = entries[:PAGE_SIZE]
