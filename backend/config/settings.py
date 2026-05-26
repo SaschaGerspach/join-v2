@@ -343,6 +343,7 @@ REST_FRAMEWORK = {
         "auth_attempts": "1000/minute" if DEBUG else "10/minute",
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
 }
 
 DEFAULT_BOARD_COLUMNS = ["To do", "In progress", "Await feedback", "Done"]

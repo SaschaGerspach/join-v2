@@ -58,6 +58,15 @@ class Task(models.Model):
             ),
         ]
 
+    def save(self, *args, **kwargs):
+        if self._state.adding and self.column_id is not None and self.order == 0.0:
+            max_order = (
+                Task.objects.filter(column_id=self.column_id, archived_at__isnull=True)
+                .aggregate(models.Max('order'))['order__max']
+            )
+            self.order = (max_order or 0.0) + 1024.0
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.title
 
