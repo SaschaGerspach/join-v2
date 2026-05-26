@@ -30,6 +30,15 @@
   padding: 2rem 0;
 }
 
+.slack-teams-hint {
+  font-size: 0.8rem;
+  color: var(--color-muted, $color-muted);
+  background: var(--color-bg, $color-bg);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
 .webhooks-actions {
   margin-bottom: 1rem;
 }

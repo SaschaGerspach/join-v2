@@ -503,7 +503,8 @@
     "RESPONSE": "Antwort",
     "TIME": "Zeit",
     "EMPTY": "Keine Webhooks konfiguriert. Erstelle einen, um HTTP-Benachrichtigungen für Board-Events zu erhalten.",
-    "CONFIRM_DELETE": "Diesen Webhook löschen?"
+    "CONFIRM_DELETE": "Diesen Webhook löschen?",
+    "SLACK_TEAMS_HINT": "Slack- und Microsoft-Teams-Webhook-URLs werden automatisch als Rich-Message-Cards formatiert."
   },
   "TIME_TRAVEL": {
     "TITLE": "Zeitreise",

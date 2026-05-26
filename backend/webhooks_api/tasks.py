@@ -11,6 +11,66 @@ logger = logging.getLogger(__name__)
 
 DELIVERY_TIMEOUT = 10
 
+EVENT_LABELS = {
+    "task_created": "Task Created",
+    "task_updated": "Task Updated",
+    "task_deleted": "Task Deleted",
+    "task_moved": "Task Moved",
+    "comment_added": "Comment Added",
+}
+
+
+def _is_slack_url(url: str) -> bool:
+    return "hooks.slack.com" in url
+
+
+def _is_teams_url(url: str) -> bool:
+    return "webhook.office.com" in url or "webhook.office365.com" in url
+
+
+def _format_slack_payload(event_type: str, payload: dict) -> dict:
+    title = payload.get("title", "")
+    board = payload.get("board_title", "")
+    label = EVENT_LABELS.get(event_type, event_type)
+    text = f"*{label}*: {title}"
+    if board:
+        text += f" (Board: {board})"
+    blocks = [
+        {"type": "section", "text": {"type": "mrkdwn", "text": text}},
+    ]
+    fields = []
+    if payload.get("priority"):
+        fields.append({"type": "mrkdwn", "text": f"*Priority:* {payload['priority']}"})
+    if payload.get("column_title"):
+        fields.append({"type": "mrkdwn", "text": f"*Column:* {payload['column_title']}"})
+    if fields:
+        blocks.append({"type": "section", "fields": fields})
+    return {"blocks": blocks, "text": text}
+
+
+def _format_teams_payload(event_type: str, payload: dict) -> dict:
+    title = payload.get("title", "")
+    board = payload.get("board_title", "")
+    label = EVENT_LABELS.get(event_type, event_type)
+    facts = []
+    if payload.get("priority"):
+        facts.append({"name": "Priority", "value": payload["priority"]})
+    if payload.get("column_title"):
+        facts.append({"name": "Column", "value": payload["column_title"]})
+    if board:
+        facts.append({"name": "Board", "value": board})
+    return {
+        "@type": "MessageCard",
+        "@context": "http://schema.org/extensions",
+        "summary": f"{label}: {title}",
+        "themeColor": "29abe2",
+        "title": label,
+        "sections": [{
+            "activityTitle": title,
+            "facts": facts,
+        }],
+    }
+
 
 @shared_task(bind=True, max_retries=3)
 def deliver_webhook(self, webhook_id, event_type, payload):
@@ -21,7 +81,14 @@ def deliver_webhook(self, webhook_id, event_type, payload):
     except Webhook.DoesNotExist:
         return
 
-    body = json.dumps(payload, cls=DjangoJSONEncoder)
+    if _is_slack_url(webhook.url):
+        formatted_payload = _format_slack_payload(event_type, payload)
+    elif _is_teams_url(webhook.url):
+        formatted_payload = _format_teams_payload(event_type, payload)
+    else:
+        formatted_payload = payload
+
+    body = json.dumps(formatted_payload, cls=DjangoJSONEncoder)
     delivery = WebhookDelivery.objects.create(
         webhook=webhook,
         event_type=event_type,

@@ -544,7 +544,8 @@
     "RESPONSE": "Response",
     "TIME": "Time",
     "EMPTY": "No webhooks configured. Add one to receive HTTP notifications for board events.",
-    "CONFIRM_DELETE": "Delete this webhook?"
+    "CONFIRM_DELETE": "Delete this webhook?",
+    "SLACK_TEAMS_HINT": "Slack and Microsoft Teams webhook URLs are automatically formatted as rich message cards."
   },
   "SW_UPDATE": {
     "AVAILABLE": "A new version is available.",
