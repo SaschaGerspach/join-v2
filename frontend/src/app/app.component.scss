@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 .app-loading-overlay {
   position: fixed;
   top: 0;
@@ -12,7 +14,7 @@
   background: var(--color-overlay, rgba(255, 255, 255, 0.75));
   backdrop-filter: blur(2px);
 
-  z-index: 9999;
+  z-index: $z-loading;
 }
 
 .app-loading-overlay p {

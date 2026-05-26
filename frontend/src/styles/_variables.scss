@@ -17,3 +17,17 @@ $priority-on-bright:   #2a3647;
 
 $bp-mobile:            768px;
 $mobile-footer-height: 64px;
+
+// Z-Index Scale
+$z-gantt-base:         1;
+$z-gantt-today:        2;
+$z-sticky:           100;
+$z-dropdown:         200;
+$z-panel:            300;
+$z-popover:          400;
+$z-modal-secondary:  500;
+$z-sidebar-backdrop: 999;
+$z-overlay:         1000;
+$z-toast:           2000;
+$z-loading:         9999;
+$z-skip-link:      10000;

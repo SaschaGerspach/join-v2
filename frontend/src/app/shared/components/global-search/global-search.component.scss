@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 .global-search {
   position: relative;
 }
@@ -32,7 +34,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   margin-top: 4px;
-  z-index: 1000;
+  z-index: $z-overlay;
 }
 
 .search-loading,

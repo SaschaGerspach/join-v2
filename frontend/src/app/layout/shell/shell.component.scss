@@ -26,7 +26,7 @@ $bp-tablet:         1024px;
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+    z-index: $z-sidebar-backdrop;
   }
 }
 
@@ -44,7 +44,7 @@ $bp-tablet:         1024px;
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 1000;
+    z-index: $z-overlay;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
 
@@ -145,7 +145,7 @@ $bp-tablet:         1024px;
   padding: 0 2rem;
   flex-shrink: 0;
   position: relative;
-  z-index: 100;
+  z-index: $z-sticky;
 
   @media (max-width: $bp-mobile) {
     padding: 0 1rem;
@@ -251,7 +251,7 @@ $bp-tablet:         1024px;
   padding: 0.5rem 0;
   min-width: 140px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  z-index: 200;
+  z-index: $z-dropdown;
 
   a, button {
     display: block;
@@ -324,7 +324,7 @@ $bp-tablet:         1024px;
   background-color: var(--color-surface, $color-white);
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-  z-index: 300;
+  z-index: $z-panel;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -436,7 +436,7 @@ $bp-tablet:         1024px;
   right: 0;
   height: $mobile-footer;
   background-color: var(--color-dark);
-  z-index: 100;
+  z-index: $z-sticky;
 
   @media (max-width: $bp-mobile) {
     display: flex;

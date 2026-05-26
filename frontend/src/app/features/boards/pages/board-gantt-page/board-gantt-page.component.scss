@@ -172,7 +172,7 @@
   bottom: 0;
   width: 2px;
   background: $color-primary;
-  z-index: 2;
+  z-index: $z-gantt-today;
   pointer-events: none;
 
   &::before {
@@ -194,7 +194,7 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 1;
+  z-index: $z-gantt-base;
 }
 
 .dep-arrow {
