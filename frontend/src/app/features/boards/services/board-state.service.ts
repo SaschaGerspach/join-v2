@@ -62,8 +62,9 @@ export class BoardStateService {
   readonly bulkMoveTarget = signal<number | null>(null);
   readonly pendingBulkDelete = signal(false);
   readonly savedFilters = signal<SavedFilter[]>([]);
-  readonly expandedColumns = signal<Set<number>>(new Set());
-  private readonly COLUMN_TASK_LIMIT = 20;
+  readonly columnTaskLimits = signal<Map<number, number>>(new Map());
+  private readonly COLUMN_TASK_LIMIT = 50;
+  private readonly COLUMN_TASK_INCREMENT = 50;
 
   readonly columnListIds = computed(() => this.columns().map(c => `col-${c.id}`));
   readonly bulkMode = computed(() => this.selectedTaskIds().size > 0);
@@ -187,8 +188,9 @@ export class BoardStateService {
 
   tasksForColumn(columnId: number): Task[] {
     const all = this.tasksByColumn().get(columnId) ?? [];
-    if (this.expandedColumns().has(columnId)) return all;
-    return all.slice(0, this.COLUMN_TASK_LIMIT);
+    const limit = this.columnTaskLimits().get(columnId) ?? this.COLUMN_TASK_LIMIT;
+    if (limit >= all.length) return all;
+    return all.slice(0, limit);
   }
 
   allTasksForColumn(columnId: number): Task[] {
@@ -196,15 +198,24 @@ export class BoardStateService {
   }
 
   hasMoreTasks(columnId: number): boolean {
-    return (this.tasksByColumn().get(columnId)?.length ?? 0) > this.COLUMN_TASK_LIMIT && !this.expandedColumns().has(columnId);
+    const total = this.tasksByColumn().get(columnId)?.length ?? 0;
+    const limit = this.columnTaskLimits().get(columnId) ?? this.COLUMN_TASK_LIMIT;
+    return total > limit;
   }
 
   hiddenTaskCount(columnId: number): number {
-    return (this.tasksByColumn().get(columnId)?.length ?? 0) - this.COLUMN_TASK_LIMIT;
+    const total = this.tasksByColumn().get(columnId)?.length ?? 0;
+    const limit = this.columnTaskLimits().get(columnId) ?? this.COLUMN_TASK_LIMIT;
+    return total - limit;
   }
 
   expandColumn(columnId: number): void {
-    this.expandedColumns.update(set => { const s = new Set(set); s.add(columnId); return s; });
+    this.columnTaskLimits.update(map => {
+      const m = new Map(map);
+      const current = m.get(columnId) ?? this.COLUMN_TASK_LIMIT;
+      m.set(columnId, current + this.COLUMN_TASK_INCREMENT);
+      return m;
+    });
   }
 
   groupedTasksForColumn(columnId: number): { label: string; tasks: Task[] }[] {
