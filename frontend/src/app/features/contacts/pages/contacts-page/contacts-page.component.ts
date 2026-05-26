@@ -5,8 +5,7 @@ import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AVATAR_COLORS } from '../../../../shared/constants/colors';
-import { ToastService } from '../../../../shared/services/toast.service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 type ContactForm = {
   first_name: string;
@@ -25,8 +24,6 @@ type ContactForm = {
 })
 export class ContactsPageComponent implements OnInit {
   private readonly api = inject(ContactsApiService);
-  private readonly toast = inject(ToastService);
-  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   contacts = signal<Contact[]>([]);
@@ -51,7 +48,7 @@ export class ContactsPageComponent implements OnInit {
   ngOnInit(): void {
     this.api.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: contacts => { this.contacts.set(contacts); this.loading.set(false); },
-      error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_CONTACTS'), 'error'); this.loading.set(false); },
+      error: () => { this.loading.set(false); },
     });
   }
 
@@ -83,7 +80,6 @@ export class ContactsPageComponent implements OnInit {
           this.selectedContact.set(updated);
           this.showForm.set(false);
         },
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPDATE_CONTACT'), 'error'),
       });
     } else {
       this.api.create(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -92,7 +88,6 @@ export class ContactsPageComponent implements OnInit {
           this.selectedContact.set(created);
           this.showForm.set(false);
         },
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_CONTACT'), 'error'),
       });
     }
   }
@@ -115,7 +110,6 @@ export class ContactsPageComponent implements OnInit {
       },
       error: () => {
         this.pendingDeleteId.set(null);
-        this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_CONTACT'), 'error');
       },
     });
   }

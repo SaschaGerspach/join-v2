@@ -73,31 +73,19 @@ export class BoardAutomationsPageComponent implements OnInit {
 
     this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: b => this.boardTitle.set(b.title),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARD'), 'error'),
-      });
+      .subscribe({ next: b => this.boardTitle.set(b.title) });
 
     this.columnsApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: c => this.columns.set(c),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_COLUMNS'), 'error'),
-      });
+      .subscribe({ next: c => this.columns.set(c) });
 
     this.boardsApi.getMembers(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: m => this.members.set(m),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_MEMBERS'), 'error'),
-      });
+      .subscribe({ next: m => this.members.set(m) });
 
     this.labelsApi.getByBoard(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: l => this.labels.set(l),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_LABELS'), 'error'),
-      });
+      .subscribe({ next: l => this.labels.set(l) });
 
     this.loadRules();
     this.loadLogs();
@@ -111,17 +99,13 @@ export class BoardAutomationsPageComponent implements OnInit {
           this.rules.set(rules);
           this.loading.set(false);
         },
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_RULES'), 'error'),
       });
   }
 
   loadLogs(): void {
     this.automationsApi.getLogs(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: logs => this.logs.set(logs),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_LOGS'), 'error'),
-      });
+      .subscribe({ next: logs => this.logs.set(logs) });
   }
 
   toggleRule(rule: AutomationRule): void {
@@ -129,7 +113,6 @@ export class BoardAutomationsPageComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: updated => this.rules.update(r => r.map(x => x.id === updated.id ? updated : x)),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_TOGGLE_RULE'), 'error'),
       });
   }
 
@@ -154,7 +137,6 @@ export class BoardAutomationsPageComponent implements OnInit {
             this.showRuleDialog.set(false);
             this.toast.show(this.translate.instant('TOAST.RULE_UPDATED'));
           },
-          error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPDATE_RULE'), 'error'),
         });
     } else {
       this.automationsApi.create(this.boardId(), payload)
@@ -165,7 +147,6 @@ export class BoardAutomationsPageComponent implements OnInit {
             this.showRuleDialog.set(false);
             this.toast.show(this.translate.instant('TOAST.RULE_CREATED'));
           },
-          error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_RULE'), 'error'),
         });
     }
   }
@@ -181,7 +162,6 @@ export class BoardAutomationsPageComponent implements OnInit {
           this.rules.update(r => r.filter(x => x.id !== id));
           this.toast.show(this.translate.instant('TOAST.RULE_DELETED'));
         },
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_RULE'), 'error'),
       });
   }
 

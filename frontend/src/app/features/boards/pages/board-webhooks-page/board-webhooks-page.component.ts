@@ -44,17 +44,11 @@ export class BoardWebhooksPageComponent implements OnInit {
     this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
     this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: b => this.boardTitle.set(b.title),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARD'), 'error'),
-      });
+      .subscribe({ next: b => this.boardTitle.set(b.title) });
 
     this.webhooksApi.getAvailableEvents()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: events => this.availableEvents.set(events),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_EVENTS'), 'error'),
-      });
+      .subscribe({ next: events => this.availableEvents.set(events) });
 
     this.loadWebhooks();
   }
@@ -67,7 +61,6 @@ export class BoardWebhooksPageComponent implements OnInit {
           this.webhooks.set(wh);
           this.loading.set(false);
         },
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_WEBHOOKS'), 'error'),
       });
   }
 
@@ -118,7 +111,6 @@ export class BoardWebhooksPageComponent implements OnInit {
         this.loadWebhooks();
         this.toast.show(this.translate.instant('TOAST.WEBHOOK_SAVED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_SAVE_WEBHOOK'), 'error'),
     });
   }
 
@@ -137,17 +129,13 @@ export class BoardWebhooksPageComponent implements OnInit {
           this.loadWebhooks();
           this.toast.show(this.translate.instant('TOAST.WEBHOOK_DELETED'));
         },
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_WEBHOOK'), 'error'),
       });
   }
 
   toggleActive(wh: Webhook): void {
     this.webhooksApi.update(wh.id, { is_active: !wh.is_active })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => this.loadWebhooks(),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_TOGGLE_WEBHOOK'), 'error'),
-      });
+      .subscribe({ next: () => this.loadWebhooks() });
   }
 
   viewDeliveries(webhookId: number): void {
@@ -159,10 +147,7 @@ export class BoardWebhooksPageComponent implements OnInit {
     this.selectedWebhookId.set(webhookId);
     this.webhooksApi.getDeliveries(webhookId)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: d => this.deliveries.set(d),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_DELIVERIES'), 'error'),
-      });
+      .subscribe({ next: d => this.deliveries.set(d) });
   }
 
   cancelForm(): void {

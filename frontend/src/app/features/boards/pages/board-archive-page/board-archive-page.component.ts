@@ -32,10 +32,7 @@ export class BoardArchivePageComponent implements OnInit {
     this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
     this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: b => this.boardTitle.set(b.title),
-        error: () => this.toast.show(this.translate.instant('TOAST.SOMETHING_WRONG'), 'error'),
-      });
+      .subscribe({ next: b => this.boardTitle.set(b.title) });
 
     this.loadArchive();
   }
@@ -46,7 +43,6 @@ export class BoardArchivePageComponent implements OnInit {
         this.tasks.update(list => list.filter(t => t.id !== task.id));
         this.toast.show(this.translate.instant('TOAST.TASK_RESTORED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_RESTORE_TASK'), 'error'),
     });
   }
 
@@ -59,7 +55,6 @@ export class BoardArchivePageComponent implements OnInit {
           this.loading.set(false);
         },
         error: () => {
-          this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_ARCHIVE'), 'error');
           this.loading.set(false);
         },
       });

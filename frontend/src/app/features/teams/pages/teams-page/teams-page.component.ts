@@ -35,7 +35,7 @@ export class TeamsPageComponent implements OnInit {
   ngOnInit(): void {
     this.teamsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: teams => { this.teams.set(teams); this.loading.set(false); },
-      error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_TEAMS'), 'error'); this.loading.set(false); },
+      error: () => { this.loading.set(false); },
     });
   }
 
@@ -49,7 +49,6 @@ export class TeamsPageComponent implements OnInit {
         this.showCreateForm.set(false);
         this.toast.show(this.translate.instant('TOAST.TEAM_CREATED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_TEAM'), 'error'),
     });
   }
 
@@ -62,7 +61,6 @@ export class TeamsPageComponent implements OnInit {
     this.teamMembers.set([]);
     this.teamsApi.getMembers(teamId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: members => this.teamMembers.set(members),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_MEMBERS'), 'error'),
     });
   }
 
@@ -89,7 +87,6 @@ export class TeamsPageComponent implements OnInit {
         this.teamMembers.update(list => list.filter(m => m.user_id !== userId));
         this.toast.show(this.translate.instant('TOAST.MEMBER_REMOVED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REMOVE_MEMBER'), 'error'),
     });
   }
 
@@ -98,7 +95,6 @@ export class TeamsPageComponent implements OnInit {
     if (!teamId) return;
     this.teamsApi.patchMemberRole(teamId, userId, role).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => this.teamMembers.update(list => list.map(m => m.user_id === updated.user_id ? updated : m)),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPDATE_ROLE'), 'error'),
     });
   }
 
@@ -116,7 +112,6 @@ export class TeamsPageComponent implements OnInit {
         if (this.expandedTeamId() === id) this.expandedTeamId.set(null);
         this.toast.show(this.translate.instant('TOAST.TEAM_DELETED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_TEAM'), 'error'),
     });
   }
 }

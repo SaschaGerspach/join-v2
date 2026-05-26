@@ -300,7 +300,6 @@ export class BoardStateService {
     if (!trimmed) return;
     this.columnsApi.create(this.boardId(), trimmed).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: col => this.columns.update(c => c.some(x => x.id === col.id) ? c : [...c, col]),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_COLUMN'), 'error'),
     });
   }
 
@@ -309,7 +308,6 @@ export class BoardStateService {
     if (!trimmed) { this.editingBoardTitle.set(false); return; }
     this.boardsApi.patch(this.boardId(), { title: trimmed }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => { this.board.set(updated); this.editingBoardTitle.set(false); },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_RENAME_BOARD'), 'error'),
     });
   }
 
@@ -324,7 +322,6 @@ export class BoardStateService {
   setWipLimit(id: number, value: number | null): void {
     this.columnsApi.patch(id, { wip_limit: value }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => this.columns.update(cols => cols.map(c => c.id === id ? updated : c)),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPDATE_WIP'), 'error'),
     });
   }
 
@@ -333,7 +330,6 @@ export class BoardStateService {
     if (!trimmed) { this.editingColumnId.set(null); return; }
     this.columnsApi.patch(id, { title: trimmed }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => { this.columns.update(cols => cols.map(c => c.id === id ? updated : c)); this.editingColumnId.set(null); },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_RENAME_COLUMN'), 'error'),
     });
   }
 
@@ -347,7 +343,6 @@ export class BoardStateService {
         this.pendingDeleteColumnId.set(null);
         this.toast.show(this.translate.instant('TOAST.COLUMN_DELETED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_COLUMN'), 'error'),
     });
   }
 
@@ -358,7 +353,6 @@ export class BoardStateService {
         this.addingTaskForColumn.set(null);
         this.toast.show(this.translate.instant('TOAST.TASK_CREATED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_TASK'), 'error'),
     });
   }
 
@@ -383,7 +377,6 @@ export class BoardStateService {
         this.pendingDeleteTaskId.set(null);
         this.toast.show(this.translate.instant('TOAST.TASK_DELETED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_TASK'), 'error'),
     });
   }
 
@@ -459,7 +452,7 @@ export class BoardStateService {
           this.pendingTaskId = null;
         }
       },
-      error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARD'), 'error'); this.loading.set(false); },
+      error: () => { this.loading.set(false); },
     });
   }
 }

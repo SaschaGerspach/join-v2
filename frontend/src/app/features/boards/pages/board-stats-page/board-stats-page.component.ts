@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ChartData, ChartOptions } from 'chart.js';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
@@ -11,8 +11,6 @@ import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service'
 import { ActivityApiService, ActivityEntry } from '../../../../core/activity/activity-api.service';
 import { ContactsApiService, Contact } from '../../../../core/contacts/contacts-api.service';
 import { BRAND_COLOR, PRIORITY_COLORS } from '../../../../shared/constants/colors';
-import { ToastService } from '../../../../shared/services/toast.service';
-
 @Component({
   selector: 'app-board-stats-page',
   standalone: true,
@@ -30,9 +28,6 @@ export class BoardStatsPageComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly activityApi = inject(ActivityApiService);
   private readonly contactsApi = inject(ContactsApiService);
-  private readonly toast = inject(ToastService);
-  private readonly translate = inject(TranslateService);
-
   boardId = signal(0);
   boardTitle = signal('Board');
   loading = signal(true);
@@ -79,10 +74,7 @@ export class BoardStatsPageComponent implements OnInit {
     this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
     this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: b => this.boardTitle.set(b.title),
-        error: () => this.toast.show(this.translate.instant('TOAST.SOMETHING_WRONG'), 'error'),
-      });
+      .subscribe({ next: b => this.boardTitle.set(b.title) });
 
     forkJoin([
       this.columnsApi.getByBoard(this.boardId()),
@@ -99,7 +91,7 @@ export class BoardStatsPageComponent implements OnInit {
         this.buildAssigneeChart(tasks, contacts);
         this.loading.set(false);
       },
-      error: () => { this.loading.set(false); this.toast.show(this.translate.instant('TOAST.SOMETHING_WRONG'), 'error'); },
+      error: () => { this.loading.set(false); },
     });
   }
 

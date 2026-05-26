@@ -49,7 +49,7 @@ export class BoardsPageComponent implements OnInit {
     this.loading.set(true);
     this.api.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: boards => { this.boards.set(boards); this.loading.set(false); },
-      error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARDS'), 'error'); this.loading.set(false); },
+      error: () => { this.loading.set(false); },
     });
   }
 
@@ -65,7 +65,6 @@ export class BoardsPageComponent implements OnInit {
         this.showForm.set(false);
         this.toast.show(this.translate.instant('TOAST.BOARD_CREATED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_BOARD'), 'error'),
     });
   }
 
@@ -87,7 +86,6 @@ export class BoardsPageComponent implements OnInit {
         this.pendingDeleteId.set(null);
         this.toast.show(this.translate.instant('TOAST.BOARD_DELETED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_BOARD'), 'error'),
     });
   }
 
@@ -115,7 +113,6 @@ export class BoardsPageComponent implements OnInit {
   changeColor(board: Board, color: string): void {
     this.api.patch(board.id, { color }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => this.boards.update(list => list.map(b => b.id === updated.id ? updated : b)),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CHANGE_COLOR'), 'error'),
     });
   }
 
@@ -130,7 +127,6 @@ export class BoardsPageComponent implements OnInit {
     this.pendingRemoveMemberId.set(null);
     this.api.removeMember(board.id, userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.members.update(list => list.filter(m => m.user_id !== userId)),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REMOVE_MEMBER'), 'error'),
     });
   }
 
@@ -139,7 +135,6 @@ export class BoardsPageComponent implements OnInit {
     if (!board) return;
     this.api.patchMemberRole(board.id, userId, role).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: updated => this.members.update(list => list.map(m => m.user_id === userId ? { ...m, role: updated.role } : m)),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CHANGE_ROLE'), 'error'),
     });
   }
 
@@ -154,7 +149,6 @@ export class BoardsPageComponent implements OnInit {
           return a.title.localeCompare(b.title);
         });
       }),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPDATE_FAVORITE'), 'error'),
     });
   }
 

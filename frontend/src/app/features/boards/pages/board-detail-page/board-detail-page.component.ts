@@ -96,7 +96,6 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
             this.toast.show(this.translate.instant('INVITE.LINK_COPIED'));
           });
         },
-        error: () => this.toast.show(this.translate.instant('INVITE.LINK_FAILED'), 'error'),
       });
   }
 
@@ -110,7 +109,6 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
         a.click();
         URL.revokeObjectURL(url);
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.EXPORT_FAILED'), 'error'),
     });
   }
 

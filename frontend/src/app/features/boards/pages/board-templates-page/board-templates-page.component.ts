@@ -45,10 +45,7 @@ export class BoardTemplatesPageComponent implements OnInit {
     this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
     this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: b => this.boardTitle.set(b.title),
-        error: () => this.toast.show(this.translate.instant('TOAST.SOMETHING_WRONG'), 'error'),
-      });
+      .subscribe({ next: b => this.boardTitle.set(b.title) });
     this.loadTemplates();
   }
 
@@ -57,7 +54,7 @@ export class BoardTemplatesPageComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: t => { this.templates.set(t); this.loading.set(false); },
-        error: () => { this.loading.set(false); this.toast.show(this.translate.instant('TOAST.SOMETHING_WRONG'), 'error'); },
+        error: () => { this.loading.set(false); },
       });
   }
 
@@ -118,7 +115,6 @@ export class BoardTemplatesPageComponent implements OnInit {
         this.loadTemplates();
         this.toast.show(this.translate.instant('TOAST.TEMPLATE_SAVED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_SAVE_TEMPLATE'), 'error'),
     });
   }
 
@@ -127,7 +123,6 @@ export class BoardTemplatesPageComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.toast.show(this.translate.instant('TOAST.TASK_CREATED')),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_CREATE_TASK'), 'error'),
       });
   }
 
@@ -146,7 +141,6 @@ export class BoardTemplatesPageComponent implements OnInit {
           this.loadTemplates();
           this.toast.show(this.translate.instant('TOAST.TEMPLATE_DELETED'));
         },
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_TEMPLATE'), 'error'),
       });
   }
 

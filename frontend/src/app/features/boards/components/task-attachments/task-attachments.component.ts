@@ -49,10 +49,7 @@ export class TaskAttachmentsComponent implements OnInit {
   ngOnInit(): void {
     this.attachmentsApi.getByTask(this.taskId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: atts => this.attachments.set(atts),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_ATTACHMENTS'), 'error'),
-      });
+      .subscribe({ next: atts => this.attachments.set(atts) });
   }
 
   onFileSelected(event: Event): void {
@@ -74,7 +71,6 @@ export class TaskAttachmentsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: att => this.attachments.update(list => [...list, att]),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_UPLOAD_FILE'), 'error'),
       });
     input.value = '';
   }
@@ -91,7 +87,6 @@ export class TaskAttachmentsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.attachments.update(list => list.filter(a => a.id !== att.id)),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_FILE'), 'error'),
       });
   }
 
@@ -112,7 +107,6 @@ export class TaskAttachmentsComponent implements OnInit {
             const url = URL.createObjectURL(blob);
             this.previewBlobUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
           },
-          error: () => this.toast.show(this.translate.instant('TOAST.FAILED_PREVIEW_FILE'), 'error'),
         });
     }
   }
@@ -137,7 +131,6 @@ export class TaskAttachmentsComponent implements OnInit {
           a.click();
           URL.revokeObjectURL(url);
         },
-        error: () => this.toast.show(this.translate.instant('TOAST.DOWNLOAD_FAILED'), 'error'),
       });
   }
 

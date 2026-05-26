@@ -3,9 +3,8 @@ import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
-import { ToastService } from '../../../../shared/services/toast.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { ActivityApiService, ActivityEntry } from '../../../../core/activity/activity-api.service';
@@ -26,9 +25,6 @@ export class BoardTimetravelPageComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly activityApi = inject(ActivityApiService);
-  private readonly toast = inject(ToastService);
-  private readonly translate = inject(TranslateService);
-
   boardId = signal(0);
   boardTitle = signal('Board');
   loading = signal(true);
@@ -112,10 +108,7 @@ export class BoardTimetravelPageComponent implements OnInit {
     this.boardId.set(Number(this.route.snapshot.paramMap.get('id')));
     this.boardsApi.getById(this.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: b => this.boardTitle.set(b.title),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARD'), 'error'),
-      });
+      .subscribe({ next: b => this.boardTitle.set(b.title) });
 
     forkJoin([
       this.tasksApi.getByBoard(this.boardId()),
@@ -129,7 +122,6 @@ export class BoardTimetravelPageComponent implements OnInit {
         this.activities.set(activities);
         this.loading.set(false);
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARD_DATA'), 'error'),
     });
   }
 

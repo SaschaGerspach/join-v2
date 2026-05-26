@@ -8,7 +8,6 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 import { AuthService } from '../../../../core/auth/auth.service';
 import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
-import { ToastService } from '../../../../shared/services/toast.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -26,7 +25,6 @@ export class SummaryPageComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly translate = inject(TranslateService);
-  private readonly toast = inject(ToastService);
 
   loading = signal(true);
   boards = signal<Board[]>([]);
@@ -90,8 +88,6 @@ export class SummaryPageComponent implements OnInit {
     const ids = favs.map(b => b.id);
     this.boardsApi.reorderFavorites(ids)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REORDER'), 'error'),
-      });
+      .subscribe();
   }
 }

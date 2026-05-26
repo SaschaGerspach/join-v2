@@ -42,7 +42,6 @@ export class TaskCustomFieldsComponent implements OnInit {
         this.fields().forEach(f => { if (!(f.id in map)) map[f.id] = ''; });
         this.values.set(map);
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.SOMETHING_WRONG'), 'error'),
     });
   }
 
@@ -59,7 +58,6 @@ export class TaskCustomFieldsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.toast.show(this.translate.instant('TOAST.CUSTOM_FIELDS_SAVED')),
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_SAVE_FIELDS'), 'error'),
       });
   }
 }

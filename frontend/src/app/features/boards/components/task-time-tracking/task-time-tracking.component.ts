@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { TimeEntry, TasksApiService } from '../../../../core/tasks/tasks-api.service';
-import { ToastService } from '../../../../shared/services/toast.service';
-
 @Component({
   selector: 'app-task-time-tracking',
   standalone: true,
@@ -15,8 +13,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
 })
 export class TaskTimeTrackingComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
-  private readonly toast = inject(ToastService);
-  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   taskId = input.required<number>();
@@ -38,7 +34,6 @@ export class TaskTimeTrackingComponent implements OnInit {
           this.entries.set(data.entries);
           this.totalMinutes.set(data.total_minutes);
         },
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_TIME_ENTRIES'), 'error'),
       });
   }
 
@@ -54,7 +49,6 @@ export class TaskTimeTrackingComponent implements OnInit {
           this.newDuration.set('');
           this.newNote.set('');
         },
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOG_TIME'), 'error'),
       });
   }
 
@@ -66,7 +60,6 @@ export class TaskTimeTrackingComponent implements OnInit {
           this.entries.update(list => list.filter(e => e.id !== entry.id));
           this.totalMinutes.update(t => t - entry.duration_minutes);
         },
-        error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_TIME_ENTRY'), 'error'),
       });
   }
 

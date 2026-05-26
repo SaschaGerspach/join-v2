@@ -84,7 +84,7 @@ export class ProfilePageComponent implements OnInit {
         this.email.set(profile.email);
         this.loading.set(false);
       },
-      error: () => { this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_PROFILE'), 'error'); this.loading.set(false); },
+      error: () => { this.loading.set(false); },
     });
 
     this.notificationsApi.getPreferences().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -93,12 +93,10 @@ export class ProfilePageComponent implements OnInit {
         this.mutedBoardIds.set(new Set(prefs.muted_boards));
         this.emailDelivery.set(prefs.email_delivery);
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_PREFERENCES'), 'error'),
     });
 
     this.boardsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: boards => this.boards.set(boards),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_BOARDS'), 'error'),
     });
 
     this.loadSessions();
@@ -107,7 +105,6 @@ export class ProfilePageComponent implements OnInit {
   loadSessions(): void {
     this.authApi.getSessions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: sessions => this.sessions.set(sessions),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_SESSIONS'), 'error'),
     });
   }
 
@@ -117,7 +114,6 @@ export class ProfilePageComponent implements OnInit {
         this.sessions.update(list => list.filter(s => s.id !== id));
         this.toast.show(this.translate.instant('TOAST.SESSION_REVOKED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REVOKE_SESSION'), 'error'),
     });
   }
 
@@ -127,7 +123,6 @@ export class ProfilePageComponent implements OnInit {
         this.sessions.update(list => list.filter(s => s.is_current));
         this.toast.show(this.translate.instant('TOAST.ALL_SESSIONS_REVOKED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REVOKE_SESSIONS'), 'error'),
     });
   }
 
@@ -143,7 +138,6 @@ export class ProfilePageComponent implements OnInit {
         URL.revokeObjectURL(url);
         this.toast.show(this.translate.instant('TOAST.DATA_EXPORTED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_EXPORT_DATA'), 'error'),
     });
   }
 
@@ -193,7 +187,6 @@ export class ProfilePageComponent implements OnInit {
         this.auth.clearUser();
         this.router.navigate(['/login']);
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_DELETE_ACCOUNT'), 'error'),
     });
   }
 
@@ -228,7 +221,6 @@ export class ProfilePageComponent implements OnInit {
     this.totpError.set('');
     this.authApi.totpSetup().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => this.totpSetup.set(res),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_TOTP_SETUP'), 'error'),
     });
   }
 
@@ -290,7 +282,6 @@ export class ProfilePageComponent implements OnInit {
         this.auth.init();
         this.toast.show(this.translate.instant('TOAST.AVATAR_REMOVED'));
       },
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_REMOVE_AVATAR'), 'error'),
     });
   }
 
@@ -299,8 +290,6 @@ export class ProfilePageComponent implements OnInit {
       disabled_types: [...this.disabledTypes()],
       muted_boards: [...this.mutedBoardIds()],
       email_delivery: this.emailDelivery(),
-    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_SAVE_NOTIFICATIONS'), 'error'),
-    });
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 }
