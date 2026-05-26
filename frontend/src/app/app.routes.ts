@@ -32,6 +32,7 @@ export const routes: Routes = [
                 {path: 'boards/:id/time-travel', title: 'Time Travel | Join', loadComponent: () => import('./features/boards/pages/board-timetravel-page/board-timetravel-page.component').then(m => m.BoardTimetravelPageComponent)},
                 {path: 'boards/:id/webhooks', title: 'Webhooks | Join', loadComponent: () => import('./features/boards/pages/board-webhooks-page/board-webhooks-page.component').then(m => m.BoardWebhooksPageComponent)},
                 {path: 'boards/:id/templates', title: 'Templates | Join', loadComponent: () => import('./features/boards/pages/board-templates-page/board-templates-page.component').then(m => m.BoardTemplatesPageComponent)},
+                {path: 'boards/:id/time-report', title: 'Time Report | Join', loadComponent: () => import('./features/boards/pages/board-time-report-page/board-time-report-page.component').then(m => m.BoardTimeReportPageComponent)},
                 {path: 'boards/join/:token', title: 'Join Board | Join', loadComponent: () => import('./features/boards/pages/board-join-page/board-join-page.component').then(m => m.BoardJoinPageComponent)},
                 {path: 'contacts', title: 'Contacts | Join', loadComponent: () => import('./features/contacts/pages/contacts-page/contacts-page.component').then(m => m.ContactsPageComponent)},
                 {path: 'profile', title: 'Profile | Join', loadComponent: () => import('./features/profile/pages/profile-page/profile-page.component').then(m => m.ProfilePageComponent)},

@@ -10,6 +10,7 @@ urlpatterns = [
     path("<int:pk>/", views.board_detail, name="board-detail"),
     path("<int:pk>/export/csv/", views.board_export_csv, name="board-export-csv"),
     path("<int:pk>/export/pdf/", views.board_export_pdf, name="board-export-pdf"),
+    path("<int:pk>/time-report/", views.board_time_report, name="board-time-report"),
     path("<int:pk>/import/csv/", views.board_import_csv, name="board-import-csv"),
     path("<int:pk>/favorite/", views.board_favorite, name="board-favorite"),
     path("<int:pk>/invite-link/", views.board_invite_link, name="board-invite-link"),

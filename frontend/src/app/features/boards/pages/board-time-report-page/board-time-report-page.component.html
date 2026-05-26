@@ -1,0 +1,42 @@
+<div class="time-report-page">
+  <div class="page-header">
+    <a class="back-link" [routerLink]="['/boards', board.boardId()]">← {{ 'TIME_REPORT.BACK' | translate }}</a>
+    <h1>{{ board.boardTitle() }} — {{ 'TIME_REPORT.TITLE' | translate }}</h1>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-hint">{{ 'COMMON.LOADING' | translate }}</p>
+  } @else {
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <span class="kpi-value">{{ totalHours() }}h</span>
+        <span class="kpi-label">{{ 'TIME_REPORT.TOTAL_HOURS' | translate }}</span>
+      </div>
+    </div>
+
+    @if (userChartData().labels!.length > 0) {
+      <div class="chart-card">
+        <h2>{{ 'TIME_REPORT.PER_USER' | translate }}</h2>
+        <canvas baseChart [data]="userChartData()" [options]="horizontalBarOptions" type="bar"></canvas>
+      </div>
+    }
+
+    @if (taskChartData().labels!.length > 0) {
+      <div class="chart-card">
+        <h2>{{ 'TIME_REPORT.PER_TASK' | translate }}</h2>
+        <canvas baseChart [data]="taskChartData()" [options]="horizontalBarOptions" type="bar"></canvas>
+      </div>
+    }
+
+    @if (dailyChartData().labels!.length > 0) {
+      <div class="chart-card">
+        <h2>{{ 'TIME_REPORT.DAILY_TREND' | translate }}</h2>
+        <canvas baseChart [data]="dailyChartData()" [options]="lineOptions" type="line"></canvas>
+      </div>
+    }
+
+    @if (userChartData().labels!.length === 0) {
+      <p class="empty-hint">{{ 'TIME_REPORT.NO_DATA' | translate }}</p>
+    }
+  }
+</div>

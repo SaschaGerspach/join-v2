@@ -18,6 +18,16 @@ export type Board = {
   team_name: string | null;
 };
 
+export type TimeReportUser = { user_id: number; name: string; total_minutes: number };
+export type TimeReportTask = { task_id: number; title: string; total_minutes: number };
+export type TimeReportDay = { date: string; total_minutes: number };
+export type TimeReport = {
+  total_minutes: number;
+  per_user: TimeReportUser[];
+  per_task: TimeReportTask[];
+  per_day: TimeReportDay[];
+};
+
 export type BoardMemberRole = 'admin' | 'editor' | 'viewer';
 
 export type BoardMember = {
@@ -112,6 +122,10 @@ export class BoardsApiService {
       withCredentials: true,
       responseType: 'blob',
     });
+  }
+
+  getTimeReport(boardId: number): Observable<TimeReport> {
+    return this.http.get<TimeReport>(`${this.baseUrl}/boards/${boardId}/time-report/`, { withCredentials: true });
   }
 
   importCsv(boardId: number, file: File): Observable<{ imported: number }> {

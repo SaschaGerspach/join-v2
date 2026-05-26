@@ -490,6 +490,15 @@
     "LESS": "Less",
     "MORE": "More"
   },
+  "TIME_REPORT": {
+    "TITLE": "Time Report",
+    "BACK": "Back to board",
+    "TOTAL_HOURS": "Total Hours",
+    "PER_USER": "Hours per Team Member",
+    "PER_TASK": "Hours per Task (Top 20)",
+    "DAILY_TREND": "Daily Time Logged",
+    "NO_DATA": "No time entries found. Log time on tasks to see reports here."
+  },
   "GANTT": {
     "TITLE": "Gantt Chart",
     "BACK": "Back to board",

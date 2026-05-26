@@ -524,6 +524,15 @@
     "LESS": "Weniger",
     "MORE": "Mehr"
   },
+  "TIME_REPORT": {
+    "TITLE": "Zeitbericht",
+    "BACK": "Zurück zum Board",
+    "TOTAL_HOURS": "Gesamtstunden",
+    "PER_USER": "Stunden pro Teammitglied",
+    "PER_TASK": "Stunden pro Aufgabe (Top 20)",
+    "DAILY_TREND": "Tägliche Zeiterfassung",
+    "NO_DATA": "Keine Zeiteinträge gefunden. Erfasse Zeit bei Aufgaben, um Berichte zu sehen."
+  },
   "GANTT": {
     "TITLE": "Gantt-Diagramm",
     "BACK": "Zurück zum Board",
