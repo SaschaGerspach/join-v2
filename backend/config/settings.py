@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -19,6 +20,7 @@ from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'false').lower() == 'true'
+TESTING = 'test' in sys.argv
 
 _sentry_dsn = os.environ.get('SENTRY_DSN', '')
 if _sentry_dsn and not DEBUG:
@@ -338,9 +340,9 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "10000/day" if DEBUG else "100/day",
-        "user": "10000/hour" if DEBUG else "1000/hour",
-        "auth_attempts": "1000/minute" if DEBUG else "10/minute",
+        "anon": "10000/day" if (DEBUG or TESTING) else "100/day",
+        "user": "10000/hour" if (DEBUG or TESTING) else "1000/hour",
+        "auth_attempts": "10000/minute" if (DEBUG or TESTING) else "10/minute",
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
