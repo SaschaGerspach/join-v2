@@ -118,8 +118,8 @@
   }
 
   &.priority-urgent.active, &.priority-high.active { background: $priority-high; }
-  &.priority-medium.active { background: $priority-medium; }
-  &.priority-low.active { background: $priority-low; }
+  &.priority-medium.active { background: $priority-medium; color: $priority-on-bright; }
+  &.priority-low.active { background: $priority-low; color: $priority-on-bright; }
 }
 
 .subtask-row {
@@ -241,11 +241,11 @@
   }
   &.priority-medium {
     background: #{$priority-medium}22;
-    color: $priority-medium;
+    color: $priority-medium-text;
   }
   &.priority-low {
     background: #{$priority-low}22;
-    color: $priority-low;
+    color: $priority-low-text;
   }
 }
 

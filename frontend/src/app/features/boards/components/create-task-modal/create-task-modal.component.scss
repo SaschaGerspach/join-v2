@@ -133,8 +133,8 @@
 
   &.active { opacity: 1; border-color: var(--color-dark); }
 
-  &.priority-low    { background: #7ae229; color: var(--color-dark); }
-  &.priority-medium { background: #ffa800; }
+  &.priority-low    { background: #7ae229; color: #2a3647; }
+  &.priority-medium { background: #ffa800; color: #2a3647; }
   &.priority-high   { background: #ff3d00; }
   &.priority-urgent { background: #ff3d00; }
 }

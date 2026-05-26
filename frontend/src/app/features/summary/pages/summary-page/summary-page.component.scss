@@ -69,7 +69,7 @@
   }
 
   &.urgent  .stat-number { color: $priority-urgent; }
-  &.high    .stat-number { color: $priority-medium; }
+  &.high    .stat-number { color: $priority-medium-text; }
   &.overdue .stat-number { color: $priority-urgent; }
   &.deadline .stat-number { font-size: 1.1rem; }
 }

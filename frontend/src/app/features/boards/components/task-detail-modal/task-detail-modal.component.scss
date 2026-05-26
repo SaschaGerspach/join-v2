@@ -205,8 +205,8 @@
   &:hover { opacity: 0.8; }
 
   &.priority-urgent, &.priority-high { background: $priority-high; }
-  &.priority-medium { background: $priority-medium; }
-  &.priority-low    { background: $priority-low; color: var(--color-dark); }
+  &.priority-medium { background: $priority-medium; color: $priority-on-bright; }
+  &.priority-low    { background: $priority-low; color: $priority-on-bright; }
 }
 
 .modal-footer {

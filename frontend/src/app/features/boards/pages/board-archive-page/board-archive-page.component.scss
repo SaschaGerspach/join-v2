@@ -70,8 +70,8 @@
   color: $color-white;
   align-self: flex-start;
 
-  &.priority-low { background-color: $priority-low; color: var(--color-dark); }
-  &.priority-medium { background-color: $priority-medium; }
+  &.priority-low { background-color: $priority-low; color: $priority-on-bright; }
+  &.priority-medium { background-color: $priority-medium; color: $priority-on-bright; }
   &.priority-high { background-color: $priority-high; }
   &.priority-urgent { background-color: $priority-urgent; }
 }
