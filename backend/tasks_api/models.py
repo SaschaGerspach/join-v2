@@ -40,7 +40,7 @@ class Task(models.Model):
     recurrence = models.CharField(max_length=10, choices=Recurrence.choices, null=True, blank=True, default=None)
     labels = models.ManyToManyField('Label', blank=True, related_name="tasks")
     cover_image_url = models.URLField(max_length=500, blank=True, default="")
-    order = models.PositiveIntegerField(default=0)
+    order = models.FloatField(default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
     archived_at = models.DateTimeField(null=True, blank=True, default=None)
 
@@ -49,6 +49,13 @@ class Task(models.Model):
         indexes = [
             models.Index(fields=["board", "order"]),
             models.Index(fields=["board", "archived_at", "order"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["column", "order"],
+                name="unique_task_order_per_column",
+                condition=models.Q(column__isnull=False, archived_at__isnull=True),
+            ),
         ]
 
     def __str__(self):

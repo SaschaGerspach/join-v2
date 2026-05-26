@@ -7,6 +7,18 @@ import { Column, ColumnsApiService } from '../../../core/columns/columns-api.ser
 import { Task, TasksApiService } from '../../../core/tasks/tasks-api.service';
 import { ToastService } from '../../../shared/services/toast.service';
 
+const ORDER_GAP = 1024;
+
+function computeOrder(siblings: Task[], insertIndex: number): number {
+  const prev = insertIndex > 0 ? siblings[insertIndex - 1]?.order : undefined;
+  const next = siblings[insertIndex]?.order;
+
+  if (prev === undefined && next === undefined) return 0;
+  if (prev === undefined) return next! - ORDER_GAP;
+  if (next === undefined) return prev + ORDER_GAP;
+  return (prev + next) / 2;
+}
+
 export function handleColumnDrop(
   columns: WritableSignal<Column[]>,
   columnsApi: ColumnsApiService,
@@ -47,47 +59,23 @@ export function handleTaskDrop(
   const isSameColumn = event.previousContainer === event.container;
   const snapshot = tasks();
 
-  if (isSameColumn) {
-    const colTasks = filteredForColumn(targetColumnId);
-    const reordered = [...colTasks];
-    const [moved] = reordered.splice(event.previousIndex, 1);
-    reordered.splice(event.currentIndex, 0, moved);
-    const updated = reordered.map((t, i) => ({ ...t, order: i }));
-    tasks.update(list =>
-      list.map(t => updated.find(u => u.id === t.id) ?? t)
-    );
-    tasksApi.reorder(updated.map(t => ({ id: t.id, order: t.order, column: t.column })))
-      .pipe(takeUntilDestroyed(destroyRef))
-      .subscribe({
-        error: () => {
-          tasks.set(snapshot);
-          toast.show(translate.instant('TOAST.FAILED_REORDER_TASKS'), 'error');
-        },
-      });
-  } else {
-    if (task.column === null) return;
-    const prevTasks = filteredForColumn(task.column).filter(t => t.id !== task.id)
-      .map((t, i) => ({ ...t, order: i }));
-    const targetTasks = [...filteredForColumn(targetColumnId)];
-    targetTasks.splice(event.currentIndex, 0, { ...task, column: targetColumnId });
-    const updatedTarget = targetTasks.map((t, i) => ({ ...t, order: i, column: targetColumnId }));
+  const targetTasks = filteredForColumn(targetColumnId).filter(t => t.id !== task.id);
+  const newOrder = computeOrder(targetTasks, event.currentIndex);
+  const movedTask = { ...task, order: newOrder, column: targetColumnId };
 
-    tasks.update(list =>
-      list.map(t => {
-        const inPrev = prevTasks.find(u => u.id === t.id);
-        const inTarget = updatedTarget.find(u => u.id === t.id);
-        return inTarget ?? inPrev ?? t;
-      })
-    );
+  tasks.update(list =>
+    list.map(t => t.id === task.id ? movedTask : t)
+  );
 
-    tasksApi.reorder([
-      ...prevTasks.map(t => ({ id: t.id, order: t.order, column: t.column })),
-      ...updatedTarget.map(t => ({ id: t.id, order: t.order, column: t.column })),
-    ]).pipe(takeUntilDestroyed(destroyRef)).subscribe({
+  tasksApi.reorder([{ id: task.id, order: newOrder, column: targetColumnId }])
+    .pipe(takeUntilDestroyed(destroyRef))
+    .subscribe({
       error: () => {
         tasks.set(snapshot);
-        toast.show(translate.instant('TOAST.FAILED_MOVE_TASK'), 'error');
+        toast.show(
+          translate.instant(isSameColumn ? 'TOAST.FAILED_REORDER_TASKS' : 'TOAST.FAILED_MOVE_TASK'),
+          'error',
+        );
       },
     });
-  }
 }

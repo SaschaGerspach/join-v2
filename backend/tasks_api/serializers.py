@@ -84,7 +84,7 @@ class TaskUpdateSerializer(serializers.Serializer):
 
 class TaskReorderItemSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    order = serializers.IntegerField(required=False)
+    order = serializers.FloatField(required=False)
     column = serializers.IntegerField(required=False)
 
 

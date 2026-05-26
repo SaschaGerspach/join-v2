@@ -190,7 +190,9 @@
       "PowerShell($env:DJANGO_SECRET_KEY=\"test-secret-key-for-running-tests\"; $env:DJANGO_DEBUG=\"true\"; python manage.py check)",
       "PowerShell($env:DJANGO_SECRET_KEY=\"test-secret-key-for-running-tests\"; $env:DJANGO_DEBUG=\"true\"; python manage.py test --verbosity 1 2>&1 | Select-Object -Last 20)",
       "PowerShell($env:DJANGO_SECRET_KEY = \"test-secret-key-for-running-tests\"; Set-Location \"C:\\\\Users\\\\Anwender\\\\OneDrive\\\\Dokumente\\\\Projekte\\\\join-v2\\\\backend\"; python manage.py test --verbosity=1 2>&1 | Select-Object -Last 20)",
-      "PowerShell($env:DJANGO_SECRET_KEY = \"test-secret-key\"; $env:DJANGO_DEBUG = \"true\"; Set-Location \"C:\\\\Users\\\\Anwender\\\\OneDrive\\\\Dokumente\\\\Projekte\\\\join-v2\\\\backend\"; python manage.py test --verbosity=1 2>&1 | Select-Object -Last 25)"
+      "PowerShell($env:DJANGO_SECRET_KEY = \"test-secret-key\"; $env:DJANGO_DEBUG = \"true\"; Set-Location \"C:\\\\Users\\\\Anwender\\\\OneDrive\\\\Dokumente\\\\Projekte\\\\join-v2\\\\backend\"; python manage.py test --verbosity=1 2>&1 | Select-Object -Last 25)",
+      "PowerShell($env:DJANGO_SECRET_KEY = \"dev-secret-key-for-migrations\"; Set-Location \"C:\\\\Users\\\\Anwender\\\\OneDrive\\\\Dokumente\\\\Projekte\\\\join-v2\\\\backend\"; python manage.py makemigrations tasks_api --name task_order_float_and_unique 2>&1)",
+      "PowerShell($env:DJANGO_SECRET_KEY = \"dev-secret-key-for-migrations\"; $env:DJANGO_DEBUG = \"true\"; Set-Location \"C:\\\\Users\\\\Anwender\\\\OneDrive\\\\Dokumente\\\\Projekte\\\\join-v2\\\\backend\"; python manage.py makemigrations tasks_api --name task_order_float_and_unique 2>&1)"
     ]
   }
 }
