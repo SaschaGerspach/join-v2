@@ -38,6 +38,8 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   newColumnTitle = signal('');
   editingColumnTitle = signal('');
   boardTitleInput = signal('');
+  showFilterNameInput = signal(false);
+  filterNameInput = signal('');
 
   ngOnInit(): void {
     this.state.init(Number(this.route.snapshot.paramMap.get('id')));
@@ -127,10 +129,16 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   }
 
   saveFilter(): void {
-    const name = prompt(this.translate.instant('BOARD_DETAIL.FILTER_NAME'));
-    if (name?.trim()) {
-      this.state.saveCurrentFilter(name.trim());
+    this.filterNameInput.set('');
+    this.showFilterNameInput.set(true);
+  }
+
+  confirmSaveFilter(): void {
+    const name = this.filterNameInput().trim();
+    if (name) {
+      this.state.saveCurrentFilter(name);
     }
+    this.showFilterNameInput.set(false);
   }
 
   applySavedFilter(event: Event): void {

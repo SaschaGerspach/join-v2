@@ -163,7 +163,8 @@
     "BOARD_TITLE_LABEL": "Board-Titel",
     "IMPORT_SUCCESS": "{{count}} Aufgaben importiert.",
     "IMPORT_FAILED": "Import fehlgeschlagen.",
-    "FILTER_NAME": "Filtername:"
+    "FILTER_NAME": "Filtername:",
+    "SAVE": "Speichern"
   },
   "TASK": {
     "NEW_TASK": "Neue Aufgabe",

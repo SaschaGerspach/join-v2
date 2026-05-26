@@ -1,11 +1,14 @@
 import base64
+import hashlib
 
 from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
 
 
 def _get_fernet():
-    key = base64.urlsafe_b64encode(settings.SECRET_KEY[:32].encode().ljust(32, b"\0"))
+    raw_key = getattr(settings, "TOTP_ENCRYPTION_KEY", None) or settings.SECRET_KEY
+    derived = hashlib.pbkdf2_hmac("sha256", raw_key.encode(), b"join-totp-encryption", 600_000)
+    key = base64.urlsafe_b64encode(derived[:32])
     return Fernet(key)
 
 

@@ -53,7 +53,21 @@
     </select>
     @if (state.hasActiveFilter()) {
       <button class="btn-clear-filter" [attr.aria-label]="'BOARD_DETAIL.CLEAR_FILTERS' | translate" (click)="state.clearFilters()">&#10005; {{ 'BOARD_DETAIL.CLEAR' | translate }}</button>
-      <button class="btn-save-filter" (click)="saveFilter()">{{ 'BOARD_DETAIL.SAVE_FILTER' | translate }}</button>
+      @if (showFilterNameInput()) {
+        <input
+          class="filter-name-input"
+          type="text"
+          [attr.aria-label]="'BOARD_DETAIL.FILTER_NAME' | translate"
+          [placeholder]="'BOARD_DETAIL.FILTER_NAME' | translate"
+          [ngModel]="filterNameInput()"
+          (ngModelChange)="filterNameInput.set($event)"
+          (keyup.enter)="confirmSaveFilter()"
+          (keyup.escape)="showFilterNameInput.set(false)"
+        />
+        <button class="btn-save-filter" (click)="confirmSaveFilter()">{{ 'BOARD_DETAIL.SAVE' | translate }}</button>
+      } @else {
+        <button class="btn-save-filter" (click)="saveFilter()">{{ 'BOARD_DETAIL.SAVE_FILTER' | translate }}</button>
+      }
     }
     @if (state.savedFilters().length > 0) {
       <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.SAVED_FILTERS' | translate" (change)="applySavedFilter($event)">

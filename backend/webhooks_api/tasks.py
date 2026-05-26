@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 DELIVERY_TIMEOUT = 10
 
 
-@shared_task(bind=True, max_retries=3, default_retry_delay=60)
+@shared_task(bind=True, max_retries=3)
 def deliver_webhook(self, webhook_id, event_type, payload):
     from .models import Webhook, WebhookDelivery
 
@@ -57,4 +57,4 @@ def deliver_webhook(self, webhook_id, event_type, payload):
         delivery.response_body = str(exc)[:2000]
         delivery.save(update_fields=["status", "response_body"])
         logger.warning("Webhook delivery %s failed: %s", delivery.delivery_id, exc)
-        raise self.retry(exc=exc)
+        raise self.retry(exc=exc, countdown=60 * (2 ** self.request.retries))

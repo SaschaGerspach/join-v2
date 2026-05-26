@@ -85,6 +85,19 @@ $bp-tablet: 1024px;
     }
   }
 
+  .filter-name-input {
+    flex: 0 0 160px;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid $color-primary;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    background: var(--color-surface);
+    outline: none;
+
+    &:focus { border-color: $color-primary; box-shadow: 0 0 0 2px rgba($color-primary, 0.15); }
+  }
+
   .btn-save-filter {
     padding: 0.4rem 0.75rem;
     border: 1px solid $color-primary;

@@ -182,7 +182,9 @@ export class BoardStateService {
 
   loadSavedFilters(): void {
     const raw = localStorage.getItem(`board-filters-${this.boardId()}`);
-    this.savedFilters.set(raw ? JSON.parse(raw) : []);
+    if (!raw) { this.savedFilters.set([]); return; }
+    try { this.savedFilters.set(JSON.parse(raw)); }
+    catch { this.savedFilters.set([]); }
   }
 
   saveCurrentFilter(name: string): void {
