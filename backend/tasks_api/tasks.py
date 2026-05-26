@@ -70,3 +70,27 @@ def send_due_date_reminders():
 
     logger.info("Sent %d due-date reminders", sent_count)
     return sent_count
+
+
+@shared_task
+def spawn_recurring_tasks():
+    from boards_api.ws_events import send_board_event
+    from tasks_api.models import Task
+    from tasks_api.views._helpers import create_next_recurring_task, serialize_task
+
+    today = timezone.now().date()
+    overdue = Task.objects.filter(
+        recurrence__isnull=False,
+        due_date__lt=today,
+        archived_at__isnull=True,
+    ).select_related("board")
+
+    created_count = 0
+    for task in overdue:
+        new_task = create_next_recurring_task(task)
+        if new_task:
+            send_board_event(task.board_id, "task_created", serialize_task(new_task))
+            created_count += 1
+
+    logger.info("Spawned %d recurring tasks", created_count)
+    return created_count

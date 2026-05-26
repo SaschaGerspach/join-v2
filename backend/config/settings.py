@@ -395,6 +395,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'automations_api.tasks.check_deadline_rules',
         'schedule': 900,
     },
+    'spawn-recurring-tasks': {
+        'task': 'tasks_api.tasks.spawn_recurring_tasks',
+        'schedule': crontab(hour=0, minute=15),
+    },
 }
 
 DUE_DATE_REMINDER_HOURS = int(os.environ.get('DUE_DATE_REMINDER_HOURS', '24'))
