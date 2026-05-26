@@ -119,7 +119,7 @@
       <div class="field-group">
         <label class="field-label">{{ 'TASK.COVER_IMAGE' | translate }}</label>
         @if (coverImageUrl()) {
-          <img class="cover-preview" [src]="coverImageUrl()" alt="" />
+          <img class="cover-preview" [src]="coverImageUrl()" alt="" loading="lazy" decoding="async" />
         }
         <input
           class="field-input"

@@ -187,7 +187,7 @@
             @for (task of group.tasks; track task.id) {
               <div class="task-card" [class]="'task-card ' + state.priorityClass(task.priority)" [class.selected]="state.isTaskSelected(task.id)" [class.kb-focused]="keyNav.focusedTaskId() === task.id" cdkDrag [cdkDragData]="task" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }" (click)="state.selectedTask.set(task)">
                 @if (task.cover_image_url) {
-                  <img class="task-cover" [src]="task.cover_image_url" alt="" loading="lazy" />
+                  <img class="task-cover" [src]="task.cover_image_url" alt="" loading="lazy" decoding="async" />
                 }
                 <div class="task-card-top">
                   <input
