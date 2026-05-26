@@ -1,0 +1,39 @@
+services:
+  backend:
+    environment:
+      DJANGO_DEBUG: "false"
+      DJANGO_ADMIN_ENABLED: "true"
+      SENTRY_ENVIRONMENT: staging
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+    labels:
+      - "traefik.http.routers.join-backend.rule=Host(`${STAGING_DOMAIN:?STAGING_DOMAIN required}`)"
+
+  celery-worker:
+    environment:
+      SENTRY_ENVIRONMENT: staging
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+          cpus: "0.5"
+
+  celery-beat:
+    environment:
+      SENTRY_ENVIRONMENT: staging
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+  db:
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
