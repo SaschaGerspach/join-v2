@@ -19,3 +19,4 @@ whitenoise==6.8.2
 django-storages[s3]==1.14.6
 boto3==1.38.6
 Pillow==12.2.0
+coverage==7.9.1

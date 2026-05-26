@@ -19,3 +19,6 @@ venv/
 *.swo
 backend/celerybeat-schedule*
 backend/private_media/
+backend/htmlcov/
+backend/.coverage
+frontend/coverage/
