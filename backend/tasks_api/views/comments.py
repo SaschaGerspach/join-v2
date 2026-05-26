@@ -118,6 +118,7 @@ def comment_detail(request, task_pk, pk):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(request=ReactionToggleSerializer, responses={200: None, 400: DetailSerializer, 404: DetailSerializer})
 @api_view(["POST"])
 def comment_reaction(request, task_pk, pk):
     try:

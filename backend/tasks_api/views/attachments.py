@@ -138,6 +138,7 @@ def attachment_download(request, task_pk, pk):
         return Response({"detail": "File not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
+@extend_schema(responses={200: None, 400: DetailSerializer, 404: DetailSerializer})
 @api_view(["GET"])
 def attachment_thumbnail(request, task_pk, pk):
     try:

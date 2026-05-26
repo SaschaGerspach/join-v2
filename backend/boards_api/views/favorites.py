@@ -34,6 +34,7 @@ def board_favorite(request, pk):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(request=FavoriteReorderSerializer, responses={200: DetailSerializer})
 @api_view(["POST"])
 def favorite_reorder(request):
     ser = FavoriteReorderSerializer(data=request.data)

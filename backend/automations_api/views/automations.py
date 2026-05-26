@@ -1,9 +1,11 @@
 from django.db import transaction
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.permissions import can_edit_board, get_board_or_404
+from config.serializers import DetailSerializer
 from ..models import AutomationRule, RuleAction, RuleCondition
 from ..serializers import AutomationRuleCreateSerializer, AutomationRuleUpdateSerializer
 
@@ -29,6 +31,15 @@ def _serialize_rule(rule):
     }
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: None, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["POST"],
+    request=AutomationRuleCreateSerializer,
+    responses={201: None, 400: DetailSerializer, 403: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["GET", "POST"])
 def rule_list(request, board_pk):
     board, err = get_board_or_404(board_pk, request.user)
@@ -73,6 +84,19 @@ def rule_list(request, board_pk):
     return Response(_serialize_rule(rule), status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: None, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["PATCH"],
+    request=AutomationRuleUpdateSerializer,
+    responses={200: None, 400: DetailSerializer, 403: DetailSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={204: None, 403: DetailSerializer, 404: DetailSerializer},
+)
 @api_view(["GET", "PATCH", "DELETE"])
 def rule_detail(request, board_pk, pk):
     board, err = get_board_or_404(board_pk, request.user)
@@ -133,6 +157,7 @@ def rule_detail(request, board_pk, pk):
     return Response(_serialize_rule(rule))
 
 
+@extend_schema(responses={200: None, 403: DetailSerializer, 404: DetailSerializer})
 @api_view(["POST"])
 def rule_toggle(request, board_pk, pk):
     board, err = get_board_or_404(board_pk, request.user)
@@ -152,6 +177,7 @@ def rule_toggle(request, board_pk, pk):
     return Response(_serialize_rule(rule))
 
 
+@extend_schema(responses={200: None, 404: DetailSerializer})
 @api_view(["GET"])
 def automation_logs(request, board_pk):
     board, err = get_board_or_404(board_pk, request.user)

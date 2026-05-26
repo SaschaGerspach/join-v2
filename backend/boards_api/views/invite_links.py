@@ -1,13 +1,27 @@
 import secrets
 
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from config.serializers import DetailSerializer
 from ..models import BoardInviteLink, BoardMember
 from ..permissions import get_board_or_404, can_manage_members
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: None, 403: DetailSerializer, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["POST"],
+    responses={201: None, 403: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={204: None, 403: DetailSerializer},
+)
 @api_view(["GET", "POST", "DELETE"])
 def board_invite_link(request, pk):
     board, err = get_board_or_404(pk, request.user)
@@ -38,6 +52,7 @@ def board_invite_link(request, pk):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(responses={200: None, 404: DetailSerializer})
 @api_view(["POST"])
 def board_join_via_link(request, token):
     try:

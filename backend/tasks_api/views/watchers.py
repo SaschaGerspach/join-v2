@@ -1,11 +1,25 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from boards_api.permissions import can_access_board
+from config.serializers import DetailSerializer
 from ..models import Task, TaskWatcher
 
 
+@extend_schema(
+    methods=["GET"],
+    responses={200: None, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["POST"],
+    responses={201: None, 404: DetailSerializer},
+)
+@extend_schema(
+    methods=["DELETE"],
+    responses={200: None, 404: DetailSerializer},
+)
 @api_view(["GET", "POST", "DELETE"])
 def task_watch(request, pk):
     try:
