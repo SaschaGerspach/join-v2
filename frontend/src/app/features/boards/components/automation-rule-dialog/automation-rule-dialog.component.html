@@ -15,6 +15,7 @@
           type="text"
           [(ngModel)]="name"
           [class.field-error]="submitted && !name.trim()"
+          [attr.aria-invalid]="submitted && !name.trim()"
         />
       </div>
 

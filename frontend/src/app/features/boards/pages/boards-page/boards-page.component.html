@@ -129,12 +129,14 @@
           [attr.aria-label]="'BOARDS.INVITE_EMAIL' | translate"
           [(ngModel)]="inviteEmail"
           [placeholder]="'BOARDS.INVITE_EMAIL' | translate"
+          [attr.aria-describedby]="inviteError() ? 'invite-email-error' : null"
+          [attr.aria-invalid]="!!inviteError()"
           (keyup.enter)="invite()"
         />
         <button class="btn-invite" (click)="invite()">{{ 'BOARDS.INVITE' | translate }}</button>
       </div>
       @if (inviteError()) {
-        <p class="invite-error">{{ inviteError() }}</p>
+        <p class="invite-error" id="invite-email-error">{{ inviteError() }}</p>
       }
 
       <ul class="members-list">

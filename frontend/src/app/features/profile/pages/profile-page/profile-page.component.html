@@ -136,10 +136,10 @@
           </div>
           <div class="form-field">
             <label for="totp-disable-code">{{ 'PROFILE.AUTH_CODE' | translate }}</label>
-            <input id="totp-disable-code" class="field-input totp-code-input" type="text" [ngModel]="totpDisableCode()" (ngModelChange)="totpDisableCode.set($event)" [placeholder]="'PROFILE.TOTP_PLACEHOLDER' | translate" maxlength="6" autocomplete="one-time-code" />
+            <input id="totp-disable-code" class="field-input totp-code-input" type="text" [ngModel]="totpDisableCode()" (ngModelChange)="totpDisableCode.set($event)" [placeholder]="'PROFILE.TOTP_PLACEHOLDER' | translate" maxlength="6" autocomplete="one-time-code" [attr.aria-describedby]="totpError() ? 'totp-disable-error' : null" [attr.aria-invalid]="!!totpError()" />
           </div>
           @if (totpError()) {
-            <p class="msg msg-error">{{ totpError() }}</p>
+            <p class="msg msg-error" id="totp-disable-error">{{ totpError() }}</p>
           }
           <button class="btn-danger-outline" (click)="disableTotp()">{{ 'PROFILE.DISABLE_2FA' | translate }}</button>
         </div>
@@ -151,10 +151,10 @@
           <code class="totp-secret">{{ totpSetup()!.secret }}</code>
           <div class="form-field">
             <label for="totp-confirm-code">{{ 'PROFILE.CONFIRM_CODE' | translate }}</label>
-            <input id="totp-confirm-code" class="field-input totp-code-input" type="text" [ngModel]="totpConfirmCode()" (ngModelChange)="totpConfirmCode.set($event)" [placeholder]="'PROFILE.TOTP_PLACEHOLDER' | translate" maxlength="6" autocomplete="one-time-code" />
+            <input id="totp-confirm-code" class="field-input totp-code-input" type="text" [ngModel]="totpConfirmCode()" (ngModelChange)="totpConfirmCode.set($event)" [placeholder]="'PROFILE.TOTP_PLACEHOLDER' | translate" maxlength="6" autocomplete="one-time-code" [attr.aria-describedby]="totpError() ? 'totp-confirm-error' : null" [attr.aria-invalid]="!!totpError()" />
           </div>
           @if (totpError()) {
-            <p class="msg msg-error">{{ totpError() }}</p>
+            <p class="msg msg-error" id="totp-confirm-error">{{ totpError() }}</p>
           }
           <div class="totp-setup-actions">
             <button class="btn-primary" (click)="confirmTotp()">{{ 'PROFILE.CONFIRM' | translate }}</button>

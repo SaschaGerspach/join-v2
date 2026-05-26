@@ -18,10 +18,12 @@
           [(ngModel)]="title"
           [placeholder]="'TASK.TASK_TITLE_PLACEHOLDER' | translate"
           [class.field-error]="submitted && !title.trim()"
+          [attr.aria-describedby]="submitted && !title.trim() ? 'create-task-title-error' : null"
+          [attr.aria-invalid]="submitted && !title.trim()"
           (keyup.enter)="submit()"
         />
         @if (submitted && !title.trim()) {
-          <span class="error-text">{{ 'TASK.TITLE_REQUIRED' | translate }}</span>
+          <span class="error-text" id="create-task-title-error">{{ 'TASK.TITLE_REQUIRED' | translate }}</span>
         }
       </div>
 

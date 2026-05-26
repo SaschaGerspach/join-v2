@@ -26,9 +26,11 @@
           autocomplete="given-name"
           #firstNameField="ngModel"
           [class.input-error]="firstNameField.invalid && (firstNameField.touched || f.submitted)"
+          [attr.aria-describedby]="firstNameField.invalid && (firstNameField.touched || f.submitted) ? 'register-first-name-error' : null"
+          [attr.aria-invalid]="firstNameField.invalid && (firstNameField.touched || f.submitted)"
         />
         @if (firstNameField.invalid && (firstNameField.touched || f.submitted)) {
-          <span class="field-error">{{ 'AUTH.FIRST_NAME_REQUIRED' | translate }}</span>
+          <span class="field-error" id="register-first-name-error">{{ 'AUTH.FIRST_NAME_REQUIRED' | translate }}</span>
         }
       </div>
 
@@ -46,9 +48,11 @@
           autocomplete="family-name"
           #lastNameField="ngModel"
           [class.input-error]="lastNameField.invalid && (lastNameField.touched || f.submitted)"
+          [attr.aria-describedby]="lastNameField.invalid && (lastNameField.touched || f.submitted) ? 'register-last-name-error' : null"
+          [attr.aria-invalid]="lastNameField.invalid && (lastNameField.touched || f.submitted)"
         />
         @if (lastNameField.invalid && (lastNameField.touched || f.submitted)) {
-          <span class="field-error">{{ 'AUTH.LAST_NAME_REQUIRED' | translate }}</span>
+          <span class="field-error" id="register-last-name-error">{{ 'AUTH.LAST_NAME_REQUIRED' | translate }}</span>
         }
       </div>
 
@@ -67,9 +71,11 @@
           autocomplete="email"
           #emailField="ngModel"
           [class.input-error]="emailField.invalid && (emailField.touched || f.submitted)"
+          [attr.aria-describedby]="emailField.invalid && (emailField.touched || f.submitted) ? 'register-email-error' : null"
+          [attr.aria-invalid]="emailField.invalid && (emailField.touched || f.submitted)"
         />
         @if (emailField.invalid && (emailField.touched || f.submitted)) {
-          <span class="field-error">
+          <span class="field-error" id="register-email-error">
             @if (emailField.errors?.['required']) { {{ 'AUTH.EMAIL_REQUIRED' | translate }} }
             @else { {{ 'AUTH.EMAIL_INVALID' | translate }} }
           </span>
@@ -92,6 +98,8 @@
             autocomplete="new-password"
             #passwordField="ngModel"
             [class.input-error]="passwordField.invalid && (passwordField.touched || f.submitted)"
+            [attr.aria-describedby]="passwordField.invalid && (passwordField.touched || f.submitted) ? 'register-password-error' : null"
+            [attr.aria-invalid]="passwordField.invalid && (passwordField.touched || f.submitted)"
           />
           <button type="button" class="btn-eye" [attr.aria-label]="'AUTH.TOGGLE_PASSWORD' | translate" (click)="showPassword.set(!showPassword())">
             {{ showPassword() ? '🙈' : '👁' }}
@@ -108,7 +116,7 @@
           </div>
         }
         @if (passwordField.invalid && (passwordField.touched || f.submitted)) {
-          <span class="field-error">
+          <span class="field-error" id="register-password-error">
             @if (passwordField.errors?.['required']) { {{ 'AUTH.PASSWORD_REQUIRED' | translate }} }
             @else { {{ 'AUTH.PASSWORD_MIN' | translate }} }
           </span>
@@ -124,11 +132,13 @@
             name="acceptedPrivacy"
             required
             #privacyField="ngModel"
+          [attr.aria-describedby]="privacyField.invalid && (privacyField.touched || f.submitted) ? 'register-privacy-error' : null"
+          [attr.aria-invalid]="privacyField.invalid && (privacyField.touched || f.submitted)"
           />
           <span [innerHTML]="'AUTH.ACCEPT_PRIVACY' | translate"></span>
         </label>
         @if (privacyField.invalid && (privacyField.touched || f.submitted)) {
-          <span class="field-error">{{ 'AUTH.PRIVACY_REQUIRED' | translate }}</span>
+          <span class="field-error" id="register-privacy-error">{{ 'AUTH.PRIVACY_REQUIRED' | translate }}</span>
         }
       </div>
 

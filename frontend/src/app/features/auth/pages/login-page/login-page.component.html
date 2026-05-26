@@ -28,9 +28,11 @@
             autocomplete="email"
             #emailField="ngModel"
             [class.input-error]="emailField.invalid && (emailField.touched || f.submitted)"
+            [attr.aria-describedby]="emailField.invalid && (emailField.touched || f.submitted) ? 'login-email-error' : null"
+            [attr.aria-invalid]="emailField.invalid && (emailField.touched || f.submitted)"
           />
           @if (emailField.invalid && (emailField.touched || f.submitted)) {
-            <span class="field-error">
+            <span class="field-error" id="login-email-error">
               @if (emailField.errors?.['required']) { {{ 'AUTH.EMAIL_REQUIRED' | translate }} }
               @else { {{ 'AUTH.EMAIL_INVALID' | translate }} }
             </span>
@@ -52,13 +54,15 @@
               autocomplete="current-password"
               #passwordField="ngModel"
               [class.input-error]="passwordField.invalid && (passwordField.touched || f.submitted)"
+              [attr.aria-describedby]="passwordField.invalid && (passwordField.touched || f.submitted) ? 'login-password-error' : null"
+              [attr.aria-invalid]="passwordField.invalid && (passwordField.touched || f.submitted)"
             />
             <button type="button" class="btn-eye" [attr.aria-label]="'AUTH.TOGGLE_PASSWORD' | translate" (click)="showPassword.set(!showPassword())">
               {{ showPassword() ? '🙈' : '👁' }}
             </button>
           </div>
           @if (passwordField.invalid && (passwordField.touched || f.submitted)) {
-            <span class="field-error">{{ 'AUTH.PASSWORD_REQUIRED' | translate }}</span>
+            <span class="field-error" id="login-password-error">{{ 'AUTH.PASSWORD_REQUIRED' | translate }}</span>
           }
         </div>
       } @else {
@@ -80,9 +84,11 @@
             autocomplete="one-time-code"
             #totpField="ngModel"
             [class.input-error]="totpField.invalid && (totpField.touched || f.submitted)"
+            [attr.aria-describedby]="totpField.invalid && (totpField.touched || f.submitted) ? 'login-totp-error' : null"
+            [attr.aria-invalid]="totpField.invalid && (totpField.touched || f.submitted)"
           />
           @if (totpField.invalid && (totpField.touched || f.submitted)) {
-            <span class="field-error">{{ 'AUTH.TOTP_INVALID' | translate }}</span>
+            <span class="field-error" id="login-totp-error">{{ 'AUTH.TOTP_INVALID' | translate }}</span>
           }
         </div>
       }
