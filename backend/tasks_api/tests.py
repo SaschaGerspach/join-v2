@@ -872,7 +872,7 @@ class TaskPatchAdvancedTests(APITestCase):
             self.url(self.task.pk), {"label_ids": [label1.pk, label2.pk]}, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        label_names = {l["name"] for l in response.data["labels"]}
+        label_names = {lb["name"] for lb in response.data["labels"]}
         self.assertEqual(label_names, {"Bug", "Feature"})
 
     def test_patch_task_clear_labels(self):

@@ -4,16 +4,13 @@ import asyncio
 import json
 import logging
 from collections import defaultdict
-from typing import Any, TYPE_CHECKING
+from typing import Any
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken
-
-if TYPE_CHECKING:
-    from auth_api.models import User
 
 logger = logging.getLogger(__name__)
 
