@@ -272,14 +272,15 @@ export class BoardStateService {
         groups.get(t.priority)!.push(t);
       }
     } else if (mode === 'assignee') {
-      groups.set('Unassigned', []);
-      order.push('Unassigned');
+      const unassigned = this.translate.instant('BOARD_DETAIL.UNASSIGNED');
+      groups.set(unassigned, []);
+      order.push(unassigned);
       for (const t of tasks) {
         if (t.assigned_to.length === 0) {
-          groups.get('Unassigned')!.push(t);
+          groups.get(unassigned)!.push(t);
         } else {
           for (const id of t.assigned_to) {
-            const name = this.contactName(id) || 'Unknown';
+            const name = this.contactName(id) || this.translate.instant('BOARD_DETAIL.UNKNOWN');
             if (!groups.has(name)) {
               groups.set(name, []);
               order.push(name);
@@ -311,8 +312,18 @@ export class BoardStateService {
     });
   }
 
+  private readonly taskCountByColumn = computed(() => {
+    const counts = new Map<number, number>();
+    for (const t of this.tasks()) {
+      if (t.column != null) {
+        counts.set(t.column, (counts.get(t.column) ?? 0) + 1);
+      }
+    }
+    return counts;
+  });
+
   taskCountForColumn(columnId: number): number {
-    return this.tasks().filter(t => t.column === columnId).length;
+    return this.taskCountByColumn().get(columnId) ?? 0;
   }
 
   isOverWipLimit(column: Column): boolean {

@@ -90,7 +90,7 @@ def subtask_detail(request, task_pk, pk):
             subtask.title = data["title"]
         if "done" in data:
             subtask.done = data["done"]
-        subtask.save()
+        subtask.save(update_fields=["title", "done"])
         if subtask.done and not subtask.task.subtasks.filter(done=False).exists():
             all_subtasks_completed.send(sender=Subtask, task=subtask.task)
         return Response(serialize_subtask(subtask))

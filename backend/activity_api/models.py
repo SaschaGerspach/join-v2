@@ -27,3 +27,6 @@ class ActivityEntry(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.action} {self.entity_type}: {self.entity_title}"

@@ -1,7 +1,10 @@
 import hashlib
 import hmac
+import ipaddress
 import json
 import logging
+import socket
+from urllib.parse import urlparse
 
 import requests
 from celery import shared_task
@@ -10,6 +13,33 @@ from django.core.serializers.json import DjangoJSONEncoder
 logger = logging.getLogger(__name__)
 
 DELIVERY_TIMEOUT = 10
+
+_BLOCKED_NETS = [
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("::1/128"),
+    ipaddress.ip_network("fc00::/7"),
+]
+
+
+def _validate_url_at_delivery(url: str) -> bool:
+    parsed = urlparse(url)
+    hostname = parsed.hostname
+    if not hostname:
+        return False
+    try:
+        resolved = socket.getaddrinfo(hostname, None)
+    except socket.gaierror:
+        return False
+    for _, _, _, _, addr in resolved:
+        ip = ipaddress.ip_address(addr[0])
+        for net in _BLOCKED_NETS:
+            if ip in net:
+                return False
+    return True
 
 EVENT_LABELS = {
     "task_created": "Task Created",
@@ -79,6 +109,10 @@ def deliver_webhook(self, webhook_id, event_type, payload):
     try:
         webhook = Webhook.objects.get(pk=webhook_id, is_active=True)
     except Webhook.DoesNotExist:
+        return
+
+    if not _validate_url_at_delivery(webhook.url):
+        logger.warning("Webhook %s blocked: URL resolves to private IP", webhook_id)
         return
 
     if _is_slack_url(webhook.url):

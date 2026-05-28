@@ -22,6 +22,7 @@ class TaskListTests(APITestCase):
         self.user = User.objects.create_user(email="a@example.com", password="pass")
         self.other = User.objects.create_user(email="b@example.com", password="pass")
         self.board = Board.objects.create(title="Board", created_by=self.user)
+        Column.objects.create(board=self.board, title="Default", order=0)
         self.client.force_authenticate(user=self.user)
 
     def test_list_tasks(self):

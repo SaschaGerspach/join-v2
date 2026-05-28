@@ -62,7 +62,9 @@ def task_list(request):
     column_id = data.get("column")
     if not column_id:
         first_column = board.columns.order_by("order").first()
-        column_id = first_column.pk if first_column else None
+        if not first_column:
+            return Response({"detail": "Board has no columns."}, status=status.HTTP_400_BAD_REQUEST)
+        column_id = first_column.pk
     elif not Column.objects.filter(pk=column_id, board=board).exists():
         return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
 

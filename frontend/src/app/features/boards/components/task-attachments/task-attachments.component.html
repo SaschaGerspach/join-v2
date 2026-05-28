@@ -42,8 +42,8 @@
       <div class="preview-body">
         @if (isImage(previewAttachment()!.filename) && previewBlobUrl()) {
           <img [src]="previewBlobUrl()!" [alt]="previewAttachment()!.filename" class="preview-image" />
-        } @else if (isPdf(previewAttachment()!.filename) && previewBlobUrl()) {
-          <iframe [src]="previewBlobUrl()!" class="preview-pdf"></iframe>
+        } @else if (isPdf(previewAttachment()!.filename) && previewSafeUrl()) {
+          <iframe [src]="previewSafeUrl()!" class="preview-pdf"></iframe>
         } @else if (!isImage(previewAttachment()!.filename) && !isPdf(previewAttachment()!.filename)) {
           <div class="preview-fallback">
             <p>{{ 'TASK.PREVIEW_UNAVAILABLE' | translate }}</p>

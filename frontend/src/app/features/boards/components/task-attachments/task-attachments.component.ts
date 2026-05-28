@@ -27,7 +27,9 @@ export class TaskAttachmentsComponent implements OnInit {
   attachments = signal<Attachment[]>([]);
   pendingDeleteAttachment = signal<Attachment | null>(null);
   previewAttachment = signal<Attachment | null>(null);
-  previewBlobUrl = signal<SafeResourceUrl | null>(null);
+  previewBlobUrl = signal<string | null>(null);
+  previewSafeUrl = signal<SafeResourceUrl | null>(null);
+  private rawBlobUrl: string | null = null;
 
   private readonly imageExtensions = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp']);
 
@@ -104,19 +106,30 @@ export class TaskAttachmentsComponent implements OnInit {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: blob => {
+            this.revokePreviewBlob();
             const url = URL.createObjectURL(blob);
-            this.previewBlobUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+            this.rawBlobUrl = url;
+            this.previewBlobUrl.set(url);
+            if (url.startsWith('blob:')) {
+              this.previewSafeUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+            }
           },
         });
     }
   }
 
   closePreview(): void {
-    const url = this.previewBlobUrl();
-    if (url) {
-      this.previewBlobUrl.set(null);
-    }
+    this.revokePreviewBlob();
+    this.previewBlobUrl.set(null);
+    this.previewSafeUrl.set(null);
     this.previewAttachment.set(null);
+  }
+
+  private revokePreviewBlob(): void {
+    if (this.rawBlobUrl) {
+      URL.revokeObjectURL(this.rawBlobUrl);
+      this.rawBlobUrl = null;
+    }
   }
 
   downloadAttachment(att: Attachment): void {

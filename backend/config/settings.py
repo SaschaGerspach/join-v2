@@ -378,6 +378,7 @@ CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', _redis_url)
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_ALWAYS_EAGER = TESTING
 
 # 'task' must match the dotted import path exactly — Celery uses it to locate the function at runtime.
 CELERY_BEAT_SCHEDULE = {

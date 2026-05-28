@@ -72,9 +72,10 @@ def team_detail(request, pk):
 
     if request.method == "PATCH":
         name = request.data.get("name", "").strip()
-        if name:
-            team.name = name
-            team.save(update_fields=["name"])
+        if not name:
+            return Response({"detail": "Name is required."}, status=status.HTTP_400_BAD_REQUEST)
+        team.name = name
+        team.save(update_fields=["name"])
         return Response(_serialize_team(team, request.user))
 
     team.delete()

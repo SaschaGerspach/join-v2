@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -62,7 +63,7 @@ def session_revoke_all(request):
 
 
 def _get_current_jti(request):
-    raw = request.COOKIES.get("refresh_token")
+    raw = request.COOKIES.get(settings.REFRESH_COOKIE_NAME)
     if not raw:
         return None
     try:

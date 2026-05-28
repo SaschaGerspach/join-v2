@@ -91,10 +91,12 @@ def _action_notify_creator(task: Task, config: dict[str, Any], triggered_by: Use
 
 
 def _action_notify_assignees(task: Task, config: dict[str, Any], triggered_by: User) -> None:
-    contacts = task.assignees.filter(user__isnull=False).select_related("user")
-    for contact in contacts:
+    from auth_api.models import User
+    emails = task.assignees.values_list("email", flat=True)
+    users = User.objects.filter(email__in=list(emails))
+    for user in users:
         create_notification(
-            contact.user, "automation",
+            user, "automation",
             f"Automation: {task.title}",
             board_id=task.board_id, task_id=task.pk,
         )

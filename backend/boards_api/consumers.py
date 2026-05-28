@@ -26,7 +26,7 @@ class BoardConsumer(AsyncWebsocketConsumer):
         self.group_name = None
         self.user = None
         await self.accept()
-        self._auth_timer = asyncio.get_event_loop().call_later(self.AUTH_TIMEOUT, lambda: asyncio.ensure_future(self._auth_timeout()))
+        self._auth_timer = asyncio.get_running_loop().call_later(self.AUTH_TIMEOUT, lambda: asyncio.ensure_future(self._auth_timeout()))
 
     async def _auth_timeout(self):
         if self.user is None:

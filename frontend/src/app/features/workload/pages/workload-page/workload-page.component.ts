@@ -51,14 +51,13 @@ export class WorkloadPageComponent implements OnInit {
   weekLabels = computed(() => {
     const dates = this.dateColumns();
     const labels: { label: string; span: number }[] = [];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
     let currentWeek = -1;
     for (const d of dates) {
       const date = new Date(d);
       const week = this.getWeekNumber(date);
       if (week !== currentWeek) {
-        labels.push({ label: `${date.getDate()} ${months[date.getMonth()]}`, span: 1 });
+        const month = date.toLocaleString(undefined, { month: 'short' });
+        labels.push({ label: `${date.getDate()} ${month}`, span: 1 });
         currentWeek = week;
       } else {
         labels[labels.length - 1].span++;

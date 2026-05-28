@@ -308,9 +308,8 @@ export class BoardGanttPageComponent implements OnInit {
   }
 
   private formatDate(d: Date, level: ZoomLevel): string {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    if (level === 'day') return `${d.getDate()} ${months[d.getMonth()]}`;
-    if (level === 'week') return `${d.getDate()} ${months[d.getMonth()]}`;
-    return `${months[d.getMonth()]} ${d.getFullYear()}`;
+    const month = d.toLocaleString(undefined, { month: 'short' });
+    if (level === 'day' || level === 'week') return `${d.getDate()} ${month}`;
+    return `${month} ${d.getFullYear()}`;
   }
 }

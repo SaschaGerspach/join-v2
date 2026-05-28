@@ -119,10 +119,9 @@ class TeamDetailTests(APITestCase):
         response = self.client.patch(self.url(self.team.pk), {"name": "Hacked"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_patch_empty_name_no_change(self):
+    def test_patch_empty_name_returns_400(self):
         response = self.client.patch(self.url(self.team.pk), {"name": "  "}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["name"], "Test Team")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_as_owner(self):
         response = self.client.delete(self.url(self.team.pk))

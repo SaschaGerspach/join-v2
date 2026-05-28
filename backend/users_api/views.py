@@ -24,13 +24,15 @@ logger = logging.getLogger(__name__)
 
 
 def _co_member_ids(user):
-    shared_boards = Board.objects.filter(
-        Q(created_by=user) | Q(members__user=user)
+    board_ids = list(
+        Board.objects.filter(
+            Q(created_by=user) | Q(members__user=user)
+        ).values_list("pk", flat=True).distinct()
     )
+    owner_ids = Board.objects.filter(pk__in=board_ids).values_list("created_by_id", flat=True)
+    member_ids = BoardMember.objects.filter(board_id__in=board_ids).values_list("user_id", flat=True)
     return (
-        User.objects.filter(
-            Q(boards__in=shared_boards) | Q(board_memberships__board__in=shared_boards)
-        )
+        User.objects.filter(Q(pk__in=owner_ids) | Q(pk__in=member_ids))
         .exclude(pk=user.pk)
         .values_list("pk", flat=True)
         .distinct()

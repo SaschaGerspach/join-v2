@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ChartData, ChartOptions } from 'chart.js';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
@@ -26,6 +26,7 @@ export class BoardStatsPageComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly activityApi = inject(ActivityApiService);
   private readonly contactsApi = inject(ContactsApiService);
+  private readonly translate = inject(TranslateService);
   loading = signal(true);
 
   totalTasks = signal(0);
@@ -115,7 +116,7 @@ export class BoardStatsPageComponent implements OnInit {
   private buildPriorityChart(tasks: Task[]): void {
     const priorities = ['urgent', 'high', 'medium', 'low'];
     this.priorityChartData.set({
-      labels: priorities.map(p => p.charAt(0).toUpperCase() + p.slice(1)),
+      labels: priorities.map(p => this.translate.instant('BOARD_DETAIL.' + p.toUpperCase())),
       datasets: [{
         data: priorities.map(p => tasks.filter(t => t.priority === p).length),
         backgroundColor: priorities.map(p => PRIORITY_COLORS[p]),
@@ -165,10 +166,11 @@ export class BoardStatsPageComponent implements OnInit {
     const assigneeCounts = new Map<string, number>();
     for (const t of tasks) {
       if (t.assigned_to.length === 0) {
-        assigneeCounts.set('Unassigned', (assigneeCounts.get('Unassigned') ?? 0) + 1);
+        const unassignedLabel = this.translate.instant('BOARD_DETAIL.UNASSIGNED');
+        assigneeCounts.set(unassignedLabel, (assigneeCounts.get(unassignedLabel) ?? 0) + 1);
       } else {
         for (const id of t.assigned_to) {
-          const name = contactMap.get(id) ?? 'Unknown';
+          const name = contactMap.get(id) ?? this.translate.instant('BOARD_DETAIL.UNKNOWN');
           assigneeCounts.set(name, (assigneeCounts.get(name) ?? 0) + 1);
         }
       }

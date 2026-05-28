@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from auth_api.models import User
+from teams_api.models import TeamMember
 from .models import Board, BoardMember
 
 _NOT_FOUND = {"detail": "Board not found."}
@@ -22,7 +23,7 @@ def can_access_board(board: Board, user: User) -> bool:
         return True
     if board.created_by_id == user.id or board.members.filter(user=user).exists():
         return True
-    if board.team_id and board.team.members.filter(user=user).exists():
+    if board.team_id and TeamMember.objects.filter(team_id=board.team_id, user=user).exists():
         return True
     return False
 
@@ -33,7 +34,7 @@ def can_edit_board(board: Board, user: User) -> bool:
     role = _get_member_role(board, user)
     if role in (BoardMember.Role.ADMIN, BoardMember.Role.EDITOR):
         return True
-    if board.team_id and board.team.members.filter(user=user).exists():
+    if board.team_id and TeamMember.objects.filter(team_id=board.team_id, user=user).exists():
         return True
     return False
 

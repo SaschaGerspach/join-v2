@@ -165,7 +165,9 @@
     "IMPORT_SUCCESS": "{{count}} Aufgaben importiert.",
     "IMPORT_FAILED": "Import fehlgeschlagen.",
     "FILTER_NAME": "Filtername:",
-    "SAVE": "Speichern"
+    "SAVE": "Speichern",
+    "UNASSIGNED": "Nicht zugewiesen",
+    "UNKNOWN": "Unbekannt"
   },
   "TASK": {
     "NEW_TASK": "Neue Aufgabe",

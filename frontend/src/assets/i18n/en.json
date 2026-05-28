@@ -165,7 +165,9 @@
     "IMPORT_SUCCESS": "Imported {{count}} tasks.",
     "IMPORT_FAILED": "Import failed.",
     "FILTER_NAME": "Filter name:",
-    "SAVE": "Save"
+    "SAVE": "Save",
+    "UNASSIGNED": "Unassigned",
+    "UNKNOWN": "Unknown"
   },
   "TASK": {
     "NEW_TASK": "New Task",
