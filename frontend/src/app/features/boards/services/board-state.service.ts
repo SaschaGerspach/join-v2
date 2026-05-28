@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -15,14 +15,19 @@ import { BoardWsService, PresenceUser } from '../../../core/websocket/board-ws.s
 import { connectBoardWebSocket } from './_board-ws-handler';
 import { handleColumnDrop, handleTaskDrop } from './_board-drag-drop';
 import { bulkMoveTasks, bulkDeleteTasks } from './_board-bulk-ops';
+import {
+  SavedFilter,
+  restoreFiltersFromUrl,
+  createFilterUrlSyncEffect,
+  filterTasks,
+  loadSavedFilters,
+  persistSavedFilters,
+  isOverdue,
+  isSoon,
+} from './_board-filters';
+import { groupTasksByMode } from './_board-grouping';
 
-export type SavedFilter = {
-  name: string;
-  priority: string;
-  assignee: number | '';
-  due: 'overdue' | 'soon' | '';
-  search: string;
-};
+export { SavedFilter } from './_board-filters';
 
 @Injectable()
 export class BoardStateService {
@@ -78,21 +83,9 @@ export class BoardStateService {
     return board.is_owner || user.is_staff;
   });
 
-  readonly filteredTasks = computed(() => {
-    const q = this.searchQuery().trim().toLowerCase();
-    const priority = this.filterPriority();
-    const assignee = this.filterAssignee();
-    const due = this.filterDue();
-
-    return this.tasks().filter(t => {
-      if (q && !t.title.toLowerCase().includes(q)) return false;
-      if (priority && t.priority !== priority) return false;
-      if (assignee !== '' && !t.assigned_to.includes(assignee as number)) return false;
-      if (due === 'overdue' && !this.isOverdue(t.due_date)) return false;
-      if (due === 'soon' && !(this.isSoon(t.due_date) && !this.isOverdue(t.due_date))) return false;
-      return true;
-    });
-  });
+  readonly filteredTasks = computed(() =>
+    filterTasks(this.tasks(), this.searchQuery(), this.filterPriority(), this.filterAssignee(), this.filterDue())
+  );
 
   readonly hasActiveFilter = computed(() =>
     !!this.searchQuery() || !!this.filterPriority() || this.filterAssignee() !== '' || !!this.filterDue()
@@ -120,45 +113,33 @@ export class BoardStateService {
     return map;
   });
 
-  private pendingTaskId: number | null = null;
-  private skipUrlSync = false;
-
-  private readonly syncFiltersToUrl = effect(() => {
-    const search = this.searchQuery();
-    const priority = this.filterPriority();
-    const assignee = this.filterAssignee();
-    const due = this.filterDue();
-    const groupBy = this.groupBy();
-
-    if (this.skipUrlSync) return;
-
-    const params: Record<string, string> = {};
-    if (search) params['search'] = search;
-    if (priority) params['priority'] = priority;
-    if (assignee) params['assignee'] = String(assignee);
-    if (due) params['due'] = due;
-    if (groupBy !== 'none') params['groupBy'] = groupBy;
-
-    this.router.navigate([], { queryParams: params, replaceUrl: true, relativeTo: this.route });
+  private readonly taskCountByColumn = computed(() => {
+    const counts = new Map<number, number>();
+    for (const t of this.tasks()) {
+      if (t.column != null) {
+        counts.set(t.column, (counts.get(t.column) ?? 0) + 1);
+      }
+    }
+    return counts;
   });
+
+  private pendingTaskId: number | null = null;
+  private skipUrlSync = { value: false };
+
+  constructor() {
+    createFilterUrlSyncEffect(
+      this.router, this.route,
+      this.searchQuery, this.filterPriority, this.filterAssignee, this.filterDue, this.groupBy,
+      this.skipUrlSync,
+    );
+  }
 
   init(boardId: number): void {
     this.boardId.set(boardId);
-    this.restoreFiltersFromUrl();
+    restoreFiltersFromUrl(this.route, this.searchQuery, this.filterPriority, this.filterAssignee, this.filterDue, this.groupBy, this.skipUrlSync);
     this.loadData(boardId);
-    this.loadSavedFilters();
+    this.savedFilters.set(loadSavedFilters(boardId));
     connectBoardWebSocket(boardId, this.boardWs, this.tasks, this.columns, this.onlineUsers, this.destroyRef);
-  }
-
-  private restoreFiltersFromUrl(): void {
-    const params = this.route.snapshot.queryParams;
-    this.skipUrlSync = true;
-    if (params['search']) this.searchQuery.set(params['search']);
-    if (params['priority']) this.filterPriority.set(params['priority']);
-    if (params['assignee']) this.filterAssignee.set(Number(params['assignee']));
-    if (params['due']) this.filterDue.set(params['due'] as 'overdue' | 'soon');
-    if (params['groupBy']) this.groupBy.set(params['groupBy'] as 'priority' | 'assignee');
-    this.skipUrlSync = false;
   }
 
   openTaskById(taskId: number): void {
@@ -180,13 +161,6 @@ export class BoardStateService {
     this.filterDue.set('');
   }
 
-  loadSavedFilters(): void {
-    const raw = localStorage.getItem(`board-filters-${this.boardId()}`);
-    if (!raw) { this.savedFilters.set([]); return; }
-    try { this.savedFilters.set(JSON.parse(raw)); }
-    catch { this.savedFilters.set([]); }
-  }
-
   saveCurrentFilter(name: string): void {
     const filter: SavedFilter = {
       name,
@@ -197,7 +171,7 @@ export class BoardStateService {
     };
     const filters = [...this.savedFilters(), filter];
     this.savedFilters.set(filters);
-    localStorage.setItem(`board-filters-${this.boardId()}`, JSON.stringify(filters));
+    persistSavedFilters(this.boardId(), filters);
   }
 
   applySavedFilter(filter: SavedFilter): void {
@@ -210,7 +184,7 @@ export class BoardStateService {
   deleteSavedFilter(name: string): void {
     const filters = this.savedFilters().filter(f => f.name !== name);
     this.savedFilters.set(filters);
-    localStorage.setItem(`board-filters-${this.boardId()}`, JSON.stringify(filters));
+    persistSavedFilters(this.boardId(), filters);
   }
 
   contactName(id: number | null): string {
@@ -256,44 +230,7 @@ export class BoardStateService {
   }
 
   groupedTasksForColumn(columnId: number): { label: string; tasks: Task[] }[] {
-    const tasks = this.tasksForColumn(columnId);
-    const mode = this.groupBy();
-    if (mode === 'none') return [{ label: '', tasks }];
-
-    const groups = new Map<string, Task[]>();
-    const order: string[] = [];
-
-    if (mode === 'priority') {
-      for (const p of ['urgent', 'high', 'medium', 'low']) {
-        groups.set(p, []);
-        order.push(p);
-      }
-      for (const t of tasks) {
-        groups.get(t.priority)!.push(t);
-      }
-    } else if (mode === 'assignee') {
-      const unassigned = this.translate.instant('BOARD_DETAIL.UNASSIGNED');
-      groups.set(unassigned, []);
-      order.push(unassigned);
-      for (const t of tasks) {
-        if (t.assigned_to.length === 0) {
-          groups.get(unassigned)!.push(t);
-        } else {
-          for (const id of t.assigned_to) {
-            const name = this.contactName(id) || this.translate.instant('BOARD_DETAIL.UNKNOWN');
-            if (!groups.has(name)) {
-              groups.set(name, []);
-              order.push(name);
-            }
-            groups.get(name)!.push(t);
-          }
-        }
-      }
-    }
-
-    return order
-      .filter(label => (groups.get(label)?.length ?? 0) > 0)
-      .map(label => ({ label, tasks: groups.get(label)! }));
+    return groupTasksByMode(this.tasksForColumn(columnId), this.groupBy(), id => this.contactName(id), this.translate);
   }
 
   createColumn(title: string): void {
@@ -311,16 +248,6 @@ export class BoardStateService {
       next: updated => { this.board.set(updated); this.editingBoardTitle.set(false); },
     });
   }
-
-  private readonly taskCountByColumn = computed(() => {
-    const counts = new Map<number, number>();
-    for (const t of this.tasks()) {
-      if (t.column != null) {
-        counts.set(t.column, (counts.get(t.column) ?? 0) + 1);
-      }
-    }
-    return counts;
-  });
 
   taskCountForColumn(columnId: number): number {
     return this.taskCountByColumn().get(columnId) ?? 0;
@@ -430,16 +357,11 @@ export class BoardStateService {
   }
 
   isOverdue(dueDate: string | null): boolean {
-    if (!dueDate) return false;
-    return new Date(dueDate) < new Date(new Date().toDateString());
+    return isOverdue(dueDate);
   }
 
   isSoon(dueDate: string | null): boolean {
-    if (!dueDate) return false;
-    const today = new Date(new Date().toDateString());
-    const due = new Date(dueDate);
-    const diff = (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-    return diff >= 0 && diff <= 3;
+    return isSoon(dueDate);
   }
 
   private loadData(boardId: number): void {

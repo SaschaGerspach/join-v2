@@ -5,13 +5,17 @@ import { TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../shared/services/toast.service';
 
 const REQUEST_TIMEOUT_MS = 30_000;
+const UPLOAD_TIMEOUT_MS = 300_000;
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(ToastService);
   const translate = inject(TranslateService);
 
+  const isUpload = req.body instanceof FormData;
+  const timeoutMs = isUpload ? UPLOAD_TIMEOUT_MS : REQUEST_TIMEOUT_MS;
+
   return next(req).pipe(
-    timeout(REQUEST_TIMEOUT_MS),
+    timeout(timeoutMs),
     catchError((err: HttpErrorResponse | TimeoutError) => {
       if (err instanceof TimeoutError) {
         toast.show(translate.instant('TOAST.REQUEST_TIMEOUT'), 'error');

@@ -30,10 +30,10 @@ def notification_list(request):
     before = request.query_params.get("before")
     qs = request.user.notifications.all()
     if before:
-        try:
-            qs = qs.filter(pk__lt=int(before))
-        except (ValueError, TypeError):
-            pass
+        from django.utils.dateparse import parse_datetime
+        dt = parse_datetime(before)
+        if dt:
+            qs = qs.filter(created_at__lt=dt)
     notifications = list(qs[:PAGE_SIZE + 1])
     has_more = len(notifications) > PAGE_SIZE
     notifications = notifications[:PAGE_SIZE]

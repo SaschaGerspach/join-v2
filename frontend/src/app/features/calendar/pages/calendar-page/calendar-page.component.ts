@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
-import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
 import { TaskDetailModalComponent } from '../../../boards/components/task-detail-modal/task-detail-modal.component';
@@ -16,7 +15,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarPageComponent implements OnInit {
-  private readonly boardsApi = inject(BoardsApiService);
   private readonly tasksApi = inject(TasksApiService);
   private readonly columnsApi = inject(ColumnsApiService);
   private readonly destroyRef = inject(DestroyRef);
@@ -66,25 +64,16 @@ export class CalendarPageComponent implements OnInit {
   ngOnInit(): void {
     forkJoin({
       tasks: this.tasksApi.getMyTasks(),
-      boards: this.boardsApi.getAll(),
+      columns: this.columnsApi.getAll(),
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: ({ tasks, boards }) => {
+      next: ({ tasks, columns }) => {
         this.tasks.set(tasks.filter(t => !!t.due_date));
-
-        const colRequests = boards.map(b => this.columnsApi.getByBoard(b.id));
-        if (colRequests.length === 0) {
-          this.loading.set(false);
-          return;
+        const cbMap: Record<number, Column[]> = {};
+        for (const col of columns) {
+          (cbMap[col.board] ??= []).push(col);
         }
-        forkJoin(colRequests).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-          next: allCols => {
-            const cbMap: Record<number, Column[]> = {};
-            boards.forEach((b, i) => { cbMap[b.id] = allCols[i] ?? []; });
-            this.columnsByBoard.set(cbMap);
-            this.loading.set(false);
-          },
-          error: () => this.loading.set(false),
-        });
+        this.columnsByBoard.set(cbMap);
+        this.loading.set(false);
       },
       error: () => this.loading.set(false),
     });

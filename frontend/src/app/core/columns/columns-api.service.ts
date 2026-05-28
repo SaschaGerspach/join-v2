@@ -16,6 +16,10 @@ export class ColumnsApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl;
 
+  getAll(): Observable<Column[]> {
+    return this.http.get<Column[]>(`${this.baseUrl}/columns/`, { withCredentials: true });
+  }
+
   getByBoard(boardId: number): Observable<Column[]> {
     return this.http.get<Column[]>(`${this.baseUrl}/columns/`, {
       params: { board: boardId },
@@ -33,6 +37,10 @@ export class ColumnsApiService {
 
   patch(id: number, payload: Partial<{ title: string; order: number; wip_limit: number | null }>): Observable<Column> {
     return this.http.patch<Column>(`${this.baseUrl}/columns/${id}/`, payload, { withCredentials: true });
+  }
+
+  reorder(items: { id: number; order: number }[]): Observable<Column[]> {
+    return this.http.post<Column[]>(`${this.baseUrl}/columns/reorder/`, items, { withCredentials: true });
   }
 
   delete(id: number): Observable<void> {

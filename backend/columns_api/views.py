@@ -3,13 +3,17 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from django.db.models import Q
+
 from activity_api.helpers import log_activity
+from boards_api.models import Board
 from boards_api.permissions import can_access_board, can_edit_board, get_board_or_404
 from boards_api.ws_events import send_board_event
 from config.serializers import DetailSerializer
 from .models import Column
 from .serializers import (
     ColumnCreateSerializer,
+    ColumnReorderItemSerializer,
     ColumnSerializer,
     ColumnUpdateSerializer,
 )
@@ -39,6 +43,14 @@ def serialize_column(col):
 @api_view(["GET", "POST"])
 def column_list(request):
     board_id = request.query_params.get("board")
+
+    if request.method == "GET" and not board_id:
+        user = request.user
+        boards = Board.objects.filter(
+            Q(created_by=user) | Q(members__user=user) | Q(team__members__user=user) | Q(team__created_by=user)
+        ).distinct()
+        columns = Column.objects.filter(board__in=boards).order_by("board_id", "order")
+        return Response([serialize_column(c) for c in columns])
 
     if not board_id:
         return Response({"detail": "board query parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -118,3 +130,39 @@ def column_detail(request, pk):
     log_activity(board, request.user, "deleted", "column", col_title)
     send_board_event(board_id, "column_deleted", {"id": col_id})
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(
+    request=ColumnReorderItemSerializer(many=True),
+    responses={200: ColumnSerializer(many=True), 400: DetailSerializer},
+)
+@api_view(["POST"])
+def column_reorder(request):
+    serializer = ColumnReorderItemSerializer(data=request.data, many=True)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    items = serializer.validated_data
+    col_ids = [item["id"] for item in items]
+    columns = Column.objects.select_related("board").filter(pk__in=col_ids)
+    col_map = {c.pk: c for c in columns}
+
+    if len(col_map) != len(col_ids):
+        return Response({"detail": "Some columns not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+    boards = {c.board for c in col_map.values()}
+    if len(boards) != 1:
+        return Response({"detail": "All columns must belong to the same board."}, status=status.HTTP_400_BAD_REQUEST)
+
+    board = boards.pop()
+    if not can_edit_board(board, request.user):
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
+    for item in items:
+        col = col_map[item["id"]]
+        col.order = item["order"]
+    Column.objects.bulk_update(col_map.values(), ["order"])
+
+    result = [serialize_column(col_map[item["id"]]) for item in items]
+    send_board_event(board.pk, "columns_reordered", result)
+    return Response(result)

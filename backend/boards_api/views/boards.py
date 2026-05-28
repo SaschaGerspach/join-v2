@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -50,11 +51,12 @@ def serialize_shared_board(board, user, *, is_favorite=False, is_member=True):
 @api_view(["GET", "POST"])
 def board_list(request):
     if request.method == "GET":
-        owned = Board.objects.filter(created_by=request.user)
-        shared = Board.objects.filter(members__user=request.user)
-        team_boards = Board.objects.filter(team__members__user=request.user)
-        team_owned = Board.objects.filter(team__created_by=request.user)
-        member_boards = (owned | shared | team_boards | team_owned).distinct()
+        member_boards = Board.objects.filter(
+            Q(created_by=request.user)
+            | Q(members__user=request.user)
+            | Q(team__members__user=request.user)
+            | Q(team__created_by=request.user)
+        ).distinct()
         if request.user.is_staff:
             boards = Board.objects.select_related("team").all().order_by("-created_at")
             member_ids = set(member_boards.values_list("pk", flat=True))

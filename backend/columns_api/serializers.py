@@ -17,3 +17,8 @@ class ColumnUpdateSerializer(serializers.Serializer):
     title = serializers.CharField(required=False, max_length=255)
     order = serializers.IntegerField(required=False, min_value=0)
     wip_limit = serializers.IntegerField(required=False, allow_null=True, min_value=1)
+
+
+class ColumnReorderItemSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    order = serializers.IntegerField(min_value=0)

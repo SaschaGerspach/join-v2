@@ -1,7 +1,6 @@
 import { DestroyRef, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { forkJoin } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { Column, ColumnsApiService } from '../../../core/columns/columns-api.service';
 import { Task, TasksApiService } from '../../../core/tasks/tasks-api.service';
@@ -35,7 +34,7 @@ export function handleColumnDrop(
   const updated = reordered.map((c, i) => ({ ...c, order: i }));
   columns.set(updated);
 
-  forkJoin(updated.map(col => columnsApi.patch(col.id, { order: col.order })))
+  columnsApi.reorder(updated.map(col => ({ id: col.id, order: col.order })))
     .pipe(takeUntilDestroyed(destroyRef))
     .subscribe({
       error: () => {
