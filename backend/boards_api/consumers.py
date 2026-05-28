@@ -3,19 +3,22 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from collections import defaultdict
 from typing import Any
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken
 
 logger = logging.getLogger(__name__)
 
-_board_presence: dict[str, dict[int, dict[str, Any]]] = defaultdict(dict)
-_presence_lock = asyncio.Lock()
+_PRESENCE_TTL = 300
+
+
+def _presence_key(group_name: str) -> str:
+    return f"presence:{group_name}"
 
 
 class BoardConsumer(AsyncWebsocketConsumer):
@@ -53,9 +56,7 @@ class BoardConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_add(self.group_name, self.channel_name)
 
             user_info = {"id": user.pk, "first_name": user.first_name, "last_name": user.last_name, "email": user.email, "avatar_url": user.avatar.url if user.avatar else None}
-            async with _presence_lock:
-                _board_presence[self.group_name][user.pk] = user_info
-                presence_list = list(_board_presence[self.group_name].values())
+            presence_list = await self._add_presence(user.pk, user_info)
 
             await self.send(text_data=json.dumps({"type": "authenticated"}))
             await self.send(text_data=json.dumps({"event": "presence_list", "data": presence_list}))
@@ -71,10 +72,7 @@ class BoardConsumer(AsyncWebsocketConsumer):
             self._auth_timer.cancel()
         if self.group_name:
             if self.user:
-                async with _presence_lock:
-                    _board_presence[self.group_name].pop(self.user.pk, None)
-                    if not _board_presence[self.group_name]:
-                        del _board_presence[self.group_name]
+                await self._remove_presence(self.user.pk)
                 await self.channel_layer.group_send(self.group_name, {
                     "type": "board.event",
                     "payload": {"event": "presence_left", "data": {"id": self.user.pk}},
@@ -83,6 +81,24 @@ class BoardConsumer(AsyncWebsocketConsumer):
 
     async def board_event(self, event):
         await self.send(text_data=json.dumps(event["payload"]))
+
+    @database_sync_to_async
+    def _add_presence(self, user_pk: int, user_info: dict[str, Any]) -> list[dict[str, Any]]:
+        key = _presence_key(self.group_name)
+        data = cache.get(key) or {}
+        data[user_pk] = user_info
+        cache.set(key, data, _PRESENCE_TTL)
+        return list(data.values())
+
+    @database_sync_to_async
+    def _remove_presence(self, user_pk: int) -> None:
+        key = _presence_key(self.group_name)
+        data = cache.get(key) or {}
+        data.pop(user_pk, None)
+        if data:
+            cache.set(key, data, _PRESENCE_TTL)
+        else:
+            cache.delete(key)
 
     @database_sync_to_async
     def _authenticate(self, token):

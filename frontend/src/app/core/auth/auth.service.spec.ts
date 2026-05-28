@@ -23,7 +23,7 @@ describe('AuthService', () => {
   });
 
   it('should set user after successful init', () => {
-    const user = { id: '1', email: 'a@b.com', first_name: 'A', last_name: 'B', is_staff: false };
+    const user = { id: 1, email: 'a@b.com', first_name: 'A', last_name: 'B', is_staff: false, totp_enabled: false, avatar_url: null };
     apiSpy.me.and.returnValue(of(user));
     service.init();
     expect(service.user()).toEqual(user);
@@ -39,14 +39,15 @@ describe('AuthService', () => {
   });
 
   it('should set user after login', () => {
-    const user = { id: '2', email: 'b@c.com', first_name: 'B', last_name: 'C', is_staff: true };
-    apiSpy.login.and.returnValue(of(user));
+    const loginResponse = { id: 2, email: 'b@c.com', first_name: 'B', last_name: 'C', is_staff: true, totp_enabled: false, avatar_url: null, access: 'tok' };
+    apiSpy.login.and.returnValue(of(loginResponse));
     service.login('b@c.com', 'pass').subscribe();
+    const { access, ...user } = loginResponse;
     expect(service.user()).toEqual(user);
   });
 
   it('should clear user on logout', () => {
-    const user = { id: '1', email: 'a@b.com', first_name: 'A', last_name: 'B', is_staff: false };
+    const user = { id: 1, email: 'a@b.com', first_name: 'A', last_name: 'B', is_staff: false, totp_enabled: false, avatar_url: null };
     apiSpy.me.and.returnValue(of(user));
     service.init();
     service.logout();

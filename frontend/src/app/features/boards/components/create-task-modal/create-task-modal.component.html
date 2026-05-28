@@ -15,14 +15,15 @@
           #titleInput
           class="field-input"
           type="text"
-          [(ngModel)]="title"
+          [ngModel]="title()"
+          (ngModelChange)="title.set($event)"
           [placeholder]="'TASK.TASK_TITLE_PLACEHOLDER' | translate"
-          [class.field-error]="submitted && !title.trim()"
-          [attr.aria-describedby]="submitted && !title.trim() ? 'create-task-title-error' : null"
-          [attr.aria-invalid]="submitted && !title.trim()"
+          [class.field-error]="submitted() && !title().trim()"
+          [attr.aria-describedby]="submitted() && !title().trim() ? 'create-task-title-error' : null"
+          [attr.aria-invalid]="submitted() && !title().trim()"
           (keyup.enter)="submit()"
         />
-        @if (submitted && !title.trim()) {
+        @if (submitted() && !title().trim()) {
           <span class="error-text" id="create-task-title-error">{{ 'TASK.TITLE_REQUIRED' | translate }}</span>
         }
       </div>
@@ -32,7 +33,8 @@
         <textarea
           class="field-textarea"
           rows="2"
-          [(ngModel)]="description"
+          [ngModel]="description()"
+          (ngModelChange)="description.set($event)"
           [placeholder]="'TASK.DESCRIPTION_OPTIONAL' | translate"
         ></textarea>
       </div>
@@ -46,9 +48,9 @@
                 type="button"
                 class="priority-btn"
                 [class]="'priority-' + p"
-                [class.active]="priority === p"
-                [attr.aria-pressed]="priority === p"
-                (click)="priority = p"
+                [class.active]="priority() === p"
+                [attr.aria-pressed]="priority() === p"
+                (click)="priority.set(p)"
               >{{ 'BOARD_DETAIL.' + p.toUpperCase() | translate }}</button>
             }
           </div>
@@ -59,7 +61,8 @@
           <input
             class="field-input"
             type="date"
-            [(ngModel)]="dueDate"
+            [ngModel]="dueDate()"
+            (ngModelChange)="dueDate.set($event)"
           />
         </div>
       </div>
@@ -67,7 +70,7 @@
       <div class="field-row">
         <div class="field-group">
           <label class="field-label">{{ 'TASK.COLUMN' | translate }}</label>
-          <select class="field-select" [(ngModel)]="selectedColumnId">
+          <select class="field-select" [ngModel]="selectedColumnId()" (ngModelChange)="selectedColumnId.set($event)">
             @for (col of columns(); track col.id) {
               <option [ngValue]="col.id">{{ col.title }}</option>
             }
@@ -79,7 +82,7 @@
           <div class="assignee-checklist">
             @for (c of contacts(); track c.id) {
               <label class="assignee-check-item">
-                <input type="checkbox" [checked]="assignedTo.includes(c.id)" (change)="toggleAssignee(c.id)" />
+                <input type="checkbox" [checked]="assignedTo().includes(c.id)" (change)="toggleAssignee(c.id)" />
                 {{ c.first_name }} {{ c.last_name }}
               </label>
             }

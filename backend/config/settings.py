@@ -118,9 +118,18 @@ CHANNEL_LAYERS = {
     }
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': _redis_url,
+    } if os.environ.get('REDIS_URL') else {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 _db_name = os.environ.get('POSTGRES_DB')
 if _db_name:

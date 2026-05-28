@@ -15,6 +15,15 @@ from ._demo_data import create_demo_data
 from .verification import send_verification_email
 
 _MIN_RESPONSE_TIME = 0.8
+_PBKDF2_ITERATIONS = 100_000
+
+
+def _constant_time_pad(email: str, start: float) -> None:
+    hashlib.pbkdf2_hmac("sha256", email.encode(), b"register-pad", _PBKDF2_ITERATIONS)
+    elapsed = time.monotonic() - start
+    remaining = _MIN_RESPONSE_TIME - elapsed
+    if remaining > 0:
+        time.sleep(remaining)
 
 
 @extend_schema(
@@ -47,11 +56,6 @@ def register(request):
             create_demo_data(user)
         send_verification_email(user)
 
-    hashlib.pbkdf2_hmac("sha256", email.encode(), b"register-pad", 100_000)
-
-    elapsed = time.monotonic() - start
-    remaining = _MIN_RESPONSE_TIME - elapsed
-    if remaining > 0:
-        time.sleep(remaining)
+    _constant_time_pad(email, start)
 
     return Response({"email": email}, status=status.HTTP_201_CREATED)

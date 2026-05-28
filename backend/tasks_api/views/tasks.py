@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
@@ -19,6 +20,23 @@ from activity_api.helpers import log_activity
 from ..signals import task_created as task_created_signal, task_moved, task_priority_changed, task_label_added
 from ._helpers import create_next_recurring_task, serialize_task
 from ._notifications import _notify_assignments
+
+
+def _board_member_user_ids(board):
+    owner_id = board.created_by_id
+    member_ids = set(board.members.values_list("user_id", flat=True))
+    if board.team_id:
+        from teams_api.models import TeamMember
+        member_ids |= set(TeamMember.objects.filter(team_id=board.team_id).values_list("user_id", flat=True))
+        member_ids.add(board.team.created_by_id)
+    member_ids.add(owner_id)
+    return member_ids
+
+
+def _validate_assignees(assignee_ids, board):
+    user_ids = _board_member_user_ids(board)
+    valid = Contact.objects.filter(pk__in=assignee_ids, owner_id__in=user_ids).values_list("pk", flat=True)
+    return len(set(assignee_ids)) == len(valid)
 
 
 @extend_schema(
@@ -69,10 +87,8 @@ def task_list(request):
         return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)
 
     assignee_ids = data.get("assigned_to", [])
-    if assignee_ids:
-        valid = Contact.objects.filter(pk__in=assignee_ids, owner=request.user).values_list("pk", flat=True)
-        if len(set(assignee_ids)) != len(valid):
-            return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
+    if assignee_ids and not _validate_assignees(assignee_ids, board):
+        return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
 
     task = Task.objects.create(
         board=board,
@@ -130,10 +146,8 @@ def task_detail(request, pk):
         data = serializer.validated_data
         if "assigned_to" in data:
             assignee_ids = data["assigned_to"]
-            if assignee_ids:
-                valid = Contact.objects.filter(pk__in=assignee_ids, owner=request.user).values_list("pk", flat=True)
-                if len(set(assignee_ids)) != len(valid):
-                    return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
+            if assignee_ids and not _validate_assignees(assignee_ids, task.board):
+                return Response({"detail": "Invalid contact."}, status=status.HTTP_400_BAD_REQUEST)
         if "column" in data and data["column"]:
             if not Column.objects.filter(pk=data["column"], board=task.board).exists():
                 return Response({"detail": "Invalid column."}, status=status.HTTP_400_BAD_REQUEST)

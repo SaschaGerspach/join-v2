@@ -24,9 +24,11 @@ class ColumnListTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
-    def test_list_missing_board_param(self):
+    def test_list_missing_board_param_returns_all_user_columns(self):
+        Column.objects.create(board=self.board, title="Todo", order=0)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsInstance(response.data, list)
 
     def test_list_board_not_found(self):
         response = self.client.get(self.url, {"board": 9999})

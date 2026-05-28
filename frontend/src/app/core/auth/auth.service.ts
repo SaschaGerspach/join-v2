@@ -1,5 +1,5 @@
 import { Injectable, signal, inject } from "@angular/core";
-import { catchError, finalize, of, tap } from "rxjs";
+import { catchError, finalize, of, take, tap } from "rxjs";
 import { AuthApiService } from "./auth-api.service";
 
 export type AuthUser = {
@@ -30,6 +30,7 @@ export class AuthService {
         this.api
             .me()
             .pipe(
+                take(1),
                 tap((u) => this._user.set(u)),
                 catchError(() => {
                     this._user.set(null);

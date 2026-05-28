@@ -24,18 +24,18 @@ export class CreateTaskModalComponent implements OnInit, AfterViewInit {
   confirmed = output<CreateTaskPayload>();
   cancelled = output<void>();
 
-  title = '';
-  description = '';
-  priority: 'low' | 'medium' | 'high' | 'urgent' = 'medium';
-  dueDate = '';
-  assignedTo: number[] = [];
-  selectedColumnId: number | null = null;
-  submitted = false;
+  title = signal('');
+  description = signal('');
+  priority = signal<'low' | 'medium' | 'high' | 'urgent'>('medium');
+  dueDate = signal('');
+  assignedTo = signal<number[]>([]);
+  selectedColumnId = signal<number | null>(null);
+  submitted = signal(false);
 
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
 
   ngOnInit(): void {
-    this.selectedColumnId = this.columnId();
+    this.selectedColumnId.set(this.columnId());
   }
 
   ngAfterViewInit(): void {
@@ -48,25 +48,25 @@ export class CreateTaskModalComponent implements OnInit, AfterViewInit {
   }
 
   toggleAssignee(id: number): void {
-    const idx = this.assignedTo.indexOf(id);
-    if (idx >= 0) {
-      this.assignedTo = this.assignedTo.filter(x => x !== id);
+    const current = this.assignedTo();
+    if (current.includes(id)) {
+      this.assignedTo.set(current.filter(x => x !== id));
     } else {
-      this.assignedTo = [...this.assignedTo, id];
+      this.assignedTo.set([...current, id]);
     }
   }
 
   submit(): void {
-    this.submitted = true;
-    const t = this.title.trim();
+    this.submitted.set(true);
+    const t = this.title().trim();
     if (!t) return;
     this.confirmed.emit({
       title: t,
-      description: this.description.trim() || undefined,
-      priority: this.priority,
-      due_date: this.dueDate || null,
-      column: this.selectedColumnId,
-      assigned_to: this.assignedTo,
+      description: this.description().trim() || undefined,
+      priority: this.priority(),
+      due_date: this.dueDate() || null,
+      column: this.selectedColumnId(),
+      assigned_to: this.assignedTo(),
     });
   }
 }

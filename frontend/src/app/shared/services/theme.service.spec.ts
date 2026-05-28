@@ -26,7 +26,9 @@ describe('ThemeService', () => {
 
   it('should read stored preference', () => {
     localStorage.setItem('theme', 'dark');
-    const s = new ThemeService();
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const s = TestBed.inject(ThemeService);
     expect(s.isDark()).toBeTrue();
   });
 });
