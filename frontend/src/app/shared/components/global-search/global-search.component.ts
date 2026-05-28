@@ -62,7 +62,7 @@ export class GlobalSearchComponent {
     this.open.set(false);
     this.query.set('');
     this.results.set([]);
-    this.router.navigate(['/boards', result.board]);
+    this.router.navigate(['/boards', result.board], { queryParams: { task: result.id } });
   }
 
   @HostListener('document:click', ['$event'])

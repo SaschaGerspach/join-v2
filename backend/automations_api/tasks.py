@@ -8,22 +8,23 @@ def check_deadline_rules():
     from .engine import evaluate_rules
     from .models import AutomationRule, TriggerType
 
-    rules = AutomationRule.objects.filter(
-        trigger_type=TriggerType.DEADLINE_APPROACHING,
-        is_active=True,
+    rules = list(
+        AutomationRule.objects.filter(
+            trigger_type=TriggerType.DEADLINE_APPROACHING,
+            is_active=True,
+        ).prefetch_related("conditions", "actions")
+    )
+    if not rules:
+        return
+
+    max_hours = max(r.trigger_config.get("hours", 24) for r in rules)
+    threshold = timezone.now() + timezone.timedelta(hours=max_hours)
+    tasks = Task.objects.filter(
+        due_date__isnull=False,
+        due_date__lte=threshold.date(),
+        due_date__gte=timezone.now().date(),
+        archived_at__isnull=True,
     )
 
-    for rule in rules:
-        hours = rule.trigger_config.get("hours", 24)
-        threshold = timezone.now() + timezone.timedelta(hours=hours)
-        tasks = Task.objects.filter(
-            due_date__isnull=False,
-            due_date__lte=threshold.date(),
-            due_date__gte=timezone.now().date(),
-            archived_at__isnull=True,
-        )
-        if rule.board_id:
-            tasks = tasks.filter(board_id=rule.board_id)
-
-        for task in tasks:
-            evaluate_rules(task, TriggerType.DEADLINE_APPROACHING)
+    for task in tasks:
+        evaluate_rules(task, TriggerType.DEADLINE_APPROACHING)

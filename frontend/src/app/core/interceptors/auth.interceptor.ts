@@ -14,7 +14,7 @@ function withBearer(req: HttpRequest<unknown>, token: string): HttpRequest<unkno
 }
 
 function isAuthSkipped(url: string): boolean {
-  return AUTH_SKIP_PATHS.some((p) => url.includes(p));
+  return AUTH_SKIP_PATHS.some((p) => url.endsWith(p));
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {

@@ -23,18 +23,6 @@ class _BoardPagination(PageNumberPagination):
     max_page_size = 200
 
 
-def serialize_board(board, *, is_favorite=False):
-    return {
-        "id": board.pk,
-        "title": board.title,
-        "color": board.color,
-        "created_by": board.created_by_id,
-        "created_at": board.created_at,
-        "is_owner": True,
-        "is_favorite": is_favorite,
-    }
-
-
 def serialize_shared_board(board, user, *, is_favorite=False, is_member=True):
     return {
         "id": board.pk,
@@ -112,7 +100,7 @@ def board_list(request):
         ])
     from automations_api.defaults import create_default_rules
     create_default_rules(board, request.user)
-    return Response(serialize_board(board), status=status.HTTP_201_CREATED)
+    return Response(serialize_shared_board(board, request.user), status=status.HTTP_201_CREATED)
 
 
 @extend_schema(

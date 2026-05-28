@@ -17,7 +17,7 @@
         (blur)="confirmRenameBoardTitle()"
       />
     } @else {
-      <h1 (dblclick)="startRenameBoardTitle()">{{ state.board()?.title ?? 'Board' }}</h1>
+      <h1 tabindex="0" role="button" (dblclick)="startRenameBoardTitle()" (keydown.enter)="startRenameBoardTitle()">{{ state.board()?.title ?? 'Board' }}</h1>
     }
     <input
       #searchInput
@@ -166,7 +166,7 @@
               (blur)="confirmRenameColumn(column.id)"
             />
           } @else {
-            <span class="column-title" (dblclick)="startRenameColumn(column)">{{ column.title }}</span>
+            <span class="column-title" tabindex="0" role="button" (dblclick)="startRenameColumn(column)" (keydown.enter)="startRenameColumn(column)">{{ column.title }}</span>
           }
           @if (column.wip_limit !== null) {
             <span class="wip-badge" [class.wip-exceeded-badge]="state.isOverWipLimit(column)">
@@ -201,7 +201,7 @@
               <div class="swimlane-header">{{ group.label }}</div>
             }
             @for (task of group.tasks; track task.id) {
-              <div class="task-card" [class]="'task-card ' + state.priorityClass(task.priority)" [class.selected]="state.isTaskSelected(task.id)" [class.kb-focused]="keyNav.focusedTaskId() === task.id" cdkDrag [cdkDragData]="task" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }" (click)="state.selectedTask.set(task)">
+              <div [class]="'task-card ' + state.priorityClass(task.priority)" [class.selected]="state.isTaskSelected(task.id)" [class.kb-focused]="keyNav.focusedTaskId() === task.id" cdkDrag [cdkDragData]="task" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }" (click)="state.selectedTask.set(task)">
                 @if (task.cover_image_url) {
                   <img class="task-cover" [src]="task.cover_image_url" alt="" loading="lazy" decoding="async" />
                 }

@@ -65,7 +65,7 @@ def comment_list(request, task_pk):
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
-        comments = list(task.comments.select_related("author").all())
+        comments = list(task.comments.select_related("author").all()[:500])
         reaction_map = _build_reactions([c.pk for c in comments])
         return Response([serialize_comment(c, request, reaction_map.get(c.pk, [])) for c in comments])
 

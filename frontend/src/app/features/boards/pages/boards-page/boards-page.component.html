@@ -10,12 +10,12 @@
         class="form-input"
         type="text"
         [attr.aria-label]="'BOARDS.BOARD_TITLE' | translate"
-        [(ngModel)]="newTitle"
+        [ngModel]="newTitle()" (ngModelChange)="newTitle.set($event)"
         [placeholder]="'BOARDS.BOARD_TITLE' | translate"
         (keyup.enter)="createBoard()"
         autofocus
       />
-      <select class="form-select" [attr.aria-label]="'BOARDS.BOARD_TEMPLATE' | translate" [(ngModel)]="newTemplate">
+      <select class="form-select" [attr.aria-label]="'BOARDS.BOARD_TEMPLATE' | translate" [ngModel]="newTemplate()" (ngModelChange)="newTemplate.set($event)">
         <option value="kanban">{{ 'BOARDS.KANBAN' | translate }}</option>
         <option value="scrum">{{ 'BOARDS.SCRUM' | translate }}</option>
         <option value="bug_tracking">{{ 'BOARDS.BUG_TRACKING' | translate }}</option>
@@ -127,7 +127,7 @@
           class="invite-input"
           type="email"
           [attr.aria-label]="'BOARDS.INVITE_EMAIL' | translate"
-          [(ngModel)]="inviteEmail"
+          [ngModel]="inviteEmail()" (ngModelChange)="inviteEmail.set($event)"
           [placeholder]="'BOARDS.INVITE_EMAIL' | translate"
           [attr.aria-describedby]="inviteError() ? 'invite-email-error' : null"
           [attr.aria-invalid]="!!inviteError()"

@@ -11,12 +11,11 @@ import { provideServiceWorker } from '@angular/service-worker';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { LanguageService } from './shared/services/language.service';
-import { ThemeService } from './shared/services/theme.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(withInterceptors([offlineInterceptor, retryInterceptor, errorInterceptor, authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, offlineInterceptor, retryInterceptor, errorInterceptor])),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideServiceWorker('ngsw-worker.js', {
         enabled: !isDevMode(),
@@ -33,12 +32,6 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: (lang: LanguageService) => () => lang.init(),
       deps: [LanguageService],
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: (_theme: ThemeService) => () => {},
-      deps: [ThemeService],
       multi: true,
     },
   ],

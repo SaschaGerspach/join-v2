@@ -669,7 +669,7 @@ class CustomFieldTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(CustomField.objects.filter(pk=field.pk).exists())
 
-    def test_duplicate_name_rejected(self):
+    def test_duplicate_custom_field_name_rejected(self):
         CustomField.objects.create(board=self.board, name="Sprint", field_type="text")
         response = self.client.post(self.fields_url(), {"name": "Sprint", "field_type": "text"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

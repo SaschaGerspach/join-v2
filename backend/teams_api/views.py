@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -28,12 +29,15 @@ def _is_team_admin(team, user):
 
 
 def _serialize_team(team, user):
+    member_count = getattr(team, '_member_count', None)
+    if member_count is None:
+        member_count = team.members.count()
     return {
         "id": team.pk,
         "name": team.name,
         "created_by": team.created_by_id,
         "is_owner": team.created_by_id == user.id,
-        "member_count": team.members.count() + 1,
+        "member_count": member_count + 1,
         "created_at": team.created_at,
     }
 
@@ -45,7 +49,7 @@ def team_list(request):
     if request.method == "GET":
         owned = Team.objects.filter(created_by=request.user)
         member_of = Team.objects.filter(members__user=request.user)
-        teams = (owned | member_of).distinct().order_by("-created_at")
+        teams = (owned | member_of).distinct().annotate(_member_count=Count("members")).order_by("-created_at")
         return Response([_serialize_team(t, request.user) for t in teams])
 
     serializer = TeamCreateSerializer(data=request.data)

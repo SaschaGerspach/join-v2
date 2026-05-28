@@ -73,7 +73,7 @@
             }
           </button>
           @if (notificationsOpen()) {
-            <div class="notification-panel">
+            <div class="notification-panel" appFocusTrap>
               <div class="notification-panel-header">
                 <span>{{ 'TOPBAR.NOTIFICATIONS' | translate }}</span>
                 @if (notificationService.unreadCount() > 0) {
@@ -96,7 +96,7 @@
             </div>
           }
         </div>
-        <div class="user-badge" role="button" tabindex="0" [attr.aria-label]="'TOPBAR.USER_MENU' | translate" [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()" (keydown.enter)="toggleMenu()" (keydown.space)="toggleMenu(); $event.preventDefault()">
+        <div class="user-badge" role="button" tabindex="0" aria-haspopup="menu" [attr.aria-label]="'TOPBAR.USER_MENU' | translate" [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()" (keydown.enter)="toggleMenu()" (keydown.space)="toggleMenu(); $event.preventDefault()">
           <app-user-avatar [firstName]="auth.user()?.first_name ?? ''" [lastName]="auth.user()?.last_name ?? ''" [avatarUrl]="auth.user()?.avatar_url ?? null" [size]="42" />
         </div>
         @if (menuOpen()) {

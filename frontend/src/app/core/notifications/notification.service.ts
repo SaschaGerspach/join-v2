@@ -43,21 +43,21 @@ export class NotificationService {
   markAsRead(id: number): void {
     this.api.markAsRead(id).subscribe({
       next: updated => this.notifications.update(list => list.map(n => n.id === id ? updated : n)),
-      error: () => {},
+      error: (err) => console.warn('Failed to mark notification as read', err),
     });
   }
 
   markAllAsRead(): void {
     this.api.markAllAsRead().subscribe({
       next: () => this.notifications.update(list => list.map(n => ({ ...n, is_read: true }))),
-      error: () => {},
+      error: (err) => console.warn('Failed to mark all notifications as read', err),
     });
   }
 
   private loadNotifications(): void {
     this.api.getAll().subscribe({
       next: list => this.notifications.set(list),
-      error: () => {},
+      error: (err) => console.warn('Failed to load notifications', err),
     });
   }
 

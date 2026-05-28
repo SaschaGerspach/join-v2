@@ -29,15 +29,15 @@ export class BoardsPageComponent implements OnInit {
   ownedBoards = computed(() => this.boards().filter(b => b.is_owner && b.is_member));
   sharedBoards = computed(() => this.boards().filter(b => !b.is_owner && b.is_member));
   adminBoards = computed(() => this.boards().filter(b => !b.is_member));
-  newTitle = '';
-  newTemplate = 'kanban';
+  newTitle = signal('');
+  newTemplate = signal('kanban');
   showForm = signal(false);
   loading = signal(true);
   pendingDeleteId = signal<number | null>(null);
 
   managingBoard = signal<Board | null>(null);
   members = signal<BoardMember[]>([]);
-  inviteEmail = '';
+  inviteEmail = signal('');
   inviteError = signal('');
   pendingRemoveMemberId = signal<number | null>(null);
 
@@ -54,14 +54,14 @@ export class BoardsPageComponent implements OnInit {
   }
 
   createBoard(): void {
-    const title = this.newTitle.trim();
+    const title = this.newTitle().trim();
     if (!title) return;
 
-    this.api.create(title, this.newTemplate).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.api.create(title, this.newTemplate()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: board => {
         this.boards.update(b => [...b, board]);
-        this.newTitle = '';
-        this.newTemplate = 'kanban';
+        this.newTitle.set('');
+        this.newTemplate.set('kanban');
         this.showForm.set(false);
         this.toast.show(this.translate.instant('TOAST.BOARD_CREATED'));
       },
@@ -92,7 +92,7 @@ export class BoardsPageComponent implements OnInit {
   openMembers(board: Board, event: Event): void {
     event.stopPropagation();
     this.managingBoard.set(board);
-    this.inviteEmail = '';
+    this.inviteEmail.set('');
     this.inviteError.set('');
     this.api.getMembers(board.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: m => this.members.set(m),
@@ -102,10 +102,10 @@ export class BoardsPageComponent implements OnInit {
 
   invite(): void {
     const board = this.managingBoard();
-    if (!board || !this.inviteEmail.trim()) return;
+    if (!board || !this.inviteEmail().trim()) return;
     this.inviteError.set('');
-    this.api.inviteMember(board.id, this.inviteEmail.trim()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: m => { this.members.update(list => [...list, m]); this.inviteEmail = ''; this.toast.show(this.translate.instant('TOAST.INVITATION_SENT')); },
+    this.api.inviteMember(board.id, this.inviteEmail().trim()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: m => { this.members.update(list => [...list, m]); this.inviteEmail.set(''); this.toast.show(this.translate.instant('TOAST.INVITATION_SENT')); },
       error: (err) => this.inviteError.set(err?.error?.detail ?? this.translate.instant('TOAST.FAILED_INVITE')),
     });
   }

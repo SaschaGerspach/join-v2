@@ -88,6 +88,6 @@ export class SummaryPageComponent implements OnInit {
     const ids = favs.map(b => b.id);
     this.boardsApi.reorderFavorites(ids)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe();
+      .subscribe({ error: (err) => console.warn('Failed to reorder favorites', err) });
   }
 }

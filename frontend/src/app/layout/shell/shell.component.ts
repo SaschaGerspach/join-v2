@@ -13,12 +13,13 @@ import { OfflineBannerComponent } from '../../shared/components/offline-banner/o
 import { SwUpdateBannerComponent } from '../../shared/components/sw-update-banner/sw-update-banner.component';
 import { InstallPromptComponent } from '../../shared/components/install-prompt/install-prompt.component';
 import { UserAvatarComponent } from '../../shared/components/user-avatar/user-avatar.component';
+import { FocusTrapDirective } from '../../shared/directives/focus-trap.directive';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterModule, DatePipe, FormsModule, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent, OfflineBannerComponent, SwUpdateBannerComponent, InstallPromptComponent, UserAvatarComponent, TranslateModule],
+  imports: [RouterModule, DatePipe, FormsModule, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent, OfflineBannerComponent, SwUpdateBannerComponent, InstallPromptComponent, UserAvatarComponent, FocusTrapDirective, TranslateModule],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
