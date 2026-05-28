@@ -18,7 +18,7 @@ import { bulkMoveTasks, bulkDeleteTasks } from './_board-bulk-ops';
 import {
   SavedFilter,
   restoreFiltersFromUrl,
-  createFilterUrlSyncEffect,
+  createFilterUrlSync,
   filterTasks,
   loadSavedFilters,
   persistSavedFilters,
@@ -127,10 +127,10 @@ export class BoardStateService {
   private skipUrlSync = { value: false };
 
   constructor() {
-    createFilterUrlSyncEffect(
+    createFilterUrlSync(
       this.router, this.route,
       this.searchQuery, this.filterPriority, this.filterAssignee, this.filterDue, this.groupBy,
-      this.skipUrlSync,
+      this.skipUrlSync, this.destroyRef,
     );
   }
 

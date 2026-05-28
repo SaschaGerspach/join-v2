@@ -1,5 +1,7 @@
-import { WritableSignal, Signal, effect } from '@angular/core';
+import { WritableSignal, Signal, computed, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { debounceTime, skip } from 'rxjs';
 import { Task } from '../../../core/tasks/tasks-api.service';
 
 export type SavedFilter = {
@@ -29,7 +31,7 @@ export function restoreFiltersFromUrl(
   skipUrlSync.value = false;
 }
 
-export function createFilterUrlSyncEffect(
+export function createFilterUrlSync(
   router: Router,
   route: ActivatedRoute,
   searchQuery: Signal<string>,
@@ -38,14 +40,22 @@ export function createFilterUrlSyncEffect(
   filterDue: Signal<'overdue' | 'soon' | ''>,
   groupBy: Signal<'none' | 'priority' | 'assignee'>,
   skipUrlSync: { value: boolean },
+  destroyRef: DestroyRef,
 ): void {
-  effect(() => {
+  const params$ = toObservable(computed(() => {
     const search = searchQuery();
     const priority = filterPriority();
     const assignee = filterAssignee();
     const due = filterDue();
     const gb = groupBy();
+    return { search, priority, assignee, due, gb };
+  }));
 
+  params$.pipe(
+    skip(1),
+    debounceTime(0),
+    takeUntilDestroyed(destroyRef),
+  ).subscribe(({ search, priority, assignee, due, gb }) => {
     if (skipUrlSync.value) return;
 
     const params: Record<string, string> = {};

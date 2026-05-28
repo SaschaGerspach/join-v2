@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -17,6 +17,7 @@ import { LanguageService } from '../../../../shared/services/language.service';
 export class LoginPageComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly pendingEmail = inject(PendingEmailService);
   private readonly translate = inject(TranslateService);
   readonly lang = inject(LanguageService);
@@ -47,7 +48,10 @@ export class LoginPageComponent {
 
     const code = this.requires2fa() ? this.totpCode() : undefined;
     this.auth.login(this.email(), this.password(), code).subscribe({
-      next: () => this.router.navigate(['/boards']),
+      next: () => {
+        const returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'];
+        this.router.navigateByUrl(returnUrl || '/boards');
+      },
       error: (err) => {
         if (err?.status === 206 && err?.error?.requires_2fa) {
           this.requires2fa.set(true);
