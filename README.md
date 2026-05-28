@@ -30,6 +30,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Favorite boards with drag-and-drop reorder on summary page
 - Board invite links — token-based sharing via clipboard
 - CSV export and import
+- PDF export (landscape Kanban layout via WeasyPrint)
 - Swimlane grouping within columns (by priority or assignee)
 - Saved filters (persist filter combinations per board)
 - Board activity log tracking tasks, columns, and comments
@@ -40,6 +41,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - **Gantt Chart** — timeline view with zoom levels (day/week/month), dependency arrows (SVG), today-line, unscheduled section, and task info panel
 - **Workload Heatmap** — cross-board GitHub-style contribution graph showing assignee workload per day with color intensity, range selector (1/3/6 months), and hover detail panel
 - **Board Time-Travel** — animated timeline slider to replay board evolution over time, play/pause controls, mini Kanban snapshot at any past date, activity feed around selected time
+- **Time Tracking Reports** — per-user, per-task, and daily trend charts with board-level time report endpoint
 - Board statistics with Chart.js (tasks per column, priority distribution, creation trend, activity timeline, assignee workload)
 - Search, filter by priority, assignee, and due date
 - Overdue and due-soon highlighting
@@ -54,6 +56,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 **Webhooks**
 - Outgoing webhooks with configurable event subscriptions
 - HMAC-signed payloads for verification
+- Auto-format payloads as Slack Block Kit or Teams MessageCard based on target URL
 - Delivery history with response status tracking
 - Celery-based async delivery with retry logic
 
@@ -126,7 +129,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 | Cache/WS | Redis 7 |
 | Proxy | Traefik with automatic HTTPS via Let's Encrypt |
 | CI/CD | GitHub Actions |
-| Testing | Django TestCase (139 tests), Playwright (26 E2E specs) |
+| Testing | Django TestCase (473 tests), Angular Karma (45 unit tests), Playwright (26 E2E specs) |
 
 ## Architecture
 
@@ -198,6 +201,11 @@ cd backend
 python -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
+
+# Required environment variables
+export DJANGO_SECRET_KEY="your-secret-key"
+export DJANGO_DEBUG="true"
+
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
@@ -238,7 +246,9 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 | GET/POST/DELETE | `/boards/:id/invite-link/` | Manage invite link |
 | POST | `/boards/join/:token/` | Join board via invite link |
 | GET | `/boards/:id/export/csv/` | CSV export |
+| GET | `/boards/:id/export/pdf/` | PDF export (landscape Kanban layout) |
 | POST | `/boards/:id/import/csv/` | CSV import |
+| GET | `/boards/:id/time-report/` | Time tracking report (per user/task/day) |
 | GET/POST | `/boards/:id/members/` | Board members |
 | PATCH/DELETE | `/boards/:id/members/:userId/` | Change role / remove member |
 | DELETE | `/boards/:id/members/leave/` | Leave board |
@@ -248,6 +258,7 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 | GET/POST | `/boards/:id/automations/` | Automation rules |
 | PATCH/DELETE | `/boards/:id/automations/:id/` | Automation detail |
 | GET/POST | `/columns/?board=:id` | List / create columns |
+| POST | `/columns/reorder/` | Batch reorder columns |
 | GET/POST | `/tasks/?board=:id` | List / create tasks |
 | GET | `/tasks/my/` | All my tasks across boards |
 | GET | `/tasks/workload/` | Cross-board workload data |
