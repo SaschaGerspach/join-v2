@@ -27,8 +27,9 @@ export class OfflineQueueService implements OnDestroy {
   }
 
   async enqueue(method: string, url: string, body: unknown): Promise<void> {
-    const all = await getAllQueued();
-    const existing = all.find(r => r.method === method && r.url === url);
+    const existing = method === 'POST'
+      ? undefined
+      : (await getAllQueued()).find(r => r.method === method && r.url === url);
     if (existing?.id != null) {
       await putQueued({ ...existing, body, timestamp: Date.now() });
     } else {
