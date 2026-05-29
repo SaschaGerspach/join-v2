@@ -193,7 +193,7 @@
           [id]="'col-' + column.id"
           [cdkDropListData]="state.tasksForColumn(column.id)"
           [cdkDropListConnectedTo]="state.columnListIds()"
-          [cdkDropListDisabled]="state.hasActiveFilter()"
+          [cdkDropListDisabled]="state.dragDisabled()"
           (cdkDropListDropped)="state.drop($event, column.id)"
         >
           @for (group of state.groupedTasksForColumn(column.id); track group.label) {

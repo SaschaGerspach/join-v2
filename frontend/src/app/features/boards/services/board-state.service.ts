@@ -91,6 +91,8 @@ export class BoardStateService {
     !!this.searchQuery() || !!this.filterPriority() || this.filterAssignee() !== '' || !!this.filterDue()
   );
 
+  readonly dragDisabled = computed(() => this.hasActiveFilter() || this.groupBy() !== 'none');
+
   private readonly contactMap = computed(() => {
     const map = new Map<number, { name: string; initials: string }>();
     for (const c of this.contacts()) {
