@@ -1,3 +1,5 @@
+from datetime import date
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -11,6 +13,25 @@ from ..serializers import (
     CustomFieldUpdateSerializer,
     TaskFieldValuesUpdateSerializer,
 )
+
+
+def _validate_field_value(field, value):
+    if value == "":
+        return None
+    if field.field_type == CustomField.FieldType.NUMBER:
+        try:
+            float(value)
+        except (TypeError, ValueError):
+            return f"Value for '{field.name}' must be a number."
+    elif field.field_type == CustomField.FieldType.DATE:
+        try:
+            date.fromisoformat(value)
+        except (TypeError, ValueError):
+            return f"Value for '{field.name}' must be an ISO date (YYYY-MM-DD)."
+    elif field.field_type == CustomField.FieldType.SELECT:
+        if value not in field.options:
+            return f"Value for '{field.name}' is not a valid option."
+    return None
 
 
 @extend_schema(
@@ -135,14 +156,22 @@ def task_field_values(request, task_pk):
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    board_field_ids = set(task.board.custom_fields.values_list("pk", flat=True))
-    result = []
+    board_fields = {f.pk: f for f in task.board.custom_fields.all()}
+    to_write = []
     for item in serializer.validated_data["values"]:
-        if item["field_id"] not in board_field_ids:
+        field = board_fields.get(item["field_id"])
+        if field is None:
             continue
+        error = _validate_field_value(field, item["value"])
+        if error:
+            return Response({"detail": error}, status=status.HTTP_400_BAD_REQUEST)
+        to_write.append((field.pk, item["value"]))
+
+    result = []
+    for field_id, value in to_write:
         obj, _ = TaskFieldValue.objects.update_or_create(
-            task=task, field_id=item["field_id"],
-            defaults={"value": item["value"]},
+            task=task, field_id=field_id,
+            defaults={"value": value},
         )
         result.append({"field_id": obj.field_id, "value": obj.value})
 

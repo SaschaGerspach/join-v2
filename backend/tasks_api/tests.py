@@ -699,6 +699,69 @@ class CustomFieldTests(APITestCase):
         self.assertEqual(len(response.data["values"]), 1)
         self.assertEqual(response.data["values"][0]["value"], "8")
 
+    def test_set_field_value_rejects_invalid_select_option(self):
+        field = CustomField.objects.create(board=self.board, name="Size", field_type="select", options=["S", "M", "L"])
+        task = Task.objects.create(board=self.board, column=self.col, title="Task 1")
+        response = self.client.put(
+            f"/tasks/{task.pk}/fields/",
+            {"values": [{"field_id": field.pk, "value": "XXL"}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(TaskFieldValue.objects.filter(task=task, field=field).exists())
+
+    def test_set_field_value_rejects_invalid_number(self):
+        field = CustomField.objects.create(board=self.board, name="Points", field_type="number")
+        task = Task.objects.create(board=self.board, column=self.col, title="Task 1")
+        response = self.client.put(
+            f"/tasks/{task.pk}/fields/",
+            {"values": [{"field_id": field.pk, "value": "abc"}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_set_field_value_rejects_invalid_date(self):
+        field = CustomField.objects.create(board=self.board, name="Deadline", field_type="date")
+        task = Task.objects.create(board=self.board, column=self.col, title="Task 1")
+        response = self.client.put(
+            f"/tasks/{task.pk}/fields/",
+            {"values": [{"field_id": field.pk, "value": "31/12/2026"}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_set_field_value_accepts_valid_typed_values(self):
+        select_field = CustomField.objects.create(board=self.board, name="Size", field_type="select", options=["S", "M"])
+        number_field = CustomField.objects.create(board=self.board, name="Points", field_type="number")
+        date_field = CustomField.objects.create(board=self.board, name="Deadline", field_type="date")
+        task = Task.objects.create(board=self.board, column=self.col, title="Task 1")
+        response = self.client.put(
+            f"/tasks/{task.pk}/fields/",
+            {"values": [
+                {"field_id": select_field.pk, "value": "M"},
+                {"field_id": number_field.pk, "value": "3.5"},
+                {"field_id": date_field.pk, "value": "2026-12-31"},
+            ]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["values"]), 3)
+
+    def test_set_field_values_is_atomic_on_invalid(self):
+        good = CustomField.objects.create(board=self.board, name="Sprint", field_type="text")
+        bad = CustomField.objects.create(board=self.board, name="Points", field_type="number")
+        task = Task.objects.create(board=self.board, column=self.col, title="Task 1")
+        response = self.client.put(
+            f"/tasks/{task.pk}/fields/",
+            {"values": [
+                {"field_id": good.pk, "value": "Sprint 5"},
+                {"field_id": bad.pk, "value": "not-a-number"},
+            ]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(TaskFieldValue.objects.filter(task=task).exists())
+
 
 class TimeTrackingTests(APITestCase):
     def setUp(self):
