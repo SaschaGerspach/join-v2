@@ -54,10 +54,10 @@ export class OfflineQueueService implements OnDestroy {
       const ok = await this.sendWithRetry(req);
       if (ok) {
         success++;
+        if (req.id != null) await deleteQueued(req.id);
       } else {
         failed++;
       }
-      if (req.id != null) await deleteQueued(req.id);
       this.refreshCount();
     }
 
