@@ -967,6 +967,24 @@ class TaskReorderTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_reorder_to_duplicate_order_uses_created_at_tiebreaker(self):
+        older = timezone.now() - timedelta(minutes=1)
+        Task.objects.filter(pk=self.task2.pk).update(created_at=older)
+
+        response = self.client.post(
+            self.url,
+            [{"id": self.task1.pk, "order": 2.0}],
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.task1.refresh_from_db()
+        self.task2.refresh_from_db()
+        self.assertEqual(self.task1.order, self.task2.order)
+
+        ordered = list(Task.objects.filter(column=self.col1).values_list("pk", flat=True))
+        self.assertEqual(ordered, [self.task2.pk, self.task1.pk])
+
 
 class MyTasksTests(APITestCase):
     url = "/tasks/my/"
