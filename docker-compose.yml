@@ -66,6 +66,7 @@ services:
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-noreply@join.app}
     volumes:
       - media_data:/app/media
+      - private_media_data:/app/private_media
     depends_on:
       db:
         condition: service_healthy
@@ -171,4 +172,5 @@ networks:
 volumes:
   postgres_data:
   media_data:
+  private_media_data:
   db_backups:
