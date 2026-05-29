@@ -1237,3 +1237,12 @@ class TaskWorkloadTests(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(len(response.data["contacts"]), 1)
         self.assertEqual(response.data["contacts"][0]["name"], "A B")
+
+    def test_workload_multi_assignee_task_listed_once(self):
+        contact2 = Contact.objects.create(owner=self.user, first_name="C", last_name="D", email="c@example.com")
+        task = Task.objects.create(board=self.board, column=self.col, title="Shared")
+        task.assignees.add(self.contact, contact2)
+        response = self.client.get(self.url)
+        shared = [t for t in response.data["tasks"] if t["title"] == "Shared"]
+        self.assertEqual(len(shared), 1)
+        self.assertCountEqual(shared[0]["assigned_to"], [self.contact.pk, contact2.pk])

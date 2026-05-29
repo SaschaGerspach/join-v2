@@ -175,9 +175,11 @@ def task_workload(request):
     ).distinct()
 
     tasks = (
-        Task.objects.filter(board__in=boards, archived_at__isnull=True)
+        Task.objects.filter(board__in=boards, archived_at__isnull=True, assignees__isnull=False)
+        .distinct()
         .select_related("board")
         .prefetch_related("assignees")
+        .order_by("due_date", "created_at")[:200]
     )
 
     contacts_qs = Contact.objects.filter(owner=user)
@@ -186,8 +188,6 @@ def task_workload(request):
     result = []
     for t in tasks:
         assignee_ids = [a.pk for a in t.assignees.all()]
-        if not assignee_ids:
-            continue
         result.append({
             "id": t.pk,
             "title": t.title,
