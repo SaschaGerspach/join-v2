@@ -210,3 +210,30 @@ class WebhookEventsTests(APITestCase):
         self.assertIn("task_created", response.data)
         self.assertIn("task_updated", response.data)
         self.assertIn("task_deleted", response.data)
+
+
+class WebhookDeliveryRetryTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.board = Board.objects.create(title="B", created_by=self.user)
+        self.webhook = Webhook.objects.create(
+            board=self.board, url="https://example.com/hook", events=["task_created"],
+        )
+
+    @patch("webhooks_api.tasks.socket.getaddrinfo", return_value=MOCK_RESOLVE)
+    @patch("webhooks_api.tasks.requests.post")
+    def test_retry_reuses_same_delivery(self, mock_post, _mock_resolve):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.text = "ok"
+        from .tasks import deliver_webhook
+
+        deliver_webhook.apply(args=(self.webhook.pk, "task_created", {"x": 1}))
+        first = WebhookDelivery.objects.get(webhook=self.webhook)
+
+        deliver_webhook.apply(
+            args=(self.webhook.pk, "task_created", {"x": 1}),
+            kwargs={"delivery_pk": first.pk},
+        )
+
+        self.assertEqual(WebhookDelivery.objects.filter(webhook=self.webhook).count(), 1)
+        self.assertEqual(WebhookDelivery.objects.get(webhook=self.webhook).delivery_id, first.delivery_id)

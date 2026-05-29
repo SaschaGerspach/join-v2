@@ -103,7 +103,7 @@ def _format_teams_payload(event_type: str, payload: dict) -> dict:
 
 
 @shared_task(bind=True, max_retries=3)
-def deliver_webhook(self, webhook_id, event_type, payload):
+def deliver_webhook(self, webhook_id, event_type, payload, delivery_pk=None):
     from .models import Webhook, WebhookDelivery
 
     try:
@@ -123,12 +123,16 @@ def deliver_webhook(self, webhook_id, event_type, payload):
         formatted_payload = payload
 
     body = json.dumps(formatted_payload, cls=DjangoJSONEncoder)
-    delivery = WebhookDelivery.objects.create(
-        webhook=webhook,
-        event_type=event_type,
-        payload=payload,
-        status=WebhookDelivery.Status.PENDING,
-    )
+    delivery = None
+    if delivery_pk is not None:
+        delivery = WebhookDelivery.objects.filter(pk=delivery_pk).first()
+    if delivery is None:
+        delivery = WebhookDelivery.objects.create(
+            webhook=webhook,
+            event_type=event_type,
+            payload=payload,
+            status=WebhookDelivery.Status.PENDING,
+        )
 
     headers = {
         "Content-Type": "application/json",
@@ -162,4 +166,9 @@ def deliver_webhook(self, webhook_id, event_type, payload):
         delivery.response_body = str(exc)[:2000]
         delivery.save(update_fields=["status", "response_body"])
         logger.warning("Webhook delivery %s failed: %s", delivery.delivery_id, exc)
-        raise self.retry(exc=exc, countdown=60 * (2 ** self.request.retries))
+        raise self.retry(
+            exc=exc,
+            args=(webhook_id, event_type, payload),
+            kwargs={"delivery_pk": delivery.pk},
+            countdown=60 * (2 ** self.request.retries),
+        )
