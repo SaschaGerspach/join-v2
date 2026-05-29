@@ -767,6 +767,23 @@ class EvaluateRulesTests(AutomationTestMixin, APITestCase):
         finally:
             _loop_guard.active.discard((rule.pk, self.task.pk))
 
+    @patch("automations_api.engine.execute_action", return_value=True)
+    @patch("boards_api.ws_events.send_board_event")
+    def test_deadline_rule_fires_only_once(self, mock_ws, mock_exec):
+        rule = AutomationRule.objects.create(
+            board=self.board, created_by=self.user,
+            name="Deadline", trigger_type=TriggerType.DEADLINE_APPROACHING,
+            is_active=True,
+        )
+        RuleAction.objects.create(
+            rule=rule, action_type=ActionType.SET_PRIORITY,
+            config={"priority": "urgent"}, order=0,
+        )
+        evaluate_rules(self.task, TriggerType.DEADLINE_APPROACHING)
+        evaluate_rules(self.task, TriggerType.DEADLINE_APPROACHING)
+        self.assertEqual(AutomationLog.objects.filter(rule=rule, task=self.task).count(), 1)
+        self.assertEqual(mock_exec.call_count, 1)
+
 
 class ModelsQTests(AutomationTestMixin, APITestCase):
     def setUp(self):

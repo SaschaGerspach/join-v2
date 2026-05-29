@@ -6,7 +6,7 @@ from typing import Any, TYPE_CHECKING
 
 from .actions import execute_action
 from .conditions import check_condition
-from .models import AutomationLog, AutomationRule
+from .models import AutomationLog, AutomationRule, TriggerType
 
 if TYPE_CHECKING:
     from django.db.models import Q
@@ -40,6 +40,11 @@ def evaluate_rules(task: Task, trigger_type: str, context: dict[str, Any] | None
             continue
 
         if not _trigger_matches(rule, context):
+            continue
+
+        if trigger_type == TriggerType.DEADLINE_APPROACHING and AutomationLog.objects.filter(
+            rule=rule, task=task, trigger_type=trigger_type
+        ).exists():
             continue
 
         if not all(check_condition(c, task) for c in rule.conditions.all()):
