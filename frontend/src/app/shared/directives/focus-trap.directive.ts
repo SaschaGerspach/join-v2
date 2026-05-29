@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostListener, inject } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener, OnDestroy, inject } from '@angular/core';
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -6,8 +6,20 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
   selector: '[appFocusTrap]',
   standalone: true,
 })
-export class FocusTrapDirective {
+export class FocusTrapDirective implements AfterViewInit, OnDestroy {
   private readonly el = inject(ElementRef);
+  private previouslyFocused: HTMLElement | null = null;
+
+  ngAfterViewInit(): void {
+    this.previouslyFocused = document.activeElement as HTMLElement | null;
+    if (this.el.nativeElement.contains(document.activeElement)) return;
+    const focusable = Array.from(this.el.nativeElement.querySelectorAll(FOCUSABLE)) as HTMLElement[];
+    focusable[0]?.focus();
+  }
+
+  ngOnDestroy(): void {
+    this.previouslyFocused?.focus?.();
+  }
 
   @HostListener('keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {

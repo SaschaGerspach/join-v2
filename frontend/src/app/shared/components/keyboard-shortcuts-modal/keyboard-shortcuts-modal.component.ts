@@ -1,15 +1,16 @@
 import { ChangeDetectionStrategy, Component, HostListener, output } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { FocusTrapDirective } from '../../directives/focus-trap.directive';
 
 export type Shortcut = { key: string; descriptionKey: string };
 
 @Component({
   selector: 'app-keyboard-shortcuts-modal',
   standalone: true,
-  imports: [TranslateModule],
+  imports: [TranslateModule, FocusTrapDirective],
   template: `
     <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" (click)="closed.emit()">
-      <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-card" appFocusTrap (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h2 id="shortcuts-title">{{ 'SHORTCUTS.TITLE' | translate }}</h2>
           <button class="btn-close" aria-label="Close" (click)="closed.emit()">&#10005;</button>
