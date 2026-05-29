@@ -5,7 +5,6 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from audit_api.models import AuditLog
 from boards_api.models import Board
-from tasks_api.models import Task
 
 User = get_user_model()
 

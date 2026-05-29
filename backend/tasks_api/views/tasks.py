@@ -1,4 +1,3 @@
-from django.db.models import Q
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
