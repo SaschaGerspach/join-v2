@@ -144,7 +144,11 @@ def deliver_webhook(self, webhook_id, event_type, payload):
 
     try:
         resp = requests.post(
-            webhook.url, data=body, headers=headers, timeout=DELIVERY_TIMEOUT
+            webhook.url,
+            data=body,
+            headers=headers,
+            timeout=DELIVERY_TIMEOUT,
+            allow_redirects=False,
         )
         delivery.response_status = resp.status_code
         delivery.response_body = resp.text[:2000]
