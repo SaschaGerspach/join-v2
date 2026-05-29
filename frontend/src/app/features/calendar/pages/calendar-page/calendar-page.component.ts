@@ -88,8 +88,15 @@ export class CalendarPageComponent implements OnInit {
     return map;
   });
 
+  private localKey(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
   tasksForDay(day: Date): Task[] {
-    return this.tasksByDate()[day.toISOString().slice(0, 10)] ?? [];
+    return this.tasksByDate()[this.localKey(day)] ?? [];
   }
 
   columnsForTask(task: Task): Column[] {
@@ -97,7 +104,7 @@ export class CalendarPageComponent implements OnInit {
   }
 
   isToday(day: Date): boolean {
-    return day.toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10);
+    return this.localKey(day) === this.localKey(new Date());
   }
 
   prevMonth(): void {
