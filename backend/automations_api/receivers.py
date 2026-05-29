@@ -16,6 +16,14 @@ from .engine import evaluate_rules
 from .models import TriggerType
 
 
+# Rules are evaluated synchronously in the request cycle on purpose, not by
+# oversight. Moving this to a Celery task (via transaction.on_commit) is viable
+# for latency, but REQUIRES replacing the thread-local _loop_guard in engine.py
+# with a distributed guard (e.g. Redis): action-triggered follow-up signals
+# would then run in separate worker tasks, where the thread-local guard no
+# longer prevents trigger-chain re-entry across task boundaries.
+
+
 @receiver(task_created)
 def on_task_created(sender: type, task: Any, **kwargs: Any) -> None:
     evaluate_rules(task, TriggerType.TASK_CREATED)
