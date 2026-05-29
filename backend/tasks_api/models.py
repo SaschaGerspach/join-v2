@@ -50,13 +50,6 @@ class Task(models.Model):
             models.Index(fields=["board", "order"]),
             models.Index(fields=["board", "archived_at", "order"]),
         ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["column", "order"],
-                name="unique_task_order_per_column",
-                condition=models.Q(column__isnull=False, archived_at__isnull=True),
-            ),
-        ]
 
     def save(self, *args, **kwargs):
         if self._state.adding and self.column_id is not None and self.order == 0.0:
