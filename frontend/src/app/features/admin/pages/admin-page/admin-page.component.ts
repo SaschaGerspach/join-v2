@@ -4,11 +4,12 @@ import { environment } from '../../../../../environments/environment';
 import { AdminStatsComponent } from '../../components/admin-stats/admin-stats.component';
 import { AdminAuditLogComponent } from '../../components/admin-audit-log/admin-audit-log.component';
 import { AdminBoardActivityComponent } from '../../components/admin-board-activity/admin-board-activity.component';
+import { AdminAiFeaturesComponent } from '../../components/admin-ai-features/admin-ai-features.component';
 
 @Component({
   selector: 'app-admin-page',
   standalone: true,
-  imports: [TranslateModule, AdminStatsComponent, AdminAuditLogComponent, AdminBoardActivityComponent],
+  imports: [TranslateModule, AdminStatsComponent, AdminAuditLogComponent, AdminBoardActivityComponent, AdminAiFeaturesComponent],
   templateUrl: './admin-page.component.html',
   styleUrl: './admin-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

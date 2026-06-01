@@ -1,0 +1,32 @@
+<section class="ai-section">
+  <h2>{{ 'ADMIN.AI.TITLE' | translate }}</h2>
+
+  @if (loading()) {
+    <app-loading-spinner />
+  } @else {
+    @if (!configured()) {
+      <p class="ai-warning">{{ 'ADMIN.AI.NOT_CONFIGURED' | translate }}</p>
+    }
+
+    <ul class="ai-list">
+      @for (feature of features(); track feature.key) {
+        <li class="ai-row">
+          <div class="ai-info">
+            <span class="ai-label">{{ feature.label }}</span>
+            <span class="ai-desc">{{ feature.description }}</span>
+          </div>
+          <button
+            type="button"
+            class="ai-toggle"
+            [class.on]="feature.enabled"
+            [disabled]="isPending(feature.key)"
+            [attr.aria-pressed]="feature.enabled"
+            [attr.aria-label]="feature.label"
+            (click)="toggle(feature)">
+            <span class="ai-knob"></span>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</section>

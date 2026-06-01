@@ -66,6 +66,19 @@ export type AdminBoardsResponse = {
   recent_boards: RecentBoard[];
 };
 
+export type AiFeature = {
+  key: string;
+  label: string;
+  description: string;
+  enabled: boolean;
+};
+
+export type AiFeatureList = {
+  provider: string;
+  configured: boolean;
+  features: AiFeature[];
+};
+
 @Injectable({ providedIn: 'root' })
 export class AdminApiService {
   private readonly http = inject(HttpClient);
@@ -83,5 +96,13 @@ export class AdminApiService {
 
   getBoards(): Observable<AdminBoardsResponse> {
     return this.http.get<AdminBoardsResponse>(`${this.baseUrl}/admin-api/boards/`, { withCredentials: true });
+  }
+
+  getAiFeatures(): Observable<AiFeatureList> {
+    return this.http.get<AiFeatureList>(`${this.baseUrl}/ai/admin/features/`, { withCredentials: true });
+  }
+
+  setAiFeature(key: string, enabled: boolean): Observable<AiFeatureList> {
+    return this.http.patch<AiFeatureList>(`${this.baseUrl}/ai/admin/features/${key}/`, { enabled }, { withCredentials: true });
   }
 }

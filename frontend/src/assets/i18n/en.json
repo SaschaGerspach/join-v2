@@ -370,6 +370,10 @@
     "TOP_BOARDS": "Top Boards by Tasks",
     "RECENT_BOARDS": "Recently Active",
     "TASKS_COUNT": "{{count}} tasks",
+    "AI": {
+      "TITLE": "AI Features",
+      "NOT_CONFIGURED": "No AI provider is configured on the server. Enabling a feature has no effect until credentials are set."
+    },
     "EVENT": {
       "LOGIN_SUCCESS": "Login successful",
       "LOGIN_FAILED": "Login failed",

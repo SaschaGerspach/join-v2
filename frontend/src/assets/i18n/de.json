@@ -370,6 +370,10 @@
     "TOP_BOARDS": "Top-Boards nach Aufgaben",
     "RECENT_BOARDS": "Zuletzt aktiv",
     "TASKS_COUNT": "{{count}} Aufgaben",
+    "AI": {
+      "TITLE": "KI-Funktionen",
+      "NOT_CONFIGURED": "Auf dem Server ist kein KI-Anbieter konfiguriert. Das Aktivieren einer Funktion bleibt wirkungslos, bis Zugangsdaten gesetzt sind."
+    },
     "EVENT": {
       "LOGIN_SUCCESS": "Login erfolgreich",
       "LOGIN_FAILED": "Login fehlgeschlagen",
