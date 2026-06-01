@@ -118,6 +118,22 @@ class ServiceGuardTests(AIBaseTestCase):
         self.assertFalse(provider_available())
 
 
+class EnabledFeaturesTests(AIBaseTestCase):
+    url = "/ai/features/"
+
+    def test_lists_only_enabled_keys(self):
+        AIFeatureFlag.objects.create(key=AIFeature.SUGGEST_SUBTASKS, enabled=True)
+        AIFeatureFlag.objects.create(key=AIFeature.SUMMARIZE, enabled=False)
+        self.auth(self.user_token)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["features"], [AIFeature.SUGGEST_SUBTASKS])
+
+    def test_requires_authentication(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
 class FeatureEndpointTests(AIBaseTestCase):
     def enable(self, key):
         AIFeatureFlag.objects.create(key=key, enabled=True)

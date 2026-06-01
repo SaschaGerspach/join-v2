@@ -18,6 +18,10 @@ class AIFeatureUpdateSerializer(serializers.Serializer):
     enabled = serializers.BooleanField()
 
 
+class EnabledFeaturesSerializer(serializers.Serializer):
+    features = serializers.ListField(child=serializers.CharField())
+
+
 class GenerateDescriptionInput(serializers.Serializer):
     title = serializers.CharField(max_length=255)
     keywords = serializers.CharField(max_length=500, required=False, allow_blank=True)

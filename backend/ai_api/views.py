@@ -21,6 +21,7 @@ from .providers.base import AIDisabledError, AINotConfiguredError, AIProviderErr
 from .serializers import (
     AIFeatureListSerializer,
     AIFeatureUpdateSerializer,
+    EnabledFeaturesSerializer,
     CategorizeInput,
     CategorizeOutput,
     DescriptionOutput,
@@ -81,6 +82,14 @@ def admin_feature_detail(request, key):
         },
     )
     return Response(_feature_list())
+
+
+@extend_schema(responses=EnabledFeaturesSerializer)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def enabled_features(request):
+    keys = AIFeatureFlag.objects.filter(enabled=True).values_list("key", flat=True)
+    return Response({"features": [key for key in keys if key in FEATURES]})
 
 
 def _run(key, system, prompt, *, max_tokens=1024):
