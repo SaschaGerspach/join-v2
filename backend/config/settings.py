@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'admin_api',
     'automations_api',
     'webhooks_api',
+    'ai_api',
 ]
 
 MIDDLEWARE = [
@@ -360,6 +361,13 @@ REST_FRAMEWORK = {
 }
 
 DEFAULT_BOARD_COLUMNS = ["To do", "In progress", "Await feedback", "Done"]
+
+# AI features. All features are toggled off by default in the database; these
+# credentials are only ever read when a feature is enabled and actually invoked.
+# Keeping them blank is a valid configuration as long as no AI feature is active.
+AI_PROVIDER = os.environ.get('AI_PROVIDER', 'anthropic')
+AI_API_KEY = os.environ.get('AI_API_KEY', '')
+AI_MODEL = os.environ.get('AI_MODEL', '')
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Join API",
