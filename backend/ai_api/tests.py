@@ -1,6 +1,6 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-from django.test import override_settings
+from django.test import SimpleTestCase, override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import AccessToken
@@ -10,7 +10,9 @@ from django.contrib.auth import get_user_model
 from .features import AIFeature
 from .models import AIFeatureFlag
 from .providers import get_provider, provider_available
+from .providers.anthropic_provider import AnthropicProvider
 from .providers.base import AIDisabledError, AINotConfiguredError, AIProviderError
+from .providers.openai_provider import OpenAIProvider
 from .service import run_feature
 
 User = get_user_model()
@@ -112,6 +114,11 @@ class ServiceGuardTests(AIBaseTestCase):
     def test_get_provider_unknown_provider_raises(self):
         with self.assertRaises(AINotConfiguredError):
             get_provider()
+
+    @override_settings(AI_API_KEY="sk-test", AI_PROVIDER="anthropic", AI_MODEL="m")
+    def test_get_provider_returns_configured_provider(self):
+        provider = get_provider()
+        self.assertIsInstance(provider, AnthropicProvider)
 
     @override_settings(AI_API_KEY="", AI_PROVIDER="anthropic")
     def test_provider_available_false_without_key(self):
@@ -238,3 +245,143 @@ class FeatureEndpointTests(AIBaseTestCase):
             "/ai/generate-description/", {"title": "X"}, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_502_BAD_GATEWAY)
+
+    @override_settings(AI_API_KEY="sk-test")
+    @patch("ai_api.service.get_provider")
+    def test_categorize_passes_valid_priority(self, mock_get):
+        mock_get.return_value.generate.return_value = (
+            '{"priority": "urgent", "labels": ["api", " ", "bug"]}'
+        )
+        self.enable(AIFeature.CATEGORIZE)
+        self.auth(self.user_token)
+        response = self.client.post("/ai/categorize/", {"title": "X"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["priority"], "urgent")
+        self.assertEqual(response.data["labels"], ["api", "bug"])
+
+    @override_settings(AI_API_KEY="sk-test")
+    @patch("ai_api.service.get_provider")
+    def test_categorize_malformed_json_returns_502(self, mock_get):
+        # Braces present but not valid JSON: exercises the JSONDecodeError branch.
+        mock_get.return_value.generate.return_value = "{priority: urgent}"
+        self.enable(AIFeature.CATEGORIZE)
+        self.auth(self.user_token)
+        response = self.client.post("/ai/categorize/", {"title": "X"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_502_BAD_GATEWAY)
+
+    def test_suggest_subtasks_disabled_returns_403(self):
+        self.auth(self.user_token)
+        response = self.client.post("/ai/suggest-subtasks/", {"title": "X"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_summarize_disabled_returns_403(self):
+        self.auth(self.user_token)
+        response = self.client.post(
+            "/ai/summarize/", {"items": ["A"]}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_categorize_disabled_returns_403(self):
+        self.auth(self.user_token)
+        response = self.client.post("/ai/categorize/", {"title": "X"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ModelTests(APITestCase):
+    def test_str_reflects_state(self):
+        flag = AIFeatureFlag.objects.create(key=AIFeature.SUMMARIZE, enabled=True)
+        self.assertEqual(str(flag), f"{AIFeature.SUMMARIZE}: on")
+        flag.enabled = False
+        self.assertEqual(str(flag), f"{AIFeature.SUMMARIZE}: off")
+
+    def test_is_enabled_unknown_key_is_false(self):
+        AIFeatureFlag.objects.create(key="bogus", enabled=True)
+        self.assertFalse(AIFeatureFlag.is_enabled("bogus"))
+
+
+class AnthropicProviderTests(SimpleTestCase):
+    def _fake_sdk(self):
+        block = MagicMock(type="text", text="Hello")
+        message = MagicMock(content=[block])
+        client = MagicMock()
+        client.messages.create.return_value = message
+        sdk = MagicMock()
+        sdk.Anthropic.return_value = client
+        return sdk, client
+
+    def test_generate_builds_client_and_extracts_text(self):
+        sdk, client = self._fake_sdk()
+        with patch.dict("sys.modules", {"anthropic": sdk}):
+            result = AnthropicProvider(api_key="sk", model="m").generate(
+                "system", "prompt", max_tokens=42
+            )
+        self.assertEqual(result, "Hello")
+        sdk.Anthropic.assert_called_once_with(api_key="sk")
+        kwargs = client.messages.create.call_args.kwargs
+        self.assertEqual(kwargs["model"], "m")
+        self.assertEqual(kwargs["system"], "system")
+        self.assertEqual(kwargs["max_tokens"], 42)
+
+    def test_default_model_used_when_unset(self):
+        sdk, client = self._fake_sdk()
+        with patch.dict("sys.modules", {"anthropic": sdk}):
+            AnthropicProvider(api_key="sk").generate("s", "p")
+        self.assertEqual(
+            client.messages.create.call_args.kwargs["model"],
+            AnthropicProvider.default_model,
+        )
+
+    def test_sdk_error_is_wrapped(self):
+        sdk = MagicMock()
+        sdk.Anthropic.side_effect = RuntimeError("boom")
+        with patch.dict("sys.modules", {"anthropic": sdk}):
+            with self.assertRaises(AIProviderError):
+                AnthropicProvider(api_key="sk").generate("s", "p")
+
+    def test_missing_sdk_is_wrapped(self):
+        with patch.dict("sys.modules", {"anthropic": None}):
+            with self.assertRaises(AIProviderError):
+                AnthropicProvider(api_key="sk").generate("s", "p")
+
+
+class OpenAIProviderTests(SimpleTestCase):
+    def _fake_sdk(self):
+        choice = MagicMock()
+        choice.message.content = "Hi"
+        response = MagicMock(choices=[choice])
+        client = MagicMock()
+        client.chat.completions.create.return_value = response
+        sdk = MagicMock()
+        sdk.OpenAI.return_value = client
+        return sdk, client
+
+    def test_generate_builds_client_and_extracts_text(self):
+        sdk, client = self._fake_sdk()
+        with patch.dict("sys.modules", {"openai": sdk}):
+            result = OpenAIProvider(api_key="sk", model="m").generate(
+                "system", "prompt", max_tokens=42
+            )
+        self.assertEqual(result, "Hi")
+        sdk.OpenAI.assert_called_once_with(api_key="sk")
+        messages = client.chat.completions.create.call_args.kwargs["messages"]
+        self.assertEqual(messages[0]["role"], "system")
+        self.assertEqual(messages[1]["content"], "prompt")
+
+    def test_none_content_becomes_empty_string(self):
+        sdk, client = self._fake_sdk()
+        client.chat.completions.create.return_value.choices[0].message.content = None
+        with patch.dict("sys.modules", {"openai": sdk}):
+            result = OpenAIProvider(api_key="sk").generate("s", "p")
+        self.assertEqual(result, "")
+
+    def test_sdk_error_is_wrapped(self):
+        sdk = MagicMock()
+        sdk.OpenAI.side_effect = RuntimeError("boom")
+        with patch.dict("sys.modules", {"openai": sdk}):
+            with self.assertRaises(AIProviderError):
+                OpenAIProvider(api_key="sk").generate("s", "p")
+
+    def test_missing_sdk_is_wrapped(self):
+        with patch.dict("sys.modules", {"openai": None}):
+            with self.assertRaises(AIProviderError):
+                OpenAIProvider(api_key="sk").generate("s", "p")
