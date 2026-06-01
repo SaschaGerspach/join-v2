@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, output, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subtask, SubtasksApiService } from '../../../../core/tasks/subtasks-api.service';
+import { AiApiService, AI_FEATURE } from '../../../../core/ai/ai-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
 
@@ -20,8 +22,12 @@ export class TaskSubtasksComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly ai = inject(AiApiService);
+  readonly aiFeature = AI_FEATURE;
 
   taskId = input.required<number>();
+  taskTitle = input('');
+  taskDescription = input('');
 
   subtaskCountChanged = output<{ total: number; done: number }>();
 
@@ -30,13 +36,48 @@ export class TaskSubtasksComponent implements OnInit {
   editingSubtaskId = signal<number | null>(null);
   editingSubtaskTitle = signal('');
   pendingDeleteSubtask = signal<Subtask | null>(null);
+  suggesting = signal(false);
 
   ngOnInit(): void {
+    this.ai.ensureLoaded();
     this.subtasksApi.getByTask(this.taskId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: subs => this.subtasks.set(subs),
         error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_SUBTASKS'), 'error'),
+      });
+  }
+
+  suggestSubtasks(): void {
+    const title = this.taskTitle().trim();
+    if (!title || this.suggesting()) return;
+    this.suggesting.set(true);
+    this.ai.suggestSubtasks(title, this.taskDescription().trim() || undefined)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: titles => this.createSuggested(titles),
+        error: () => this.suggesting.set(false),
+      });
+  }
+
+  private createSuggested(titles: string[]): void {
+    const fresh = titles.map(t => t.trim()).filter(Boolean);
+    if (!fresh.length) {
+      this.suggesting.set(false);
+      return;
+    }
+    forkJoin(fresh.map(t => this.subtasksApi.create(this.taskId(), t)))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: created => {
+          this.subtasks.update(s => [...s, ...created]);
+          this.emitCounts();
+          this.suggesting.set(false);
+        },
+        error: () => {
+          this.toast.show(this.translate.instant('TOAST.FAILED_ADD_SUBTASK'), 'error');
+          this.suggesting.set(false);
+        },
       });
   }
 

@@ -145,6 +145,8 @@
 
       <app-task-subtasks
         [taskId]="task().id"
+        [taskTitle]="task().title"
+        [taskDescription]="task().description"
         (subtaskCountChanged)="onSubtaskCountChanged($event)"
       />
 

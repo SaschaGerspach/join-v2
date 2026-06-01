@@ -29,7 +29,17 @@
       </div>
 
       <div class="field-group">
-        <label class="field-label">{{ 'TASK.DESCRIPTION' | translate }}</label>
+        <div class="field-label-row">
+          <label class="field-label">{{ 'TASK.DESCRIPTION' | translate }}</label>
+          @if (ai.isEnabled(aiFeature.generateDescription)) {
+            <button
+              type="button"
+              class="ai-action"
+              [disabled]="!title().trim() || generatingDescription()"
+              (click)="generateDescription()"
+            >✨ {{ (generatingDescription() ? 'AI.GENERATING' : 'AI.GENERATE_DESCRIPTION') | translate }}</button>
+          }
+        </div>
         <textarea
           class="field-textarea"
           rows="2"
@@ -41,7 +51,17 @@
 
       <div class="field-row">
         <div class="field-group">
-          <label class="field-label">{{ 'TASK.PRIORITY' | translate }}</label>
+          <div class="field-label-row">
+            <label class="field-label">{{ 'TASK.PRIORITY' | translate }}</label>
+            @if (ai.isEnabled(aiFeature.categorize)) {
+              <button
+                type="button"
+                class="ai-action"
+                [disabled]="!title().trim() || categorizing()"
+                (click)="suggestCategory()"
+              >✨ {{ (categorizing() ? 'AI.SUGGESTING' : 'AI.SUGGEST_PRIORITY') | translate }}</button>
+            }
+          </div>
           <div class="priority-options">
             @for (p of priorities; track p) {
               <button

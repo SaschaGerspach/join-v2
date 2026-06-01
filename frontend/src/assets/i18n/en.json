@@ -390,6 +390,14 @@
       "ADMIN_ACTION": "Admin action"
     }
   },
+  "AI": {
+    "GENERATE_DESCRIPTION": "Generate",
+    "GENERATING": "Generating…",
+    "SUGGEST_PRIORITY": "Suggest",
+    "SUGGESTING": "Suggesting…",
+    "SUGGEST_SUBTASKS": "Suggest subtasks",
+    "SUGGESTING_SUBTASKS": "Suggesting…"
+  },
   "STATS": {
     "BACK": "Back to board",
     "TITLE": "Statistics",
