@@ -195,6 +195,32 @@ class FeatureEndpointTests(AIBaseTestCase):
 
     @override_settings(AI_API_KEY="sk-test")
     @patch("ai_api.service.get_provider")
+    def test_suggest_subtasks_non_list_yields_empty(self, mock_get):
+        # A string instead of an array must not be iterated character by character.
+        mock_get.return_value.generate.return_value = '{"subtasks": "A, B"}'
+        self.enable(AIFeature.SUGGEST_SUBTASKS)
+        self.auth(self.user_token)
+        response = self.client.post(
+            "/ai/suggest-subtasks/", {"title": "X"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["subtasks"], [])
+
+    @override_settings(AI_API_KEY="sk-test")
+    @patch("ai_api.service.get_provider")
+    def test_categorize_non_list_labels_yield_empty(self, mock_get):
+        mock_get.return_value.generate.return_value = (
+            '{"priority": "high", "labels": "bug"}'
+        )
+        self.enable(AIFeature.CATEGORIZE)
+        self.auth(self.user_token)
+        response = self.client.post("/ai/categorize/", {"title": "X"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["priority"], "high")
+        self.assertEqual(response.data["labels"], [])
+
+    @override_settings(AI_API_KEY="sk-test")
+    @patch("ai_api.service.get_provider")
     def test_suggest_subtasks_invalid_json_returns_502(self, mock_get):
         mock_get.return_value.generate.return_value = "not json at all"
         self.enable(AIFeature.SUGGEST_SUBTASKS)

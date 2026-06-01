@@ -130,6 +130,15 @@ def _validate(serializer_cls, data):
     return serializer.validated_data
 
 
+def _string_list(value):
+    """Coerce a model-provided value into a clean list of non-empty strings.
+    Guards against the model returning a string (which would iterate per char)
+    or a non-list type instead of an array."""
+    if not isinstance(value, list):
+        return []
+    return [str(item) for item in value if str(item).strip()]
+
+
 @extend_schema(request=GenerateDescriptionInput, responses=DescriptionOutput)
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -160,8 +169,7 @@ def suggest_subtasks(request):
             {"detail": "The AI provider returned an unexpected response."},
             status=status.HTTP_502_BAD_GATEWAY,
         )
-    subtasks = [str(item) for item in parsed.get("subtasks", []) if str(item).strip()]
-    return Response({"subtasks": subtasks})
+    return Response({"subtasks": _string_list(parsed.get("subtasks"))})
 
 
 @extend_schema(request=SummarizeInput, responses=SummaryOutput)
@@ -197,5 +205,4 @@ def categorize(request):
     priority = parsed.get("priority", "medium")
     if priority not in PRIORITIES:
         priority = "medium"
-    labels = [str(item) for item in parsed.get("labels", []) if str(item).strip()]
-    return Response({"priority": priority, "labels": labels})
+    return Response({"priority": priority, "labels": _string_list(parsed.get("labels"))})
