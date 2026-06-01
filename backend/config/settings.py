@@ -355,6 +355,7 @@ REST_FRAMEWORK = {
         "anon": "10000/day" if (DEBUG or TESTING) else "100/day",
         "user": "10000/hour" if (DEBUG or TESTING) else "1000/hour",
         "auth_attempts": "10000/minute" if (DEBUG or TESTING) else "10/minute",
+        "ai": "10000/hour" if (DEBUG or TESTING) else "30/hour",
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",

@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -8,7 +10,7 @@ from django.contrib.auth import get_user_model
 from .features import AIFeature
 from .models import AIFeatureFlag
 from .providers import get_provider, provider_available
-from .providers.base import AIDisabledError, AINotConfiguredError
+from .providers.base import AIDisabledError, AINotConfiguredError, AIProviderError
 from .service import run_feature
 
 User = get_user_model()
@@ -114,3 +116,109 @@ class ServiceGuardTests(AIBaseTestCase):
     @override_settings(AI_API_KEY="", AI_PROVIDER="anthropic")
     def test_provider_available_false_without_key(self):
         self.assertFalse(provider_available())
+
+
+class FeatureEndpointTests(AIBaseTestCase):
+    def enable(self, key):
+        AIFeatureFlag.objects.create(key=key, enabled=True)
+
+    def test_disabled_feature_returns_403_before_touching_credentials(self):
+        self.auth(self.user_token)
+        response = self.client.post(
+            "/ai/generate-description/", {"title": "x"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_unauthenticated_401(self):
+        response = self.client.post(
+            "/ai/generate-description/", {"title": "x"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    @override_settings(AI_API_KEY="")
+    def test_enabled_without_key_returns_503(self):
+        self.enable(AIFeature.GENERATE_DESCRIPTION)
+        self.auth(self.user_token)
+        response = self.client.post(
+            "/ai/generate-description/", {"title": "x"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    @override_settings(AI_API_KEY="sk-test")
+    @patch("ai_api.service.get_provider")
+    def test_generate_description_success(self, mock_get):
+        mock_get.return_value.generate.return_value = "  A nice description.  "
+        self.enable(AIFeature.GENERATE_DESCRIPTION)
+        self.auth(self.user_token)
+        response = self.client.post(
+            "/ai/generate-description/", {"title": "Build login"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["description"], "A nice description.")
+
+    @override_settings(AI_API_KEY="sk-test")
+    @patch("ai_api.service.get_provider")
+    def test_suggest_subtasks_parses_fenced_json(self, mock_get):
+        mock_get.return_value.generate.return_value = (
+            '```json\n{"subtasks": ["A", "B"]}\n```'
+        )
+        self.enable(AIFeature.SUGGEST_SUBTASKS)
+        self.auth(self.user_token)
+        response = self.client.post(
+            "/ai/suggest-subtasks/", {"title": "X"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["subtasks"], ["A", "B"])
+
+    @override_settings(AI_API_KEY="sk-test")
+    @patch("ai_api.service.get_provider")
+    def test_suggest_subtasks_invalid_json_returns_502(self, mock_get):
+        mock_get.return_value.generate.return_value = "not json at all"
+        self.enable(AIFeature.SUGGEST_SUBTASKS)
+        self.auth(self.user_token)
+        response = self.client.post(
+            "/ai/suggest-subtasks/", {"title": "X"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_502_BAD_GATEWAY)
+
+    @override_settings(AI_API_KEY="sk-test")
+    @patch("ai_api.service.get_provider")
+    def test_categorize_clamps_invalid_priority(self, mock_get):
+        mock_get.return_value.generate.return_value = (
+            '{"priority": "wat", "labels": ["bug"]}'
+        )
+        self.enable(AIFeature.CATEGORIZE)
+        self.auth(self.user_token)
+        response = self.client.post("/ai/categorize/", {"title": "X"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["priority"], "medium")
+        self.assertEqual(response.data["labels"], ["bug"])
+
+    @override_settings(AI_API_KEY="sk-test")
+    @patch("ai_api.service.get_provider")
+    def test_summarize_success(self, mock_get):
+        mock_get.return_value.generate.return_value = "Summary text."
+        self.enable(AIFeature.SUMMARIZE)
+        self.auth(self.user_token)
+        response = self.client.post(
+            "/ai/summarize/", {"items": ["Task A", "Task B"]}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["summary"], "Summary text.")
+
+    def test_summarize_requires_items(self):
+        self.enable(AIFeature.SUMMARIZE)
+        self.auth(self.user_token)
+        response = self.client.post("/ai/summarize/", {"items": []}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @override_settings(AI_API_KEY="sk-test")
+    @patch("ai_api.service.get_provider")
+    def test_provider_failure_returns_502(self, mock_get):
+        mock_get.return_value.generate.side_effect = AIProviderError("boom")
+        self.enable(AIFeature.GENERATE_DESCRIPTION)
+        self.auth(self.user_token)
+        response = self.client.post(
+            "/ai/generate-description/", {"title": "X"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_502_BAD_GATEWAY)
