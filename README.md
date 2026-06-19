@@ -47,10 +47,11 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Overdue and due-soon highlighting
 
 **Automations**
-- Rule-based automation engine: when X happens, do Y
-- Triggers: task created, task moved to column, priority changed, label added
-- Actions: move to column, set priority, add label, send notification
-- Custom signal chaining for complex workflows
+- Rule-based automation engine: when X happens (with optional conditions), do Y
+- Triggers: task created, task moved to column, priority set, label added, all subtasks done, deadline approaching
+- Conditions: priority equals, label set, assignee equals
+- Actions: move to column, set priority, assign user, add/remove label, notify creator / assignees / a specific user
+- Execution log of applied rules
 - Per-board automation management UI
 
 **Webhooks**
@@ -60,6 +61,14 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Delivery history with response status tracking
 - Celery-based async delivery with retry logic
 
+**AI Assist** (optional, admin-toggled)
+- Generate a task description from a title and keywords
+- Suggest sensible subtasks for a task
+- Summarize a board or its open tasks
+- Auto-categorize: suggest priority and labels from the task text
+- Per-feature on/off toggles in the admin dashboard
+- Pluggable providers (Anthropic, OpenAI); features stay disabled until a provider key is configured
+
 **Teams & Collaboration**
 - Create and manage teams with member invitations
 - Team roles: admin and member
@@ -67,7 +76,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Real-time board updates via WebSockets (Django Channels + Redis)
 - Real-time notification push via dedicated WebSocket (`/ws/notifications/`)
 - Board sharing — invite members by email or via invite link
-- Granular roles: owner, admin, editor, viewer
+- Granular per-board/per-team roles: owner, admin, editor, viewer
 - Account deletion with automatic board ownership transfer
 
 **Notifications & Scheduling**
@@ -104,6 +113,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Email verification on registration (with resend option)
 - Password reset via email with token-based confirmation
 - Audit logging (login, password reset, 2FA, member changes, account deletion)
+- Tiered admin access: a platform admin (`is_staff`) reaches the admin dashboard only — never private boards or teams; a separate superuser holds the cross-board/-team override, and every such access is recorded in the audit log
 - Security headers: HSTS, X-Frame-Options DENY, Referrer-Policy
 - Private media storage for attachments (not publicly accessible)
 
@@ -129,7 +139,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 | Cache/WS | Redis 7 |
 | Proxy | Traefik with automatic HTTPS via Let's Encrypt |
 | CI/CD | GitHub Actions |
-| Testing | Django TestCase (473 tests), Angular Karma (45 unit tests), Playwright (26 E2E specs) |
+| Testing | Django TestCase (532 tests), Angular Karma (51 unit tests), Playwright (26 E2E specs) |
 
 ## Architecture
 
@@ -287,6 +297,13 @@ The frontend runs on `http://localhost:4200`, the backend API on `http://localho
 | PATCH/DELETE | `/webhooks/:id/` | Webhook detail |
 | GET | `/webhooks/:id/deliveries/` | Delivery history |
 | GET | `/webhooks/events/` | Available event types |
+| GET | `/ai/features/` | Enabled AI features for the current user |
+| POST | `/ai/generate-description/` | Generate a task description |
+| POST | `/ai/suggest-subtasks/` | Suggest subtasks |
+| POST | `/ai/summarize/` | Summarize a board / open tasks |
+| POST | `/ai/categorize/` | Suggest priority and labels |
+| GET | `/ai/admin/features/` | List AI features with status (admin) |
+| PATCH | `/ai/admin/features/:key/` | Enable / disable an AI feature (admin) |
 | GET/POST | `/contacts/` | Contacts (CRUD) |
 | GET/POST | `/teams/` | List / create teams |
 | GET/PATCH/DELETE | `/teams/:id/` | Team detail |
