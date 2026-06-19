@@ -100,7 +100,7 @@ class BoardDetailTests(APITestCase):
 class AdminBoardAccessTests(APITestCase):
     def setUp(self):
         self.owner = User.objects.create_user(email="owner@example.com", password="pass")
-        self.admin = User.objects.create_user(email="admin@example.com", password="pass", is_staff=True)
+        self.admin = User.objects.create_user(email="admin@example.com", password="pass", is_superuser=True)
         self.board = Board.objects.create(title="Owner Board", created_by=self.owner)
         self.client.force_authenticate(user=self.admin)
 
@@ -119,6 +119,27 @@ class AdminBoardAccessTests(APITestCase):
         response = self.client.delete(f"/boards/{self.board.pk}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Board.objects.count(), 0)
+
+    def test_plain_staff_cannot_access_others_board(self):
+        staff = User.objects.create_user(email="staff@example.com", password="pass", is_staff=True)
+        self.client.force_authenticate(user=staff)
+        self.assertEqual(self.client.get(f"/boards/{self.board.pk}/").status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(len(self.client.get("/boards/").data["results"]), 0)
+
+    def test_superuser_cross_board_access_is_audited(self):
+        from audit_api.models import AuditLog
+        self.client.get(f"/boards/{self.board.pk}/")
+        self.assertTrue(
+            AuditLog.objects.filter(user=self.admin, event_type="superuser_board_access").exists()
+        )
+
+    def test_owner_access_is_not_audited_as_superuser(self):
+        from audit_api.models import AuditLog
+        self.client.force_authenticate(user=self.owner)
+        self.client.get(f"/boards/{self.board.pk}/")
+        self.assertFalse(
+            AuditLog.objects.filter(event_type="superuser_board_access").exists()
+        )
 
 
 class BoardLeaveTests(APITestCase):

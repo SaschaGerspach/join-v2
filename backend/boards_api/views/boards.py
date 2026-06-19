@@ -9,7 +9,15 @@ from rest_framework.response import Response
 from columns_api.models import Column
 from config.serializers import DetailSerializer
 from ..models import Board, BoardFavorite
-from ..permissions import get_board_or_404, is_board_owner
+from audit_api.helpers import log_audit
+from ..permissions import (
+    can_edit_board,
+    can_manage_members,
+    get_board_or_404,
+    is_board_admin,
+    is_board_member,
+    is_board_owner,
+)
 from ..serializers import (
     BOARD_TEMPLATES,
     BoardCreateSerializer,
@@ -57,7 +65,7 @@ def board_list(request):
             | Q(team__members__user=request.user)
             | Q(team__created_by=request.user)
         ).distinct()
-        if request.user.is_staff:
+        if request.user.is_superuser:
             boards = Board.objects.select_related("team").all().order_by("-created_at")
             member_ids = set(member_boards.values_list("pk", flat=True))
         else:
@@ -127,7 +135,20 @@ def board_detail(request, pk):
     is_fav = BoardFavorite.objects.filter(board=board, user=request.user).exists()
 
     if request.method == "GET":
-        return Response(serialize_shared_board(board, request.user, is_favorite=is_fav))
+        # Audit the superuser cross-board override: a superuser opening a board
+        # they are not a member of is using the emergency key, not a normal visit.
+        if request.user.is_superuser and not is_board_member(board, request.user):
+            log_audit(
+                "superuser_board_access",
+                user=request.user,
+                request=request,
+                detail=f"Accessed board #{board.pk} '{board.title}'",
+            )
+        payload = serialize_shared_board(board, request.user, is_favorite=is_fav)
+        payload["can_edit"] = can_edit_board(board, request.user)
+        payload["can_manage_members"] = can_manage_members(board, request.user)
+        payload["can_view_archive"] = is_board_admin(board, request.user)
+        return Response(payload)
 
     if not is_board_owner(board, request.user):
         return Response({"detail": "Only the owner can modify this board."}, status=status.HTTP_403_FORBIDDEN)

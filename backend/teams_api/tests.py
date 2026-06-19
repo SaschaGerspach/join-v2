@@ -147,22 +147,40 @@ class TeamDetailTests(APITestCase):
 class StaffTeamAccessTests(APITestCase):
     def setUp(self):
         self.owner = User.objects.create_user(email="owner@example.com", password="pass")
-        self.staff = User.objects.create_user(email="staff@example.com", password="pass", is_staff=True)
+        self.superuser = User.objects.create_user(email="root@example.com", password="pass", is_superuser=True)
         self.team = Team.objects.create(name="Owner Team", created_by=self.owner)
-        self.client.force_authenticate(user=self.staff)
+        self.client.force_authenticate(user=self.superuser)
 
-    def test_staff_can_view_any_team(self):
+    def test_superuser_can_view_any_team(self):
         response = self.client.get(f"/teams/{self.team.pk}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_staff_can_patch_any_team(self):
-        response = self.client.patch(f"/teams/{self.team.pk}/", {"name": "Staff Edit"}, format="json")
+    def test_superuser_can_patch_any_team(self):
+        response = self.client.patch(f"/teams/{self.team.pk}/", {"name": "Root Edit"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["name"], "Staff Edit")
+        self.assertEqual(response.data["name"], "Root Edit")
 
-    def test_staff_can_delete_any_team(self):
+    def test_superuser_can_delete_any_team(self):
         response = self.client.delete(f"/teams/{self.team.pk}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_plain_staff_cannot_access_others_team(self):
+        staff_only = User.objects.create_user(email="staffonly@example.com", password="pass", is_staff=True)
+        self.client.force_authenticate(user=staff_only)
+        self.assertEqual(self.client.get(f"/teams/{self.team.pk}/").status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_superuser_cross_team_access_is_audited(self):
+        from audit_api.models import AuditLog
+        self.client.get(f"/teams/{self.team.pk}/")
+        self.assertTrue(
+            AuditLog.objects.filter(user=self.superuser, event_type="superuser_team_access").exists()
+        )
+
+    def test_owner_team_access_is_not_audited(self):
+        from audit_api.models import AuditLog
+        self.client.force_authenticate(user=self.owner)
+        self.client.get(f"/teams/{self.team.pk}/")
+        self.assertFalse(AuditLog.objects.filter(event_type="superuser_team_access").exists())
 
 
 class TeamMembersTests(APITestCase):

@@ -16,6 +16,10 @@ export type Board = {
   is_member: boolean;
   team_id: number | null;
   team_name: string | null;
+  // Only present on board detail (GET /boards/:id/), not in the board list.
+  can_edit?: boolean;
+  can_manage_members?: boolean;
+  can_view_archive?: boolean;
 };
 
 export type TimeReportUser = { user_id: number; name: string; total_minutes: number };

@@ -17,10 +17,8 @@ def _get_member_role(board: Board, user: User) -> str | None:
         return None
 
 
-# Board owner (created_by) has implicit full control — not stored as a BoardMember role.
-def can_access_board(board: Board, user: User) -> bool:
-    if user.is_staff:
-        return True
+# Regular (non-superuser) access: ownership, board membership or team membership.
+def is_board_member(board: Board, user: User) -> bool:
     if board.created_by_id == user.id or board.members.filter(user=user).exists():
         return True
     if board.team_id and TeamMember.objects.filter(team_id=board.team_id, user=user).exists():
@@ -28,8 +26,15 @@ def can_access_board(board: Board, user: User) -> bool:
     return False
 
 
+# Only a superuser has a cross-board override (support/emergency). Regular staff
+# members are treated like any other user: board access comes from ownership,
+# board membership or team membership — never from the is_staff flag.
+def can_access_board(board: Board, user: User) -> bool:
+    return user.is_superuser or is_board_member(board, user)
+
+
 def can_edit_board(board: Board, user: User) -> bool:
-    if user.is_staff or board.created_by_id == user.id:
+    if user.is_superuser or board.created_by_id == user.id:
         return True
     role = _get_member_role(board, user)
     if role in (BoardMember.Role.ADMIN, BoardMember.Role.EDITOR):
@@ -39,15 +44,20 @@ def can_edit_board(board: Board, user: User) -> bool:
     return False
 
 
-def can_manage_members(board: Board, user: User) -> bool:
-    if user.is_staff or board.created_by_id == user.id:
+# Board management threshold (owner or admin): managing members, viewing the
+# archive and other board-level administration.
+def is_board_admin(board: Board, user: User) -> bool:
+    if user.is_superuser or board.created_by_id == user.id:
         return True
-    role = _get_member_role(board, user)
-    return role == BoardMember.Role.ADMIN
+    return _get_member_role(board, user) == BoardMember.Role.ADMIN
+
+
+def can_manage_members(board: Board, user: User) -> bool:
+    return is_board_admin(board, user)
 
 
 def is_board_owner(board: Board, user: User) -> bool:
-    if user.is_staff:
+    if user.is_superuser:
         return True
     return board.created_by_id == user.id
 

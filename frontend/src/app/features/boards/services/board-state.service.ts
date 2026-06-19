@@ -5,7 +5,6 @@ import { forkJoin } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
-import { AuthService } from '../../../core/auth/auth.service';
 import { BoardsApiService, Board } from '../../../core/boards/boards-api.service';
 import { ColumnsApiService, Column } from '../../../core/columns/columns-api.service';
 import { TasksApiService, Task, CreateTaskPayload } from '../../../core/tasks/tasks-api.service';
@@ -31,7 +30,6 @@ export { SavedFilter } from './_board-filters';
 
 @Injectable()
 export class BoardStateService {
-  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly boardsApi = inject(BoardsApiService);
@@ -76,12 +74,11 @@ export class BoardStateService {
 
   readonly columnListIds = computed(() => this.columns().map(c => `col-${c.id}`));
   readonly bulkMode = computed(() => this.selectedTaskIds().size > 0);
-  readonly canViewArchive = computed(() => {
-    const board = this.board();
-    const user = this.auth.user();
-    if (!board || !user) return false;
-    return board.is_owner || user.is_staff;
-  });
+  // Permissions come from the backend per board (single source of truth in
+  // boards_api/permissions.py); the frontend no longer interprets is_staff.
+  readonly canViewArchive = computed(() => this.board()?.can_view_archive ?? false);
+  readonly canEdit = computed(() => this.board()?.can_edit ?? false);
+  readonly canManageMembers = computed(() => this.board()?.can_manage_members ?? false);
 
   readonly filteredTasks = computed(() =>
     filterTasks(this.tasks(), this.searchQuery(), this.filterPriority(), this.filterAssignee(), this.filterDue())

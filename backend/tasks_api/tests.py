@@ -239,7 +239,9 @@ class CommentTests(APITestCase):
         self.assertEqual(response.data["text"], "New")
 
     def test_cannot_edit_others_comment(self):
-        comment = Comment.objects.create(task=self.task, author=self.member, text="X")
+        # A regular member (neither author nor board admin) cannot edit someone else's comment.
+        comment = Comment.objects.create(task=self.task, author=self.user, text="X")
+        self.client.force_authenticate(user=self.member)
         response = self.client.patch(self.detail_url(comment.pk), {"text": "Y"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -261,7 +263,7 @@ class CommentTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_admin_can_edit_others_comment(self):
-        admin = User.objects.create_user(email="admin@example.com", password="pass", is_staff=True)
+        admin = User.objects.create_user(email="admin@example.com", password="pass", is_superuser=True)
         comment = Comment.objects.create(task=self.task, author=self.user, text="Original")
         self.client.force_authenticate(user=admin)
         response = self.client.patch(self.detail_url(comment.pk), {"text": "Admin Edit"}, format="json")
@@ -269,7 +271,7 @@ class CommentTests(APITestCase):
         self.assertEqual(response.data["text"], "Admin Edit")
 
     def test_admin_can_delete_others_comment(self):
-        admin = User.objects.create_user(email="admin2@example.com", password="pass", is_staff=True)
+        admin = User.objects.create_user(email="admin2@example.com", password="pass", is_superuser=True)
         comment = Comment.objects.create(task=self.task, author=self.user, text="To Delete")
         self.client.force_authenticate(user=admin)
         response = self.client.delete(self.detail_url(comment.pk))
@@ -321,7 +323,7 @@ class TaskArchiveTests(APITestCase):
     def setUp(self):
         self.owner = User.objects.create_user(email="owner@example.com", password="pass")
         self.member = User.objects.create_user(email="member@example.com", password="pass")
-        self.admin = User.objects.create_user(email="admin@example.com", password="pass", is_staff=True)
+        self.admin = User.objects.create_user(email="admin@example.com", password="pass", is_superuser=True)
         self.outsider = User.objects.create_user(email="outsider@example.com", password="pass")
         self.board = Board.objects.create(title="Board", created_by=self.owner)
         BoardMember.objects.create(board=self.board, user=self.member)
@@ -340,6 +342,14 @@ class TaskArchiveTests(APITestCase):
 
     def test_list_archive_as_admin(self):
         self.client.force_authenticate(user=self.admin)
+        response = self.client.get(self.archive_url, {"board": self.board.pk})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_list_archive_as_board_admin(self):
+        board_admin = User.objects.create_user(email="badmin@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=board_admin, role=BoardMember.Role.ADMIN)
+        self.client.force_authenticate(user=board_admin)
         response = self.client.get(self.archive_url, {"board": self.board.pk})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
@@ -398,7 +408,7 @@ class TaskArchiveTests(APITestCase):
 class AdminAccessTests(APITestCase):
     def setUp(self):
         self.owner = User.objects.create_user(email="owner@example.com", password="pass")
-        self.admin = User.objects.create_user(email="admin@example.com", password="pass", is_staff=True)
+        self.admin = User.objects.create_user(email="admin@example.com", password="pass", is_superuser=True)
         self.board = Board.objects.create(title="Board", created_by=self.owner)
         self.task = Task.objects.create(board=self.board, title="Task")
         self.client.force_authenticate(user=self.admin)

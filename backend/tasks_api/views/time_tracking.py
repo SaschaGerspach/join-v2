@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from boards_api.permissions import can_access_board, can_edit_board
+from boards_api.permissions import can_access_board, can_edit_board, is_board_admin
 from ..models import Task, TimeEntry
 from ..serializers import TimeEntryCreateSerializer, TimeEntrySerializer
 
@@ -81,7 +81,7 @@ def time_entry_detail(request, task_pk, pk):
     except TimeEntry.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if entry.user_id != request.user.id and not request.user.is_staff:
+    if entry.user_id != request.user.id and not is_board_admin(task.board, request.user):
         return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
     entry.delete()

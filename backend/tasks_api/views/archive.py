@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from activity_api.helpers import log_activity
-from boards_api.permissions import can_access_board, get_board_or_404, is_board_owner
+from boards_api.permissions import can_access_board, get_board_or_404, is_board_admin
 from boards_api.ws_events import send_board_event
 from config.serializers import DetailSerializer
 from ..models import Task
@@ -27,7 +27,7 @@ def task_archive(request):
     if err:
         return err
 
-    if not is_board_owner(board, request.user):
+    if not is_board_admin(board, request.user):
         return Response({"detail": "Only the board owner or an admin can view the archive."}, status=status.HTTP_403_FORBIDDEN)
 
     tasks = (
@@ -51,7 +51,7 @@ def task_restore(request, pk):
     if not can_access_board(task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if not is_board_owner(task.board, request.user):
+    if not is_board_admin(task.board, request.user):
         return Response({"detail": "Only the board owner or an admin can restore tasks."}, status=status.HTTP_403_FORBIDDEN)
 
     task.archived_at = None

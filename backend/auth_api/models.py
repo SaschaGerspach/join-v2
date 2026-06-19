@@ -24,7 +24,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
+    # "Staff" is Django's name for a platform administrator: it grants access to
+    # the admin dashboard (user management, audit log, AI toggles). It does NOT
+    # grant access to private boards — only a superuser has that override.
+    is_staff = models.BooleanField(
+        default=False,
+        verbose_name="Admin",
+        help_text="Platform admin: access to the admin dashboard. Does not grant access to private boards.",
+    )
     is_verified = models.BooleanField(default=False)
     totp_secret = models.CharField(max_length=255, blank=True, default="")
     totp_enabled = models.BooleanField(default=False)

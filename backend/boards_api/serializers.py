@@ -12,6 +12,10 @@ class BoardSerializer(serializers.Serializer):
     is_member = serializers.BooleanField()
     team_id = serializers.IntegerField(allow_null=True)
     team_name = serializers.CharField(allow_null=True)
+    # Only populated on board detail (GET), not in the board list.
+    can_edit = serializers.BooleanField(required=False)
+    can_manage_members = serializers.BooleanField(required=False)
+    can_view_archive = serializers.BooleanField(required=False)
 
 
 BOARD_TEMPLATES = {

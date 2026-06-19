@@ -17,6 +17,8 @@ class AuditLog(models.Model):
         TEAM_MEMBER_ROLE_CHANGED = "team_member_role_changed"
         ACCOUNT_DELETED = "account_deleted"
         ADMIN_ACTION = "admin_action"
+        SUPERUSER_BOARD_ACCESS = "superuser_board_access"
+        SUPERUSER_TEAM_ACCESS = "superuser_team_access"
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs",

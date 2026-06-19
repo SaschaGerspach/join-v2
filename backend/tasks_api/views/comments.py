@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from activity_api.helpers import log_activity
-from boards_api.permissions import can_access_board
+from boards_api.permissions import can_access_board, is_board_admin
 from config.serializers import DetailSerializer
 from collections import defaultdict
 
@@ -103,7 +103,7 @@ def comment_detail(request, task_pk, pk):
     if not can_access_board(comment.task.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if comment.author != request.user and not request.user.is_staff:
+    if comment.author != request.user and not is_board_admin(comment.task.board, request.user):
         return Response({"detail": "You can only edit your own comments."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "PATCH":

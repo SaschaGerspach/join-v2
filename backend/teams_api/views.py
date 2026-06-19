@@ -12,18 +12,23 @@ from .serializers import TeamSerializer, TeamCreateSerializer, TeamMemberSeriali
 User = get_user_model()
 
 
+def _is_team_member(team, user):
+    return team.created_by_id == user.id or team.members.filter(user=user).exists()
+
+
 def _get_team_or_404(pk, user):
     try:
         team = Team.objects.get(pk=pk)
     except (Team.DoesNotExist, ValueError, TypeError):
         return None, Response({"detail": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
-    if not (team.created_by_id == user.id or team.members.filter(user=user).exists() or user.is_staff):
+    # Only a superuser has a cross-team override; is_staff (platform admin) does not.
+    if not (_is_team_member(team, user) or user.is_superuser):
         return None, Response({"detail": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
     return team, None
 
 
 def _is_team_admin(team, user):
-    if user.is_staff or team.created_by_id == user.id:
+    if user.is_superuser or team.created_by_id == user.id:
         return True
     return team.members.filter(user=user, role=TeamMember.Role.ADMIN).exists()
 
@@ -69,6 +74,14 @@ def team_detail(request, pk):
         return err
 
     if request.method == "GET":
+        # Audit the superuser cross-team override (emergency key, not a normal visit).
+        if request.user.is_superuser and not _is_team_member(team, request.user):
+            log_audit(
+                "superuser_team_access",
+                user=request.user,
+                request=request,
+                detail=f"Accessed team #{team.pk} '{team.name}'",
+            )
         return Response(_serialize_team(team, request.user))
 
     if not _is_team_admin(team, request.user):
