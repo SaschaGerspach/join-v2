@@ -12,8 +12,8 @@
       @for (feature of features(); track feature.key) {
         <li class="ai-row">
           <div class="ai-info">
-            <span class="ai-label">{{ feature.label }}</span>
-            <span class="ai-desc">{{ feature.description }}</span>
+            <span class="ai-label">{{ 'ADMIN.AI.FEATURES.' + feature.key + '.LABEL' | translate }}</span>
+            <span class="ai-desc">{{ 'ADMIN.AI.FEATURES.' + feature.key + '.DESC' | translate }}</span>
           </div>
           <button
             type="button"
@@ -21,7 +21,7 @@
             [class.on]="feature.enabled"
             [disabled]="isPending(feature.key)"
             [attr.aria-pressed]="feature.enabled"
-            [attr.aria-label]="feature.label"
+            [attr.aria-label]="'ADMIN.AI.FEATURES.' + feature.key + '.LABEL' | translate"
             (click)="toggle(feature)">
             <span class="ai-knob"></span>
           </button>

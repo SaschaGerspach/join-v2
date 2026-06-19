@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -32,6 +32,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly elementRef = inject(ElementRef);
   protected readonly state = inject(BoardStateService);
 
   showColumnForm = signal(false);
@@ -40,6 +41,18 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   boardTitleInput = signal('');
   showFilterNameInput = signal(false);
   filterNameInput = signal('');
+  moreMenuOpen = signal(false);
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (!this.elementRef.nativeElement.querySelector('.board-tools')?.contains(event.target)) {
+      this.moreMenuOpen.set(false);
+    }
+  }
+
+  toggleMoreMenu(): void {
+    this.moreMenuOpen.update(v => !v);
+  }
 
   ngOnInit(): void {
     this.state.init(Number(this.route.snapshot.paramMap.get('id')));
@@ -87,6 +100,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   }
 
   shareInviteLink(): void {
+    this.moreMenuOpen.set(false);
     this.boardsApi.createInviteLink(this.state.boardId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -100,12 +114,14 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
   }
 
   exportCsv(): void {
+    this.moreMenuOpen.set(false);
     this.boardsApi.exportCsv(this.state.boardId()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: blob => this.downloadBlob(blob, `board-${this.state.boardId()}.csv`),
     });
   }
 
   exportPdf(): void {
+    this.moreMenuOpen.set(false);
     this.boardsApi.exportPdf(this.state.boardId()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: blob => this.downloadBlob(blob, `board-${this.state.boardId()}.pdf`),
     });
@@ -124,6 +140,7 @@ export class BoardDetailPageComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+    this.moreMenuOpen.set(false);
     this.boardsApi.importCsv(this.state.boardId(), file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.toast.show(this.translate.instant('BOARD_DETAIL.IMPORT_SUCCESS', { count: res.imported }));

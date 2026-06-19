@@ -126,6 +126,7 @@
     "CLEAR_FILTERS": "Clear filters",
     "SAVE_FILTER": "Save filter",
     "SAVED_FILTERS": "Saved filters…",
+    "MORE": "More ▾",
     "STATS": "Stats",
     "ACTIVITY": "Activity",
     "ARCHIVE": "Archive",
@@ -372,7 +373,25 @@
     "TASKS_COUNT": "{{count}} tasks",
     "AI": {
       "TITLE": "AI Features",
-      "NOT_CONFIGURED": "No AI provider is configured on the server. Enabling a feature has no effect until credentials are set."
+      "NOT_CONFIGURED": "No AI provider is configured on the server. Enabling a feature has no effect until credentials are set.",
+      "FEATURES": {
+        "generate_description": {
+          "LABEL": "Generate task description",
+          "DESC": "Draft a task description from a title and keywords."
+        },
+        "suggest_subtasks": {
+          "LABEL": "Suggest subtasks",
+          "DESC": "Propose sensible subtasks for a task."
+        },
+        "summarize": {
+          "LABEL": "Summarize board/tasks",
+          "DESC": "Produce a short summary across open tasks or a board."
+        },
+        "categorize": {
+          "LABEL": "Auto-categorize",
+          "DESC": "Suggest priority and category from the task text."
+        }
+      }
     },
     "EVENT": {
       "LOGIN_SUCCESS": "Login successful",

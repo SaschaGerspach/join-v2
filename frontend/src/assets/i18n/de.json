@@ -126,6 +126,7 @@
     "CLEAR_FILTERS": "Filter zurücksetzen",
     "SAVE_FILTER": "Filter speichern",
     "SAVED_FILTERS": "Gespeicherte Filter…",
+    "MORE": "Mehr ▾",
     "STATS": "Statistik",
     "ACTIVITY": "Aktivität",
     "ARCHIVE": "Archiv",
@@ -372,7 +373,25 @@
     "TASKS_COUNT": "{{count}} Aufgaben",
     "AI": {
       "TITLE": "KI-Funktionen",
-      "NOT_CONFIGURED": "Auf dem Server ist kein KI-Anbieter konfiguriert. Das Aktivieren einer Funktion bleibt wirkungslos, bis Zugangsdaten gesetzt sind."
+      "NOT_CONFIGURED": "Auf dem Server ist kein KI-Anbieter konfiguriert. Das Aktivieren einer Funktion bleibt wirkungslos, bis Zugangsdaten gesetzt sind.",
+      "FEATURES": {
+        "generate_description": {
+          "LABEL": "Aufgabenbeschreibung generieren",
+          "DESC": "Erstellt einen Beschreibungsentwurf aus Titel und Stichwörtern."
+        },
+        "suggest_subtasks": {
+          "LABEL": "Unteraufgaben vorschlagen",
+          "DESC": "Schlägt sinnvolle Unteraufgaben für eine Aufgabe vor."
+        },
+        "summarize": {
+          "LABEL": "Board/Aufgaben zusammenfassen",
+          "DESC": "Erstellt eine kurze Zusammenfassung offener Aufgaben oder eines Boards."
+        },
+        "categorize": {
+          "LABEL": "Automatisch kategorisieren",
+          "DESC": "Schlägt Priorität und Kategorie aus dem Aufgabentext vor."
+        }
+      }
     },
     "EVENT": {
       "LOGIN_SUCCESS": "Login erfolgreich",

@@ -86,24 +86,41 @@
         }
       </div>
     }
-    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'stats']">{{ 'BOARD_DETAIL.STATS' | translate }}</a>
-    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'activity']">{{ 'BOARD_DETAIL.ACTIVITY' | translate }}</a>
-    @if (state.canViewArchive()) {
-      <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'archive']">{{ 'BOARD_DETAIL.ARCHIVE' | translate }}</a>
-    }
-    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'automations']">{{ 'AUTOMATIONS.TITLE' | translate }}</a>
-    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'gantt']">{{ 'GANTT.TITLE' | translate }}</a>
-    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'time-travel']">{{ 'TIME_TRAVEL.TITLE' | translate }}</a>
-    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'webhooks']">{{ 'WEBHOOKS.TITLE' | translate }}</a>
-    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'templates']">{{ 'TEMPLATES.TITLE' | translate }}</a>
-    <a class="btn-stats" [routerLink]="['/boards', state.boardId(), 'time-report']">{{ 'TIME_REPORT.TITLE' | translate }}</a>
-    <button class="btn-stats" (click)="shareInviteLink()">{{ 'INVITE.SHARE' | translate }}</button>
-    <button class="btn-stats" (click)="exportCsv()">{{ 'BOARD_DETAIL.EXPORT_CSV' | translate }}</button>
-    <button class="btn-stats" (click)="exportPdf()">{{ 'BOARD_DETAIL.EXPORT_PDF' | translate }}</button>
-    <label class="btn-stats import-label">
-      {{ 'BOARD_DETAIL.IMPORT_CSV' | translate }}
-      <input type="file" accept=".csv" hidden (change)="importCsv($event)" />
-    </label>
+    <div class="board-tools">
+      <button class="btn-more" aria-haspopup="menu" [attr.aria-expanded]="moreMenuOpen()" (click)="toggleMoreMenu()">{{ 'BOARD_DETAIL.MORE' | translate }}</button>
+      @if (moreMenuOpen()) {
+        <div class="dropdown-menu" role="menu">
+          <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'stats']">{{ 'BOARD_DETAIL.STATS' | translate }}</a>
+          <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'activity']">{{ 'BOARD_DETAIL.ACTIVITY' | translate }}</a>
+          <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'gantt']">{{ 'GANTT.TITLE' | translate }}</a>
+          <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'time-report']">{{ 'TIME_REPORT.TITLE' | translate }}</a>
+          <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'time-travel']">{{ 'TIME_TRAVEL.TITLE' | translate }}</a>
+          <div class="dropdown-divider"></div>
+          <button type="button" role="menuitem" (click)="exportCsv()">{{ 'BOARD_DETAIL.EXPORT_CSV' | translate }}</button>
+          <button type="button" role="menuitem" (click)="exportPdf()">{{ 'BOARD_DETAIL.EXPORT_PDF' | translate }}</button>
+          @if (state.canEdit()) {
+            <label class="import-label" role="menuitem">
+              {{ 'BOARD_DETAIL.IMPORT_CSV' | translate }}
+              <input type="file" accept=".csv" hidden (change)="importCsv($event)" />
+            </label>
+          }
+          @if (state.canEdit() || state.canManageMembers()) {
+            <div class="dropdown-divider"></div>
+          }
+          @if (state.canEdit()) {
+            <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'automations']">{{ 'AUTOMATIONS.TITLE' | translate }}</a>
+            <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'webhooks']">{{ 'WEBHOOKS.TITLE' | translate }}</a>
+            <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'templates']">{{ 'TEMPLATES.TITLE' | translate }}</a>
+          }
+          @if (state.canViewArchive()) {
+            <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'archive']">{{ 'BOARD_DETAIL.ARCHIVE' | translate }}</a>
+          }
+          @if (state.canManageMembers()) {
+            <button type="button" role="menuitem" (click)="shareInviteLink()">{{ 'INVITE.SHARE' | translate }}</button>
+          }
+        </div>
+      }
+    </div>
     <button class="btn-add-column" (click)="showColumnForm.set(true)">{{ 'BOARD_DETAIL.ADD_COLUMN' | translate }}</button>
   </div>
 
