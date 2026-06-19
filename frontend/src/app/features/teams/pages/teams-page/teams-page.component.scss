@@ -76,12 +76,12 @@
   }
 
   &::placeholder {
-    color: var(--color-border);
+    color: var(--color-muted);
   }
 }
 
 .btn-confirm {
-  background: var(--color-dark);
+  background: var(--color-action);
   color: $color-white;
   border: none;
   border-radius: 10px;

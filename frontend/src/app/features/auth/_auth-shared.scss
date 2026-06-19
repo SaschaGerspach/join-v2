@@ -84,7 +84,7 @@
     transition: border-color 0.2s ease;
 
     &::placeholder {
-      color: var(--color-border);
+      color: var(--color-muted);
     }
 
     &:focus {

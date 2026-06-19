@@ -435,7 +435,7 @@ $bp-tablet:         1024px;
   left: 0;
   right: 0;
   height: $mobile-footer;
-  background-color: var(--color-dark);
+  background-color: var(--color-action);
   z-index: $z-sticky;
 
   @media (max-width: $bp-mobile) {

@@ -48,6 +48,10 @@ $bp-desktop: 1410px;
   --color-bg:      #f6f7f8;
   --color-surface: #ffffff;
   --color-dark:    #2a3647;
+  // Solid button background with white text. Distinct from --color-dark, which
+  // flips to a light value in dark mode (for text/borders) and would make white
+  // button text unreadable.
+  --color-action:  #2a3647;
   --color-border:  #d1d1d1;
   --color-muted:   #a8a8a8;
   --color-text:    #2a3647;
@@ -62,6 +66,7 @@ $bp-desktop: 1410px;
   --color-bg:      #1a1f2b;
   --color-surface: #252c3b;
   --color-dark:    #e8eaf0;
+  --color-action:  #29abe2;
   --color-border:  #3a4255;
   --color-muted:   #7a8099;
   --color-text:    #e8eaf0;
@@ -151,7 +156,7 @@ input, textarea, select {
 // ─── Utility Classes ─────────────────────────────────────────────────────────
 
 .btn-primary {
-  background-color: var(--color-dark);
+  background-color: var(--color-action);
   color: $color-white;
   font-weight: 700;
   font-size: 1rem;
@@ -194,7 +199,7 @@ input, textarea, select {
   transition: border-color 0.2s ease;
 
   &::placeholder {
-    color: var(--color-border);
+    color: var(--color-muted);
   }
 
   &:focus {
@@ -218,6 +223,46 @@ input, textarea, select {
   font-size: 12px;
   color: $color-error;
   margin-top: 4px;
+}
+
+// ─── Dropdown Menu ───────────────────────────────────────────────────────────
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 180px;
+  padding: 0.5rem 0;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: $z-dropdown;
+
+  a, button, label {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 1.2rem;
+    color: var(--color-text);
+    font-size: 0.9rem;
+    text-align: left;
+    background: none;
+    border: none;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: var(--color-bg);
+    }
+  }
+}
+
+.dropdown-divider {
+  height: 1px;
+  margin: 0.35rem 0;
+  background-color: var(--color-border);
 }
 
 // ─── Markdown Content ───────────────────────────────────────────────────────
