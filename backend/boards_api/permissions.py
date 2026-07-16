@@ -33,6 +33,9 @@ def can_access_board(board: Board, user: User) -> bool:
     return user.is_superuser or is_board_member(board, user)
 
 
+# Team boards are deliberately collaborative: every member of the board's team
+# may edit content, and an explicit VIEWER membership does not demote them.
+# Administration is not granted this way (see is_board_admin).
 def can_edit_board(board: Board, user: User) -> bool:
     if user.is_superuser or board.created_by_id == user.id:
         return True

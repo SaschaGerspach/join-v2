@@ -76,7 +76,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Real-time board updates via WebSockets (Django Channels + Redis)
 - Real-time notification push via dedicated WebSocket (`/ws/notifications/`)
 - Board sharing — invite members by email or via invite link
-- Granular per-board/per-team roles: owner, admin, editor, viewer
+- Granular per-board roles: owner, admin, editor, viewer (team members act as editors on team boards — see [Permission Model](#permission-model))
 - Account deletion with automatic board ownership transfer
 
 **Notifications & Scheduling**
@@ -113,7 +113,7 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - Email verification on registration (with resend option)
 - Password reset via email with token-based confirmation
 - Audit logging (login, password reset, 2FA, member changes, account deletion)
-- Tiered admin access: a platform admin (`is_staff`) reaches the admin dashboard only — never private boards or teams; a separate superuser holds the cross-board/-team override, and every such access is recorded in the audit log
+- Tiered admin access: platform admins (`is_staff`) never gain board or team content access through the API; a separate superuser holds the audited emergency override — see [Permission Model](#permission-model)
 - Security headers: HSTS, X-Frame-Options DENY, Referrer-Policy
 - Private media storage for attachments (not publicly accessible)
 
@@ -127,6 +127,29 @@ A fullstack Kanban board application built with **Angular 17** and **Django REST
 - OpenAPI schema + Swagger UI + ReDoc (dev mode)
 - Lazy-loaded routes
 - Gzip compression for all text assets
+
+## Permission Model
+
+All board access decisions live in one module — `backend/boards_api/permissions.py` — and every app (tasks, columns, automations, webhooks, …) consumes the same functions instead of re-implementing role checks. Endpoints require authentication; a user without access gets a 404, never a 403, so board existence is not leaked.
+
+| Actor | Read | Edit content | Edit board metadata | Administer | Delete board |
+|-------|------|--------------|---------------------|------------|--------------|
+| Logged-in non-member | — | — | — | — | — |
+| Member — viewer | ✓ | — | — | — | — |
+| Member — editor | ✓ | ✓ | — | — | — |
+| Member — admin | ✓ | ✓ | — | ✓ | — |
+| Owner (creator) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Team member (team boards) | ✓ | ✓ | — | — | — |
+| Platform admin (`is_staff`) | — | — | — | — | — |
+| Superuser | ✓ | ✓ | ✓ | ✓ | ✓ |
+
+"Edit content" covers tasks, columns, labels, automations and webhooks. "Edit board metadata" (title, color, team assignment) and deletion are reserved for the owner. "Administer" means managing members and invite links and viewing the archive.
+
+- **Team boards are collaborative by design** — every member of the board's team can edit content, and an explicit `viewer` membership does not demote a team member. To share a board read-only, keep it out of a team and invite viewers directly.
+- **`is_staff` is a platform admin, not a content role.** Staff users reach the admin dashboard and the AI feature toggles, and can manage user accounts — including changing another user's email or password. Through the API they never see board or team contents, but the dashboard does show metadata of all boards (title, color, task count, last activity).
+- **`is_superuser` is the emergency override.** A superuser passes every board and team permission check and sees all boards in the board list.
+- **Audit scope, precisely:** opening a foreign board or team detail as superuser writes `superuser_board_access` / `superuser_team_access` to the audit log; other superuser reads (board list, sub-resources) are not individually audited. Independently, every successful write request by a staff user is logged as `admin_action` via middleware — this also covers superuser writes as long as the account has `is_staff` (the `createsuperuser` default).
+- **Django admin** (`/manage/`) is only mounted when `DEBUG` or `DJANGO_ADMIN_ENABLED=true`. A staff user who is additionally granted model permissions there can read data past the API layer, so the flag stays off in production.
 
 ## Tech Stack
 
