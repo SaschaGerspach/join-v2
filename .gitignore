@@ -18,9 +18,14 @@ venv/
 *.swp
 *.swo
 backend/celerybeat-schedule*
+backend/media/
 backend/private_media/
 backend/htmlcov/
 backend/.coverage
 frontend/coverage/
 frontend/android/
 frontend/ios/
+.claude/settings.local.json
+.claude/claude.md
+.DS_Store
+Thumbs.db
