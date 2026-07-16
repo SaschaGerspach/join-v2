@@ -1,39 +1,39 @@
 # E2E Tests (Playwright)
 
-## Voraussetzungen
+## Prerequisites
 
-- Backend läuft lokal auf `http://localhost:8000`
-- Empfehlung: leere Test-DB pro Run (SQLite-Datei löschen)
+- Backend running locally on `http://localhost:8000`
+- Recommended: a fresh test database per run (delete the SQLite file)
 
-## Backend starten
+## Starting the backend
 
 ```bash
 cd backend
 rm -f db.sqlite3
 DJANGO_SECRET_KEY=dev-secret DJANGO_DEBUG=true python manage.py migrate
-DJANGO_SECRET_KEY=dev-secret DJANGO_DEBUG=true DJANGO_DISABLE_THROTTLE=true python manage.py runserver 0.0.0.0:8000
+DJANGO_SECRET_KEY=dev-secret DJANGO_DEBUG=true python manage.py runserver 0.0.0.0:8000
 ```
 
-`DJANGO_DISABLE_THROTTLE=true` setzt die Auth-Throttle-Rate hoch, damit die Login-Requests der Tests nicht gedrosselt werden. In Production niemals setzen.
+`DJANGO_DEBUG=true` automatically raises the API throttle rates (see `DEFAULT_THROTTLE_RATES` in `backend/config/settings.py`), so the tests' login requests are not rate-limited. Never set it in production.
 
-## Tests ausführen
+## Running the tests
 
 ```bash
 cd frontend
 npx playwright test
 ```
 
-Der `ng serve` wird automatisch gestartet (`reuseExistingServer: true`).
+`ng serve` is started automatically (`reuseExistingServer: true`).
 
-## Test-User
+## Test user
 
-`global-setup.ts` registriert einmalig `e2e@example.com` (Passwort `E2ePass123!`).
-Falls User schon existiert, wird nur eingeloggt. Der Login-Storage-State landet unter `e2e/.auth/user.json` und wird von allen Specs geteilt.
+`global-setup.ts` registers `e2e@example.com` (password `E2ePass123!`) once.
+If the user already exists, it just logs in. The login storage state is written to `e2e/.auth/user.json` and shared by all specs.
 
 ## Debugging
 
 ```bash
-npx playwright test --headed            # sichtbarer Browser
-npx playwright test --debug             # Inspector
-npx playwright show-report              # Reports nach Lauf
+npx playwright test --headed            # visible browser
+npx playwright test --debug             # inspector
+npx playwright show-report              # report after a run
 ```

@@ -1,27 +1,41 @@
-# Frontend
+# Join Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.9.
+Angular 17 single-page application for the Join Kanban board. Talks to the Django REST backend and receives real-time updates over WebSockets. See the [main README](../README.md) for the full feature list, architecture and Docker setup.
+
+## Prerequisites
+
+- Node.js (see `Dockerfile` for the version used in production builds)
+- A running backend on `http://localhost:8000` (see the main README)
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+```bash
+npm install
+npm start
+```
 
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Serves the app at `http://localhost:4200` with hot reload. The backend URL for local development is configured in `src/environments/environment.ts` (`http://localhost:8000`).
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```bash
+npm run build -- --configuration=production
+```
 
-## Running unit tests
+Output goes to `dist/`.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Tests
 
-## Running end-to-end tests
+**Unit tests** (Karma/Jasmine):
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+```bash
+npm test                                        # watch mode
+npm test -- --watch=false --browsers=ChromeHeadlessCI   # single run, as in CI
+```
 
-## Further help
+**E2E tests** (Playwright — requires a running backend, see [e2e/README.md](e2e/README.md)):
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```bash
+npm run e2e        # headless
+npm run e2e:ui     # Playwright UI mode
+```
