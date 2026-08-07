@@ -5,7 +5,11 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from boards_api.models import Board, BoardMember
+# Imported at module level so the @patch targets below resolve no matter which
+# modules an earlier test happened to import.
+from . import serializers  # noqa: F401
 from .models import Webhook, WebhookDelivery
+from .tasks import deliver_webhook
 
 User = get_user_model()
 
@@ -225,7 +229,6 @@ class WebhookDeliveryRetryTests(APITestCase):
     def test_retry_reuses_same_delivery(self, mock_post, _mock_resolve):
         mock_post.return_value.status_code = 200
         mock_post.return_value.text = "ok"
-        from .tasks import deliver_webhook
 
         deliver_webhook.apply(args=(self.webhook.pk, "task_created", {"x": 1}))
         first = WebhookDelivery.objects.get(webhook=self.webhook)
