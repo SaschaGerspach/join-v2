@@ -39,6 +39,19 @@ export function connectBoardWebSocket(
       case 'column_deleted':
         columns.update(c => c.filter(x => x.id !== evt.data.id));
         break;
+      case 'columns_reordered':
+        // The board renders columns in array order, so re-sort after merging.
+        columns.update(list => {
+          const updated = evt.data;
+          return list
+            .map(c => updated.find(x => x.id === c.id) ?? c)
+            .sort((a, b) => a.order - b.order);
+        });
+        break;
+      case 'automation_executed':
+        // Purely informational: the resulting task changes arrive as their own
+        // task_updated events, so there is nothing to reduce onto the state.
+        break;
       case 'presence_list':
         onlineUsers.set(evt.data);
         break;

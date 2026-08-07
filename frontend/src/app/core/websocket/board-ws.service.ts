@@ -7,6 +7,8 @@ import { AuthService } from '../auth/auth.service';
 
 export type PresenceUser = { id: number; first_name: string; last_name: string; email: string; avatar_url: string | null };
 
+export type AutomationExecuted = { rule_name: string; task_id: number; actions: string[] };
+
 export type BoardWsEvent =
   | { event: 'task_created'; data: Task }
   | { event: 'task_updated'; data: Task }
@@ -15,13 +17,16 @@ export type BoardWsEvent =
   | { event: 'column_created'; data: Column }
   | { event: 'column_updated'; data: Column }
   | { event: 'column_deleted'; data: { id: number } }
+  | { event: 'columns_reordered'; data: Column[] }
+  | { event: 'automation_executed'; data: AutomationExecuted }
   | { event: 'presence_list'; data: PresenceUser[] }
   | { event: 'presence_joined'; data: PresenceUser }
   | { event: 'presence_left'; data: { id: number } };
 
 const BOARD_WS_EVENTS = new Set<string>([
   'task_created', 'task_updated', 'task_deleted', 'tasks_reordered',
-  'column_created', 'column_updated', 'column_deleted',
+  'column_created', 'column_updated', 'column_deleted', 'columns_reordered',
+  'automation_executed',
   'presence_list', 'presence_joined', 'presence_left',
 ]);
 
@@ -78,6 +83,8 @@ export class BoardWsService {
         const parsed: unknown = JSON.parse(msg.data);
         if (isBoardWsEvent(parsed)) {
           this.events$.next(parsed);
+        } else {
+          console.warn('WebSocket: discarded unknown board event', parsed);
         }
       } catch (e) {
         console.error('WebSocket: failed to parse message', e);
