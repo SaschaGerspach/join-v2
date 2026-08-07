@@ -165,6 +165,8 @@
     "BOARD_TITLE_LABEL": "Board title",
     "IMPORT_SUCCESS": "Imported {{count}} tasks.",
     "IMPORT_FAILED": "Import failed.",
+    "WS_RECONNECTING": "Reconnecting… live updates are paused.",
+    "WS_OFFLINE": "Offline — live updates are paused.",
     "FILTER_NAME": "Filter name:",
     "SAVE": "Save",
     "UNASSIGNED": "Unassigned",

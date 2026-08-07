@@ -165,6 +165,8 @@
     "BOARD_TITLE_LABEL": "Board-Titel",
     "IMPORT_SUCCESS": "{{count}} Aufgaben importiert.",
     "IMPORT_FAILED": "Import fehlgeschlagen.",
+    "WS_RECONNECTING": "Verbindung wird wiederhergestellt … Live-Updates pausiert.",
+    "WS_OFFLINE": "Offline – Live-Updates pausiert.",
     "FILTER_NAME": "Filtername:",
     "SAVE": "Speichern",
     "UNASSIGNED": "Nicht zugewiesen",

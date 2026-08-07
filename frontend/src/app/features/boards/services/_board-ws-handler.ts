@@ -10,9 +10,11 @@ export function connectBoardWebSocket(
   tasks: WritableSignal<Task[]>,
   columns: WritableSignal<Column[]>,
   onlineUsers: WritableSignal<PresenceUser[]>,
+  onResync: () => void,
   destroyRef: DestroyRef,
 ): void {
   boardWs.connect(boardId);
+  boardWs.resync$.pipe(takeUntilDestroyed(destroyRef)).subscribe(() => onResync());
   boardWs.events$.pipe(takeUntilDestroyed(destroyRef)).subscribe(evt => {
     switch (evt.event) {
       case 'task_created':

@@ -49,6 +49,7 @@ export class BoardStateService {
   readonly contacts = signal<Contact[]>([]);
   readonly onlineUsers = signal<PresenceUser[]>([]);
   readonly loading = signal(true);
+  readonly connectionStatus = this.boardWs.status;
 
   readonly searchQuery = signal('');
   readonly filterPriority = signal<string>('');
@@ -138,7 +139,10 @@ export class BoardStateService {
     restoreFiltersFromUrl(this.route, this.searchQuery, this.filterPriority, this.filterAssignee, this.filterDue, this.groupBy, this.skipUrlSync);
     this.loadData(boardId);
     this.savedFilters.set(loadSavedFilters(boardId));
-    connectBoardWebSocket(boardId, this.boardWs, this.tasks, this.columns, this.onlineUsers, this.destroyRef);
+    connectBoardWebSocket(
+      boardId, this.boardWs, this.tasks, this.columns, this.onlineUsers,
+      () => this.loadData(boardId), this.destroyRef,
+    );
   }
 
   openTaskById(taskId: number): void {

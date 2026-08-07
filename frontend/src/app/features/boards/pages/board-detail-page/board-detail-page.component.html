@@ -4,6 +4,12 @@
     <app-loading-spinner />
   }
 
+  @if (state.connectionStatus() !== 'connected') {
+    <p class="ws-status" role="status">
+      {{ (state.connectionStatus() === 'offline' ? 'BOARD_DETAIL.WS_OFFLINE' : 'BOARD_DETAIL.WS_RECONNECTING') | translate }}
+    </p>
+  }
+
   <div class="board-detail-header">
     @if (state.editingBoardTitle()) {
       <input
