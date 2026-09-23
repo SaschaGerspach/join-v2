@@ -68,9 +68,32 @@ describe('AssigneePickerComponent', () => {
     expect(enter.defaultPrevented).toBeTrue();
   });
 
+  it('should open on ArrowDown with the first suggestion active', () => {
+    component.onKeydown(key('ArrowDown'));
+    expect(component.open()).toBeTrue();
+    expect(component.activeIndex()).toBe(0);
+    component.onKeydown(key('Enter'));
+    expect(component.selectedIds()).toEqual([2, 1]);
+  });
+
+  it('should keep a valid active index when there are no suggestions', () => {
+    fixture.componentRef.setInput('selectedIds', [1, 2, 3]);
+    component.open.set(true);
+    component.onKeydown(key('ArrowDown'));
+    expect(component.activeIndex()).toBe(0);
+  });
+
   it('should remove the last contact on Backspace with an empty query', () => {
     component.onKeydown(key('Backspace'));
     expect(component.selectedIds()).toEqual([]);
+  });
+
+  it('should not remove assignees without a chip on Backspace', () => {
+    fixture.componentRef.setInput('selectedIds', [2, 99]);
+    component.onKeydown(key('Backspace'));
+    expect(component.selectedIds()).toEqual([99]);
+    component.onKeydown(key('Backspace'));
+    expect(component.selectedIds()).toEqual([99]);
   });
 
   it('should keep contacts on Backspace while typing', () => {
@@ -102,5 +125,12 @@ describe('AssigneePickerComponent', () => {
     const options = document.querySelectorAll(`#${component.listboxId} [role="option"]`);
     expect(options.length).toBe(2);
     expect(fixture.nativeElement.querySelector('.suggestions')).toBeNull();
+  });
+
+  it('should reopen the suggestion list when the focused input is clicked', () => {
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('.picker-input');
+    component.open.set(false);
+    input.click();
+    expect(component.open()).toBeTrue();
   });
 });

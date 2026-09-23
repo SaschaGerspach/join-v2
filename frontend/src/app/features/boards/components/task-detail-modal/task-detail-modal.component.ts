@@ -197,6 +197,10 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    if (this.moreMenuOpen()) {
+      this.moreMenuOpen.set(false);
+      return;
+    }
     if (!this.showDeleteConfirm()) {
       this.closed.emit();
     }

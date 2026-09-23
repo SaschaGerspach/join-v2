@@ -80,8 +80,12 @@ export class AssigneePickerComponent {
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
-        if (!this.open()) this.openList();
-        this.moveActive(Math.min(this.activeIndex() + 1, list.length - 1));
+        if (!this.open()) {
+          this.openList();
+          this.resetActive();
+        } else if (list.length > 0) {
+          this.moveActive(Math.min(this.activeIndex() + 1, list.length - 1));
+        }
         break;
       case 'ArrowUp':
         event.preventDefault();
@@ -100,11 +104,14 @@ export class AssigneePickerComponent {
           this.open.set(false);
         }
         break;
-      case 'Backspace':
-        if (!this.query() && this.selectedIds().length > 0) {
-          this.selectedIds.update(ids => ids.slice(0, -1));
+      case 'Backspace': {
+        // Assignees outside this user's address book have no chip and must not be removed unseen.
+        const lastVisible = this.selectedContacts().at(-1);
+        if (!this.query() && lastVisible) {
+          this.remove(lastVisible.id);
         }
         break;
+      }
     }
   }
 

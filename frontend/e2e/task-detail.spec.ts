@@ -35,6 +35,15 @@ test('edit task title in detail modal', async ({ page }) => {
   await expect(page.locator('.task-card', { hasText: 'Updated Title' })).toBeVisible();
 });
 
+test('Escape closes the more menu but keeps the modal open', async ({ page }) => {
+  await page.locator('.task-card', { hasText: 'Detail Task' }).click();
+  await page.locator('.modal-footer').getByRole('button', { name: /more/i }).click();
+  await expect(page.getByRole('menu')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('menu')).toHaveCount(0);
+  await expect(page.locator('.modal-card')).toBeVisible();
+});
+
 test('delete task from detail modal', async ({ page }) => {
   await page.locator('.task-card', { hasText: 'Detail Task' }).click();
   await page.locator('.modal-footer').getByRole('button', { name: /more/i }).click();
