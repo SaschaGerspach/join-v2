@@ -49,23 +49,35 @@
     (detach)="open.set(false)"
   >
     <!-- mousedown is cancelled so the input keeps focus (also when dragging the scrollbar) -->
-    <ul class="suggestions" role="listbox" [id]="listboxId" (mousedown)="$event.preventDefault()">
-      @for (c of suggestions(); track c.id; let i = $index) {
-        <li
+    @if (suggestions().length > 0) {
+      <cdk-virtual-scroll-viewport
+        class="suggestions"
+        role="listbox"
+        [id]="listboxId"
+        [itemSize]="optionHeight"
+        [style.height.px]="listHeight()"
+        (mousedown)="$event.preventDefault()"
+      >
+        <div
+          *cdkVirtualFor="let c of suggestions(); let i = index; trackBy: trackById"
           role="option"
           class="suggestion"
           [id]="optionId(i)"
           [class.active]="i === activeIndex()"
           [attr.aria-selected]="i === activeIndex()"
+          [attr.aria-setsize]="suggestions().length"
+          [attr.aria-posinset]="i + 1"
           (click)="add(c)"
         >
           <app-user-avatar [firstName]="c.first_name" [lastName]="c.last_name" [size]="24" />
           <span class="suggestion-name">{{ c.first_name }} {{ c.last_name }}</span>
           <span class="suggestion-email">{{ c.email }}</span>
-        </li>
-      } @empty {
-        <li class="suggestion-hint">{{ 'TASK.NO_MATCHING_CONTACTS' | translate }}</li>
-      }
-    </ul>
+        </div>
+      </cdk-virtual-scroll-viewport>
+    } @else {
+      <div class="suggestions" role="listbox" [id]="listboxId">
+        <div class="suggestion-hint">{{ 'TASK.NO_MATCHING_CONTACTS' | translate }}</div>
+      </div>
+    }
   </ng-template>
 }

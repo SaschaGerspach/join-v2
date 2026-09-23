@@ -21,6 +21,16 @@ describe('AssigneePickerComponent', () => {
     return new KeyboardEvent('keydown', { key: name, cancelable: true });
   }
 
+  // The virtual viewport renders and updates its visible range on animation frames.
+  async function settle(): Promise<void> {
+    fixture.detectChanges();
+    await fixture.whenStable();
+    for (let frame = 0; frame < 2; frame++) {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      fixture.detectChanges();
+    }
+  }
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [AssigneePickerComponent, TranslateModule.forRoot()],
@@ -118,13 +128,38 @@ describe('AssigneePickerComponent', () => {
     expect(component.suggestions().length).toBe(100);
   });
 
-  it('should render the suggestion list in an overlay when focused', () => {
+  it('should render the suggestion list in an overlay when focused', async () => {
     const input: HTMLInputElement = fixture.nativeElement.querySelector('.picker-input');
     input.dispatchEvent(new Event('focus'));
-    fixture.detectChanges();
+    await settle();
     const options = document.querySelectorAll(`#${component.listboxId} [role="option"]`);
     expect(options.length).toBe(2);
     expect(fixture.nativeElement.querySelector('.suggestions')).toBeNull();
+  });
+
+  describe('with a large address book', () => {
+    beforeEach(async () => {
+      const many = Array.from({ length: 500 }, (_, i) => contact(1000 + i, `Person${i}`, 'Test'));
+      fixture.componentRef.setInput('contacts', many);
+      fixture.componentRef.setInput('selectedIds', []);
+      component.openList();
+      await settle();
+    });
+
+    it('should render only the visible rows', () => {
+      const options = document.querySelectorAll(`#${component.listboxId} [role="option"]`);
+      expect(options.length).toBeGreaterThan(0);
+      expect(options.length).toBeLessThan(50);
+      expect(options[0].getAttribute('aria-setsize')).toBe('500');
+    });
+
+    it('should scroll the active row into view on keyboard navigation', async () => {
+      for (let i = 0; i < 20; i++) component.onKeydown(key('ArrowDown'));
+      await settle();
+      expect(component.activeIndex()).toBe(20);
+      expect(component.viewport!.measureScrollOffset('top')).toBe(21 * component.optionHeight - component.listHeight());
+      expect(document.getElementById(component.optionId(20))).not.toBeNull();
+    });
   });
 
   it('should reopen the suggestion list when the focused input is clicked', () => {

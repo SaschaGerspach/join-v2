@@ -1,20 +1,23 @@
 import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, computed, inject, input, model, signal } from '@angular/core';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition, Overlay } from '@angular/cdk/overlay';
+import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { TranslateModule } from '@ngx-translate/core';
 import { Contact } from '../../../../core/contacts/contacts-api.service';
 import { UserAvatarComponent } from '../../../../shared/components/user-avatar/user-avatar.component';
 
 let nextId = 0;
+const MAX_VISIBLE_OPTIONS = 6;
 
 @Component({
   selector: 'app-assignee-picker',
-  imports: [TranslateModule, UserAvatarComponent, CdkConnectedOverlay, CdkOverlayOrigin],
+  imports: [TranslateModule, UserAvatarComponent, CdkConnectedOverlay, CdkOverlayOrigin, CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf],
   templateUrl: './assignee-picker.component.html',
   styleUrl: './assignee-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssigneePickerComponent {
   @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
+  @ViewChild(CdkVirtualScrollViewport) viewport?: CdkVirtualScrollViewport;
 
   contacts = input.required<Contact[]>();
   selectedIds = model.required<number[]>();
@@ -25,6 +28,7 @@ export class AssigneePickerComponent {
   listWidth = signal(0);
 
   readonly listboxId = `assignee-listbox-${nextId++}`;
+  readonly optionHeight = 36;
 
   readonly positions: ConnectedPosition[] = [
     { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 4 },
@@ -50,8 +54,15 @@ export class AssigneePickerComponent {
     );
   });
 
+  // Only the visible rows are rendered, so large address books stay cheap to filter and open.
+  listHeight = computed(() => Math.min(this.suggestions().length, MAX_VISIBLE_OPTIONS) * this.optionHeight);
+
   optionId(index: number): string {
     return `${this.listboxId}-${index}`;
+  }
+
+  trackById(_index: number, contact: Contact): number {
+    return contact.id;
   }
 
   openList(): void {
@@ -118,11 +129,23 @@ export class AssigneePickerComponent {
   // A new result set starts at the top, not at the old scroll offset.
   private resetActive(): void {
     this.activeIndex.set(0);
-    document.getElementById(this.listboxId)?.scrollTo({ top: 0 });
+    this.viewport?.scrollToOffset(0);
   }
 
+  // Rows outside the viewport are not rendered, so scrolling goes through the viewport
+  // instead of scrollIntoView; it only moves when the active row would leave the view.
   private moveActive(index: number): void {
     this.activeIndex.set(index);
-    document.getElementById(this.optionId(index))?.scrollIntoView({ block: 'nearest' });
+    const viewport = this.viewport;
+    if (!viewport) return;
+    const top = index * this.optionHeight;
+    const bottom = top + this.optionHeight;
+    const scrollTop = viewport.measureScrollOffset('top');
+    const height = viewport.getViewportSize();
+    if (top < scrollTop) {
+      viewport.scrollToOffset(top);
+    } else if (bottom > scrollTop + height) {
+      viewport.scrollToOffset(bottom - height);
+    }
   }
 }

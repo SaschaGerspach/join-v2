@@ -67,12 +67,12 @@
 }
 
 .suggestions {
-  width: 100%;
-  max-height: 15rem;
-  overflow-y: auto;
-  margin: 0;
-  padding: 0.25rem 0;
-  list-style: none;
+  display: block;
+  // The viewport height is computed from the row count; the border must not eat into it.
+  // Width comes from flex, since the overlay pane is a flex container.
+  box-sizing: content-box;
+  flex: 1;
+  min-width: 0;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-surface);
@@ -83,7 +83,10 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.4rem 0.75rem;
+  // Must match optionHeight in the component; the virtual viewport relies on a fixed row size.
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 0.75rem;
   cursor: pointer;
   font-size: 0.85rem;
   color: var(--color-text);
