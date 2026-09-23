@@ -699,7 +699,6 @@
     "FAILED_CHANGE_COLOR": "Failed to change color.",
     "FAILED_CHANGE_ROLE": "Failed to change role.",
     "FAILED_UPDATE_FAVORITE": "Failed to update favorite.",
-    "FAILED_LOAD_CONTACTS": "Failed to load contacts.",
     "FAILED_UPDATE_CONTACT": "Failed to update contact.",
     "FAILED_CREATE_CONTACT": "Failed to create contact.",
     "FAILED_DELETE_CONTACT": "Failed to delete contact.",

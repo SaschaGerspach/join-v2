@@ -5,7 +5,7 @@ import { CdkScrollable } from '@angular/cdk/scrolling';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Task, TasksApiService, UpdateTaskPayload, Recurrence } from '../../../../core/tasks/tasks-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
-import { Contact, ContactsApiService } from '../../../../core/contacts/contacts-api.service';
+import { Contact } from '../../../../core/contacts/contacts-api.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { TaskSubtasksComponent } from '../task-subtasks/task-subtasks.component';
@@ -30,7 +30,6 @@ import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   @ViewChild('titleInput') titleInput!: ElementRef<HTMLInputElement>;
   private readonly tasksApi = inject(TasksApiService);
-  private readonly contactsApi = inject(ContactsApiService);
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
@@ -38,8 +37,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   task = input.required<Task>();
   columns = input.required<Column[]>();
   boardTasks = input.required<Task[]>();
-
-  contacts = signal<Contact[]>([]);
+  contacts = input.required<Contact[]>();
 
   closed = output<void>();
   taskUpdated = output<Task>();
@@ -88,10 +86,6 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.coverImageUrl.set(t.cover_image_url ?? '');
     this.selectedLabelIds.set(new Set(t.labels?.map(l => l.id) ?? []));
 
-    this.contactsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: contacts => this.contacts.set(contacts),
-      error: () => this.toast.show(this.translate.instant('TOAST.FAILED_LOAD_CONTACTS'), 'error'),
-    });
     this.tasksApi.getWatchStatus(t.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: res => {
         this.isWatching.set(res.is_watching);

@@ -699,7 +699,6 @@
     "FAILED_CHANGE_COLOR": "Fehler beim Ändern der Farbe.",
     "FAILED_CHANGE_ROLE": "Fehler beim Ändern der Rolle.",
     "FAILED_UPDATE_FAVORITE": "Fehler beim Aktualisieren des Favoriten.",
-    "FAILED_LOAD_CONTACTS": "Fehler beim Laden der Kontakte.",
     "FAILED_UPDATE_CONTACT": "Fehler beim Aktualisieren des Kontakts.",
     "FAILED_CREATE_CONTACT": "Fehler beim Erstellen des Kontakts.",
     "FAILED_DELETE_CONTACT": "Fehler beim Löschen des Kontakts.",

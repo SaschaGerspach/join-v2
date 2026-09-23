@@ -328,6 +328,7 @@
     [task]="state.selectedTask()!"
     [columns]="state.columns()"
     [boardTasks]="state.tasks()"
+    [contacts]="state.contacts()"
     (closed)="state.selectedTask.set(null)"
     (taskUpdated)="state.onTaskUpdated($event)"
     (taskDeleted)="state.onTaskDeleted($event)"

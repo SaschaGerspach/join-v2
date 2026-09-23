@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
+import { ContactsApiService, Contact } from '../../../../core/contacts/contacts-api.service';
 import { TaskDetailModalComponent } from '../../../boards/components/task-detail-modal/task-detail-modal.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -16,12 +17,14 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 export class CalendarPageComponent implements OnInit {
   private readonly tasksApi = inject(TasksApiService);
   private readonly columnsApi = inject(ColumnsApiService);
+  private readonly contactsApi = inject(ContactsApiService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly translate = inject(TranslateService);
 
   viewDate = signal(new Date());
   tasks = signal<Task[]>([]);
   columnsByBoard = signal<Record<number, Column[]>>({});
+  contacts = signal<Contact[]>([]);
   selectedTask = signal<Task | null>(null);
   loading = signal(true);
 
@@ -64,9 +67,11 @@ export class CalendarPageComponent implements OnInit {
     forkJoin({
       tasks: this.tasksApi.getMyTasks(),
       columns: this.columnsApi.getAll(),
+      contacts: this.contactsApi.getAll(),
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: ({ tasks, columns }) => {
+      next: ({ tasks, columns, contacts }) => {
         this.tasks.set(tasks.filter(t => !!t.due_date));
+        this.contacts.set(contacts);
         const cbMap: Record<number, Column[]> = {};
         for (const col of columns) {
           (cbMap[col.board] ??= []).push(col);

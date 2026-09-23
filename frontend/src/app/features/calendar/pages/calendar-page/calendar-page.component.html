@@ -37,6 +37,7 @@
     [task]="selectedTask()!"
     [columns]="columnsForTask(selectedTask()!)"
     [boardTasks]="tasks()"
+    [contacts]="contacts()"
     (closed)="selectedTask.set(null)"
     (taskUpdated)="onTaskUpdated($event)"
     (taskDeleted)="onTaskDeleted($event)"
