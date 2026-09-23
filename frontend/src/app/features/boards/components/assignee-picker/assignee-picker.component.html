@@ -1,0 +1,70 @@
+@if (selectedContacts().length > 0) {
+  <ul class="chip-list">
+    @for (c of selectedContacts(); track c.id) {
+      <li class="chip">
+        <app-user-avatar [firstName]="c.first_name" [lastName]="c.last_name" [size]="22" />
+        <span class="chip-name">{{ c.first_name }} {{ c.last_name }}</span>
+        <button
+          type="button"
+          class="chip-remove"
+          [attr.aria-label]="'TASK.REMOVE_ASSIGNEE' | translate: { name: c.first_name + ' ' + c.last_name }"
+          (click)="remove(c.id)"
+        >&#10005;</button>
+      </li>
+    }
+  </ul>
+}
+
+@if (contacts().length === 0) {
+  <span class="picker-empty">{{ 'TASK.NO_CONTACTS' | translate }}</span>
+} @else {
+  <input
+    #searchInput
+    #origin="cdkOverlayOrigin"
+    cdkOverlayOrigin
+    class="picker-input"
+    type="text"
+    role="combobox"
+    aria-autocomplete="list"
+    [attr.aria-label]="'TASK.ASSIGNED_TO' | translate"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="listboxId"
+    [attr.aria-activedescendant]="open() && suggestions().length > 0 ? optionId(activeIndex()) : null"
+    [placeholder]="'TASK.SEARCH_ASSIGNEE' | translate"
+    [value]="query()"
+    (input)="onInput($any($event.target).value)"
+    (focus)="openList()"
+    (blur)="open.set(false)"
+    (keydown)="onKeydown($event)"
+  />
+
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="origin"
+    [cdkConnectedOverlayOpen]="open()"
+    [cdkConnectedOverlayWidth]="listWidth()"
+    [cdkConnectedOverlayPositions]="positions"
+    [cdkConnectedOverlayScrollStrategy]="scrollStrategy"
+    (detach)="open.set(false)"
+  >
+    <!-- mousedown is cancelled so the input keeps focus (also when dragging the scrollbar) -->
+    <ul class="suggestions" role="listbox" [id]="listboxId" (mousedown)="$event.preventDefault()">
+      @for (c of suggestions(); track c.id; let i = $index) {
+        <li
+          role="option"
+          class="suggestion"
+          [id]="optionId(i)"
+          [class.active]="i === activeIndex()"
+          [attr.aria-selected]="i === activeIndex()"
+          (click)="add(c)"
+        >
+          <app-user-avatar [firstName]="c.first_name" [lastName]="c.last_name" [size]="24" />
+          <span class="suggestion-name">{{ c.first_name }} {{ c.last_name }}</span>
+          <span class="suggestion-email">{{ c.email }}</span>
+        </li>
+      } @empty {
+        <li class="suggestion-hint">{{ 'TASK.NO_MATCHING_CONTACTS' | translate }}</li>
+      }
+    </ul>
+  </ng-template>
+}

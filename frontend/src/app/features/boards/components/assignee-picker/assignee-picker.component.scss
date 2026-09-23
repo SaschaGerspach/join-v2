@@ -1,0 +1,113 @@
+@use 'variables' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 2px 4px 2px 2px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-bg);
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip-remove {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: $color-error;
+    background: rgba($color-error, 0.1);
+  }
+}
+
+.picker-input {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background: var(--color-bg);
+  width: 100%;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: $color-primary;
+    outline: none;
+  }
+}
+
+.suggestions {
+  width: 100%;
+  max-height: 15rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--color-text);
+
+  &:hover, &.active { background: var(--color-bg); }
+}
+
+.suggestion-name {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.suggestion-email {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.suggestion-hint, .picker-empty {
+  display: block;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}

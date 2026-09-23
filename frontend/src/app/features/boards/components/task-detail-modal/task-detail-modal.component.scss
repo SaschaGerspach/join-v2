@@ -68,9 +68,15 @@
   }
 }
 
-.modal-body {
+.modal-scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-muted) transparent;
+}
+
+.modal-body {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -167,10 +173,11 @@
 
 .field-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
 
   .field-group {
-    flex: 1;
+    flex: 1 1 12rem;
   }
 
   @media (max-width: 768px) {
@@ -228,41 +235,35 @@
   gap: 0.5rem;
 }
 
-.btn-danger {
-  background: none;
-  border: 2px solid $color-error;
-  color: $color-error;
-  border-radius: 8px;
-  padding: 0.45rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+.task-tools {
+  position: relative;
 
-  &:hover {
-    background: $color-error;
-    color: $color-white;
+  // Open upwards: the card clips overflow and the footer sits at its bottom edge.
+  .dropdown-menu {
+    top: auto;
+    bottom: calc(100% + 0.5rem);
+    left: 0;
+    right: auto;
+
+    .watching { color: $color-primary; }
+    .menu-danger { color: $color-error; }
   }
 }
 
-.btn-duplicate, .btn-copy-link, .btn-watch {
+.btn-more {
   background: none;
-  border: 2px solid var(--color-border, #d1d1d1);
+  border: 2px solid var(--color-border);
   color: var(--color-text);
   border-radius: 8px;
   padding: 0.45rem 1rem;
   font-size: 0.9rem;
   font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.15s ease;
 
   &:hover {
-    background: var(--color-bg, #f6f7f8);
-  }
-
-  &.watching {
-    border-color: $color-primary;
-    color: $color-primary;
+    background: var(--color-bg);
   }
 }
 

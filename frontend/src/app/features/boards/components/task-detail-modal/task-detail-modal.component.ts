@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, AfterViewInit, DestroyRef, ElementRef, HostListener, inject, input, output, signal, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { CdkScrollable } from '@angular/cdk/scrolling';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Task, TasksApiService, UpdateTaskPayload, Recurrence } from '../../../../core/tasks/tasks-api.service';
 import { Column } from '../../../../core/columns/columns-api.service';
@@ -15,13 +16,14 @@ import { TaskDependenciesComponent } from '../task-dependencies/task-dependencie
 import { TaskCustomFieldsComponent } from '../task-custom-fields/task-custom-fields.component';
 import { TaskTimeTrackingComponent } from '../task-time-tracking/task-time-tracking.component';
 import { TaskHistoryComponent } from '../task-history/task-history.component';
+import { AssigneePickerComponent } from '../assignee-picker/assignee-picker.component';
 import { FocusTrapDirective } from '../../../../shared/directives/focus-trap.directive';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 
 @Component({
   selector: 'app-task-detail-modal',
   standalone: true,
-  imports: [FormsModule, TranslateModule, FocusTrapDirective, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent, TaskDependenciesComponent, TaskCustomFieldsComponent, TaskTimeTrackingComponent, TaskHistoryComponent, MarkdownPipe],
+  imports: [FormsModule, TranslateModule, FocusTrapDirective, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent, TaskDependenciesComponent, TaskCustomFieldsComponent, TaskTimeTrackingComponent, TaskHistoryComponent, AssigneePickerComponent, CdkScrollable, MarkdownPipe],
   templateUrl: './task-detail-modal.component.html',
   styleUrl: './task-detail-modal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,6 +61,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   descriptionPreview = signal(false);
   isWatching = signal(false);
   watcherCount = signal(0);
+  moreMenuOpen = signal(false);
 
   readonly priorities = ['urgent', 'high', 'medium', 'low'] as const;
   readonly recurrenceOptions = [
@@ -123,16 +126,8 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     });
   }
 
-  toggleAssignee(id: number): void {
-    const current = this.assignedTo();
-    if (current.includes(id)) {
-      this.assignedTo.set(current.filter(x => x !== id));
-    } else {
-      this.assignedTo.set([...current, id]);
-    }
-  }
-
   deleteTask(): void {
+    this.moreMenuOpen.set(false);
     this.showDeleteConfirm.set(true);
   }
 
@@ -147,6 +142,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   }
 
   duplicateTask(): void {
+    this.moreMenuOpen.set(false);
     this.tasksApi.duplicate(this.task().id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: newTask => {
         this.taskDuplicated.emit(newTask);
@@ -158,6 +154,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   }
 
   toggleWatch(): void {
+    this.moreMenuOpen.set(false);
     const req = this.isWatching()
       ? this.tasksApi.unwatch(this.task().id)
       : this.tasksApi.watch(this.task().id);
@@ -171,6 +168,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   }
 
   copyLink(): void {
+    this.moreMenuOpen.set(false);
     const url = `${window.location.origin}/boards/${this.task().board}/tasks/${this.task().id}`;
     navigator.clipboard.writeText(url).then(() => {
       this.toast.show(this.translate.instant('TOAST.LINK_COPIED'));
@@ -183,6 +181,19 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       subtask_count: counts.total,
       subtask_done_count: counts.done,
     });
+  }
+
+  toggleMoreMenu(): void {
+    this.moreMenuOpen.update(v => !v);
+  }
+
+  // The card stops click propagation so the backdrop can close the modal;
+  // a document-level listener would never see these clicks.
+  onCardClick(event: Event): void {
+    event.stopPropagation();
+    if (!(event.target as Element).closest('.task-tools')) {
+      this.moreMenuOpen.set(false);
+    }
   }
 
   @HostListener('document:keydown.escape')

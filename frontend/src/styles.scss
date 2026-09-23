@@ -1,4 +1,12 @@
 @use 'styles/variables' as *;
+@use '@angular/cdk' as cdk;
+
+@include cdk.overlay();
+
+// CDK popups (e.g. the assignee picker) open from inside modals, which sit at $z-overlay.
+.cdk-overlay-container {
+  z-index: $z-overlay-popup;
+}
 
 // ─── Font ────────────────────────────────────────────────────────────────────
 

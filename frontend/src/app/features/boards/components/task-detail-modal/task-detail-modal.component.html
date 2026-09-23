@@ -1,5 +1,5 @@
 <div class="modal-backdrop" role="dialog" aria-modal="true" [attr.aria-label]="'TASK.TASK_DETAILS' | translate" (click)="close()">
-  <div class="modal-card" appFocusTrap (click)="$event.stopPropagation()">
+  <div class="modal-card" appFocusTrap (click)="onCardClick($event)">
 
     <div class="modal-header">
       <input
@@ -13,159 +13,159 @@
       <button class="btn-close" [attr.aria-label]="'COMMON.CLOSE' | translate" (click)="close()">&#10005;</button>
     </div>
 
-    <div class="modal-body">
-
-      <div class="field-group">
-        <div class="field-label-row">
-          <label class="field-label">{{ 'TASK.DESCRIPTION' | translate }}</label>
-          <div class="preview-toggle">
-            <button class="toggle-btn" [class.active]="!descriptionPreview()" (click)="descriptionPreview.set(false)">{{ 'TASK.EDIT' | translate }}</button>
-            <button class="toggle-btn" [class.active]="descriptionPreview()" (click)="descriptionPreview.set(true)">{{ 'TASK.PREVIEW' | translate }}</button>
-          </div>
-        </div>
-        @if (descriptionPreview()) {
-          <div class="description-preview markdown-content" [innerHTML]="description() | markdown"></div>
-        } @else {
-          <textarea
-            class="field-textarea"
-            rows="3"
-            [ngModel]="description()"
-            (ngModelChange)="description.set($event)"
-            [placeholder]="'TASK.DESCRIPTION_PLACEHOLDER' | translate"
-          ></textarea>
-        }
-      </div>
-
-      <div class="field-row">
-        <div class="field-group">
-          <label class="field-label">{{ 'TASK.PRIORITY' | translate }}</label>
-          <div class="priority-options">
-            @for (p of priorities; track p) {
-              <button
-                class="priority-btn"
-                [class]="'priority-' + p"
-                [class.active]="priority() === p"
-                [attr.aria-pressed]="priority() === p"
-                (click)="priority.set(p)"
-              >{{ 'BOARD_DETAIL.' + p.toUpperCase() | translate }}</button>
-            }
-          </div>
-        </div>
+    <div class="modal-scroll" cdkScrollable>
+      <div class="modal-body">
 
         <div class="field-group">
-          <label class="field-label">{{ 'TASK.START_DATE' | translate }}</label>
+          <div class="field-label-row">
+            <label class="field-label">{{ 'TASK.DESCRIPTION' | translate }}</label>
+            <div class="preview-toggle">
+              <button class="toggle-btn" [class.active]="!descriptionPreview()" (click)="descriptionPreview.set(false)">{{ 'TASK.EDIT' | translate }}</button>
+              <button class="toggle-btn" [class.active]="descriptionPreview()" (click)="descriptionPreview.set(true)">{{ 'TASK.PREVIEW' | translate }}</button>
+            </div>
+          </div>
+          @if (descriptionPreview()) {
+            <div class="description-preview markdown-content" [innerHTML]="description() | markdown"></div>
+          } @else {
+            <textarea
+              class="field-textarea"
+              rows="3"
+              [ngModel]="description()"
+              (ngModelChange)="description.set($event)"
+              [placeholder]="'TASK.DESCRIPTION_PLACEHOLDER' | translate"
+            ></textarea>
+          }
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">{{ 'TASK.PRIORITY' | translate }}</label>
+            <div class="priority-options">
+              @for (p of priorities; track p) {
+                <button
+                  class="priority-btn"
+                  [class]="'priority-' + p"
+                  [class.active]="priority() === p"
+                  [attr.aria-pressed]="priority() === p"
+                  (click)="priority.set(p)"
+                >{{ 'BOARD_DETAIL.' + p.toUpperCase() | translate }}</button>
+              }
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">{{ 'TASK.START_DATE' | translate }}</label>
+            <input
+              class="field-input"
+              type="date"
+              [ngModel]="startDate()"
+              (ngModelChange)="startDate.set($event)"
+            />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">{{ 'TASK.DUE_DATE' | translate }}</label>
+            <input
+              class="field-input"
+              type="date"
+              [ngModel]="dueDate()"
+              (ngModelChange)="dueDate.set($event)"
+            />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">{{ 'TASK.REPEAT' | translate }}</label>
+            <select
+              class="field-select"
+              [ngModel]="recurrence()"
+              (ngModelChange)="recurrence.set($event || null)"
+            >
+              @for (opt of recurrenceOptions; track opt.value) {
+                <option [ngValue]="opt.value">{{ opt.labelKey | translate }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">{{ 'TASK.COLUMN' | translate }}</label>
+            <select
+              class="field-select"
+              [ngModel]="columnId()"
+              (ngModelChange)="columnId.set($event)"
+            >
+              @for (col of columns(); track col.id) {
+                <option [ngValue]="col.id">{{ col.title }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">{{ 'TASK.ASSIGNED_TO' | translate }}</label>
+            <app-assignee-picker [contacts]="contacts()" [(selectedIds)]="assignedTo" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">{{ 'TASK.COVER_IMAGE' | translate }}</label>
+          @if (coverImageUrl()) {
+            <img class="cover-preview" [src]="coverImageUrl()" alt="" loading="lazy" decoding="async" />
+          }
           <input
             class="field-input"
-            type="date"
-            [ngModel]="startDate()"
-            (ngModelChange)="startDate.set($event)"
+            type="url"
+            [ngModel]="coverImageUrl()"
+            (ngModelChange)="coverImageUrl.set($event)"
+            [placeholder]="'TASK.COVER_IMAGE_PLACEHOLDER' | translate"
           />
         </div>
 
-        <div class="field-group">
-          <label class="field-label">{{ 'TASK.DUE_DATE' | translate }}</label>
-          <input
-            class="field-input"
-            type="date"
-            [ngModel]="dueDate()"
-            (ngModelChange)="dueDate.set($event)"
-          />
-        </div>
-
-        <div class="field-group">
-          <label class="field-label">{{ 'TASK.REPEAT' | translate }}</label>
-          <select
-            class="field-select"
-            [ngModel]="recurrence()"
-            (ngModelChange)="recurrence.set($event || null)"
-          >
-            @for (opt of recurrenceOptions; track opt.value) {
-              <option [ngValue]="opt.value">{{ opt.labelKey | translate }}</option>
-            }
-          </select>
-        </div>
-      </div>
-
-      <div class="field-row">
-        <div class="field-group">
-          <label class="field-label">{{ 'TASK.COLUMN' | translate }}</label>
-          <select
-            class="field-select"
-            [ngModel]="columnId()"
-            (ngModelChange)="columnId.set($event)"
-          >
-            @for (col of columns(); track col.id) {
-              <option [ngValue]="col.id">{{ col.title }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="field-group">
-          <label class="field-label">{{ 'TASK.ASSIGNED_TO' | translate }}</label>
-          <div class="assignee-checklist">
-            @for (contact of contacts(); track contact.id) {
-              <label class="assignee-check-item">
-                <input type="checkbox" [checked]="assignedTo().includes(contact.id)" (change)="toggleAssignee(contact.id)" />
-                {{ contact.first_name }} {{ contact.last_name }}
-              </label>
-            }
-            @if (contacts().length === 0) {
-              <span class="no-contacts">{{ 'TASK.NO_CONTACTS' | translate }}</span>
-            }
-          </div>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label class="field-label">{{ 'TASK.COVER_IMAGE' | translate }}</label>
-        @if (coverImageUrl()) {
-          <img class="cover-preview" [src]="coverImageUrl()" alt="" loading="lazy" decoding="async" />
-        }
-        <input
-          class="field-input"
-          type="url"
-          [ngModel]="coverImageUrl()"
-          (ngModelChange)="coverImageUrl.set($event)"
-          [placeholder]="'TASK.COVER_IMAGE_PLACEHOLDER' | translate"
+        <app-task-labels
+          [boardId]="task().board"
+          [(selectedLabelIds)]="selectedLabelIds"
         />
+
+        <app-task-dependencies [taskId]="task().id" [boardTasks]="boardTasks()" />
+
+        <app-task-custom-fields [taskId]="task().id" [boardId]="task().board" />
+
+        <app-task-time-tracking [taskId]="task().id" />
+
+        <app-task-attachments [taskId]="task().id" />
+
+        <app-task-subtasks
+          [taskId]="task().id"
+          [taskTitle]="task().title"
+          [taskDescription]="task().description"
+          (subtaskCountChanged)="onSubtaskCountChanged($event)"
+        />
+
+        <app-task-history [taskId]="task().id" />
+
       </div>
 
-      <app-task-labels
-        [boardId]="task().board"
-        [(selectedLabelIds)]="selectedLabelIds"
-      />
-
-      <app-task-dependencies [taskId]="task().id" [boardTasks]="boardTasks()" />
-
-      <app-task-custom-fields [taskId]="task().id" [boardId]="task().board" />
-
-      <app-task-time-tracking [taskId]="task().id" />
-
-      <app-task-attachments [taskId]="task().id" />
-
-      <app-task-subtasks
-        [taskId]="task().id"
-        [taskTitle]="task().title"
-        [taskDescription]="task().description"
-        (subtaskCountChanged)="onSubtaskCountChanged($event)"
-      />
-
-      <app-task-history [taskId]="task().id" />
-
+      <app-task-comments [taskId]="task().id" [contacts]="contacts()" />
     </div>
 
-    <app-task-comments [taskId]="task().id" [contacts]="contacts()" />
-
     <div class="modal-footer">
-      <button class="btn-danger" (click)="deleteTask()">{{ 'COMMON.DELETE' | translate }}</button>
-      <button class="btn-duplicate" (click)="duplicateTask()">{{ 'TASK.DUPLICATE' | translate }}</button>
-      <button class="btn-copy-link" (click)="copyLink()">{{ 'TASK.COPY_LINK' | translate }}</button>
-      <button class="btn-watch" [class.watching]="isWatching()" (click)="toggleWatch()">
-        {{ isWatching() ? ('TASK.UNWATCH' | translate) : ('TASK.WATCH' | translate) }}
-        @if (watcherCount() > 0) {
-          <span class="watcher-count">{{ watcherCount() }}</span>
+      <div class="task-tools">
+        <button type="button" class="btn-more" aria-haspopup="menu" [attr.aria-expanded]="moreMenuOpen()" (click)="toggleMoreMenu()">{{ 'TASK.MORE' | translate }}</button>
+        @if (moreMenuOpen()) {
+          <div class="dropdown-menu" role="menu">
+            <button type="button" role="menuitem" (click)="duplicateTask()">{{ 'TASK.DUPLICATE' | translate }}</button>
+            <button type="button" role="menuitem" (click)="copyLink()">{{ 'TASK.COPY_LINK' | translate }}</button>
+            <button type="button" role="menuitem" [class.watching]="isWatching()" (click)="toggleWatch()">
+              {{ isWatching() ? ('TASK.UNWATCH' | translate) : ('TASK.WATCH' | translate) }}
+              @if (watcherCount() > 0) {
+                <span class="watcher-count">{{ watcherCount() }}</span>
+              }
+            </button>
+            <div class="dropdown-divider"></div>
+            <button type="button" role="menuitem" class="menu-danger" (click)="deleteTask()">{{ 'COMMON.DELETE' | translate }}</button>
+          </div>
         }
-      </button>
+      </div>
       <div class="footer-right">
         <button class="btn-cancel" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
         <button class="btn-save" (click)="save()">{{ 'COMMON.SAVE' | translate }}</button>
