@@ -18,6 +18,10 @@ def space_out_orders(apps, schema_editor):
         for i, task in enumerate(tasks):
             task.order = float(i * 1024)
         Task.objects.bulk_update(tasks, ['order'])
+    # PostgreSQL refuses the following CREATE INDEX while deferred FK triggers
+    # from the updates above are still pending in the same transaction.
+    if schema_editor.connection.vendor == 'postgresql':
+        schema_editor.execute('SET CONSTRAINTS ALL IMMEDIATE')
 
 
 class Migration(migrations.Migration):
