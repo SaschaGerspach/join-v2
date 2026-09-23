@@ -1,5 +1,4 @@
-import { DOCUMENT } from '@angular/common';
-import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
+import { Injectable, inject, signal, PLATFORM_ID, DOCUMENT } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({ providedIn: 'root' })
