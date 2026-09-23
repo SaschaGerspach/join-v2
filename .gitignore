@@ -20,6 +20,7 @@ venv/
 backend/celerybeat-schedule*
 backend/media/
 backend/private_media/
+backend/.cache/
 backend/htmlcov/
 backend/.coverage
 frontend/coverage/
