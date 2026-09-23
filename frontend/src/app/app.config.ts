@@ -1,4 +1,4 @@
-import { ApplicationConfig, APP_INITIALIZER, ErrorHandler, isDevMode } from '@angular/core';
+import { ApplicationConfig, APP_INITIALIZER, ErrorHandler, isDevMode, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
@@ -14,6 +14,8 @@ import { LanguageService } from './shared/services/language.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    // Angular 21 defaults to zoneless; the app still relies on zone.js change detection.
+    provideZoneChangeDetection(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor, offlineInterceptor, retryInterceptor, errorInterceptor])),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
