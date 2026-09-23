@@ -20,6 +20,16 @@ test.describe('Navigation (unauthenticated)', () => {
 
   test('should show not-found page for invalid routes', async ({ page }) => {
     await page.goto('/this-does-not-exist');
+    await page.waitForLoadState('networkidle');
+    await expect(page).toHaveURL(/\/this-does-not-exist$/);
     await expect(page.locator('body')).toContainText(/not found|404/i);
   });
+
+  for (const path of ['/register', '/privacy', '/reset-password/uid/token', '/verify-email/uid/token']) {
+    test(`should keep logged-out visitors on public page ${path}`, async ({ page }) => {
+      await page.goto(path);
+      await page.waitForLoadState('networkidle');
+      await expect(page).toHaveURL(new RegExp(`${path}$`));
+    });
+  }
 });

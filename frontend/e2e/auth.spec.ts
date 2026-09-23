@@ -18,7 +18,7 @@ test('logout redirects to login', async ({ page }) => {
 
 test('unauthenticated user is redirected to login', async ({ page }) => {
   await page.goto('/summary');
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL(/\/login\?returnUrl=%2Fsummary$/);
 });
 
 test('invalid credentials show error message', async ({ page }) => {

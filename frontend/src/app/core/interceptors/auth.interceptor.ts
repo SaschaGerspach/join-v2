@@ -6,6 +6,7 @@ import { AuthService } from '../auth/auth.service';
 import { environment } from '../../../environments/environment';
 
 const AUTH_SKIP_PATHS = ['/auth/login/', '/auth/token/refresh/', '/auth/register/'];
+const SESSION_PROBE_PATH = '/auth/me/';
 
 function withBearer(req: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
   return req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
@@ -31,7 +32,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       return auth.refreshAccessToken().pipe(
         catchError((refreshErr) => {
-          router.navigate(['/login']);
+          // The startup session probe fails for every logged-out visitor, including on public
+          // pages like register or password reset; authGuard already redirects protected routes.
+          if (!req.url.endsWith(SESSION_PROBE_PATH)) {
+            router.navigate(['/login']);
+          }
           return throwError(() => refreshErr);
         }),
         switchMap((newToken) => next(withBearer(req, newToken))),
