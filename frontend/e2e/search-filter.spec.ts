@@ -25,20 +25,20 @@ test.afterEach(async () => {
 });
 
 test('search filters tasks by title', async ({ page }) => {
-  await page.locator('input.search-input').fill('Beta');
+  await page.getByRole('searchbox', { name: /search tasks/i }).fill('Beta');
   await expect(page.locator('.task-card', { hasText: 'Beta Task' })).toBeVisible();
   await expect(page.locator('.task-card', { hasText: 'Alpha Task' })).toHaveCount(0);
   await expect(page.locator('.task-card', { hasText: 'Gamma Task' })).toHaveCount(0);
 });
 
 test('clearing search shows all tasks again', async ({ page }) => {
-  await page.locator('input.search-input').fill('Beta');
+  await page.getByRole('searchbox', { name: /search tasks/i }).fill('Beta');
   await expect(page.locator('.task-card')).toHaveCount(1);
-  await page.locator('input.search-input').fill('');
+  await page.getByRole('searchbox', { name: /search tasks/i }).fill('');
   await expect(page.locator('.task-card')).toHaveCount(3);
 });
 
 test('search with no matches shows empty columns', async ({ page }) => {
-  await page.locator('input.search-input').fill('NonexistentXYZ');
+  await page.getByRole('searchbox', { name: /search tasks/i }).fill('NonexistentXYZ');
   await expect(page.locator('.task-card')).toHaveCount(0);
 });

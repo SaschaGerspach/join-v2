@@ -15,7 +15,7 @@ test('create, open and delete a board via UI', async ({ page }) => {
 
   await card.click();
   await expect(page).toHaveURL(/\/boards\/\d+$/);
-  await expect(page.getByRole('heading', { name: title })).toBeVisible();
+  await expect(page.locator('h1', { hasText: title })).toBeVisible();
 
   await page.goto('/boards');
   await page.locator('.board-card', { hasText: title }).locator('.btn-delete').click();

@@ -39,5 +39,6 @@ test('delete task from detail modal', async ({ page }) => {
   await page.locator('.task-card', { hasText: 'Detail Task' }).click();
   await page.locator('.modal-footer').getByRole('button', { name: /more/i }).click();
   await page.getByRole('menuitem', { name: /delete/i }).click();
+  await page.locator('.dialog .btn-delete').click();
   await expect(page.locator('.task-card', { hasText: 'Detail Task' })).toHaveCount(0);
 });

@@ -13,7 +13,7 @@ const TEST_USER = {
 export default async function globalSetup(_config: FullConfig): Promise<void> {
   const ctx = await request.newContext({ baseURL: API_URL });
 
-  const register = await ctx.post('/auth/register', { data: TEST_USER });
+  const register = await ctx.post('/auth/register/', { data: TEST_USER });
   if (!register.ok() && register.status() !== 400) {
     throw new Error(`Registration failed: ${register.status()} ${await register.text()}`);
   }

@@ -5,7 +5,7 @@ const API_URL = process.env.E2E_API_URL ?? 'http://localhost:8000';
 
 async function getAccessToken(): Promise<string> {
   const ctx = await pwRequest.newContext({ baseURL: API_URL });
-  const res = await ctx.post('/auth/login', {
+  const res = await ctx.post('/auth/login/', {
     data: { email: TEST_USER.email, password: TEST_USER.password },
   });
   if (!res.ok()) {
