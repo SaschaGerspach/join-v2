@@ -1,7 +1,5 @@
 @use 'variables' as *;
 
-$color-dark-hover:  #2a3d59;
-$color-dark-active: #091931;
 $color-text-muted:  #cdcdcd;
 $sidebar-width:     248px;
 $header-height:     6rem;
@@ -79,20 +77,21 @@ $bp-tablet:         1024px;
     align-items: center;
     gap: 1rem;
     padding: 0.9rem 0 0.9rem 3.25rem;
-    color: $color-text-muted;
+    color: var(--color-sidebar-text-muted);
     text-decoration: none;
     font-size: 1rem;
     font-weight: 400;
     transition: background-color 0.15s ease;
 
     &:hover {
-      background-color: $color-dark-hover;
+      background-color: var(--color-sidebar-hover);
       text-decoration: none;
     }
 
     &.active {
-      background-color: $color-dark-active;
-      color: $color-white;
+      background-color: var(--color-sidebar-active);
+      box-shadow: inset 4px 0 0 var(--color-primary);
+      color: var(--color-sidebar-text);
       font-weight: 700;
     }
 
@@ -109,7 +108,7 @@ $bp-tablet:         1024px;
   gap: 0.5rem;
 
   a {
-    color: $color-text-muted;
+    color: var(--color-sidebar-text-muted);
     font-size: 0.875rem;
     text-decoration: none;
 
@@ -435,7 +434,7 @@ $bp-tablet:         1024px;
   left: 0;
   right: 0;
   height: $mobile-footer;
-  background-color: var(--color-action);
+  background-color: var(--color-sidebar-bg);
   z-index: $z-sticky;
 
   @media (max-width: $bp-mobile) {
@@ -449,12 +448,12 @@ $bp-tablet:         1024px;
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    color: $color-text-muted;
+    color: var(--color-sidebar-text-muted);
     text-decoration: none;
     font-size: 0.75rem;
 
     &.active {
-      color: $color-white;
+      color: var(--color-sidebar-text);
     }
   }
 }

@@ -66,6 +66,9 @@ $bp-desktop: 1410px;
   --color-primary: #29abe2;
   --color-sidebar-bg: #2a3647;
   --color-sidebar-text: #ffffff;
+  --color-sidebar-text-muted: #cdcdcd;
+  --color-sidebar-hover: #2a3d59;
+  --color-sidebar-active: #091931;
   --color-overlay: rgba(255, 255, 255, 0.75);
   --shadow-card:   0 4px 24px rgba(0, 0, 0, 0.08);
 }
@@ -81,6 +84,9 @@ $bp-desktop: 1410px;
   --color-primary: #29abe2;
   --color-sidebar-bg: #151a24;
   --color-sidebar-text: #e8eaf0;
+  --color-sidebar-text-muted: #b0b6c6;
+  --color-sidebar-hover: #1d2331;
+  --color-sidebar-active: #262e40;
   --color-overlay: rgba(0, 0, 0, 0.6);
   --shadow-card:   0 4px 24px rgba(0, 0, 0, 0.4);
 }
