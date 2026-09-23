@@ -6,13 +6,7 @@ marked.setOptions({ breaks: true, gfm: true });
 
 const MENTION_RE = /@([\w.+-]+@[\w-]+\.[\w.-]+)/g;
 
-// Security note (Angular XSS CVE assessment, 2026-05-29):
-// npm audit reports 10 high CVEs in @angular/core <=18.2.14, incl.
-// GHSA-jrmj-c5cx-3cw6 (SVG sanitizer bypass) and two i18n XSS CVEs
-// (GHSA-prjf-86w9-mfqv, GHSA-g93w-mfhg-p222).
-// Read-only exposure review concluded: NOT practically exploitable here.
-//  - i18n CVEs target Angular's built-in $localize/i18n; this app uses
-//    ngx-translate -> not affected.
+// Security note:
 //  - The only path rendering untrusted user HTML is THIS markdown pipe
 //    (comments, task descriptions). It runs DOMPurify.sanitize() as the
 //    final stage, independent of Angular's sanitizer, so an Angular
@@ -22,9 +16,9 @@ const MENTION_RE = /@([\w.+-]+@[\w-]+\.[\w.-]+)/g;
 //    not route untrusted HTML around it.
 //  - bypassSecurityTrustResourceUrl is used only on app-generated blob:
 //    URLs; all other [src]/[href] bindings are URL-context, not HTML/SVG.
-// Decision: audit gate stays at 'critical'; raising to 'high' is deferred
-// until the Angular 17->19 major upgrade. Re-evaluate when DOMPurify or
-// the markdown rendering path changes.
+// History: this defence-in-depth argument kept the CI npm audit gate at
+// 'critical' while Angular <=18 carried unpatched XSS advisories. The
+// Angular 21 upgrade (2026-09-23) resolved them and the gate is now 'high'.
 @Pipe({ name: 'markdown' })
 export class MarkdownPipe implements PipeTransform {
   transform(value: string | null | undefined): string {
