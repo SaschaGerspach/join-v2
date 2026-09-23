@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListene
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { SlicePipe, UpperCasePipe } from '@angular/common';
+import { SlicePipe } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { TaskDetailModalComponent } from '../../components/task-detail-modal/task-detail-modal.component';
 import { CreateTaskModalComponent } from '../../components/create-task-modal/create-task-modal.component';
@@ -19,7 +19,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-board-detail-page',
-  imports: [FormsModule, DragDropModule, SlicePipe, UpperCasePipe, RouterModule, TranslateModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe, UserAvatarComponent, BoardKeyboardNavDirective],
+  imports: [FormsModule, DragDropModule, SlicePipe, RouterModule, TranslateModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe, UserAvatarComponent, BoardKeyboardNavDirective],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',
   providers: [BoardStateService],

@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use 'variables' as *;
 
 .auth-page {
@@ -171,8 +172,8 @@
     border: 2px solid $color-primary;
 
     &:hover {
-      background-color: darken($color-primary, 10%);
-      border-color: darken($color-primary, 10%);
+      background-color: color.adjust($color-primary, $lightness: -10%);
+      border-color: color.adjust($color-primary, $lightness: -10%);
     }
   }
 

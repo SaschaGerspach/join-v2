@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
-import { DatePipe } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -9,7 +8,7 @@ import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-archive-page',
-  imports: [RouterModule, DatePipe, TranslateModule],
+  imports: [RouterModule, TranslateModule],
   templateUrl: './board-archive-page.component.html',
   styleUrl: './board-archive-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

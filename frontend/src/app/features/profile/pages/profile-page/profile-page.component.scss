@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use 'variables' as *;
 
 .profile-page {
@@ -53,7 +54,7 @@
   border: 2px solid var(--color-surface);
   transition: background-color 0.15s ease;
 
-  &:hover { background: darken($color-primary, 10%); }
+  &:hover { background: color.adjust($color-primary, $lightness: -10%); }
 }
 
 .avatar-remove-btn {
@@ -73,7 +74,7 @@
   border: 2px solid var(--color-surface);
   transition: background-color 0.15s ease;
 
-  &:hover { background: darken($color-error, 10%); }
+  &:hover { background: color.adjust($color-error, $lightness: -10%); }
 }
 
 .profile-name {
@@ -195,12 +196,12 @@
 
 .msg-error {
   background: rgba($color-error, 0.1);
-  color: darken($color-error, 15%);
+  color: color.adjust($color-error, $lightness: -15%);
 }
 
 .msg-success {
   background: rgba($priority-low, 0.12);
-  color: darken($priority-low, 20%);
+  color: color.adjust($priority-low, $lightness: -20%);
 }
 
 // ─── Actions ─────────────────────────────────────────────────────────────────
@@ -213,8 +214,8 @@
 
 .btn-danger-outline {
   background: none;
-  color: darken($color-error, 15%);
-  border: 2px solid darken($color-error, 15%);
+  color: color.adjust($color-error, $lightness: -15%);
+  border: 2px solid color.adjust($color-error, $lightness: -15%);
   border-radius: 10px;
   padding: 0.6rem 1.5rem;
   font-size: 0.95rem;
