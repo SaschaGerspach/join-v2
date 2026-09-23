@@ -1,16 +1,18 @@
 import { ChangeDetectionStrategy, Component, AfterViewInit, DestroyRef, ElementRef, HostListener, inject, input, output, OnInit, signal, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { CdkScrollable } from '@angular/cdk/scrolling';
 import { TranslateModule } from '@ngx-translate/core';
 import { Column } from '../../../../core/columns/columns-api.service';
 import { Contact } from '../../../../core/contacts/contacts-api.service';
 import { CreateTaskPayload } from '../../../../core/tasks/tasks-api.service';
 import { AiApiService, AI_FEATURE } from '../../../../core/ai/ai-api.service';
 import { FocusTrapDirective } from '../../../../shared/directives/focus-trap.directive';
+import { AssigneePickerComponent } from '../assignee-picker/assignee-picker.component';
 
 @Component({
   selector: 'app-create-task-modal',
-  imports: [FormsModule, TranslateModule, FocusTrapDirective],
+  imports: [FormsModule, TranslateModule, FocusTrapDirective, AssigneePickerComponent, CdkScrollable],
   templateUrl: './create-task-modal.component.html',
   styleUrl: './create-task-modal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -82,15 +84,6 @@ export class CreateTaskModalComponent implements OnInit, AfterViewInit {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.cancelled.emit();
-  }
-
-  toggleAssignee(id: number): void {
-    const current = this.assignedTo();
-    if (current.includes(id)) {
-      this.assignedTo.set(current.filter(x => x !== id));
-    } else {
-      this.assignedTo.set([...current, id]);
-    }
   }
 
   submit(): void {

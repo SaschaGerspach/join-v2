@@ -27,6 +27,21 @@ test('create a task in a column', async ({ page }) => {
   await expect(todoCol.locator('.task-card', { hasText: 'My first task' })).toBeVisible();
 });
 
+test('assign a contact while creating a task', async ({ page }) => {
+  await page.goto(`/boards/${boardId}`);
+  const todoCol = page.locator('.kanban-column').filter({ has: page.locator('.column-title', { hasText: /^To Do$/ }) });
+
+  await todoCol.getByRole('button', { name: '+ Add Task' }).click();
+  await page.locator('input.field-input[placeholder="Task title"]').fill('Assigned task');
+  await page.getByRole('combobox', { name: 'Assigned to' }).fill('E2E');
+  await page.getByRole('listbox').getByRole('option', { name: /E2E User/ }).first().click();
+  await expect(page.locator('.chip-name', { hasText: 'E2E User' })).toBeVisible();
+  await page.getByRole('button', { name: 'Create Task' }).click();
+
+  await todoCol.locator('.task-card', { hasText: 'Assigned task' }).click();
+  await expect(page.locator('.modal-card .chip-name', { hasText: 'E2E User' })).toBeVisible();
+});
+
 test('move task between columns via bulk-move', async ({ page }) => {
   await page.goto(`/boards/${boardId}`);
   const todoCol = page.locator('.kanban-column').filter({ has: page.locator('.column-title', { hasText: /^To Do$/ }) });
