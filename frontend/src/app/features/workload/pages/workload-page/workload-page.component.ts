@@ -17,7 +17,6 @@ type ContactRow = {
 
 @Component({
   selector: 'app-workload-page',
-  standalone: true,
   imports: [TranslateModule],
   templateUrl: './workload-page.component.html',
   styleUrl: './workload-page.component.scss',

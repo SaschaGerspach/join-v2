@@ -7,7 +7,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-labels',
-  standalone: true,
   imports: [FormsModule, TranslateModule],
   templateUrl: './task-labels.component.html',
   styleUrl: './task-labels.component.scss',

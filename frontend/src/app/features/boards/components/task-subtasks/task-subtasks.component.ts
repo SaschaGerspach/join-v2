@@ -11,7 +11,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-subtasks',
-  standalone: true,
   imports: [FormsModule, DragDropModule, TranslateModule, ConfirmDialogComponent],
   templateUrl: './task-subtasks.component.html',
   styleUrl: './task-subtasks.component.scss',

@@ -6,7 +6,6 @@ import { LanguageService } from '../../shared/services/language.service';
 
 @Component({
   selector: 'app-privacy-page',
-  standalone: true,
   imports: [FormsModule, TranslateModule],
   templateUrl: './privacy-page.component.html',
   styleUrl: './legal-shared.scss',

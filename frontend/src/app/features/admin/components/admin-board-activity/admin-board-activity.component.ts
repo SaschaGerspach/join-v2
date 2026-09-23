@@ -8,7 +8,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-admin-board-activity',
-  standalone: true,
   imports: [TranslateModule, DatePipe, LoadingSpinnerComponent],
   templateUrl: './admin-board-activity.component.html',
   styleUrl: './admin-board-activity.component.scss',

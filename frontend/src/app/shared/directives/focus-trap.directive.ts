@@ -4,7 +4,6 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
 
 @Directive({
   selector: '[appFocusTrap]',
-  standalone: true,
 })
 export class FocusTrapDirective implements AfterViewInit, OnDestroy {
   private readonly el = inject(ElementRef);

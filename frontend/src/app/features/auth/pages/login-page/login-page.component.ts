@@ -8,7 +8,6 @@ import { LanguageService } from '../../../../shared/services/language.service';
 
 @Component({
   selector: 'app-login-page',
-  standalone: true,
   imports: [FormsModule, RouterModule, TranslateModule],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',

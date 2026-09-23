@@ -12,7 +12,6 @@ import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-summary-page',
-  standalone: true,
   imports: [SlicePipe, RouterModule, LoadingSpinnerComponent, TranslateModule, DragDropModule],
   templateUrl: './summary-page.component.html',
   styleUrl: './summary-page.component.scss',

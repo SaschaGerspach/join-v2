@@ -10,7 +10,6 @@ import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-templates-page',
-  standalone: true,
   imports: [RouterModule, FormsModule, TranslateModule, ConfirmDialogComponent],
   templateUrl: './board-templates-page.component.html',
   styleUrl: './board-templates-page.component.scss',

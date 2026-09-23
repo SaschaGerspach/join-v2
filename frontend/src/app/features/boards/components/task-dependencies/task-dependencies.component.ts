@@ -8,7 +8,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-dependencies',
-  standalone: true,
   imports: [FormsModule, TranslateModule, ConfirmDialogComponent],
   templateUrl: './task-dependencies.component.html',
   styleUrl: './task-dependencies.component.scss',

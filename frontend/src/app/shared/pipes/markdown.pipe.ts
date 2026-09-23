@@ -25,7 +25,7 @@ const MENTION_RE = /@([\w.+-]+@[\w-]+\.[\w.-]+)/g;
 // Decision: audit gate stays at 'critical'; raising to 'high' is deferred
 // until the Angular 17->19 major upgrade. Re-evaluate when DOMPurify or
 // the markdown rendering path changes.
-@Pipe({ name: 'markdown', standalone: true })
+@Pipe({ name: 'markdown' })
 export class MarkdownPipe implements PipeTransform {
   transform(value: string | null | undefined): string {
     if (!value) return '';

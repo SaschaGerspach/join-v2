@@ -16,7 +16,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-profile-page',
-  standalone: true,
   imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent, DatePipe, UserAvatarComponent, TranslateModule],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss',

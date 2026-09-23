@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 
 @Component({
   selector: 'app-user-avatar',
-  standalone: true,
   template: `
     @if (avatarUrl()) {
       <img [src]="avatarUrl()" [alt]="initials()" class="avatar-img" loading="lazy" decoding="async" [style.width.px]="size()" [style.height.px]="size()" />

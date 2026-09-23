@@ -10,7 +10,6 @@ import { FocusTrapDirective } from '../../../../shared/directives/focus-trap.dir
 
 @Component({
   selector: 'app-create-task-modal',
-  standalone: true,
   imports: [FormsModule, TranslateModule, FocusTrapDirective],
   templateUrl: './create-task-modal.component.html',
   styleUrl: './create-task-modal.component.scss',

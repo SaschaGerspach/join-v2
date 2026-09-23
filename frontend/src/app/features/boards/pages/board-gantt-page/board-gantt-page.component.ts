@@ -21,7 +21,6 @@ type GanttBar = {
 
 @Component({
   selector: 'app-board-gantt-page',
-  standalone: true,
   imports: [RouterModule, TranslateModule],
   templateUrl: './board-gantt-page.component.html',
   styleUrl: './board-gantt-page.component.scss',

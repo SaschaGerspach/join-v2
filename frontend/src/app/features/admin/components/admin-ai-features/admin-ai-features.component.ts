@@ -6,7 +6,6 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 
 @Component({
   selector: 'app-admin-ai-features',
-  standalone: true,
   imports: [TranslateModule, LoadingSpinnerComponent],
   templateUrl: './admin-ai-features.component.html',
   styleUrl: './admin-ai-features.component.scss',

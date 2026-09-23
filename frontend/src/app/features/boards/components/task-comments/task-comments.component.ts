@@ -13,7 +13,6 @@ import { UserAvatarComponent } from '../../../../shared/components/user-avatar/u
 
 @Component({
   selector: 'app-task-comments',
-  standalone: true,
   imports: [FormsModule, TranslateModule, SlicePipe, MarkdownPipe, ConfirmDialogComponent, UserAvatarComponent],
   templateUrl: './task-comments.component.html',
   styleUrl: './task-comments.component.scss',

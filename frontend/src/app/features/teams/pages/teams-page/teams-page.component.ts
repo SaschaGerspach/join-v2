@@ -9,7 +9,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-teams-page',
-  standalone: true,
   imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent, TranslateModule],
   templateUrl: './teams-page.component.html',
   styleUrl: './teams-page.component.scss',

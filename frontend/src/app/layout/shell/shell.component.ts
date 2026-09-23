@@ -18,7 +18,6 @@ import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-shell',
-  standalone: true,
   imports: [RouterModule, DatePipe, FormsModule, ToastComponent, KeyboardShortcutsModalComponent, GlobalSearchComponent, OfflineBannerComponent, SwUpdateBannerComponent, InstallPromptComponent, UserAvatarComponent, FocusTrapDirective, TranslateModule],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',

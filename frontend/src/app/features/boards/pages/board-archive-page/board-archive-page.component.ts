@@ -9,7 +9,6 @@ import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-archive-page',
-  standalone: true,
   imports: [RouterModule, DatePipe, TranslateModule],
   templateUrl: './board-archive-page.component.html',
   styleUrl: './board-archive-page.component.scss',

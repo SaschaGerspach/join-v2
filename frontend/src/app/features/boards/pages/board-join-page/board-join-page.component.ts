@@ -8,7 +8,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-board-join-page',
-  standalone: true,
   imports: [TranslateModule, LoadingSpinnerComponent],
   template: `
     <div class="join-page">

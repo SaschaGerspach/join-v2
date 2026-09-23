@@ -11,7 +11,6 @@ import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-webhooks-page',
-  standalone: true,
   imports: [RouterModule, DatePipe, FormsModule, TranslateModule, ConfirmDialogComponent],
   templateUrl: './board-webhooks-page.component.html',
   styleUrl: './board-webhooks-page.component.scss',

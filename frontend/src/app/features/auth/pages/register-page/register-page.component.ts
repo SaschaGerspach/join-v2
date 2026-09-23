@@ -9,7 +9,6 @@ import { LanguageService } from '../../../../shared/services/language.service';
 
 @Component({
   selector: 'app-register-page',
-  standalone: true,
   imports: [FormsModule, RouterLink, TranslateModule],
   templateUrl: './register-page.component.html',
   styleUrl: './register-page.component.scss',

@@ -25,7 +25,6 @@ import {
 
 @Component({
   selector: 'app-automation-rule-dialog',
-  standalone: true,
   imports: [FormsModule, TranslateModule, FocusTrapDirective],
   templateUrl: './automation-rule-dialog.component.html',
   styleUrl: './automation-rule-dialog.component.scss',

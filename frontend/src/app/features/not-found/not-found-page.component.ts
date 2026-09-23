@@ -4,7 +4,6 @@ import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-not-found-page',
-  standalone: true,
   imports: [RouterLink, TranslateModule],
   template: `
     <div class="not-found">

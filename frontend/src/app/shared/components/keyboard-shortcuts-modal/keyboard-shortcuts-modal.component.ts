@@ -6,7 +6,6 @@ export type Shortcut = { key: string; descriptionKey: string };
 
 @Component({
   selector: 'app-keyboard-shortcuts-modal',
-  standalone: true,
   imports: [TranslateModule, FocusTrapDirective],
   template: `
     <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" (click)="closed.emit()">

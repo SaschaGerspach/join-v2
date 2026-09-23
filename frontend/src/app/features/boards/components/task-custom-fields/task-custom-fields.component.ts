@@ -9,7 +9,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-custom-fields',
-  standalone: true,
   imports: [FormsModule, TranslateModule],
   templateUrl: './task-custom-fields.component.html',
   styleUrl: './task-custom-fields.component.scss',

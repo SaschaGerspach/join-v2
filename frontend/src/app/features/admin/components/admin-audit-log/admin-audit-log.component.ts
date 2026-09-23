@@ -9,7 +9,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-admin-audit-log',
-  standalone: true,
   imports: [TranslateModule, FormsModule, DatePipe, LoadingSpinnerComponent],
   templateUrl: './admin-audit-log.component.html',
   styleUrl: './admin-audit-log.component.scss',

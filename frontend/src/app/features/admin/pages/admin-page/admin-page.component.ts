@@ -8,7 +8,6 @@ import { AdminAiFeaturesComponent } from '../../components/admin-ai-features/adm
 
 @Component({
   selector: 'app-admin-page',
-  standalone: true,
   imports: [TranslateModule, AdminStatsComponent, AdminAuditLogComponent, AdminBoardActivityComponent, AdminAiFeaturesComponent],
   templateUrl: './admin-page.component.html',
   styleUrl: './admin-page.component.scss',

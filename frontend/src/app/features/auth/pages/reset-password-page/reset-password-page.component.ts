@@ -7,7 +7,6 @@ import { LanguageService } from '../../../../shared/services/language.service';
 
 @Component({
   selector: 'app-reset-password-page',
-  standalone: true,
   imports: [FormsModule, RouterModule, TranslateModule],
   template: `
     <div class="auth-page">

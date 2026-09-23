@@ -3,7 +3,6 @@ import { BoardStateService } from '../services/board-state.service';
 
 @Directive({
   selector: '[appBoardKeyboardNav]',
-  standalone: true,
   exportAs: 'boardKeyNav',
 })
 export class BoardKeyboardNavDirective {

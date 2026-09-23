@@ -12,7 +12,6 @@ import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-timetravel-page',
-  standalone: true,
   imports: [DatePipe, RouterModule, TranslateModule],
   templateUrl: './board-timetravel-page.component.html',
   styleUrl: './board-timetravel-page.component.scss',

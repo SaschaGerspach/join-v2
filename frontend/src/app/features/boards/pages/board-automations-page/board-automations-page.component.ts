@@ -19,7 +19,6 @@ import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-automations-page',
-  standalone: true,
   imports: [RouterModule, DatePipe, TranslateModule, ConfirmDialogComponent, AutomationRuleDialogComponent],
   templateUrl: './board-automations-page.component.html',
   styleUrl: './board-automations-page.component.scss',

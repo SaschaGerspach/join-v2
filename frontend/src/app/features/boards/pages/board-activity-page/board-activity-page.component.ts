@@ -8,7 +8,6 @@ import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-activity-page',
-  standalone: true,
   imports: [RouterModule, DatePipe, TranslateModule],
   templateUrl: './board-activity-page.component.html',
   styleUrl: './board-activity-page.component.scss',

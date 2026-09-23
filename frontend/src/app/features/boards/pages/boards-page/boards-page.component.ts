@@ -12,7 +12,6 @@ import { FocusTrapDirective } from '../../../../shared/directives/focus-trap.dir
 
 @Component({
   selector: 'app-boards-page',
-  standalone: true,
   imports: [FormsModule, NgTemplateOutlet, LoadingSpinnerComponent, ConfirmDialogComponent, TranslateModule, FocusTrapDirective],
   templateUrl: './boards-page.component.html',
   styleUrl: './boards-page.component.scss',

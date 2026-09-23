@@ -8,7 +8,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-calendar-page',
-  standalone: true,
   imports: [TaskDetailModalComponent, TranslateModule],
   templateUrl: './calendar-page.component.html',
   styleUrl: './calendar-page.component.scss',

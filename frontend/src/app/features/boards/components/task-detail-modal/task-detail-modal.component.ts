@@ -22,7 +22,6 @@ import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 
 @Component({
   selector: 'app-task-detail-modal',
-  standalone: true,
   imports: [FormsModule, TranslateModule, FocusTrapDirective, ConfirmDialogComponent, TaskSubtasksComponent, TaskCommentsComponent, TaskAttachmentsComponent, TaskLabelsComponent, TaskDependenciesComponent, TaskCustomFieldsComponent, TaskTimeTrackingComponent, TaskHistoryComponent, AssigneePickerComponent, CdkScrollable, MarkdownPipe],
   templateUrl: './task-detail-modal.component.html',
   styleUrl: './task-detail-modal.component.scss',

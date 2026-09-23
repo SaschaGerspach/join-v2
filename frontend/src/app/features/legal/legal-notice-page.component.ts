@@ -6,7 +6,6 @@ import { LanguageService } from '../../shared/services/language.service';
 
 @Component({
   selector: 'app-legal-notice-page',
-  standalone: true,
   imports: [FormsModule, TranslateModule],
   templateUrl: './legal-notice-page.component.html',
   styleUrl: './legal-shared.scss',

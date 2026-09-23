@@ -6,7 +6,6 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 
 @Component({
   selector: 'app-admin-stats',
-  standalone: true,
   imports: [TranslateModule, LoadingSpinnerComponent],
   templateUrl: './admin-stats.component.html',
   styleUrl: './admin-stats.component.scss',

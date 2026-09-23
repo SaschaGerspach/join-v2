@@ -6,7 +6,6 @@ const DISMISS_DAYS = 7;
 
 @Component({
   selector: 'app-install-prompt',
-  standalone: true,
   imports: [TranslateModule],
   template: `
     @if (showPrompt()) {

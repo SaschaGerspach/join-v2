@@ -9,7 +9,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-attachments',
-  standalone: true,
   imports: [TranslateModule, ConfirmDialogComponent, FocusTrapDirective],
   templateUrl: './task-attachments.component.html',
   styleUrl: './task-attachments.component.scss',

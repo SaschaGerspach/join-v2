@@ -5,7 +5,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { TimeEntry, TasksApiService } from '../../../../core/tasks/tasks-api.service';
 @Component({
   selector: 'app-task-time-tracking',
-  standalone: true,
   imports: [FormsModule, TranslateModule],
   templateUrl: './task-time-tracking.component.html',
   styleUrl: './task-time-tracking.component.scss',

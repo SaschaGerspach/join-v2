@@ -7,7 +7,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-task-history',
-  standalone: true,
   imports: [DatePipe, TranslateModule],
   templateUrl: './task-history.component.html',
   styleUrl: './task-history.component.scss',

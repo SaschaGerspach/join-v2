@@ -13,7 +13,6 @@ import { BRAND_COLOR, PRIORITY_COLORS } from '../../../../shared/constants/color
 import { initBoardPage } from '../../utils/board-page-init';
 @Component({
   selector: 'app-board-stats-page',
-  standalone: true,
   imports: [BaseChartDirective, RouterModule, TranslateModule],
   providers: [provideCharts(withDefaultRegisterables())],
   templateUrl: './board-stats-page.component.html',

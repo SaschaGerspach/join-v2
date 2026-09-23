@@ -8,7 +8,6 @@ let nextId = 0;
 
 @Component({
   selector: 'app-assignee-picker',
-  standalone: true,
   imports: [TranslateModule, UserAvatarComponent, CdkConnectedOverlay, CdkOverlayOrigin],
   templateUrl: './assignee-picker.component.html',
   styleUrl: './assignee-picker.component.scss',

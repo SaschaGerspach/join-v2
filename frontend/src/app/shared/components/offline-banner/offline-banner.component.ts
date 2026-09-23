@@ -4,7 +4,6 @@ import { OfflineQueueService } from '../../../core/offline/offline-queue.service
 
 @Component({
   selector: 'app-offline-banner',
-  standalone: true,
   imports: [TranslateModule],
   template: `
     @if (offline()) {

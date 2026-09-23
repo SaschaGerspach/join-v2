@@ -4,7 +4,6 @@ import { FocusTrapDirective } from '../../../shared/directives/focus-trap.direct
 
 @Component({
   selector: 'app-confirm-dialog',
-  standalone: true,
   imports: [TranslateModule, FocusTrapDirective],
   templateUrl: './confirm-dialog.component.html',
   styleUrl: './confirm-dialog.component.scss',

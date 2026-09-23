@@ -7,7 +7,6 @@ import { LanguageService } from '../../../../shared/services/language.service';
 
 @Component({
   selector: 'app-verify-email-page',
-  standalone: true,
   imports: [RouterModule, FormsModule, TranslateModule],
   template: `
     <div class="auth-page">

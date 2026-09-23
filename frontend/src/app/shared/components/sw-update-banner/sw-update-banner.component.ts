@@ -6,7 +6,6 @@ import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-sw-update-banner',
-  standalone: true,
   imports: [TranslateModule],
   template: `
     @if (updateAvailable()) {

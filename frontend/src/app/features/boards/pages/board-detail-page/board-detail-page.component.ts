@@ -19,7 +19,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-board-detail-page',
-  standalone: true,
   imports: [FormsModule, DragDropModule, SlicePipe, UpperCasePipe, RouterModule, TranslateModule, TaskDetailModalComponent, CreateTaskModalComponent, LoadingSpinnerComponent, ConfirmDialogComponent, MarkdownPipe, UserAvatarComponent, BoardKeyboardNavDirective],
   templateUrl: './board-detail-page.component.html',
   styleUrl: './board-detail-page.component.scss',

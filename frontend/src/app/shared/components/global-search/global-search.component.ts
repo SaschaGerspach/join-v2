@@ -10,7 +10,6 @@ type SearchResult = Task & { board_title: string };
 
 @Component({
   selector: 'app-global-search',
-  standalone: true,
   imports: [FormsModule, TranslateModule],
   templateUrl: './global-search.component.html',
   styleUrl: './global-search.component.scss',

@@ -10,7 +10,6 @@ import { initBoardPage } from '../../utils/board-page-init';
 
 @Component({
   selector: 'app-board-time-report-page',
-  standalone: true,
   imports: [BaseChartDirective, RouterModule, TranslateModule],
   providers: [provideCharts(withDefaultRegisterables())],
   templateUrl: './board-time-report-page.component.html',

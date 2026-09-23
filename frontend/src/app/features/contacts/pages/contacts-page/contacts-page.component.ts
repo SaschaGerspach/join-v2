@@ -16,7 +16,6 @@ type ContactForm = {
 
 @Component({
   selector: 'app-contacts-page',
-  standalone: true,
   imports: [FormsModule, LoadingSpinnerComponent, ConfirmDialogComponent, TranslateModule],
   templateUrl: './contacts-page.component.html',
   styleUrl: './contacts-page.component.scss',
