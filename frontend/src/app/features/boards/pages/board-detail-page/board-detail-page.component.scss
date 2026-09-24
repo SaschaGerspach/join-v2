@@ -719,24 +719,6 @@ $bp-tablet: 1024px;
   }
 }
 
-.btn-cancel {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 2px solid var(--color-dark);
-  border-radius: 8px;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
-
-  &:hover {
-    background-color: $color-primary;
-    color: $color-white;
-    border-color: $color-primary;
-  }
-}
-
 .btn-confirm {
   background: var(--color-action);
   color: $color-white;

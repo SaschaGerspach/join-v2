@@ -1,19 +1,5 @@
 @use 'variables' as *;
 
-.field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.field-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 .attachment-list {
   display: flex;
   flex-direction: column;

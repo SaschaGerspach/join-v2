@@ -1,35 +1,5 @@
 @use 'variables' as *;
 
-.field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.field-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.field-input {
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  padding: 0.55rem 0.9rem;
-  font-size: 0.95rem;
-  color: var(--color-text);
-  background: var(--color-bg);
-  width: 100%;
-  box-sizing: border-box;
-
-  &:focus {
-    border-color: $color-primary;
-    outline: none;
-  }
-}
-
 .label-options {
   display: flex;
   flex-wrap: wrap;

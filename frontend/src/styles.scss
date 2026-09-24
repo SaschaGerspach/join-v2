@@ -239,6 +239,96 @@ input, textarea, select {
   margin-top: 4px;
 }
 
+.btn-save,
+.btn-cancel {
+  border: 2px solid var(--color-dark);
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background-color: $color-primary;
+    color: $color-white;
+    border-color: $color-primary;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-save {
+  background-color: var(--color-action);
+  color: $color-white;
+}
+
+.btn-cancel {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.field-input,
+.field-select,
+.field-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background: var(--color-bg);
+
+  &:focus {
+    border-color: $color-primary;
+    outline: none;
+  }
+}
+
+.field-select {
+  cursor: pointer;
+}
+
+.field-textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.back-link {
+  font-size: 0.85rem;
+  color: $color-primary;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.loading-hint,
+.empty-hint {
+  text-align: center;
+  color: var(--color-muted);
+  padding: 3rem 0;
+}
+
 // ─── Dropdown Menu ───────────────────────────────────────────────────────────
 
 .dropdown-menu {

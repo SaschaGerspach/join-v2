@@ -73,20 +73,6 @@
   }
 }
 
-.field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.field-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--color-text);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
 .field-label-row {
   display: flex;
   align-items: center;
@@ -113,23 +99,6 @@
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-  }
-}
-
-.field-input,
-.field-select,
-.field-textarea {
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  padding: 0.55rem 0.9rem;
-  font-size: 0.9rem;
-  color: var(--color-text);
-  background: var(--color-surface);
-  width: 100%;
-
-  &:focus {
-    border-color: $color-primary;
-    outline: none;
   }
 }
 
@@ -175,28 +144,3 @@
   padding: 0 1.5rem 1.5rem;
 }
 
-.btn-cancel {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 2px solid var(--color-dark);
-  border-radius: 8px;
-  padding: 0.5rem 1.25rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-
-  &:hover { background: $color-primary; color: $color-white; border-color: $color-primary; }
-}
-
-.btn-save {
-  background: var(--color-action);
-  color: $color-white;
-  border: 2px solid var(--color-dark);
-  border-radius: 8px;
-  padding: 0.5rem 1.25rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-
-  &:hover { background: $color-primary; border-color: $color-primary; }
-}

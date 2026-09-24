@@ -9,26 +9,12 @@
 .page-header {
   margin-bottom: 1.5rem;
 
-  .back-link {
-    font-size: 0.85rem;
-    color: $color-primary;
-    text-decoration: none;
-    &:hover { text-decoration: underline; }
-  }
-
   h1 {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--color-text, $color-dark);
     margin-top: 0.5rem;
   }
-}
-
-.loading-hint,
-.empty-hint {
-  text-align: center;
-  color: var(--color-muted, $color-muted);
-  padding: 3rem 0;
 }
 
 .kpi-row {

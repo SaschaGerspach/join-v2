@@ -83,20 +83,6 @@
   gap: 1.25rem;
 }
 
-.field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.field-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 .field-label-row {
   display: flex;
   align-items: center;
@@ -141,34 +127,6 @@
   background: var(--color-bg);
   min-height: 4rem;
   line-height: 1.5;
-}
-
-.field-input {
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  padding: 0.55rem 0.9rem;
-  font-size: 0.95rem;
-  color: var(--color-text);
-  background: var(--color-bg);
-  width: 100%;
-  box-sizing: border-box;
-
-  &:focus {
-    border-color: $color-primary;
-    outline: none;
-  }
-}
-
-.field-textarea {
-  @extend .field-input;
-  resize: vertical;
-  font-family: inherit;
-  line-height: 1.5;
-}
-
-.field-select {
-  @extend .field-input;
-  cursor: pointer;
 }
 
 .field-row {
@@ -275,33 +233,3 @@
   margin-left: 0.25rem;
 }
 
-.btn-cancel {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 2px solid var(--color-border);
-  border-radius: 8px;
-  padding: 0.45rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-
-  &:hover {
-    background: var(--color-bg);
-  }
-}
-
-.btn-save {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 2px solid var(--color-primary);
-  border-radius: 8px;
-  padding: 0.45rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-
-  &:hover {
-    background: var(--color-bg);
-  }
-}

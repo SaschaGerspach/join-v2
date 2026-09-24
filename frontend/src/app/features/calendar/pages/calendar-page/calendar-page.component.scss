@@ -49,12 +49,6 @@
   }
 }
 
-.loading-hint {
-  text-align: center;
-  color: var(--color-muted);
-  padding: 3rem 0;
-}
-
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
