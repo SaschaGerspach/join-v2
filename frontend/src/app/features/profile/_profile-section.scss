@@ -1,0 +1,59 @@
+@use 'sass:color';
+@use 'variables' as *;
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-border, $color-border);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-muted, $color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.msg {
+  font-size: 0.9rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+}
+
+.msg-error {
+  background: rgba($color-error, 0.1);
+  color: color.adjust($color-error, $lightness: -15%);
+}
+
+.btn-danger-outline {
+  background: none;
+  color: color.adjust($color-error, $lightness: -15%);
+  border: 2px solid color.adjust($color-error, $lightness: -15%);
+  border-radius: 10px;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover { background: rgba($color-error, 0.08); }
+}

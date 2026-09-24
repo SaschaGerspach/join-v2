@@ -1,5 +1,6 @@
 @use 'sass:color';
 @use 'variables' as *;
+@use '../../profile-section';
 
 .profile-page {
   display: flex;
@@ -96,96 +97,15 @@
 
 // ─── Form ────────────────────────────────────────────────────────────────────
 
-.form-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.section-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-text);
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--color-border, $color-border);
-}
-
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-
-  &.full-width {
-    grid-column: 1 / -1;
-  }
-
-  label {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--color-muted, $color-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-}
-
 .field-input.field-readonly {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-// ─── Notification Preferences ────────────────────────────────────────────────
-
-.notification-prefs,
-.muted-boards {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.pref-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--color-text);
-  cursor: pointer;
-
-  input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: $color-primary;
-  }
-}
-
-.subsection-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-muted, $color-muted);
-  margin-top: 0.5rem;
-}
-
-// ─── Messages ────────────────────────────────────────────────────────────────
-
-.msg {
-  font-size: 0.9rem;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-}
-
-.msg-error {
-  background: rgba($color-error, 0.1);
-  color: color.adjust($color-error, $lightness: -15%);
-}
-
-.msg-success {
-  background: rgba($priority-low, 0.12);
-  color: color.adjust($priority-low, $lightness: -20%);
 }
 
 // ─── Actions ─────────────────────────────────────────────────────────────────
@@ -194,166 +114,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.btn-danger-outline {
-  background: none;
-  color: color.adjust($color-error, $lightness: -15%);
-  border: 2px solid color.adjust($color-error, $lightness: -15%);
-  border-radius: 10px;
-  padding: 0.6rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s ease;
-
-  &:hover { background: rgba($color-error, 0.08); }
-}
-
-.session-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.session-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.6rem 0.9rem;
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-
-  &.session-current {
-    border-color: $color-primary;
-    background: rgba($color-primary, 0.04);
-  }
-}
-
-.session-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.session-label {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.session-date {
-  font-size: 0.75rem;
-  color: var(--color-muted);
-}
-
-.session-empty {
-  font-size: 0.85rem;
-  color: var(--color-muted);
-  font-style: italic;
-}
-
-.btn-revoke {
-  background: none;
-  border: 1px solid $color-error;
-  color: $color-error;
-  border-radius: 6px;
-  padding: 0.3rem 0.7rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:hover {
-    background: $color-error;
-    color: $color-white;
-  }
-}
-
-// ─── 2FA ─────────────────────────────────────────────────────────────────────
-
-.totp-status {
-  font-size: 0.9rem;
-  color: var(--color-muted, $color-muted);
-
-  &.totp-active {
-    color: $priority-low;
-    font-weight: 600;
-  }
-}
-
-.totp-setup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-
-  p { font-size: 0.9rem; color: var(--color-text); margin: 0; }
-}
-
-.totp-qr {
-  width: 200px;
-  height: 200px;
-  border-radius: 12px;
-  border: 1px solid var(--color-border, $color-border);
-}
-
-.totp-secret-label {
-  font-size: 0.8rem;
-  color: var(--color-muted, $color-muted);
-}
-
-.totp-secret {
-  font-size: 0.85rem;
-  background: var(--color-bg, $color-bg);
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  border: 1px solid var(--color-border, $color-border);
-  word-break: break-all;
-  user-select: all;
-}
-
-.totp-code-input {
-  text-align: center;
-  font-size: 1.25rem;
-  letter-spacing: 0.4rem;
-  font-variant-numeric: tabular-nums;
-  max-width: 200px;
-}
-
-.totp-setup-actions {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.totp-disable-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.btn-primary {
-  background: var(--color-sidebar-bg, $color-dark);
-  color: var(--color-sidebar-text, $color-white);
-  border: 2px solid var(--color-sidebar-bg, $color-dark);
-  border-radius: 10px;
-  padding: 0.6rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-
-  &:hover { background: $color-primary; border-color: $color-primary; }
-}
-
-.btn-secondary {
-  background: none;
-  border: 2px solid var(--color-border, $color-border);
-  border-radius: 10px;
-  padding: 0.6rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--color-text);
-  cursor: pointer;
-
-  &:hover { background: var(--color-bg, $color-bg); }
 }
 
 .btn-export {

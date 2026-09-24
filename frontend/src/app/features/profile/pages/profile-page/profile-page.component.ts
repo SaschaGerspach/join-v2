@@ -1,22 +1,31 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
-import { AuthApiService, Session, TotpSetupResponse } from '../../../../core/auth/auth-api.service';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { UsersApiService } from '../../../../core/users/users-api.service';
-import { NotificationsApiService } from '../../../../core/notifications/notifications-api.service';
-import { BoardsApiService, Board } from '../../../../core/boards/boards-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { UserAvatarComponent } from '../../../../shared/components/user-avatar/user-avatar.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ProfileNotificationsComponent } from '../../components/profile-notifications/profile-notifications.component';
+import { ProfileSessionsComponent } from '../../components/profile-sessions/profile-sessions.component';
+import { ProfileTwoFactorComponent } from '../../components/profile-two-factor/profile-two-factor.component';
 
 @Component({
   selector: 'app-profile-page',
-  imports: [FormsModule, ConfirmDialogComponent, LoadingSpinnerComponent, DatePipe, UserAvatarComponent, TranslateModule],
+  imports: [
+    FormsModule,
+    ConfirmDialogComponent,
+    LoadingSpinnerComponent,
+    UserAvatarComponent,
+    TranslateModule,
+    ProfileNotificationsComponent,
+    ProfileSessionsComponent,
+    ProfileTwoFactorComponent,
+  ],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,8 +35,6 @@ export class ProfilePageComponent implements OnInit {
   private readonly authApi = inject(AuthApiService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly usersApi = inject(UsersApiService);
-  private readonly notificationsApi = inject(NotificationsApiService);
-  private readonly boardsApi = inject(BoardsApiService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
@@ -44,28 +51,9 @@ export class ProfilePageComponent implements OnInit {
   errorMessage = signal('');
   showDeleteConfirm = signal(false);
 
-  boards = signal<Board[]>([]);
-  sessions = signal<Session[]>([]);
-  disabledTypes = signal<Set<string>>(new Set());
-  mutedBoardIds = signal<Set<number>>(new Set());
-  emailDelivery = signal<'instant' | 'digest' | 'none'>('instant');
-
   avatarUrl = signal<string | null>(null);
 
-  totpEnabled = signal(false);
-  totpSetup = signal<TotpSetupResponse | null>(null);
-  totpConfirmCode = signal('');
-  totpDisableCode = signal('');
-  totpDisablePassword = signal('');
-  totpError = signal('');
-
   isAdmin = computed(() => this.auth.user()?.is_staff ?? false);
-
-  initials = computed(() => {
-    const f = this.firstName()[0] ?? '';
-    const l = this.lastName()[0] ?? '';
-    return (f + l).toUpperCase() || (this.email()[0]?.toUpperCase() ?? '?');
-  });
 
   private userId = 0;
 
@@ -74,7 +62,6 @@ export class ProfilePageComponent implements OnInit {
     if (!user) return;
     this.userId = user.id;
 
-    this.totpEnabled.set(user.totp_enabled ?? false);
     this.avatarUrl.set(user.avatar_url ?? null);
 
     this.usersApi.get(this.userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -85,44 +72,6 @@ export class ProfilePageComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => { this.loading.set(false); },
-    });
-
-    this.notificationsApi.getPreferences().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: prefs => {
-        this.disabledTypes.set(new Set(prefs.disabled_types));
-        this.mutedBoardIds.set(new Set(prefs.muted_boards));
-        this.emailDelivery.set(prefs.email_delivery);
-      },
-    });
-
-    this.boardsApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: boards => this.boards.set(boards),
-    });
-
-    this.loadSessions();
-  }
-
-  loadSessions(): void {
-    this.authApi.getSessions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: sessions => this.sessions.set(sessions),
-    });
-  }
-
-  revokeSession(id: number): void {
-    this.authApi.revokeSession(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.sessions.update(list => list.filter(s => s.id !== id));
-        this.toast.show(this.translate.instant('TOAST.SESSION_REVOKED'));
-      },
-    });
-  }
-
-  revokeAllSessions(): void {
-    this.authApi.revokeAllSessions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.sessions.update(list => list.filter(s => s.is_current));
-        this.toast.show(this.translate.instant('TOAST.ALL_SESSIONS_REVOKED'));
-      },
     });
   }
 
@@ -198,78 +147,6 @@ export class ProfilePageComponent implements OnInit {
     });
   }
 
-  toggleType(type: string): void {
-    const types = new Set(this.disabledTypes());
-    if (types.has(type)) {
-      types.delete(type);
-    } else {
-      types.add(type);
-    }
-    this.disabledTypes.set(types);
-    this.savePreferences();
-  }
-
-  setEmailDelivery(value: 'instant' | 'digest' | 'none'): void {
-    this.emailDelivery.set(value);
-    this.savePreferences();
-  }
-
-  toggleMuteBoard(boardId: number): void {
-    const muted = new Set(this.mutedBoardIds());
-    if (muted.has(boardId)) {
-      muted.delete(boardId);
-    } else {
-      muted.add(boardId);
-    }
-    this.mutedBoardIds.set(muted);
-    this.savePreferences();
-  }
-
-  startTotpSetup(): void {
-    this.totpError.set('');
-    this.authApi.totpSetup().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (res) => this.totpSetup.set(res),
-    });
-  }
-
-  confirmTotp(): void {
-    const code = this.totpConfirmCode().trim();
-    if (code.length !== 6) { this.totpError.set(this.translate.instant('ERROR.ENTER_6_DIGIT')); return; }
-    this.totpError.set('');
-    this.authApi.totpConfirm(code).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.totpEnabled.set(true);
-        this.totpSetup.set(null);
-        this.totpConfirmCode.set('');
-        this.toast.show(this.translate.instant('TOAST.TOTP_ENABLED'));
-      },
-      error: () => this.totpError.set(this.translate.instant('TOAST.INVALID_TOTP_CODE')),
-    });
-  }
-
-  cancelTotpSetup(): void {
-    this.totpSetup.set(null);
-    this.totpConfirmCode.set('');
-    this.totpError.set('');
-  }
-
-  disableTotp(): void {
-    const code = this.totpDisableCode().trim();
-    const password = this.totpDisablePassword().trim();
-    if (!password) { this.totpError.set(this.translate.instant('ERROR.PASSWORD_REQUIRED')); return; }
-    if (code.length !== 6) { this.totpError.set(this.translate.instant('ERROR.ENTER_6_DIGIT')); return; }
-    this.totpError.set('');
-    this.authApi.totpDisable(password, code).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.totpEnabled.set(false);
-        this.totpDisableCode.set('');
-        this.totpDisablePassword.set('');
-        this.toast.show(this.translate.instant('TOAST.TOTP_DISABLED'));
-      },
-      error: (err) => this.totpError.set(err?.error?.detail ?? this.translate.instant('TOAST.FAILED_DISABLE_TOTP')),
-    });
-  }
-
   onAvatarSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
@@ -291,13 +168,5 @@ export class ProfilePageComponent implements OnInit {
         this.toast.show(this.translate.instant('TOAST.AVATAR_REMOVED'));
       },
     });
-  }
-
-  private savePreferences(): void {
-    this.notificationsApi.updatePreferences({
-      disabled_types: [...this.disabledTypes()],
-      muted_boards: [...this.mutedBoardIds()],
-      email_delivery: this.emailDelivery(),
-    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 }

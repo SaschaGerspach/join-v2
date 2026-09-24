@@ -1,0 +1,43 @@
+<div class="form-section">
+  <h2 class="section-title">{{ 'PROFILE.NOTIFICATIONS' | translate }}</h2>
+  <div class="notification-prefs">
+    <label class="pref-label">
+      <input type="checkbox" [checked]="!disabledTypes().has('assignment')" (change)="toggleType('assignment')" />
+      {{ 'PROFILE.ASSIGNMENT_NOTIFICATIONS' | translate }}
+    </label>
+    <label class="pref-label">
+      <input type="checkbox" [checked]="!disabledTypes().has('comment')" (change)="toggleType('comment')" />
+      {{ 'PROFILE.COMMENT_NOTIFICATIONS' | translate }}
+    </label>
+    <label class="pref-label">
+      <input type="checkbox" [checked]="!disabledTypes().has('mention')" (change)="toggleType('mention')" />
+      {{ 'PROFILE.MENTION_NOTIFICATIONS' | translate }}
+    </label>
+  </div>
+  <h3 class="subsection-title">{{ 'PROFILE.EMAIL_DELIVERY' | translate }}</h3>
+  <div class="notification-prefs">
+    <label class="pref-label">
+      <input type="radio" name="emailDelivery" value="instant" [checked]="emailDelivery() === 'instant'" (change)="setEmailDelivery('instant')" />
+      {{ 'PROFILE.EMAIL_INSTANT' | translate }}
+    </label>
+    <label class="pref-label">
+      <input type="radio" name="emailDelivery" value="digest" [checked]="emailDelivery() === 'digest'" (change)="setEmailDelivery('digest')" />
+      {{ 'PROFILE.EMAIL_DIGEST' | translate }}
+    </label>
+    <label class="pref-label">
+      <input type="radio" name="emailDelivery" value="none" [checked]="emailDelivery() === 'none'" (change)="setEmailDelivery('none')" />
+      {{ 'PROFILE.EMAIL_NONE' | translate }}
+    </label>
+  </div>
+  @if (boards().length > 0) {
+    <h3 class="subsection-title">{{ 'PROFILE.MUTED_BOARDS' | translate }}</h3>
+    <div class="muted-boards">
+      @for (board of boards(); track board.id) {
+        <label class="pref-label">
+          <input type="checkbox" [checked]="mutedBoardIds().has(board.id)" (change)="toggleMuteBoard(board.id)" />
+          {{ board.title }}
+        </label>
+      }
+    </div>
+  }
+</div>

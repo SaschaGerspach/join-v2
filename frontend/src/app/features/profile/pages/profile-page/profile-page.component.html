@@ -61,121 +61,17 @@
       </div>
     </div>
 
-    <div class="form-section">
-      <h2 class="section-title">{{ 'PROFILE.NOTIFICATIONS' | translate }}</h2>
-      <div class="notification-prefs">
-        <label class="pref-label">
-          <input type="checkbox" [checked]="!disabledTypes().has('assignment')" (change)="toggleType('assignment')" />
-          {{ 'PROFILE.ASSIGNMENT_NOTIFICATIONS' | translate }}
-        </label>
-        <label class="pref-label">
-          <input type="checkbox" [checked]="!disabledTypes().has('comment')" (change)="toggleType('comment')" />
-          {{ 'PROFILE.COMMENT_NOTIFICATIONS' | translate }}
-        </label>
-        <label class="pref-label">
-          <input type="checkbox" [checked]="!disabledTypes().has('mention')" (change)="toggleType('mention')" />
-          {{ 'PROFILE.MENTION_NOTIFICATIONS' | translate }}
-        </label>
-      </div>
-      <h3 class="subsection-title">{{ 'PROFILE.EMAIL_DELIVERY' | translate }}</h3>
-      <div class="notification-prefs">
-        <label class="pref-label">
-          <input type="radio" name="emailDelivery" value="instant" [checked]="emailDelivery() === 'instant'" (change)="setEmailDelivery('instant')" />
-          {{ 'PROFILE.EMAIL_INSTANT' | translate }}
-        </label>
-        <label class="pref-label">
-          <input type="radio" name="emailDelivery" value="digest" [checked]="emailDelivery() === 'digest'" (change)="setEmailDelivery('digest')" />
-          {{ 'PROFILE.EMAIL_DIGEST' | translate }}
-        </label>
-        <label class="pref-label">
-          <input type="radio" name="emailDelivery" value="none" [checked]="emailDelivery() === 'none'" (change)="setEmailDelivery('none')" />
-          {{ 'PROFILE.EMAIL_NONE' | translate }}
-        </label>
-      </div>
-      @if (boards().length > 0) {
-        <h3 class="subsection-title">{{ 'PROFILE.MUTED_BOARDS' | translate }}</h3>
-        <div class="muted-boards">
-          @for (board of boards(); track board.id) {
-            <label class="pref-label">
-              <input type="checkbox" [checked]="mutedBoardIds().has(board.id)" (change)="toggleMuteBoard(board.id)" />
-              {{ board.title }}
-            </label>
-          }
-        </div>
-      }
-    </div>
+    <app-profile-notifications />
 
-    <div class="form-section">
-      <h2 class="section-title">{{ 'PROFILE.SESSIONS' | translate }}</h2>
-      <div class="session-list">
-        @for (session of sessions(); track session.id) {
-          <div class="session-item" [class.session-current]="session.is_current">
-            <div class="session-info">
-              <span class="session-label">{{ session.is_current ? ('PROFILE.CURRENT_SESSION' | translate) : ('PROFILE.SESSION' | translate) }}</span>
-              <span class="session-date">{{ 'PROFILE.CREATED' | translate }}: {{ session.created_at | date:'short' }}</span>
-              <span class="session-date">{{ 'PROFILE.EXPIRES' | translate }}: {{ session.expires_at | date:'short' }}</span>
-            </div>
-            @if (!session.is_current) {
-              <button class="btn-revoke" (click)="revokeSession(session.id)">{{ 'PROFILE.REVOKE' | translate }}</button>
-            }
-          </div>
-        }
-        @if (sessions().length === 0) {
-          <span class="session-empty">{{ 'PROFILE.NO_SESSIONS' | translate }}</span>
-        }
-      </div>
-      @if (sessions().length > 1) {
-        <button class="btn-danger-outline" (click)="revokeAllSessions()">{{ 'PROFILE.REVOKE_ALL' | translate }}</button>
-      }
-    </div>
+    <app-profile-sessions />
 
-    <div class="form-section">
-      <h2 class="section-title">{{ 'PROFILE.TWO_FACTOR' | translate }}</h2>
-      @if (totpEnabled()) {
-        <p class="totp-status totp-active">{{ 'PROFILE.TOTP_ENABLED' | translate }}</p>
-        <div class="totp-disable-form">
-          <div class="form-field">
-            <label for="totp-disable-password">{{ 'PROFILE.CURRENT_PASSWORD' | translate }}</label>
-            <input id="totp-disable-password" class="field-input" type="password" autocomplete="current-password" [ngModel]="totpDisablePassword()" (ngModelChange)="totpDisablePassword.set($event)" [placeholder]="'PROFILE.YOUR_PASSWORD' | translate" />
-          </div>
-          <div class="form-field">
-            <label for="totp-disable-code">{{ 'PROFILE.AUTH_CODE' | translate }}</label>
-            <input id="totp-disable-code" class="field-input totp-code-input" type="text" [ngModel]="totpDisableCode()" (ngModelChange)="totpDisableCode.set($event)" [placeholder]="'PROFILE.TOTP_PLACEHOLDER' | translate" maxlength="6" autocomplete="one-time-code" [attr.aria-describedby]="totpError() ? 'totp-disable-error' : null" [attr.aria-invalid]="!!totpError()" />
-          </div>
-          @if (totpError()) {
-            <p class="msg msg-error" id="totp-disable-error">{{ totpError() }}</p>
-          }
-          <button class="btn-danger-outline" (click)="disableTotp()">{{ 'PROFILE.DISABLE_2FA' | translate }}</button>
-        </div>
-      } @else if (totpSetup()) {
-        <div class="totp-setup">
-          <p>{{ 'PROFILE.SCAN_QR' | translate }}</p>
-          <img class="totp-qr" [src]="totpSetup()!.qr_code" [attr.alt]="'PROFILE.QR_ALT' | translate" />
-          <p class="totp-secret-label">{{ 'PROFILE.MANUAL_KEY' | translate }}</p>
-          <code class="totp-secret">{{ totpSetup()!.secret }}</code>
-          <div class="form-field">
-            <label for="totp-confirm-code">{{ 'PROFILE.CONFIRM_CODE' | translate }}</label>
-            <input id="totp-confirm-code" class="field-input totp-code-input" type="text" [ngModel]="totpConfirmCode()" (ngModelChange)="totpConfirmCode.set($event)" [placeholder]="'PROFILE.TOTP_PLACEHOLDER' | translate" maxlength="6" autocomplete="one-time-code" [attr.aria-describedby]="totpError() ? 'totp-confirm-error' : null" [attr.aria-invalid]="!!totpError()" />
-          </div>
-          @if (totpError()) {
-            <p class="msg msg-error" id="totp-confirm-error">{{ totpError() }}</p>
-          }
-          <div class="totp-setup-actions">
-            <button class="btn-primary" (click)="confirmTotp()">{{ 'PROFILE.CONFIRM' | translate }}</button>
-            <button class="btn-secondary" (click)="cancelTotpSetup()">{{ 'COMMON.CANCEL' | translate }}</button>
-          </div>
-        </div>
-      } @else {
-        <p class="totp-status">{{ 'PROFILE.TOTP_DISABLED' | translate }}</p>
-        <button class="btn-primary" (click)="startTotpSetup()">{{ 'PROFILE.SETUP_2FA' | translate }}</button>
-      }
-    </div>
+    <app-profile-two-factor />
 
     @if (errorMessage()) {
       <p class="msg msg-error">{{ errorMessage() }}</p>
     }
 
-<div class="form-actions">
+    <div class="form-actions">
       <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">{{ 'PROFILE.DELETE_ACCOUNT' | translate }}</button>
       <button class="btn-export" (click)="exportData()">{{ 'PROFILE.EXPORT_DATA' | translate }}</button>
       <button class="btn-save" [disabled]="saving()" (click)="save()">
