@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import pyotp
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.models import Q
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+
+from ..encryption import decrypt_totp_secret
 
 User = get_user_model()
 
@@ -32,6 +37,21 @@ def clear_refresh_cookie(response: Response) -> None:
         path=settings.REFRESH_COOKIE_PATH,
         domain=getattr(settings, "SESSION_COOKIE_DOMAIN", None),
     )
+
+
+def verify_totp_code(user: User, code: str) -> bool:
+    totp = pyotp.TOTP(decrypt_totp_secret(user.totp_secret))
+    now = timezone.now()
+    if not totp.verify(code, for_time=now):
+        return False
+    counter = totp.timecode(now)
+    # Conditional update so a code is accepted at most once, even for concurrent requests.
+    consumed = (
+        User.objects.filter(pk=user.pk)
+        .filter(Q(totp_last_counter__isnull=True) | Q(totp_last_counter__lt=counter))
+        .update(totp_last_counter=counter)
+    )
+    return consumed == 1
 
 
 def issue_tokens_for(user: User) -> tuple[RefreshToken, AccessToken]:

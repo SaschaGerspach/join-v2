@@ -9,8 +9,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from audit_api.helpers import log_audit
-from ..encryption import encrypt_totp_secret, decrypt_totp_secret
+from ..encryption import encrypt_totp_secret
 from ..serializers import TotpSetupSerializer, TotpCodeSerializer, TotpDisableSerializer
+from ._helpers import verify_totp_code
 
 
 @extend_schema(responses={200: TotpSetupSerializer})
@@ -52,8 +53,7 @@ def totp_confirm(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     code = serializer.validated_data["code"]
-    totp = pyotp.TOTP(decrypt_totp_secret(user.totp_secret))
-    if not totp.verify(code):
+    if not verify_totp_code(user, code):
         return Response({"detail": "Invalid code."}, status=status.HTTP_400_BAD_REQUEST)
 
     user.totp_enabled = True
@@ -77,8 +77,7 @@ def totp_disable(request):
         return Response({"detail": "Wrong password."}, status=status.HTTP_400_BAD_REQUEST)
 
     code = serializer.validated_data["code"]
-    totp = pyotp.TOTP(decrypt_totp_secret(user.totp_secret))
-    if not totp.verify(code):
+    if not verify_totp_code(user, code):
         return Response({"detail": "Invalid code."}, status=status.HTTP_400_BAD_REQUEST)
 
     user.totp_enabled = False

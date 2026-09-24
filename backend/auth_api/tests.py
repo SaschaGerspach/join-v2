@@ -93,6 +93,71 @@ class LogoutViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
+class TotpLoginTests(APITestCase):
+    url = "/auth/login/"
+
+    def setUp(self):
+        import pyotp
+
+        from .encryption import encrypt_totp_secret
+
+        self.secret = pyotp.random_base32()
+        self.totp = pyotp.TOTP(self.secret)
+        self.user = User.objects.create_user(email="totp@example.com", password="securepass123")
+        self.user.is_verified = True
+        self.user.totp_enabled = True
+        self.user.totp_secret = encrypt_totp_secret(self.secret)
+        self.user.save()
+
+    def _login(self, code):
+        return self.client.post(self.url, {
+            "email": "totp@example.com",
+            "password": "securepass123",
+            "totp_code": code,
+        })
+
+    def test_login_requires_code(self):
+        response = self.client.post(self.url, {"email": "totp@example.com", "password": "securepass123"})
+        self.assertEqual(response.status_code, status.HTTP_206_PARTIAL_CONTENT)
+
+    def test_login_with_valid_code(self):
+        response = self._login(self.totp.now())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_login_with_wrong_code(self):
+        wrong = "000000" if self.totp.now() != "000000" else "111111"
+        response = self._login(wrong)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_code_cannot_be_replayed(self):
+        from unittest.mock import patch
+
+        from django.utils import timezone
+
+        # Pin the clock so both logins fall into the same TOTP time step.
+        now = timezone.now()
+        code = self.totp.at(now)
+        with patch("auth_api.views._helpers.timezone.now", return_value=now):
+            self.assertEqual(self._login(code).status_code, status.HTTP_200_OK)
+            self.assertEqual(self._login(code).status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_confirm_code_cannot_be_reused_for_login(self):
+        from unittest.mock import patch
+
+        from django.utils import timezone
+
+        self.user.totp_enabled = False
+        self.user.save(update_fields=["totp_enabled"])
+        self.client.force_authenticate(user=self.user)
+        now = timezone.now()
+        code = self.totp.at(now)
+        with patch("auth_api.views._helpers.timezone.now", return_value=now):
+            confirm = self.client.post("/auth/2fa/confirm/", {"code": code})
+            self.assertEqual(confirm.status_code, status.HTTP_200_OK)
+            self.client.force_authenticate(user=None)
+            self.assertEqual(self._login(code).status_code, status.HTTP_401_UNAUTHORIZED)
+
+
 class TokenRefreshTests(APITestCase):
     url = "/auth/token/refresh/"
 

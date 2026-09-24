@@ -1,7 +1,5 @@
-import pyotp
 from django.conf import settings
 from django.contrib.auth import authenticate
-from ..encryption import decrypt_totp_secret
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
@@ -20,7 +18,14 @@ from ..serializers import (
     TwoFactorRequiredSerializer,
 )
 from audit_api.helpers import log_audit
-from ._helpers import AuthRateThrottle, User, clear_refresh_cookie, issue_tokens_for, set_refresh_cookie
+from ._helpers import (
+    AuthRateThrottle,
+    User,
+    clear_refresh_cookie,
+    issue_tokens_for,
+    set_refresh_cookie,
+    verify_totp_code,
+)
 
 
 @extend_schema(
@@ -66,8 +71,7 @@ def login_view(request):
                 {"requires_2fa": True, "detail": "2FA code required."},
                 status=status.HTTP_206_PARTIAL_CONTENT,
             )
-        totp = pyotp.TOTP(decrypt_totp_secret(user.totp_secret))
-        if not totp.verify(totp_code):
+        if not verify_totp_code(user, totp_code):
             log_audit("login_failed", user=user, request=request, detail="invalid 2FA code")
             return Response(
                 {"detail": "Invalid 2FA code."},
