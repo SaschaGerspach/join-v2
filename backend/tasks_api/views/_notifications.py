@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.models.functions import Lower
 
 from config.mail import send_mail_async
 from contacts_api.models import Contact
@@ -60,16 +61,19 @@ def _find_user_by_email(email: str | None) -> User | None:
 
 
 def _notify_comment(comment: Comment, actor: User) -> None:
+    User = get_user_model()
     task = comment.task
     recipients: set[str] = set()
     in_app_recipients: set[int] = set()
 
-    for contact in task.assignees.all():
-        if contact.email:
-            recipients.add(contact.email.lower())
-            user = _find_user_by_email(contact.email)
-            if user and user.pk != actor.pk:
-                in_app_recipients.add(user.pk)
+    assignee_emails = {c.email.lower() for c in task.assignees.all() if c.email}
+    recipients |= assignee_emails
+    if assignee_emails:
+        in_app_recipients |= set(
+            User.objects.annotate(email_lower=Lower("email"))
+            .filter(email_lower__in=assignee_emails, is_active=True)
+            .values_list("pk", flat=True)
+        )
 
     if task.board.created_by_id != actor.id and task.board.created_by.email:
         recipients.add(task.board.created_by.email.lower())
@@ -78,13 +82,13 @@ def _notify_comment(comment: Comment, actor: User) -> None:
     prior_authors = (
         Comment.objects.filter(task=task)
         .exclude(pk=comment.pk)
-        .select_related("author")
+        .values_list("author_id", "author__email")
+        .distinct()
     )
-    for c in prior_authors:
-        if c.author.email:
-            recipients.add(c.author.email.lower())
-        if c.author_id != actor.pk:
-            in_app_recipients.add(c.author_id)
+    for author_id, author_email in prior_authors:
+        if author_email:
+            recipients.add(author_email.lower())
+        in_app_recipients.add(author_id)
 
     recipients.discard(actor.email.lower())
     in_app_recipients.discard(actor.pk)
@@ -100,20 +104,15 @@ def _notify_comment(comment: Comment, actor: User) -> None:
             recipients=list(recipients),
         )
 
-    User = get_user_model()
     message = f'{_actor_name(actor)} commented on "{_sanitize(task.title)}"'
-    for user_id in in_app_recipients:
-        try:
-            user = User.objects.get(pk=user_id)
-            create_notification(
-                recipient=user,
-                notification_type=Notification.Type.COMMENT,
-                message=message,
-                board_id=task.board_id,
-                task_id=task.pk,
-            )
-        except User.DoesNotExist:
-            pass
+    for user in User.objects.filter(pk__in=in_app_recipients):
+        create_notification(
+            recipient=user,
+            notification_type=Notification.Type.COMMENT,
+            message=message,
+            board_id=task.board_id,
+            task_id=task.pk,
+        )
 
 
 def _notify_mentions(comment: Comment, actor: User) -> None:

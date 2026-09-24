@@ -292,6 +292,43 @@ class CommentTests(APITestCase):
         response = self.client.delete(self.detail_url(comment.pk))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_comment_notifies_assignee_and_prior_author_but_not_actor(self):
+        prior = User.objects.create_user(email="p@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=prior)
+        Comment.objects.create(task=self.task, author=prior, text="Earlier")
+        self.task.assignees.add(
+            Contact.objects.create(owner=self.user, first_name="M", last_name="M", email="M@Example.com")
+        )
+
+        response = self.client.post(self.list_url(), {"text": "Update"}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        notified = set(
+            Notification.objects.filter(type=Notification.Type.COMMENT).values_list("recipient_id", flat=True)
+        )
+        self.assertEqual(notified, {self.member.pk, prior.pk})
+
+    def test_comment_notification_queries_independent_of_assignee_count(self):
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+
+        def query_count():
+            with CaptureQueriesContext(connection) as ctx:
+                self.client.post(self.list_url(), {"text": "Ping"}, format="json")
+            return len(ctx.captured_queries)
+
+        def add_external_assignee(i):
+            self.task.assignees.add(
+                Contact.objects.create(owner=self.user, first_name="E", last_name=str(i), email=f"ext{i}@example.com")
+            )
+
+        add_external_assignee(0)
+        query_count()
+        baseline = query_count()
+        for i in range(1, 4):
+            add_external_assignee(i)
+        self.assertEqual(query_count(), baseline)
+
     def test_mention_creates_notification(self):
         from notifications_api.models import Notification
 
