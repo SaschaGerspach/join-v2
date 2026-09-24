@@ -1,0 +1,89 @@
+@use 'variables' as *;
+
+// The controls stay flex items of the board header, including its mobile wrapping.
+:host {
+  display: contents;
+}
+
+.search-input {
+  flex: 0 0 220px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  color: var(--color-text);
+  background: var(--color-surface);
+
+  &:focus { border-color: $color-primary; }
+
+  @media (max-width: $bp-mobile) {
+    flex: 1 1 100%;
+    order: 3;
+  }
+}
+
+.filter-select {
+  flex: 0 0 auto;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  cursor: pointer;
+  outline: none;
+
+  &:focus { border-color: $color-primary; }
+
+  @media (max-width: $bp-mobile) {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+}
+
+.btn-clear-filter {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid $color-error;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $color-error;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: $color-error;
+    color: $color-white;
+  }
+}
+
+.filter-name-input {
+  flex: 0 0 160px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid $color-primary;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  outline: none;
+
+  &:focus { border-color: $color-primary; box-shadow: 0 0 0 2px rgba($color-primary, 0.15); }
+}
+
+.btn-save-filter {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid $color-primary;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $color-primary;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: $color-primary;
+    color: $color-white;
+  }
+}

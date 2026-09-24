@@ -1,0 +1,57 @@
+<input
+  class="search-input"
+  type="search"
+  [attr.aria-label]="'BOARD_DETAIL.SEARCH_TASKS' | translate"
+  [placeholder]="'BOARD_DETAIL.SEARCH_TASKS' | translate"
+  [value]="state.searchQuery()"
+  (input)="state.searchQuery.set(inputValue($event))"
+/>
+<select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.FILTER_PRIORITY' | translate" [ngModel]="state.filterPriority()" (ngModelChange)="state.filterPriority.set($event)">
+  <option value="">{{ 'BOARD_DETAIL.ALL_PRIORITIES' | translate }}</option>
+  <option value="urgent">{{ 'BOARD_DETAIL.URGENT' | translate }}</option>
+  <option value="high">{{ 'BOARD_DETAIL.HIGH' | translate }}</option>
+  <option value="medium">{{ 'BOARD_DETAIL.MEDIUM' | translate }}</option>
+  <option value="low">{{ 'BOARD_DETAIL.LOW' | translate }}</option>
+</select>
+<select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.FILTER_ASSIGNEE' | translate" [ngModel]="state.filterAssignee()" (ngModelChange)="state.filterAssignee.set($event === '' ? '' : +$event)">
+  <option value="">{{ 'BOARD_DETAIL.ALL_ASSIGNEES' | translate }}</option>
+  @for (c of state.contacts(); track c.id) {
+    <option [value]="c.id">{{ c.first_name }} {{ c.last_name }}</option>
+  }
+</select>
+<select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.FILTER_DUE' | translate" [ngModel]="state.filterDue()" (ngModelChange)="state.filterDue.set($event)">
+  <option value="">{{ 'BOARD_DETAIL.ANY_DUE_DATE' | translate }}</option>
+  <option value="overdue">{{ 'BOARD_DETAIL.OVERDUE' | translate }}</option>
+  <option value="soon">{{ 'BOARD_DETAIL.DUE_SOON' | translate }}</option>
+</select>
+<select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.GROUP_BY' | translate" [ngModel]="state.groupBy()" (ngModelChange)="state.groupBy.set($event)">
+  <option value="none">{{ 'BOARD_DETAIL.NO_GROUPING' | translate }}</option>
+  <option value="priority">{{ 'BOARD_DETAIL.GROUP_PRIORITY' | translate }}</option>
+  <option value="assignee">{{ 'BOARD_DETAIL.GROUP_ASSIGNEE' | translate }}</option>
+</select>
+@if (state.hasActiveFilter()) {
+  <button class="btn-clear-filter" [attr.aria-label]="'BOARD_DETAIL.CLEAR_FILTERS' | translate" (click)="state.clearFilters()">&#10005; {{ 'BOARD_DETAIL.CLEAR' | translate }}</button>
+  @if (showFilterNameInput()) {
+    <input
+      class="filter-name-input"
+      type="text"
+      [attr.aria-label]="'BOARD_DETAIL.FILTER_NAME' | translate"
+      [placeholder]="'BOARD_DETAIL.FILTER_NAME' | translate"
+      [ngModel]="filterNameInput()"
+      (ngModelChange)="filterNameInput.set($event)"
+      (keyup.enter)="confirmSaveFilter()"
+      (keyup.escape)="showFilterNameInput.set(false)"
+    />
+    <button class="btn-save-filter" (click)="confirmSaveFilter()">{{ 'BOARD_DETAIL.SAVE' | translate }}</button>
+  } @else {
+    <button class="btn-save-filter" (click)="saveFilter()">{{ 'BOARD_DETAIL.SAVE_FILTER' | translate }}</button>
+  }
+}
+@if (state.savedFilters().length > 0) {
+  <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.SAVED_FILTERS' | translate" (change)="applySavedFilter($event)">
+    <option value="">{{ 'BOARD_DETAIL.SAVED_FILTERS' | translate }}</option>
+    @for (f of state.savedFilters(); track f.name) {
+      <option [value]="f.name">{{ f.name }}</option>
+    }
+  </select>
+}

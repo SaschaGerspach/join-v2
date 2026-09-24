@@ -1,0 +1,12 @@
+<div class="bulk-toolbar">
+  <span class="bulk-count">{{ 'BOARD_DETAIL.SELECTED' | translate:{ count: state.selectedTaskIds().size } }}</span>
+  <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.MOVE_COLUMN' | translate" [ngModel]="state.bulkMoveTarget()" (ngModelChange)="state.bulkMoveTarget.set($event === '' ? null : +$event)">
+    <option value="">{{ 'BOARD_DETAIL.MOVE_TO' | translate }}</option>
+    @for (col of state.columns(); track col.id) {
+      <option [value]="col.id">{{ col.title }}</option>
+    }
+  </select>
+  <button class="btn-bulk-move" [disabled]="state.bulkMoveTarget() === null" (click)="state.bulkMove()">{{ 'BOARD_DETAIL.MOVE' | translate }}</button>
+  <button class="btn-bulk-delete" (click)="state.pendingBulkDelete.set(true)">{{ 'BOARD_DETAIL.DELETE' | translate }}</button>
+  <button class="btn-clear-filter" (click)="state.clearSelection()">&#10005; {{ 'COMMON.CANCEL' | translate }}</button>
+</div>

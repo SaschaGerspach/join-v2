@@ -25,64 +25,7 @@
     } @else {
       <h1 tabindex="0" role="button" (dblclick)="startRenameBoardTitle()" (keydown.enter)="startRenameBoardTitle()">{{ state.board()?.title ?? 'Board' }}</h1>
     }
-    <input
-      #searchInput
-      class="search-input"
-      type="search"
-      [attr.aria-label]="'BOARD_DETAIL.SEARCH_TASKS' | translate"
-      [placeholder]="'BOARD_DETAIL.SEARCH_TASKS' | translate"
-      [value]="state.searchQuery()"
-      (input)="state.searchQuery.set(inputValue($event))"
-    />
-    <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.FILTER_PRIORITY' | translate" [ngModel]="state.filterPriority()" (ngModelChange)="state.filterPriority.set($event)">
-      <option value="">{{ 'BOARD_DETAIL.ALL_PRIORITIES' | translate }}</option>
-      <option value="urgent">{{ 'BOARD_DETAIL.URGENT' | translate }}</option>
-      <option value="high">{{ 'BOARD_DETAIL.HIGH' | translate }}</option>
-      <option value="medium">{{ 'BOARD_DETAIL.MEDIUM' | translate }}</option>
-      <option value="low">{{ 'BOARD_DETAIL.LOW' | translate }}</option>
-    </select>
-    <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.FILTER_ASSIGNEE' | translate" [ngModel]="state.filterAssignee()" (ngModelChange)="state.filterAssignee.set($event === '' ? '' : +$event)">
-      <option value="">{{ 'BOARD_DETAIL.ALL_ASSIGNEES' | translate }}</option>
-      @for (c of state.contacts(); track c.id) {
-        <option [value]="c.id">{{ c.first_name }} {{ c.last_name }}</option>
-      }
-    </select>
-    <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.FILTER_DUE' | translate" [ngModel]="state.filterDue()" (ngModelChange)="state.filterDue.set($event)">
-      <option value="">{{ 'BOARD_DETAIL.ANY_DUE_DATE' | translate }}</option>
-      <option value="overdue">{{ 'BOARD_DETAIL.OVERDUE' | translate }}</option>
-      <option value="soon">{{ 'BOARD_DETAIL.DUE_SOON' | translate }}</option>
-    </select>
-    <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.GROUP_BY' | translate" [ngModel]="state.groupBy()" (ngModelChange)="state.groupBy.set($event)">
-      <option value="none">{{ 'BOARD_DETAIL.NO_GROUPING' | translate }}</option>
-      <option value="priority">{{ 'BOARD_DETAIL.GROUP_PRIORITY' | translate }}</option>
-      <option value="assignee">{{ 'BOARD_DETAIL.GROUP_ASSIGNEE' | translate }}</option>
-    </select>
-    @if (state.hasActiveFilter()) {
-      <button class="btn-clear-filter" [attr.aria-label]="'BOARD_DETAIL.CLEAR_FILTERS' | translate" (click)="state.clearFilters()">&#10005; {{ 'BOARD_DETAIL.CLEAR' | translate }}</button>
-      @if (showFilterNameInput()) {
-        <input
-          class="filter-name-input"
-          type="text"
-          [attr.aria-label]="'BOARD_DETAIL.FILTER_NAME' | translate"
-          [placeholder]="'BOARD_DETAIL.FILTER_NAME' | translate"
-          [ngModel]="filterNameInput()"
-          (ngModelChange)="filterNameInput.set($event)"
-          (keyup.enter)="confirmSaveFilter()"
-          (keyup.escape)="showFilterNameInput.set(false)"
-        />
-        <button class="btn-save-filter" (click)="confirmSaveFilter()">{{ 'BOARD_DETAIL.SAVE' | translate }}</button>
-      } @else {
-        <button class="btn-save-filter" (click)="saveFilter()">{{ 'BOARD_DETAIL.SAVE_FILTER' | translate }}</button>
-      }
-    }
-    @if (state.savedFilters().length > 0) {
-      <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.SAVED_FILTERS' | translate" (change)="applySavedFilter($event)">
-        <option value="">{{ 'BOARD_DETAIL.SAVED_FILTERS' | translate }}</option>
-        @for (f of state.savedFilters(); track f.name) {
-          <option [value]="f.name">{{ f.name }}</option>
-        }
-      </select>
-    }
+    <app-board-filter-bar />
     @if (state.onlineUsers().length > 0) {
       <div class="presence-bar">
         @for (u of state.onlineUsers(); track u.id) {
@@ -92,57 +35,12 @@
         }
       </div>
     }
-    <div class="board-tools">
-      <button class="btn-more" aria-haspopup="menu" [attr.aria-expanded]="moreMenuOpen()" (click)="toggleMoreMenu()">{{ 'BOARD_DETAIL.MORE' | translate }}</button>
-      @if (moreMenuOpen()) {
-        <div class="dropdown-menu" role="menu">
-          <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'stats']">{{ 'BOARD_DETAIL.STATS' | translate }}</a>
-          <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'activity']">{{ 'BOARD_DETAIL.ACTIVITY' | translate }}</a>
-          <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'gantt']">{{ 'GANTT.TITLE' | translate }}</a>
-          <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'time-report']">{{ 'TIME_REPORT.TITLE' | translate }}</a>
-          <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'time-travel']">{{ 'TIME_TRAVEL.TITLE' | translate }}</a>
-          <div class="dropdown-divider"></div>
-          <button type="button" role="menuitem" (click)="exportCsv()">{{ 'BOARD_DETAIL.EXPORT_CSV' | translate }}</button>
-          <button type="button" role="menuitem" (click)="exportPdf()">{{ 'BOARD_DETAIL.EXPORT_PDF' | translate }}</button>
-          @if (state.canEdit()) {
-            <label class="import-label" role="menuitem">
-              {{ 'BOARD_DETAIL.IMPORT_CSV' | translate }}
-              <input type="file" accept=".csv" hidden (change)="importCsv($event)" />
-            </label>
-          }
-          @if (state.canEdit() || state.canManageMembers()) {
-            <div class="dropdown-divider"></div>
-          }
-          @if (state.canEdit()) {
-            <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'automations']">{{ 'AUTOMATIONS.TITLE' | translate }}</a>
-            <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'webhooks']">{{ 'WEBHOOKS.TITLE' | translate }}</a>
-            <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'templates']">{{ 'TEMPLATES.TITLE' | translate }}</a>
-          }
-          @if (state.canViewArchive()) {
-            <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'archive']">{{ 'BOARD_DETAIL.ARCHIVE' | translate }}</a>
-          }
-          @if (state.canManageMembers()) {
-            <button type="button" role="menuitem" (click)="shareInviteLink()">{{ 'INVITE.SHARE' | translate }}</button>
-          }
-        </div>
-      }
-    </div>
+    <app-board-more-menu />
     <button class="btn-add-column" (click)="showColumnForm.set(true)">{{ 'BOARD_DETAIL.ADD_COLUMN' | translate }}</button>
   </div>
 
   @if (state.bulkMode()) {
-    <div class="bulk-toolbar">
-      <span class="bulk-count">{{ 'BOARD_DETAIL.SELECTED' | translate:{ count: state.selectedTaskIds().size } }}</span>
-      <select class="filter-select" [attr.aria-label]="'BOARD_DETAIL.MOVE_COLUMN' | translate" [ngModel]="state.bulkMoveTarget()" (ngModelChange)="state.bulkMoveTarget.set($event === '' ? null : +$event)">
-        <option value="">{{ 'BOARD_DETAIL.MOVE_TO' | translate }}</option>
-        @for (col of state.columns(); track col.id) {
-          <option [value]="col.id">{{ col.title }}</option>
-        }
-      </select>
-      <button class="btn-bulk-move" [disabled]="state.bulkMoveTarget() === null" (click)="state.bulkMove()">{{ 'BOARD_DETAIL.MOVE' | translate }}</button>
-      <button class="btn-bulk-delete" (click)="state.pendingBulkDelete.set(true)">{{ 'BOARD_DETAIL.DELETE' | translate }}</button>
-      <button class="btn-clear-filter" (click)="state.clearSelection()">&#10005; {{ 'COMMON.CANCEL' | translate }}</button>
-    </div>
+    <app-board-bulk-toolbar />
   }
 
   @if (showColumnForm()) {
@@ -225,67 +123,7 @@
             }
             @for (task of group.tasks; track task.id) {
               <div [class]="'task-card ' + state.priorityClass(task.priority)" [class.selected]="state.isTaskSelected(task.id)" [class.kb-focused]="keyNav.focusedTaskId() === task.id" cdkDrag [cdkDragData]="task" [cdkDragStartDelay]="{ touch: 200, mouse: 0 }" (click)="state.selectedTask.set(task)">
-                @if (task.cover_image_url) {
-                  <img class="task-cover" [src]="task.cover_image_url" alt="" loading="lazy" decoding="async" />
-                }
-                <div class="task-card-top">
-                  <input
-                    type="checkbox"
-                    class="task-select-checkbox"
-                    [attr.aria-label]="'BOARD_DETAIL.SELECT_TASK' | translate"
-                    [checked]="state.isTaskSelected(task.id)"
-                    (click)="state.toggleTaskSelection(task.id, $event)"
-                  />
-                  <span class="task-priority" [class]="state.priorityClass(task.priority)">
-                    {{ 'BOARD_DETAIL.' + task.priority.toUpperCase() | translate }}
-                  </span>
-                  <button class="btn-icon small" [attr.aria-label]="'BOARD_DETAIL.DELETE_TASK' | translate" (click)="$event.stopPropagation(); state.pendingDeleteTaskId.set(task.id)">&#10005;</button>
-                </div>
-                <p class="task-title">{{ task.title }}</p>
-                @if (task.labels && task.labels.length > 0) {
-                  <div class="task-labels">
-                    @for (label of task.labels; track label.id) {
-                      <span class="label-chip" [style.background]="label.color">{{ label.name }}</span>
-                    }
-                  </div>
-                }
-                @if (task.description) {
-                  <div class="task-description markdown-content" [innerHTML]="task.description | markdown"></div>
-                }
-                @if (task.due_date) {
-                  <div class="task-due-date"
-                       [class.overdue]="state.isOverdue(task.due_date)"
-                       [class.due-soon]="!state.isOverdue(task.due_date) && state.isSoon(task.due_date)">
-                    <span class="due-icon" aria-hidden="true">&#128197;</span>
-                    <span>{{ task.due_date | slice:0:10 }}</span>
-                  </div>
-                }
-                @if (task.assigned_to.length > 0) {
-                  <div class="task-assignees">
-                    @for (aId of task.assigned_to; track aId) {
-                      @if (state.contactName(aId)) {
-                        <span class="assignee-avatar" [title]="state.contactName(aId)">{{ state.contactInitials(aId) }}</span>
-                      }
-                    }
-                  </div>
-                }
-                @if (task.subtask_count > 0) {
-                  <div class="subtask-progress">
-                    <div class="subtask-progress-bar">
-                      <div
-                        class="subtask-progress-fill"
-                        [style.width.%]="(task.subtask_done_count / task.subtask_count) * 100"
-                      ></div>
-                    </div>
-                    <span class="subtask-progress-label">{{ task.subtask_done_count }}/{{ task.subtask_count }}</span>
-                  </div>
-                }
-                @if (task.recurrence) {
-                  <span class="recurrence-badge" [title]="'BOARD_DETAIL.REPEATS' | translate:{ interval: ('TASK.' + task.recurrence.toUpperCase() | translate) }">&#128260; {{ 'TASK.' + task.recurrence.toUpperCase() | translate }}</span>
-                }
-                @if (task.attachment_count > 0) {
-                  <span class="attachment-badge" [title]="'TASK.ATTACHMENTS' | translate">📎 {{ task.attachment_count }}</span>
-                }
+                <app-task-card [task]="task" />
               </div>
             }
           }

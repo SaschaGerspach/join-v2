@@ -1,0 +1,62 @@
+@let t = task();
+@if (t.cover_image_url) {
+  <img class="task-cover" [src]="t.cover_image_url" alt="" loading="lazy" decoding="async" />
+}
+<div class="task-card-top">
+  <input
+    type="checkbox"
+    class="task-select-checkbox"
+    [attr.aria-label]="'BOARD_DETAIL.SELECT_TASK' | translate"
+    [checked]="state.isTaskSelected(t.id)"
+    (click)="state.toggleTaskSelection(t.id, $event)"
+  />
+  <span class="task-priority" [class]="state.priorityClass(t.priority)">
+    {{ 'BOARD_DETAIL.' + t.priority.toUpperCase() | translate }}
+  </span>
+  <button class="btn-delete-task" [attr.aria-label]="'BOARD_DETAIL.DELETE_TASK' | translate" (click)="$event.stopPropagation(); state.pendingDeleteTaskId.set(t.id)">&#10005;</button>
+</div>
+<p class="task-title">{{ t.title }}</p>
+@if (t.labels && t.labels.length > 0) {
+  <div class="task-labels">
+    @for (label of t.labels; track label.id) {
+      <span class="label-chip" [style.background]="label.color">{{ label.name }}</span>
+    }
+  </div>
+}
+@if (t.description) {
+  <div class="task-description markdown-content" [innerHTML]="t.description | markdown"></div>
+}
+@if (t.due_date) {
+  <div class="task-due-date"
+       [class.overdue]="state.isOverdue(t.due_date)"
+       [class.due-soon]="!state.isOverdue(t.due_date) && state.isSoon(t.due_date)">
+    <span class="due-icon" aria-hidden="true">&#128197;</span>
+    <span>{{ t.due_date | slice:0:10 }}</span>
+  </div>
+}
+@if (t.assigned_to.length > 0) {
+  <div class="task-assignees">
+    @for (aId of t.assigned_to; track aId) {
+      @if (state.contactName(aId)) {
+        <span class="assignee-avatar" [title]="state.contactName(aId)">{{ state.contactInitials(aId) }}</span>
+      }
+    }
+  </div>
+}
+@if (t.subtask_count > 0) {
+  <div class="subtask-progress">
+    <div class="subtask-progress-bar">
+      <div
+        class="subtask-progress-fill"
+        [style.width.%]="(t.subtask_done_count / t.subtask_count) * 100"
+      ></div>
+    </div>
+    <span class="subtask-progress-label">{{ t.subtask_done_count }}/{{ t.subtask_count }}</span>
+  </div>
+}
+@if (t.recurrence) {
+  <span class="recurrence-badge" [title]="'BOARD_DETAIL.REPEATS' | translate:{ interval: ('TASK.' + t.recurrence.toUpperCase() | translate) }">&#128260; {{ 'TASK.' + t.recurrence.toUpperCase() | translate }}</span>
+}
+@if (t.attachment_count > 0) {
+  <span class="attachment-badge" [title]="'TASK.ATTACHMENTS' | translate">📎 {{ t.attachment_count }}</span>
+}

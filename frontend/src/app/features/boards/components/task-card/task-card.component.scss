@@ -1,0 +1,176 @@
+@use 'variables' as *;
+
+// The card box lives in the board page (it carries cdkDrag); the content joins its flex layout.
+:host {
+  display: contents;
+}
+
+.task-cover {
+  width: calc(100% + 1rem + 4px);
+  margin: -1rem -1rem 0 calc(-1rem - 4px);
+  border-radius: 24px 24px 0 0;
+  height: 120px;
+  object-fit: cover;
+}
+
+.task-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.task-select-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: $color-primary;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.task-priority {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 8px;
+  color: $color-white;
+
+  &.priority-low    { background-color: $priority-low; color: $priority-on-bright; }
+  &.priority-medium { background-color: $priority-medium; color: $priority-on-bright; }
+  &.priority-high   { background-color: $priority-high; }
+  &.priority-urgent { background-color: $priority-urgent; }
+}
+
+.btn-delete-task {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 50%;
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    color: $color-error;
+    background-color: rgba(255, 129, 144, 0.1);
+  }
+}
+
+.task-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.task-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.label-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.task-description {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-due-date {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+
+  &.overdue {
+    color: $color-error;
+    font-weight: 700;
+  }
+
+  &.due-soon {
+    color: #e6a817;
+    font-weight: 600;
+  }
+}
+
+.due-icon {
+  font-size: 0.75rem;
+}
+
+.task-assignees {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.assignee-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-action);
+  color: $color-white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: default;
+}
+
+.subtask-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.subtask-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.subtask-progress-fill {
+  height: 100%;
+  background: $color-primary;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.subtask-progress-label {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.recurrence-badge {
+  font-size: 0.7rem;
+  color: $color-primary;
+  background: rgba(41, 171, 226, 0.1);
+  border-radius: 6px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+
+.attachment-badge {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+  margin-left: 0.5rem;
+}

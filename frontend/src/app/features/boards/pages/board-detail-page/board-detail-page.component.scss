@@ -2,8 +2,6 @@
 
 $bp-tablet: 1024px;
 
-// ─── Error Banner ────────────────────────────────────────────────────────────
-
 // ─── Page Header ─────────────────────────────────────────────────────────────
 
 .board-detail {
@@ -43,89 +41,6 @@ $bp-tablet: 1024px;
 
   h1, .board-title-input { flex: 1; min-width: 120px; }
 
-  .search-input {
-    flex: 0 0 220px;
-    padding: 0.4rem 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    outline: none;
-    color: var(--color-text);
-    background: var(--color-surface);
-
-    &:focus { border-color: $color-primary; }
-
-    @media (max-width: $bp-mobile) {
-      flex: 1 1 100%;
-      order: 3;
-    }
-  }
-
-  .filter-select {
-    flex: 0 0 auto;
-    padding: 0.4rem 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    color: var(--color-text);
-    background: var(--color-surface);
-    cursor: pointer;
-    outline: none;
-
-    &:focus { border-color: $color-primary; }
-
-    @media (max-width: $bp-mobile) {
-      flex: 1 1 calc(50% - 0.5rem);
-    }
-  }
-
-  .btn-clear-filter {
-    padding: 0.4rem 0.75rem;
-    border: 1px solid $color-error;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: $color-error;
-    background: transparent;
-    cursor: pointer;
-    white-space: nowrap;
-
-    &:hover {
-      background: $color-error;
-      color: $color-white;
-    }
-  }
-
-  .filter-name-input {
-    flex: 0 0 160px;
-    padding: 0.4rem 0.75rem;
-    border: 1px solid $color-primary;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    color: var(--color-text);
-    background: var(--color-surface);
-    outline: none;
-
-    &:focus { border-color: $color-primary; box-shadow: 0 0 0 2px rgba($color-primary, 0.15); }
-  }
-
-  .btn-save-filter {
-    padding: 0.4rem 0.75rem;
-    border: 1px solid $color-primary;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: $color-primary;
-    background: transparent;
-    cursor: pointer;
-    white-space: nowrap;
-
-    &:hover {
-      background: $color-primary;
-      color: $color-white;
-    }
-  }
-
   h1 {
     font-size: 2rem;
     font-weight: 700;
@@ -154,28 +69,6 @@ $bp-tablet: 1024px;
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
-  }
-}
-
-.board-tools {
-  position: relative;
-  margin-left: auto;
-}
-
-.btn-more {
-  padding: 0.4rem 0.75rem;
-  border: 1px solid $color-primary;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: $color-primary;
-  white-space: nowrap;
-  cursor: pointer;
-  background: none;
-
-  &:hover {
-    background: $color-primary;
-    color: $color-white;
   }
 }
 
@@ -401,14 +294,6 @@ $bp-tablet: 1024px;
     outline-offset: -2px;
   }
 
-  .task-cover {
-    width: calc(100% + 1rem + 4px);
-    margin: -1rem -1rem 0 calc(-1rem - 4px);
-    border-radius: 24px 24px 0 0;
-    height: 120px;
-    object-fit: cover;
-  }
-
   &.kb-focused {
     outline: 2px solid $color-primary;
     outline-offset: 2px;
@@ -423,157 +308,6 @@ $bp-tablet: 1024px;
   }
 }
 
-.task-select-checkbox {
-  width: 16px;
-  height: 16px;
-  accent-color: $color-primary;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.task-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.bulk-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 1rem;
-  background: $color-primary;
-  border-radius: 10px;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-
-  .bulk-count {
-    font-weight: 700;
-    color: $color-white;
-    font-size: 0.9rem;
-  }
-
-  .btn-bulk-move {
-    background: var(--color-surface);
-    color: var(--color-text);
-    border: none;
-    border-radius: 8px;
-    padding: 0.35rem 0.75rem;
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-
-    &:disabled { opacity: 0.5; cursor: not-allowed; }
-    &:hover:not(:disabled) { background: var(--color-bg); }
-  }
-
-  .btn-bulk-delete {
-    background: $color-error;
-    color: $color-white;
-    border: none;
-    border-radius: 8px;
-    padding: 0.35rem 0.75rem;
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-
-    &:hover { opacity: 0.85; }
-  }
-}
-
-.task-priority {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: 8px;
-  color: $color-white;
-
-  &.priority-low    { background-color: $priority-low; color: $priority-on-bright; }
-  &.priority-medium { background-color: $priority-medium; color: $priority-on-bright; }
-  &.priority-high   { background-color: $priority-high; }
-  &.priority-urgent { background-color: $priority-urgent; }
-}
-
-.task-title {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--color-text);
-}
-
-.task-labels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.label-chip {
-  display: inline-block;
-  padding: 1px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #fff;
-  white-space: nowrap;
-}
-
-.task-description {
-  font-size: 0.85rem;
-  color: var(--color-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-// ─── Due Date ────────────────────────────────────────────────────────────────
-
-.task-due-date {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.78rem;
-  color: var(--color-muted);
-
-  &.overdue {
-    color: $color-error;
-    font-weight: 700;
-  }
-
-  &.due-soon {
-    color: #e6a817;
-    font-weight: 600;
-  }
-}
-
-.due-icon {
-  font-size: 0.75rem;
-}
-
-// ─── Assignee ────────────────────────────────────────────────────────────────
-
-.task-assignees {
-  display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-}
-
-.assignee-avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--color-action);
-  color: $color-white;
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  cursor: default;
-}
-
 // ─── Swimlane Headers ────────────────────────────────────────────────────────
 
 .swimlane-header {
@@ -585,82 +319,6 @@ $bp-tablet: 1024px;
   padding: 0.5rem 0 0.25rem;
   border-bottom: 1px solid var(--color-border, $color-border);
   margin-bottom: 0.25rem;
-}
-
-// ─── Subtask Progress ────────────────────────────────────────────────────────
-
-.subtask-progress {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.subtask-progress-bar {
-  flex: 1;
-  height: 6px;
-  background: var(--color-border);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.subtask-progress-fill {
-  height: 100%;
-  background: $color-primary;
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.subtask-progress-label {
-  font-size: 0.75rem;
-  color: var(--color-muted);
-  white-space: nowrap;
-}
-
-.recurrence-badge {
-  font-size: 0.7rem;
-  color: $color-primary;
-  background: rgba(41, 171, 226, 0.1);
-  border-radius: 6px;
-  padding: 1px 6px;
-  white-space: nowrap;
-}
-
-.attachment-badge {
-  font-size: 0.75rem;
-  color: var(--color-muted);
-  white-space: nowrap;
-  margin-left: 0.5rem;
-}
-
-// ─── Task Input ───────────────────────────────────────────────────────────────
-
-.task-input-card {
-  background: var(--color-surface);
-  border-radius: 16px;
-  padding: 0.75rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  .form-input {
-    width: 100%;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9rem;
-
-    &:focus {
-      border-color: $color-primary;
-      outline: none;
-    }
-  }
-}
-
-.task-input-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 
 .btn-add-task {
@@ -713,10 +371,6 @@ $bp-tablet: 1024px;
     background-color: rgba(255, 129, 144, 0.1);
   }
 
-  &.small {
-    font-size: 0.75rem;
-    padding: 2px 5px;
-  }
 }
 
 .btn-confirm {
