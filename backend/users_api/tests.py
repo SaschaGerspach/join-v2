@@ -177,3 +177,53 @@ class UserDetailTests(APITestCase):
         BoardMember.objects.create(board=board, user=target)
         self.client.delete(self.url(target.pk))
         self.assertFalse(BoardMember.objects.filter(user=target).exists())
+
+
+class DeleteAccountServiceTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="leaver@example.com", password="pass", first_name="Lea")
+        self.other = User.objects.create_user(email="stayer@example.com", password="pass")
+
+    def test_team_is_handed_to_earliest_member(self):
+        from teams_api.models import Team, TeamMember
+
+        from .services import delete_account
+
+        team = Team.objects.create(name="Crew", created_by=self.user)
+        TeamMember.objects.create(team=team, user=self.other)
+        delete_account(self.user)
+        team.refresh_from_db()
+        self.assertEqual(team.created_by, self.other)
+        self.assertFalse(TeamMember.objects.filter(team=team, user=self.other).exists())
+
+    def test_team_without_members_is_deleted(self):
+        from teams_api.models import Team
+
+        from .services import delete_account
+
+        Team.objects.create(name="Solo", created_by=self.user)
+        delete_account(self.user)
+        self.assertFalse(Team.objects.filter(name="Solo").exists())
+
+    def test_user_is_anonymized_and_deactivated(self):
+        from .services import delete_account
+
+        delete_account(self.user)
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.is_active)
+        self.assertTrue(self.user.email.endswith("@anonymized.local"))
+        self.assertEqual(self.user.first_name, "Deleted")
+        self.assertFalse(self.user.has_usable_password())
+
+    def test_all_refresh_tokens_are_revoked(self):
+        from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        from .services import delete_account
+
+        RefreshToken.for_user(self.user)
+        RefreshToken.for_user(self.user)
+        delete_account(self.user)
+        outstanding = OutstandingToken.objects.filter(user=self.user)
+        self.assertEqual(outstanding.count(), 2)
+        self.assertEqual(BlacklistedToken.objects.filter(token__in=outstanding).count(), 2)

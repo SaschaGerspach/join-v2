@@ -1,26 +1,19 @@
-import logging
-
 from django.contrib.auth import get_user_model
-from django.db import transaction
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
-from rest_framework_simplejwt.tokens import RefreshToken as RefreshTokenClass
-
-import uuid
 
 from auth_api.views._helpers import clear_refresh_cookie, issue_tokens_for, set_refresh_cookie
 from boards_api.models import Board, BoardMember
 from config.serializers import DetailSerializer
 from audit_api.helpers import log_audit
 from .serializers import PublicUserSerializer, UserUpdateSerializer
+from .services import delete_account, revoke_all_refresh_tokens
 
 User = get_user_model()
-logger = logging.getLogger(__name__)
 
 
 def _co_member_ids(user):
@@ -127,8 +120,7 @@ def user_detail(request, pk):
         if "password" in data:
             # The refresh cookie is scoped to /auth/, so the current session cannot be spared;
             # revoke all sessions and hand this client a fresh refresh token instead.
-            for token in OutstandingToken.objects.filter(user=user):
-                BlacklistedToken.objects.get_or_create(token=token)
+            revoke_all_refresh_tokens(user)
             refresh, _ = issue_tokens_for(user)
             set_refresh_cookie(response, refresh)
         return response
@@ -138,55 +130,8 @@ def user_detail(request, pk):
             return Response({"detail": "You can only delete your own account."}, status=status.HTTP_403_FORBIDDEN)
 
         original_email = user.email
-        with transaction.atomic():
-            for board in Board.objects.select_for_update().filter(created_by=user):
-                successor = (
-                    BoardMember.objects.select_for_update()
-                    .filter(board=board)
-                    .order_by("invited_at")
-                    .first()
-                )
-                if successor:
-                    board.created_by = successor.user
-                    board.save(update_fields=["created_by"])
-                    successor.delete()
-                else:
-                    board.title = f"[Deleted User] {board.title}"
-                    board.save(update_fields=["title"])
-            BoardMember.objects.filter(user=user).delete()
-
-            from teams_api.models import Team, TeamMember
-            for team in Team.objects.select_for_update().filter(created_by=user):
-                successor = TeamMember.objects.filter(team=team).order_by("joined_at").first()
-                if successor:
-                    team.created_by = successor.user
-                    team.save(update_fields=["created_by"])
-                    successor.delete()
-                else:
-                    team.delete()
-            TeamMember.objects.filter(user=user).delete()
-
-            anon_id = uuid.uuid4().hex[:8]
-            user.email = f"deleted-{anon_id}@anonymized.local"
-            user.first_name = "Deleted"
-            user.last_name = "User"
-            user.is_active = False
-            user.set_unusable_password()
-            if hasattr(user, "totp_secret"):
-                user.totp_secret = ""
-            if user.avatar:
-                try:
-                    user.avatar.delete(save=False)
-                except Exception:
-                    logger.warning("Failed to delete avatar file for user %s", user.pk)
-            user.save()
+        delete_account(user)
         log_audit("account_deleted", user=user, request=request, detail=f"email={original_email}")
-
-        for token in OutstandingToken.objects.filter(user=user):
-            try:
-                RefreshTokenClass(token.token).blacklist()
-            except Exception:
-                logger.warning("Failed to blacklist token %s for user %s", token.pk, user.pk)
 
         response = Response(status=status.HTTP_204_NO_CONTENT)
         clear_refresh_cookie(response)
