@@ -74,6 +74,21 @@ class TaskDetailTests(APITestCase):
         response = self.client.get(self.url(9999))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_get_task_query_count_independent_of_dependencies(self):
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+
+        def query_count():
+            with CaptureQueriesContext(connection) as ctx:
+                self.client.get(self.url(self.task.pk))
+            return len(ctx.captured_queries)
+
+        TaskDependency.objects.create(task=self.task, depends_on=Task.objects.create(board=self.board, title="Dep 0"))
+        baseline = query_count()
+        for i in range(1, 4):
+            TaskDependency.objects.create(task=self.task, depends_on=Task.objects.create(board=self.board, title=f"Dep {i}"))
+        self.assertEqual(query_count(), baseline)
+
     def test_patch_task(self):
         response = self.client.patch(self.url(self.task.pk), {"title": "Updated", "priority": "high"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -339,6 +354,22 @@ class TaskArchiveTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["title"], "Archived Task")
+
+    def test_list_archive_query_count_independent_of_task_count(self):
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+
+        def query_count():
+            with CaptureQueriesContext(connection) as ctx:
+                self.client.get(self.archive_url, {"board": self.board.pk})
+            return len(ctx.captured_queries)
+
+        TaskDependency.objects.create(task=self.task, depends_on=self.active_task)
+        baseline = query_count()
+        for i in range(3):
+            archived = Task.objects.create(board=self.board, title=f"Archived {i}", archived_at=timezone.now())
+            TaskDependency.objects.create(task=archived, depends_on=self.active_task)
+        self.assertEqual(query_count(), baseline)
 
     def test_list_archive_as_admin(self):
         self.client.force_authenticate(user=self.admin)

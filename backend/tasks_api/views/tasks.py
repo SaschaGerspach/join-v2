@@ -125,7 +125,7 @@ def task_list(request):
 @api_view(["GET", "PATCH", "DELETE"])
 def task_detail(request, pk):
     try:
-        task = Task.objects.select_related("board").prefetch_related("assignees", "subtasks", "attachments", "labels", "dependencies").get(pk=pk, archived_at__isnull=True)
+        task = Task.objects.select_related("board").prefetch_related("assignees", "subtasks", "attachments", "labels", "dependencies__depends_on").get(pk=pk, archived_at__isnull=True)
     except Task.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
