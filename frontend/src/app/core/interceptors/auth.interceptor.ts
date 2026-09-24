@@ -20,7 +20,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const auth = inject(AuthService);
 
-  const sameOrigin = req.url.startsWith(environment.apiUrl);
+  // A bare prefix check would also match hosts like `<apiUrl>.evil.com` and leak the token there.
+  const sameOrigin = req.url === environment.apiUrl || req.url.startsWith(`${environment.apiUrl}/`);
   const token = auth.getAccessToken();
   const outgoing = sameOrigin && token && !isAuthSkipped(req.url) ? withBearer(req, token) : req;
 

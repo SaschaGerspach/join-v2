@@ -11,10 +11,11 @@ describe('authInterceptor', () => {
   let http: HttpClient;
   let httpMock: HttpTestingController;
   let routerSpy: jasmine.SpyObj<Router>;
+  let authSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    const authSpy = jasmine.createSpyObj('AuthService', ['getAccessToken', 'refreshAccessToken']);
+    authSpy = jasmine.createSpyObj('AuthService', ['getAccessToken', 'refreshAccessToken']);
     authSpy.getAccessToken.and.returnValue(null);
     authSpy.refreshAccessToken.and.returnValue(throwError(() => new Error('refresh failed')));
 
@@ -37,6 +38,24 @@ describe('authInterceptor', () => {
     http.get(url).subscribe({ error: () => {} });
     httpMock.expectOne(url).flush('unauth', { status: 401, statusText: 'Unauthorized' });
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('should attach the token to API requests', () => {
+    authSpy.getAccessToken.and.returnValue('secret-token');
+    const url = `${environment.apiUrl}/boards/`;
+    http.get(url).subscribe();
+    const req = httpMock.expectOne(url);
+    expect(req.request.headers.get('Authorization')).toBe('Bearer secret-token');
+    req.flush([]);
+  });
+
+  it('should not attach the token to hosts that merely share the API url prefix', () => {
+    authSpy.getAccessToken.and.returnValue('secret-token');
+    const url = `${environment.apiUrl}.evil.com/collect/`;
+    http.get(url).subscribe();
+    const req = httpMock.expectOne(url);
+    expect(req.request.headers.has('Authorization')).toBeFalse();
+    req.flush({});
   });
 
   it('should not redirect when the startup session probe fails', () => {
