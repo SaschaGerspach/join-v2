@@ -785,6 +785,38 @@ class EvaluateRulesTests(AutomationTestMixin, APITestCase):
         self.assertEqual(mock_exec.call_count, 1)
 
 
+class CheckDeadlineRulesTests(AutomationTestMixin, APITestCase):
+    def setUp(self):
+        from django.utils import timezone
+
+        super().setUp()
+        self.task.due_date = timezone.now().date()
+        self.task.save(update_fields=["due_date"])
+        other_board = Board.objects.create(title="Other", created_by=self.other)
+        self.other_task = Task.objects.create(board=other_board, title="Other Task", due_date=self.task.due_date)
+
+    def _evaluated_task_ids(self):
+        from .tasks import check_deadline_rules
+
+        with patch("automations_api.engine.evaluate_rules") as mock_eval:
+            check_deadline_rules()
+        return {c.args[0].pk for c in mock_eval.call_args_list}
+
+    def test_only_tasks_on_boards_with_rules_are_evaluated(self):
+        AutomationRule.objects.create(
+            board=self.board, created_by=self.user,
+            name="Deadline", trigger_type=TriggerType.DEADLINE_APPROACHING,
+        )
+        self.assertEqual(self._evaluated_task_ids(), {self.task.pk})
+
+    def test_global_rule_evaluates_all_boards(self):
+        AutomationRule.objects.create(
+            board=None, created_by=self.user,
+            name="Global Deadline", trigger_type=TriggerType.DEADLINE_APPROACHING,
+        )
+        self.assertEqual(self._evaluated_task_ids(), {self.task.pk, self.other_task.pk})
+
+
 class ModelsQTests(AutomationTestMixin, APITestCase):
     def setUp(self):
         super().setUp()

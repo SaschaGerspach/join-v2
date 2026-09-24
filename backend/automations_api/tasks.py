@@ -24,7 +24,9 @@ def check_deadline_rules():
         due_date__lte=threshold.date(),
         due_date__gte=timezone.now().date(),
         archived_at__isnull=True,
-    )
+    ).select_related("board")
+    if all(r.board_id is not None for r in rules):
+        tasks = tasks.filter(board_id__in={r.board_id for r in rules})
 
     for task in tasks:
         evaluate_rules(task, TriggerType.DEADLINE_APPROACHING)
