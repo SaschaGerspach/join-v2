@@ -20,7 +20,7 @@ from ..serializers import (
     TwoFactorRequiredSerializer,
 )
 from audit_api.helpers import log_audit
-from ._helpers import AuthRateThrottle, clear_refresh_cookie, issue_tokens_for, set_refresh_cookie
+from ._helpers import AuthRateThrottle, User, clear_refresh_cookie, issue_tokens_for, set_refresh_cookie
 
 
 @extend_schema(
@@ -121,6 +121,13 @@ def token_refresh(request):
         refresh = RefreshToken(raw)
     except TokenError:
         response = Response({"detail": "Invalid or expired refresh token."}, status=status.HTTP_401_UNAUTHORIZED)
+        clear_refresh_cookie(response)
+        return response
+
+    user_id = refresh.payload.get(settings.SIMPLE_JWT["USER_ID_CLAIM"])
+    if not User.objects.filter(pk=user_id, is_active=True).exists():
+        refresh.blacklist()
+        response = Response({"detail": "User is inactive."}, status=status.HTTP_401_UNAUTHORIZED)
         clear_refresh_cookie(response)
         return response
 

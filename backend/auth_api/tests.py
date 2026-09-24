@@ -93,6 +93,33 @@ class LogoutViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
+class TokenRefreshTests(APITestCase):
+    url = "/auth/token/refresh/"
+
+    def setUp(self):
+        from django.conf import settings
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        self.user = User.objects.create_user(email="test@example.com", password="securepass123")
+        self.refresh = RefreshToken.for_user(self.user)
+        self.client.cookies[settings.REFRESH_COOKIE_NAME] = str(self.refresh)
+
+    def test_refresh_issues_access_token(self):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+
+    def test_refresh_rejected_for_inactive_user(self):
+        from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+
+        self.user.is_active = False
+        self.user.save(update_fields=["is_active"])
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertNotIn("access", response.data)
+        self.assertTrue(BlacklistedToken.objects.filter(token__jti=self.refresh["jti"]).exists())
+
+
 class MeViewTests(APITestCase):
     url = "/auth/me/"
 
