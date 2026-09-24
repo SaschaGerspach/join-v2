@@ -42,20 +42,20 @@
             <div class="today-line" [style.left.%]="todayPosition()"></div>
           }
 
-          <svg class="dependency-lines" [attr.viewBox]="'0 0 ' + timelineWidth() + ' ' + (ganttBars().length * 44)">
+          <svg class="dependency-lines" [attr.viewBox]="'0 0 ' + timelineWidth() + ' ' + (ganttBars().length * rowHeight)">
             @for (line of dependencyLines(); track $index) {
               <path
-                [attr.d]="'M ' + (line.x1 / 100 * timelineWidth()) + ' ' + line.y1 + ' C ' + ((line.x1 / 100 * timelineWidth()) + 30) + ' ' + line.y1 + ' ' + ((line.x2 / 100 * timelineWidth()) - 30) + ' ' + line.y2 + ' ' + (line.x2 / 100 * timelineWidth()) + ' ' + line.y2"
+                [attr.d]="line.path"
                 class="dep-arrow-hit"
                 (click)="onDepLineClick(line.taskId, line.depId, line.dependsOnTitle)"
               />
               <path
-                [attr.d]="'M ' + (line.x1 / 100 * timelineWidth()) + ' ' + line.y1 + ' C ' + ((line.x1 / 100 * timelineWidth()) + 30) + ' ' + line.y1 + ' ' + ((line.x2 / 100 * timelineWidth()) - 30) + ' ' + line.y2 + ' ' + (line.x2 / 100 * timelineWidth()) + ' ' + line.y2"
+                [attr.d]="line.path"
                 class="dep-arrow"
               />
               <circle
-                [attr.cx]="line.x2 / 100 * timelineWidth()"
-                [attr.cy]="line.y2"
+                [attr.cx]="line.endX"
+                [attr.cy]="line.endY"
                 r="3"
                 class="dep-dot"
               />

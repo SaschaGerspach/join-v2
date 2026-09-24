@@ -5,19 +5,19 @@ import { forkJoin } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TasksApiService, Task } from '../../../../core/tasks/tasks-api.service';
 import { ColumnsApiService, Column } from '../../../../core/columns/columns-api.service';
-import { PRIORITY_COLORS, BRAND_COLOR } from '../../../../shared/constants/colors';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { initBoardPage } from '../../utils/board-page-init';
-
-type ZoomLevel = 'day' | 'week' | 'month';
-
-type GanttBar = {
-  task: Task;
-  left: number;
-  width: number;
-  color: string;
-  columnTitle: string;
-};
+import {
+  COLUMN_WIDTH,
+  ROW_HEIGHT,
+  ZoomLevel,
+  buildDependencyLines,
+  buildGanttBars,
+  buildTimelineHeaders,
+  computeDateRange,
+  rowCenter,
+  todayPosition,
+} from './_gantt-layout';
 
 @Component({
   selector: 'app-board-gantt-page',
@@ -33,6 +33,9 @@ export class BoardGanttPageComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
   private readonly elRef = inject(ElementRef);
+  protected readonly rowHeight = ROW_HEIGHT;
+  private stopDrag: (() => void) | null = null;
+
   loading = signal(true);
   tasks = signal<Task[]>([]);
   columns = signal<Column[]>([]);
@@ -43,157 +46,16 @@ export class BoardGanttPageComponent implements OnInit {
   dragLineEnd = signal<{ x: number; y: number } | null>(null);
   pendingDeleteDep = signal<{ taskId: number; depId: number; dependsOnTitle: string } | null>(null);
 
-  private columnMap = computed(() => {
-    const map = new Map<number, string>();
-    for (const c of this.columns()) {
-      map.set(c.id, c.title);
-    }
-    return map;
-  });
+  private columnTitles = computed(() => new Map(this.columns().map(c => [c.id, c.title])));
 
-  datedTasks = computed(() =>
-    this.tasks().filter(t => t.start_date || t.due_date)
-  );
-
-  undatedTasks = computed(() =>
-    this.tasks().filter(t => !t.start_date && !t.due_date)
-  );
-
-  dateRange = computed(() => {
-    const dated = this.datedTasks();
-    if (dated.length === 0) return { start: new Date(), end: new Date(), days: 0 };
-
-    let min = Infinity;
-    let max = -Infinity;
-    for (const t of dated) {
-      const s = t.start_date ? new Date(t.start_date).getTime() : null;
-      const d = t.due_date ? new Date(t.due_date).getTime() : null;
-      const earliest = s ?? d!;
-      const latest = d ?? s!;
-      if (earliest < min) min = earliest;
-      if (latest > max) max = latest;
-    }
-
-    const start = new Date(min);
-    start.setDate(start.getDate() - 7);
-    const end = new Date(max);
-    end.setDate(end.getDate() + 7);
-    const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    return { start, end, days };
-  });
-
-  timelineHeaders = computed(() => {
-    const { start, days } = this.dateRange();
-    if (days === 0) return [];
-    const z = this.zoom();
-    const headers: { label: string; span: number }[] = [];
-
-    if (z === 'day') {
-      for (let i = 0; i < days; i++) {
-        const d = new Date(start);
-        d.setDate(d.getDate() + i);
-        headers.push({ label: this.formatDate(d, 'day'), span: 1 });
-      }
-    } else if (z === 'week') {
-      let i = 0;
-      while (i < days) {
-        const d = new Date(start);
-        d.setDate(d.getDate() + i);
-        const weekEnd = 7 - d.getDay();
-        const span = Math.min(weekEnd || 7, days - i);
-        headers.push({ label: this.formatDate(d, 'week'), span });
-        i += span;
-      }
-    } else {
-      let i = 0;
-      while (i < days) {
-        const d = new Date(start);
-        d.setDate(d.getDate() + i);
-        const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-        const remaining = daysInMonth - d.getDate() + 1;
-        const span = Math.min(remaining, days - i);
-        headers.push({ label: this.formatDate(d, 'month'), span });
-        i += span;
-      }
-    }
-    return headers;
-  });
-
-  ganttBars = computed<GanttBar[]>(() => {
-    const dated = this.datedTasks();
-    const { start, days } = this.dateRange();
-    if (days === 0) return [];
-    const startMs = start.getTime();
-    const totalMs = days * 24 * 60 * 60 * 1000;
-    const colMap = this.columnMap();
-
-    return dated.map(t => {
-      const s = t.start_date ? new Date(t.start_date).getTime() : null;
-      const d = t.due_date ? new Date(t.due_date + 'T23:59:59').getTime() : null;
-      const barStart = s ?? d!;
-      const barEnd = d ?? (s! + 24 * 60 * 60 * 1000);
-
-      const left = ((barStart - startMs) / totalMs) * 100;
-      const width = Math.max(((barEnd - barStart) / totalMs) * 100, 0.5);
-
-      return {
-        task: t,
-        left,
-        width,
-        color: PRIORITY_COLORS[t.priority] ?? BRAND_COLOR,
-        columnTitle: (t.column ? colMap.get(t.column) : null) ?? '',
-      };
-    });
-  });
-
-  todayPosition = computed(() => {
-    const { start, days } = this.dateRange();
-    if (days === 0) return -1;
-    const now = new Date();
-    const startMs = start.getTime();
-    const totalMs = days * 24 * 60 * 60 * 1000;
-    const pos = ((now.getTime() - startMs) / totalMs) * 100;
-    return pos >= 0 && pos <= 100 ? pos : -1;
-  });
-
-  dependencyLines = computed(() => {
-    const bars = this.ganttBars();
-    const barMap = new Map<number, GanttBar>();
-    for (const b of bars) barMap.set(b.task.id, b);
-    const barIndex = new Map<number, number>();
-    bars.forEach((b, i) => barIndex.set(b.task.id, i));
-
-    const lines: { x1: number; y1: number; x2: number; y2: number; taskId: number; depId: number; dependsOnTitle: string }[] = [];
-    for (const bar of bars) {
-      for (const dep of bar.task.dependencies) {
-        const source = barMap.get(dep.depends_on);
-        if (!source) continue;
-        const sourceIdx = barIndex.get(dep.depends_on)!;
-        const targetIdx = barIndex.get(bar.task.id)!;
-        lines.push({
-          x1: source.left + source.width,
-          y1: sourceIdx * 44 + 22,
-          x2: bar.left,
-          y2: targetIdx * 44 + 22,
-          taskId: bar.task.id,
-          depId: dep.id,
-          dependsOnTitle: dep.title,
-        });
-      }
-    }
-    return lines;
-  });
-
-  colWidth = computed(() => {
-    const z = this.zoom();
-    if (z === 'day') return 40;
-    if (z === 'week') return 20;
-    return 8;
-  });
-
-  timelineWidth = computed(() => {
-    return this.dateRange().days * this.colWidth();
-  });
+  datedTasks = computed(() => this.tasks().filter(t => t.start_date || t.due_date));
+  undatedTasks = computed(() => this.tasks().filter(t => !t.start_date && !t.due_date));
+  dateRange = computed(() => computeDateRange(this.datedTasks()));
+  timelineHeaders = computed(() => buildTimelineHeaders(this.dateRange().start, this.dateRange().days, this.zoom()));
+  ganttBars = computed(() => buildGanttBars(this.datedTasks(), this.dateRange(), this.columnTitles()));
+  todayPosition = computed(() => todayPosition(this.dateRange()));
+  timelineWidth = computed(() => this.dateRange().days * COLUMN_WIDTH[this.zoom()]);
+  dependencyLines = computed(() => buildDependencyLines(this.ganttBars(), this.timelineWidth()));
 
   dragLine = computed(() => {
     const fromId = this.dragFromTaskId();
@@ -203,11 +65,13 @@ export class BoardGanttPageComponent implements OnInit {
     const idx = bars.findIndex(b => b.task.id === fromId);
     if (idx < 0) return null;
     const bar = bars[idx];
-    const tw = this.timelineWidth();
-    const x1 = (bar.left + bar.width) / 100 * tw;
-    const y1 = idx * 44 + 22;
-    return { x1, y1, x2: end.x, y2: end.y };
+    const x1 = (bar.left + bar.width) / 100 * this.timelineWidth();
+    return { x1, y1: rowCenter(idx), x2: end.x, y2: end.y };
   });
+
+  constructor() {
+    this.board.destroyRef.onDestroy(() => this.stopDrag?.());
+  }
 
   ngOnInit(): void {
     forkJoin([
@@ -247,8 +111,7 @@ export class BoardGanttPageComponent implements OnInit {
     };
 
     const onUp = (e: MouseEvent) => {
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
+      this.stopDrag?.();
 
       const targetEl = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
       const barEl = targetEl?.closest('[data-task-id]') as HTMLElement | null;
@@ -262,8 +125,15 @@ export class BoardGanttPageComponent implements OnInit {
       this.dragLineEnd.set(null);
     };
 
+    this.stopDrag?.();
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
+    // Listeners live on document, so they must also be removed if the page is destroyed mid-drag.
+    this.stopDrag = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      this.stopDrag = null;
+    };
   }
 
   onDepLineClick(taskId: number, depId: number, dependsOnTitle: string): void {
@@ -304,11 +174,5 @@ export class BoardGanttPageComponent implements OnInit {
           this.toast.show(this.translate.instant('TOAST.DEPENDENCY_CREATED'));
         },
       });
-  }
-
-  private formatDate(d: Date, level: ZoomLevel): string {
-    const month = d.toLocaleString(undefined, { month: 'short' });
-    if (level === 'day' || level === 'week') return `${d.getDate()} ${month}`;
-    return `${month} ${d.getFullYear()}`;
   }
 }
