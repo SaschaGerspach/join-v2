@@ -118,6 +118,11 @@ def logout_view(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def token_refresh(request):
+    # The refresh cookie is SameSite=None in production, so a foreign page could trigger a rotation.
+    origin = request.headers.get("Origin")
+    if origin and origin not in {*settings.CORS_ALLOWED_ORIGINS, *settings.CSRF_TRUSTED_ORIGINS}:
+        return Response({"detail": "Origin not allowed."}, status=status.HTTP_403_FORBIDDEN)
+
     raw = request.COOKIES.get(settings.REFRESH_COOKIE_NAME)
     if not raw:
         return Response({"detail": "No refresh token."}, status=status.HTTP_401_UNAUTHORIZED)

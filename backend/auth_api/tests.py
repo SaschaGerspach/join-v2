@@ -216,6 +216,19 @@ class TokenRefreshTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("access", response.data)
 
+    def test_refresh_allowed_from_frontend_origin(self):
+        from django.conf import settings
+
+        response = self.client.post(self.url, HTTP_ORIGIN=settings.CORS_ALLOWED_ORIGINS[0])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_refresh_rejected_from_foreign_origin(self):
+        from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+
+        response = self.client.post(self.url, HTTP_ORIGIN="https://evil.example")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(BlacklistedToken.objects.filter(token__jti=self.refresh["jti"]).exists())
+
     def test_refresh_rejected_for_inactive_user(self):
         from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 
