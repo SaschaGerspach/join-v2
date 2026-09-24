@@ -47,6 +47,10 @@
       <h2 class="section-title">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</h2>
       <div class="form-grid">
         <div class="form-field full-width">
+          <label for="profile-current-password">{{ 'PROFILE.CURRENT_PASSWORD' | translate }}</label>
+          <input id="profile-current-password" class="field-input" type="password" autocomplete="current-password" [ngModel]="currentPassword()" (ngModelChange)="currentPassword.set($event)" [placeholder]="'PROFILE.CURRENT_PASSWORD_PLACEHOLDER' | translate" />
+        </div>
+        <div class="form-field full-width">
           <label for="profile-new-password">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
           <input id="profile-new-password" class="field-input" type="password" minlength="8" autocomplete="new-password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" [placeholder]="'PROFILE.NEW_PASSWORD_PLACEHOLDER' | translate" />
         </div>

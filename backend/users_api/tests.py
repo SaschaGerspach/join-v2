@@ -87,6 +87,42 @@ class UserDetailTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(User.objects.get(pk=target.pk).is_active)
 
+    def test_password_change_requires_current_password(self):
+        response = self.client.patch(self.url(self.user.pk), {"password": "newsecret123"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.patch(
+            self.url(self.user.pk), {"password": "newsecret123", "current_password": "wrong"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("pass"))
+
+    def test_password_change_revokes_sessions_and_issues_new_refresh_token(self):
+        from django.conf import settings
+        from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        old = RefreshToken.for_user(self.user)
+        response = self.client.patch(
+            self.url(self.user.pk), {"password": "newsecret123", "current_password": "pass"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("newsecret123"))
+        self.assertTrue(BlacklistedToken.objects.filter(token__jti=old["jti"]).exists())
+        new_jti = RefreshToken(response.cookies[settings.REFRESH_COOKIE_NAME].value)["jti"]
+        self.assertFalse(BlacklistedToken.objects.filter(token__jti=new_jti).exists())
+
+    def test_admin_cannot_set_password_of_other_user(self):
+        self.user.is_superuser = True
+        self.user.save()
+        response = self.client.patch(
+            self.url(self.other.pk), {"password": "newsecret123", "current_password": "pass"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.other.refresh_from_db()
+        self.assertTrue(self.other.check_password("pass"))
+
     def test_staff_cannot_modify_superuser(self):
         self.user.is_staff = True
         self.user.save()

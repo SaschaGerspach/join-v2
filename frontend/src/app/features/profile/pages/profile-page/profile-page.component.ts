@@ -36,6 +36,7 @@ export class ProfilePageComponent implements OnInit {
   firstName = signal('');
   lastName = signal('');
   email = signal('');
+  currentPassword = signal('');
   newPassword = signal('');
   confirmPassword = signal('');
 
@@ -154,6 +155,10 @@ export class ProfilePageComponent implements OnInit {
       this.errorMessage.set(this.translate.instant('ERROR.PASSWORDS_NO_MATCH'));
       return;
     }
+    if (pw && !this.currentPassword()) {
+      this.errorMessage.set(this.translate.instant('ERROR.CURRENT_PASSWORD_REQUIRED'));
+      return;
+    }
 
     const payload: Record<string, string> = {
       first_name: this.firstName().trim(),
@@ -163,11 +168,15 @@ export class ProfilePageComponent implements OnInit {
       payload['email'] = this.email().trim();
     }
 
-    if (pw) payload['password'] = pw;
+    if (pw) {
+      payload['password'] = pw;
+      payload['current_password'] = this.currentPassword();
+    }
 
     this.saving.set(true);
     this.usersApi.patch(this.userId, payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.currentPassword.set('');
         this.newPassword.set('');
         this.confirmPassword.set('');
         this.saving.set(false);

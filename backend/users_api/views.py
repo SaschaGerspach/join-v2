@@ -8,12 +8,12 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken as RefreshTokenClass
 
 import uuid
 
-from auth_api.views._helpers import clear_refresh_cookie
+from auth_api.views._helpers import clear_refresh_cookie, issue_tokens_for, set_refresh_cookie
 from boards_api.models import Board, BoardMember
 from config.serializers import DetailSerializer
 from audit_api.helpers import log_audit
@@ -109,6 +109,11 @@ def user_detail(request, pk):
             new_email = data["email"].lower()
             if User.objects.filter(email=new_email, is_active=True).exclude(pk=pk).exists():
                 return Response({"detail": "A user with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        if "password" in data:
+            if request.user.pk != user.pk:
+                return Response({"detail": "You can only change your own password."}, status=status.HTTP_403_FORBIDDEN)
+            if not user.check_password(data.get("current_password", "")):
+                return Response({"detail": "Current password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
         for field in ["first_name", "last_name", "email"]:
             if field in data:
                 value = data[field]
@@ -118,7 +123,15 @@ def user_detail(request, pk):
         if "password" in data:
             user.set_password(data["password"])
         user.save()
-        return Response(serialize_user(user))
+        response = Response(serialize_user(user))
+        if "password" in data:
+            # The refresh cookie is scoped to /auth/, so the current session cannot be spared;
+            # revoke all sessions and hand this client a fresh refresh token instead.
+            for token in OutstandingToken.objects.filter(user=user):
+                BlacklistedToken.objects.get_or_create(token=token)
+            refresh, _ = issue_tokens_for(user)
+            set_refresh_cookie(response, refresh)
+        return response
 
     if request.method == "DELETE":
         if not _can_manage(request.user, user):

@@ -19,7 +19,7 @@ export class UsersApiService {
     return this.http.get<UserProfile>(`${this.baseUrl}/users/${id}/`, { withCredentials: true });
   }
 
-  patch(id: number, payload: Partial<UserProfile & { password: string }>): Observable<UserProfile> {
+  patch(id: number, payload: Partial<UserProfile & { password: string; current_password: string }>): Observable<UserProfile> {
     return this.http.patch<UserProfile>(`${this.baseUrl}/users/${id}/`, payload, { withCredentials: true });
   }
 
