@@ -49,7 +49,9 @@ export class LoginPageComponent {
     this.auth.login(this.email(), this.password(), code).subscribe({
       next: () => {
         const returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'];
-        this.router.navigateByUrl(returnUrl || '/boards');
+        // Only in-app paths; `//host` and `/\host` are treated as off-site URLs by browsers.
+        const isInternal = typeof returnUrl === 'string' && /^\/(?![/\\])/.test(returnUrl);
+        this.router.navigateByUrl(isInternal ? returnUrl : '/boards');
       },
       error: (err) => {
         if (err?.status === 206 && err?.error?.requires_2fa) {
