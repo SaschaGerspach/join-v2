@@ -5,8 +5,7 @@ import uuid
 from typing import TYPE_CHECKING
 
 from django.db import transaction
-from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
-
+from auth_api.views._helpers import revoke_all_refresh_tokens
 from boards_api.models import Board, BoardMember
 from teams_api.models import Team, TeamMember
 
@@ -14,11 +13,6 @@ if TYPE_CHECKING:
     from auth_api.models import User
 
 logger = logging.getLogger(__name__)
-
-
-def revoke_all_refresh_tokens(user: User) -> None:
-    for token in OutstandingToken.objects.filter(user=user):
-        BlacklistedToken.objects.get_or_create(token=token)
 
 
 def delete_account(user: User) -> None:

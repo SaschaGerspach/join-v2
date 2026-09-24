@@ -6,12 +6,17 @@ from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-from auth_api.views._helpers import clear_refresh_cookie, issue_tokens_for, set_refresh_cookie
+from auth_api.views._helpers import (
+    clear_refresh_cookie,
+    issue_tokens_for,
+    revoke_all_refresh_tokens,
+    set_refresh_cookie,
+)
 from boards_api.models import Board, BoardMember
 from config.serializers import DetailSerializer
 from audit_api.helpers import log_audit
 from .serializers import PublicUserSerializer, UserUpdateSerializer
-from .services import delete_account, revoke_all_refresh_tokens
+from .services import delete_account
 
 User = get_user_model()
 

@@ -12,7 +12,7 @@ from config.serializers import DetailSerializer
 from ..serializers import EmailSerializer, PasswordResetConfirmSerializer
 from audit_api.helpers import log_audit
 from ..tasks import send_password_reset_email
-from ._helpers import AuthRateThrottle, User
+from ._helpers import AuthRateThrottle, User, revoke_all_refresh_tokens
 
 
 @extend_schema(
@@ -63,5 +63,7 @@ def password_reset_confirm(request):
         return Response({"detail": errors[0]}, status=status.HTTP_400_BAD_REQUEST)
 
     form.save()
+    # A reset is the recovery path after a compromise, so existing sessions must not survive it.
+    revoke_all_refresh_tokens(user)
     log_audit("password_reset", user=user, request=request)
     return Response(status=status.HTTP_204_NO_CONTENT)

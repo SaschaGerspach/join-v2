@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 from ..encryption import decrypt_totp_secret
@@ -66,3 +67,8 @@ def verify_totp_code(user: User, code: str) -> bool:
 def issue_tokens_for(user: User) -> tuple[RefreshToken, AccessToken]:
     refresh = RefreshToken.for_user(user)
     return refresh, refresh.access_token
+
+
+def revoke_all_refresh_tokens(user: User) -> None:
+    for token in OutstandingToken.objects.filter(user=user):
+        BlacklistedToken.objects.get_or_create(token=token)

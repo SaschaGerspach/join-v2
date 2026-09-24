@@ -509,6 +509,20 @@ class PasswordResetConfirmTests(APITestCase):
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password("newpass12345"))
 
+    def test_confirm_revokes_existing_sessions(self):
+        from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        stolen = RefreshToken.for_user(self.user)
+        uid, token = self._get_uid_token()
+        response = self.client.post(self.url, {"uid": uid, "token": token, "password": "newpass12345"})
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertTrue(BlacklistedToken.objects.filter(token__jti=stolen["jti"]).exists())
+
+        self.client.cookies["refresh_token"] = str(stolen)
+        refresh = self.client.post("/auth/token/refresh/")
+        self.assertEqual(refresh.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_confirm_invalid_uid(self):
         _, token = self._get_uid_token()
         response = self.client.post(self.url, {
