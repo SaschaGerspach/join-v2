@@ -158,6 +158,48 @@ class TotpLoginTests(APITestCase):
             self.assertEqual(self._login(code).status_code, status.HTTP_401_UNAUTHORIZED)
 
 
+class TotpSecretEncryptionTests(APITestCase):
+    def test_undecryptable_secret_rejects_login(self):
+        import pyotp
+
+        secret = pyotp.random_base32()
+        user = User.objects.create_user(email="legacy@example.com", password="securepass123")
+        user.is_verified = True
+        user.totp_enabled = True
+        user.totp_secret = secret
+        user.save()
+
+        with self.assertLogs("auth_api.views._helpers", level="ERROR"):
+            response = self.client.post("/auth/login/", {
+                "email": "legacy@example.com",
+                "password": "securepass123",
+                "totp_code": pyotp.TOTP(secret).now(),
+            })
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_migration_encrypts_only_plaintext_secrets(self):
+        import importlib
+
+        import pyotp
+        from django.apps import apps
+
+        from .encryption import decrypt_totp_secret, encrypt_totp_secret
+
+        migration = importlib.import_module("auth_api.migrations.0010_encrypt_legacy_totp_secrets")
+        plain = pyotp.random_base32()
+        encrypted = encrypt_totp_secret(pyotp.random_base32())
+        legacy = User.objects.create_user(email="legacy@example.com", password="x", totp_secret=plain)
+        current = User.objects.create_user(email="current@example.com", password="x", totp_secret=encrypted)
+
+        migration.encrypt_plaintext_secrets(apps, None)
+
+        legacy.refresh_from_db()
+        current.refresh_from_db()
+        self.assertNotEqual(legacy.totp_secret, plain)
+        self.assertEqual(decrypt_totp_secret(legacy.totp_secret), plain)
+        self.assertEqual(current.totp_secret, encrypted)
+
+
 class TokenRefreshTests(APITestCase):
     url = "/auth/token/refresh/"
 

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import logging
+
 import pyotp
+from cryptography.fernet import InvalidToken
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -12,6 +15,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from ..encryption import decrypt_totp_secret
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class AuthRateThrottle(AnonRateThrottle):
@@ -40,7 +44,12 @@ def clear_refresh_cookie(response: Response) -> None:
 
 
 def verify_totp_code(user: User, code: str) -> bool:
-    totp = pyotp.TOTP(decrypt_totp_secret(user.totp_secret))
+    try:
+        secret = decrypt_totp_secret(user.totp_secret)
+    except InvalidToken:
+        logger.error("Cannot decrypt TOTP secret for user %s; was TOTP_ENCRYPTION_KEY changed?", user.pk)
+        return False
+    totp = pyotp.TOTP(secret)
     now = timezone.now()
     if not totp.verify(code, for_time=now):
         return False

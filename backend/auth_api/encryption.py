@@ -2,7 +2,7 @@ import base64
 import hashlib
 import logging
 
-from cryptography.fernet import Fernet, InvalidToken
+from cryptography.fernet import Fernet
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,4 @@ def encrypt_totp_secret(plain: str) -> str:
 def decrypt_totp_secret(encrypted: str) -> str:
     if not encrypted:
         return ""
-    try:
-        return _get_fernet().decrypt(encrypted.encode()).decode()
-    except InvalidToken:
-        return encrypted
+    return _get_fernet().decrypt(encrypted.encode()).decode()
