@@ -3,6 +3,7 @@ source = .
 omit =
     */migrations/*
     */tests/*
+    */tests.py
     */test_*
     manage.py
     config/wsgi.py
