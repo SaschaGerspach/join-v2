@@ -35,6 +35,7 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        indexes = [models.Index(fields=["recipient", "-created_at"], name="notif_recipient_created_idx")]
 
 
 class NotificationPreference(models.Model):

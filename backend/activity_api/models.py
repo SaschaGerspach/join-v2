@@ -27,6 +27,7 @@ class ActivityEntry(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        indexes = [models.Index(fields=["board", "-created_at"], name="activity_board_created_idx")]
 
     def __str__(self):
         return f"{self.action} {self.entity_type}: {self.entity_title}"
