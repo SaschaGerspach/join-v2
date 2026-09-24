@@ -436,17 +436,24 @@ class PasswordResetRequestTests(APITestCase):
 
     def test_request_with_existing_email(self):
         from unittest.mock import patch
-        with patch("auth_api.views.password_reset.send_mail_async") as mock_mail:
+        with patch("auth_api.tasks.send_mail_async") as mock_mail:
             response = self.client.post(self.url, {"email": "test@example.com"})
             self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
             mock_mail.assert_called_once()
 
     def test_request_with_unknown_email(self):
         from unittest.mock import patch
-        with patch("auth_api.views.password_reset.send_mail_async") as mock_mail:
+        with patch("auth_api.tasks.send_mail_async") as mock_mail:
             response = self.client.post(self.url, {"email": "unknown@example.com"})
             self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
             mock_mail.assert_not_called()
+
+    def test_request_enqueues_lookup_for_unknown_email(self):
+        from unittest.mock import patch
+        with patch("auth_api.views.password_reset.send_password_reset_email.delay") as mock_task:
+            response = self.client.post(self.url, {"email": "unknown@example.com"})
+            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+            mock_task.assert_called_once_with("unknown@example.com")
 
     def test_request_invalid_email(self):
         response = self.client.post(self.url, {"email": "not-an-email"})
@@ -458,7 +465,7 @@ class PasswordResetRequestTests(APITestCase):
 
     def test_request_email_case_insensitive(self):
         from unittest.mock import patch
-        with patch("auth_api.views.password_reset.send_mail_async") as mock_mail:
+        with patch("auth_api.tasks.send_mail_async") as mock_mail:
             response = self.client.post(self.url, {"email": "Test@Example.COM"})
             self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
             mock_mail.assert_called_once()
