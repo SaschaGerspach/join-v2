@@ -87,6 +87,32 @@ class UserDetailTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(User.objects.get(pk=target.pk).is_active)
 
+    def test_staff_cannot_modify_superuser(self):
+        self.user.is_staff = True
+        self.user.save()
+        root = User.objects.create_user(email="root@example.com", password="pass", is_superuser=True)
+        response = self.client.patch(self.url(root.pk), {"email": "attacker@example.com"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        response = self.client.delete(self.url(root.pk))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        root.refresh_from_db()
+        self.assertEqual(root.email, "root@example.com")
+        self.assertTrue(root.is_active)
+
+    def test_staff_cannot_modify_other_staff(self):
+        self.user.is_staff = True
+        self.user.save()
+        admin = User.objects.create_user(email="admin2@example.com", password="pass", is_staff=True)
+        response = self.client.patch(self.url(admin.pk), {"first_name": "Hacked"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_superuser_can_modify_staff(self):
+        self.user.is_superuser = True
+        self.user.save()
+        admin = User.objects.create_user(email="admin2@example.com", password="pass", is_staff=True)
+        response = self.client.patch(self.url(admin.pk), {"first_name": "Renamed"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_delete_transfers_board_to_member(self):
         self.user.is_staff = True
         self.user.save()

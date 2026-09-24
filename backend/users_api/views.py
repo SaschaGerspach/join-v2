@@ -39,6 +39,13 @@ def _co_member_ids(user):
     )
 
 
+def _can_manage(actor, target):
+    if actor.pk == target.pk or actor.is_superuser:
+        return True
+    # Staff must not modify other admins, otherwise they could take over a superuser account.
+    return actor.is_staff and not (target.is_staff or target.is_superuser)
+
+
 class _UserPagination(PageNumberPagination):
     page_size = 50
     page_size_query_param = "page_size"
@@ -90,7 +97,7 @@ def user_detail(request, pk):
         return Response(serialize_user(user))
 
     if request.method == "PATCH":
-        if request.user.pk != pk and not request.user.is_staff:
+        if not _can_manage(request.user, user):
             return Response({"detail": "You can only edit your own profile."}, status=status.HTTP_403_FORBIDDEN)
         serializer = UserUpdateSerializer(data=request.data)
         if not serializer.is_valid():
@@ -114,7 +121,7 @@ def user_detail(request, pk):
         return Response(serialize_user(user))
 
     if request.method == "DELETE":
-        if request.user.pk != pk and not request.user.is_staff:
+        if not _can_manage(request.user, user):
             return Response({"detail": "You can only delete your own account."}, status=status.HTTP_403_FORBIDDEN)
 
         original_email = user.email
