@@ -33,6 +33,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text="Platform admin: access to the admin dashboard. Does not grant access to private boards.",
     )
     is_verified = models.BooleanField(default=False)
+    # Throwaway demo account for portfolio visitors; removed by a periodic cleanup task.
+    is_guest = models.BooleanField(default=False)
     totp_secret = models.CharField(max_length=255, blank=True, default="")
     totp_enabled = models.BooleanField(default=False)
     totp_last_counter = models.BigIntegerField(null=True, blank=True)

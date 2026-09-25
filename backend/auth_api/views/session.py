@@ -88,6 +88,7 @@ def login_view(request):
         "first_name": user.first_name,
         "last_name": user.last_name,
         "is_staff": user.is_staff,
+        "is_guest": user.is_guest,
         "totp_enabled": user.totp_enabled,
         "avatar_url": request.build_absolute_uri(user.avatar.url) if user.avatar else None,
         "access": str(access),
@@ -167,6 +168,7 @@ def me(request):
         "first_name": user.first_name,
         "last_name": user.last_name,
         "is_staff": user.is_staff,
+        "is_guest": user.is_guest,
         "totp_enabled": user.totp_enabled,
         "avatar_url": request.build_absolute_uri(user.avatar.url) if user.avatar else None,
     })

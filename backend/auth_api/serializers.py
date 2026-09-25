@@ -26,6 +26,7 @@ class UserSerializer(serializers.Serializer):
 
 class MeSerializer(UserSerializer):
     is_staff = serializers.BooleanField()
+    is_guest = serializers.BooleanField()
     totp_enabled = serializers.BooleanField()
     avatar_url = serializers.CharField(allow_null=True)
 

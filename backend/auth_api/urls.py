@@ -6,6 +6,7 @@ app_name = "auth_api"
 urlpatterns = [
     path("register/", views.register, name="register"),
     path("login/", views.login_view, name="login"),
+    path("guest/", views.guest_login, name="guest_login"),
     path("logout/", views.logout_view, name="logout"),
     path("token/refresh/", views.token_refresh, name="token_refresh"),
     path("me/", views.me, name="me"),

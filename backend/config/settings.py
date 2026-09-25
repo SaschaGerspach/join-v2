@@ -356,12 +356,17 @@ REST_FRAMEWORK = {
         "user": "10000/hour" if (DEBUG or TESTING) else "1000/hour",
         "auth_attempts": "10000/minute" if (DEBUG or TESTING) else "10/minute",
         "ai": "10000/hour" if (DEBUG or TESTING) else "30/hour",
+        "guest_login": "10000/minute" if (DEBUG or TESTING) else "10/hour",
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
 }
 
 DEFAULT_BOARD_COLUMNS = ["To do", "In progress", "Await feedback", "Done"]
+
+# Guest accounts use a reserved TLD (RFC 2606) so no real mailbox can ever match.
+GUEST_EMAIL_DOMAIN = "guest.invalid"
+GUEST_ACCOUNT_TTL = timedelta(hours=24)
 
 # AI features. All features are toggled off by default in the database; these
 # credentials are only ever read when a feature is enabled and actually invoked.

@@ -74,6 +74,37 @@ class LoginViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
+class GuestLoginTests(APITestCase):
+    url = "/auth/guest/"
+
+    def test_guest_login_creates_verified_guest_with_session(self):
+        from django.conf import settings
+
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["is_guest"])
+        self.assertIn("access", response.data)
+        self.assertIn(settings.REFRESH_COOKIE_NAME, response.cookies)
+
+        guest = User.objects.get(pk=response.data["id"])
+        self.assertTrue(guest.is_guest)
+        self.assertTrue(guest.is_verified)
+        self.assertFalse(guest.has_usable_password())
+        self.assertTrue(guest.email.endswith(f"@{settings.GUEST_EMAIL_DOMAIN}"))
+        self.assertTrue(guest.boards.exists())
+
+    def test_each_guest_login_gets_own_account(self):
+        first = self.client.post(self.url)
+        second = self.client.post(self.url)
+        self.assertNotEqual(first.data["id"], second.data["id"])
+
+    def test_me_reports_guest_flag(self):
+        guest_id = self.client.post(self.url).data["id"]
+        self.client.force_authenticate(user=User.objects.get(pk=guest_id))
+        response = self.client.get("/auth/me/")
+        self.assertTrue(response.data["is_guest"])
+
+
 class LogoutViewTests(APITestCase):
     url = "/auth/logout/"
 
@@ -255,6 +286,7 @@ class MeViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["email"], "test@example.com")
         self.assertEqual(response.data["id"], self.user.pk)
+        self.assertFalse(response.data["is_guest"])
 
     def test_me_unauthenticated(self):
         response = self.client.get(self.url)
