@@ -101,6 +101,9 @@ services:
     mem_limit: 384m
     cpus: 0.5
     command: celery -A config worker --loglevel=info --concurrency=2
+    # The image's healthcheck probes the web server on :8000, which only the backend runs.
+    healthcheck:
+      disable: true
     environment:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY required}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
@@ -132,6 +135,9 @@ services:
     cpus: 0.25
     # /app is not writable for the unprivileged app user; the schedule is disposable state.
     command: celery -A config beat --loglevel=info --schedule /tmp/celerybeat-schedule
+    # The image's healthcheck probes the web server on :8000, which only the backend runs.
+    healthcheck:
+      disable: true
     environment:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY required}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
