@@ -130,7 +130,8 @@ services:
     logging: *default-logging
     mem_limit: 256m
     cpus: 0.25
-    command: celery -A config beat --loglevel=info
+    # /app is not writable for the unprivileged app user; the schedule is disposable state.
+    command: celery -A config beat --loglevel=info --schedule /tmp/celerybeat-schedule
     environment:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY required}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-false}

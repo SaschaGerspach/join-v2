@@ -8,3 +8,4 @@ staticfiles
 venv/
 *.log
 .git
+celerybeat-schedule*
