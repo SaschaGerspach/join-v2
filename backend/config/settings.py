@@ -425,6 +425,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'tasks_api.tasks.spawn_recurring_tasks',
         'schedule': crontab(hour=0, minute=15),
     },
+    'delete-expired-guest-accounts': {
+        'task': 'auth_api.tasks.delete_expired_guest_accounts',
+        'schedule': 3600,
+    },
 }
 
 DUE_DATE_REMINDER_HOURS = int(os.environ.get('DUE_DATE_REMINDER_HOURS', '24'))

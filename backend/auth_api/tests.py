@@ -687,3 +687,27 @@ class GuestRestrictionTests(APITestCase):
             mock_delay.assert_not_called()
             send_mail_async(subject="s", message="m", from_email="a@b.c", recipient_list=[self.guest.email, "real@example.com"])
         self.assertEqual(mock_delay.call_args.kwargs["recipient_list"], ["real@example.com"])
+
+
+class DeleteExpiredGuestAccountsTests(APITestCase):
+    def test_removes_only_expired_guests_with_their_data(self):
+        from datetime import timedelta
+        from django.conf import settings
+        from django.utils import timezone
+        from boards_api.models import Board
+        from .tasks import delete_expired_guest_accounts
+
+        expired_id = self.client.post("/auth/guest/").data["id"]
+        fresh_id = self.client.post("/auth/guest/").data["id"]
+        real_user = User.objects.create_user(email="real@example.com", password="securepass123")
+        long_ago = timezone.now() - settings.GUEST_ACCOUNT_TTL - timedelta(minutes=1)
+        User.objects.filter(pk=real_user.pk).update(date_joined=long_ago)
+        User.objects.filter(pk=expired_id).update(date_joined=long_ago)
+        User.objects.filter(email__endswith=f"@{settings.GUEST_EMAIL_DOMAIN}", board_memberships__board__created_by_id=expired_id).update(date_joined=long_ago)
+
+        self.assertEqual(delete_expired_guest_accounts(), 5)
+
+        self.assertFalse(User.objects.filter(pk=expired_id).exists())
+        self.assertFalse(Board.objects.filter(created_by_id=expired_id).exists())
+        self.assertTrue(User.objects.filter(pk=fresh_id).exists())
+        self.assertTrue(User.objects.filter(pk=real_user.pk).exists())
