@@ -54,6 +54,7 @@ export class ProfilePageComponent implements OnInit {
   avatarUrl = signal<string | null>(null);
 
   isAdmin = computed(() => this.auth.user()?.is_staff ?? false);
+  isGuest = computed(() => this.auth.user()?.is_guest ?? false);
 
   private userId = 0;
 

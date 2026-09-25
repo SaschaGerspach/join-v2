@@ -14,6 +14,7 @@
     "WORKLOAD": "Auslastung"
   },
   "TOPBAR": {
+    "GUEST_BANNER": "Demo-Modus: Sie sind als Gast angemeldet. Alle Daten werden nach 24 Stunden gelöscht.",
     "TITLE": "Kanban-Projektmanagement-Tool",
     "OPEN_MENU": "Menü öffnen",
     "NOTIFICATIONS": "Benachrichtigungen",
@@ -45,6 +46,9 @@
     "BACK": "Zurück",
     "BACK_TO_LOGIN": "Zurück zur Anmeldung",
     "FORGOT_PASSWORD": "Passwort vergessen?",
+    "OR": "oder",
+    "GUEST_LOGIN": "Als Gast testen",
+    "GUEST_HINT": "Ohne Registrierung. Erkunden Sie einen Demo-Workspace – er wird nach 24 Stunden gelöscht.",
     "TOTP_HINT": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein.",
     "TOTP_CODE": "Authentifizierungscode",
     "TOTP_INVALID": "Geben Sie einen 6-stelligen Code ein.",
@@ -830,6 +834,7 @@
     "PASSWORDS_NO_MATCH": "Passwörter stimmen nicht überein.",
     "SOMETHING_WRONG": "Etwas ist schiefgelaufen.",
     "ENTER_6_DIGIT": "Gib einen 6-stelligen Code ein.",
-    "PASSWORD_REQUIRED": "Passwort ist erforderlich."
+    "PASSWORD_REQUIRED": "Passwort ist erforderlich.",
+    "GUEST_LOGIN_FAILED": "Der Gastzugang ist gerade nicht verfügbar. Bitte versuchen Sie es später erneut."
   }
 }

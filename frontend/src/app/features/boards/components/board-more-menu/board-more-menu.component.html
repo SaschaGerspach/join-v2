@@ -21,7 +21,9 @@
       }
       @if (state.canEdit()) {
         <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'automations']">{{ 'AUTOMATIONS.TITLE' | translate }}</a>
-        <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'webhooks']">{{ 'WEBHOOKS.TITLE' | translate }}</a>
+        @if (!auth.user()?.is_guest) {
+          <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'webhooks']">{{ 'WEBHOOKS.TITLE' | translate }}</a>
+        }
         <a role="menuitem" [routerLink]="['/boards', state.boardId(), 'templates']">{{ 'TEMPLATES.TITLE' | translate }}</a>
       }
       @if (state.canViewArchive()) {

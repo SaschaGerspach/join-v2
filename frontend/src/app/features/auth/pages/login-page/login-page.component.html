@@ -120,6 +120,16 @@
       }
     </form>
 
+    @if (!requires2fa()) {
+      <div class="guest-login">
+        <span class="guest-divider">{{ 'AUTH.OR' | translate }}</span>
+        <button type="button" class="btn-guest" [disabled]="submitting()" (click)="loginAsGuest()">
+          {{ 'AUTH.GUEST_LOGIN' | translate }}
+        </button>
+        <p class="guest-hint">{{ 'AUTH.GUEST_HINT' | translate }}</p>
+      </div>
+    }
+
     <div class="auth-legal-links">
       <a routerLink="/privacy">{{ 'NAV.PRIVACY_POLICY' | translate }}</a>
       <a routerLink="/legal">{{ 'NAV.LEGAL_NOTICE' | translate }}</a>

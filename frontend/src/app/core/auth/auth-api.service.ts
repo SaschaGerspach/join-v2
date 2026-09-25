@@ -43,6 +43,12 @@ export class AuthApiService {
         });
     }
 
+    guestLogin(): Observable<LoginResponse> {
+        return this.http.post<LoginResponse>(`${this.baseUrl}/auth/guest/`, null, {
+            withCredentials: true,
+        });
+    }
+
     refreshToken(): Observable<{ access: string }> {
         return this.http.post<{ access: string }>(`${this.baseUrl}/auth/token/refresh/`, null, {
             withCredentials: true,

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListene
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { BoardsApiService } from '../../../../core/boards/boards-api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { BoardStateService } from '../../services/board-state.service';
@@ -20,6 +21,7 @@ export class BoardMoreMenuComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly elementRef = inject(ElementRef);
   protected readonly state = inject(BoardStateService);
+  protected readonly auth = inject(AuthService);
 
   open = signal(false);
 

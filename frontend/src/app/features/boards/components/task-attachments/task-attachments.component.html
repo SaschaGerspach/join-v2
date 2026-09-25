@@ -22,13 +22,15 @@
       <span class="comments-empty">{{ 'TASK.NO_FILES' | translate }}</span>
     }
   </div>
-  <input
-    type="file"
-    class="file-input"
-    [attr.aria-label]="'TASK.UPLOAD_ATTACHMENT' | translate"
-    accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.md,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
-    (change)="onFileSelected($event)"
-  />
+  @if (!auth.user()?.is_guest) {
+    <input
+      type="file"
+      class="file-input"
+      [attr.aria-label]="'TASK.UPLOAD_ATTACHMENT' | translate"
+      accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.md,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
+      (change)="onFileSelected($event)"
+    />
+  }
 </div>
 
 @if (previewAttachment()) {

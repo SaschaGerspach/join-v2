@@ -12,8 +12,9 @@ describe('LoginPageComponent', () => {
   const validForm = { invalid: false } as NgForm;
 
   beforeEach(() => {
-    const authSpy = jasmine.createSpyObj('AuthService', ['login']);
+    const authSpy = jasmine.createSpyObj('AuthService', ['login', 'loginAsGuest']);
     authSpy.login.and.returnValue(of({}));
+    authSpy.loginAsGuest.and.returnValue(of({}));
 
     TestBed.configureTestingModule({
       imports: [LoginPageComponent, TranslateModule.forRoot()],
@@ -41,6 +42,11 @@ describe('LoginPageComponent', () => {
 
   it('should fall back to boards without a returnUrl', () => {
     loginWithReturnUrl(undefined);
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/boards');
+  });
+
+  it('should open the boards after a guest login', () => {
+    TestBed.createComponent(LoginPageComponent).componentInstance.loginAsGuest();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/boards');
   });
 

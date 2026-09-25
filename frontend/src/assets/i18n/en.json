@@ -14,6 +14,7 @@
     "WORKLOAD": "Workload"
   },
   "TOPBAR": {
+    "GUEST_BANNER": "Demo mode: you are signed in as a guest. All data will be deleted after 24 hours.",
     "TITLE": "Kanban Project Management Tool",
     "OPEN_MENU": "Open menu",
     "NOTIFICATIONS": "Notifications",
@@ -45,6 +46,9 @@
     "BACK": "Back",
     "BACK_TO_LOGIN": "Back to login",
     "FORGOT_PASSWORD": "Forgot password?",
+    "OR": "or",
+    "GUEST_LOGIN": "Try as guest",
+    "GUEST_HINT": "No sign-up needed. Explore a demo workspace – it is deleted after 24 hours.",
     "TOTP_HINT": "Enter the 6-digit code from your authenticator app.",
     "TOTP_CODE": "Authentication code",
     "TOTP_INVALID": "Enter a 6-digit code.",
@@ -830,6 +834,7 @@
     "PASSWORDS_NO_MATCH": "Passwords do not match.",
     "SOMETHING_WRONG": "Something went wrong.",
     "ENTER_6_DIGIT": "Enter a 6-digit code.",
-    "PASSWORD_REQUIRED": "Password is required."
+    "PASSWORD_REQUIRED": "Password is required.",
+    "GUEST_LOGIN_FAILED": "Guest access is currently unavailable. Please try again later."
   }
 }

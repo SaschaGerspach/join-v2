@@ -11,17 +11,21 @@
     <div class="profile-avatar-section">
       <div class="avatar-upload-wrapper">
         <app-user-avatar [firstName]="firstName()" [lastName]="lastName()" [avatarUrl]="avatarUrl()" [size]="72" />
-        <label class="avatar-upload-btn" [title]="'PROFILE.CHANGE_AVATAR' | translate" [attr.aria-label]="'PROFILE.CHANGE_AVATAR' | translate">
-          <span aria-hidden="true">&#9998;</span>
-          <input type="file" accept="image/*" hidden (change)="onAvatarSelected($event)" />
-        </label>
-        @if (avatarUrl()) {
+        @if (!isGuest()) {
+          <label class="avatar-upload-btn" [title]="'PROFILE.CHANGE_AVATAR' | translate" [attr.aria-label]="'PROFILE.CHANGE_AVATAR' | translate">
+            <span aria-hidden="true">&#9998;</span>
+            <input type="file" accept="image/*" hidden (change)="onAvatarSelected($event)" />
+          </label>
+        }
+        @if (avatarUrl() && !isGuest()) {
           <button class="avatar-remove-btn" [title]="'PROFILE.REMOVE_AVATAR' | translate" [attr.aria-label]="'PROFILE.REMOVE_AVATAR' | translate" (click)="removeAvatar()">&#10005;</button>
         }
       </div>
       <div class="profile-name">
         <span class="profile-full-name">{{ firstName() }} {{ lastName() }}</span>
-        <span class="profile-email-display">{{ email() }}</span>
+        @if (!isGuest()) {
+          <span class="profile-email-display">{{ email() }}</span>
+        }
       </div>
     </div>
 
@@ -36,43 +40,51 @@
           <label for="profile-last-name">{{ 'PROFILE.LAST_NAME' | translate }}</label>
           <input id="profile-last-name" class="field-input" type="text" autocomplete="family-name" [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" />
         </div>
-        <div class="form-field full-width">
-          <label for="profile-email">{{ 'PROFILE.EMAIL' | translate }}</label>
-          <input id="profile-email" class="field-input" type="email" autocomplete="email" [ngModel]="email()" (ngModelChange)="email.set($event)" [readonly]="!isAdmin()" [class.field-readonly]="!isAdmin()" />
-        </div>
+        @if (!isGuest()) {
+          <div class="form-field full-width">
+            <label for="profile-email">{{ 'PROFILE.EMAIL' | translate }}</label>
+            <input id="profile-email" class="field-input" type="email" autocomplete="email" [ngModel]="email()" (ngModelChange)="email.set($event)" [readonly]="!isAdmin()" [class.field-readonly]="!isAdmin()" />
+          </div>
+        }
       </div>
     </div>
 
-    <div class="form-section">
-      <h2 class="section-title">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</h2>
-      <div class="form-grid">
-        <div class="form-field full-width">
-          <label for="profile-current-password">{{ 'PROFILE.CURRENT_PASSWORD' | translate }}</label>
-          <input id="profile-current-password" class="field-input" type="password" autocomplete="current-password" [ngModel]="currentPassword()" (ngModelChange)="currentPassword.set($event)" [placeholder]="'PROFILE.CURRENT_PASSWORD_PLACEHOLDER' | translate" />
-        </div>
-        <div class="form-field full-width">
-          <label for="profile-new-password">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
-          <input id="profile-new-password" class="field-input" type="password" minlength="8" autocomplete="new-password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" [placeholder]="'PROFILE.NEW_PASSWORD_PLACEHOLDER' | translate" />
-        </div>
-        <div class="form-field full-width">
-          <label for="profile-confirm-password">{{ 'PROFILE.CONFIRM_PASSWORD' | translate }}</label>
-          <input id="profile-confirm-password" class="field-input" type="password" autocomplete="new-password" [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" [placeholder]="'PROFILE.CONFIRM_PLACEHOLDER' | translate" />
+    @if (!isGuest()) {
+      <div class="form-section">
+        <h2 class="section-title">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</h2>
+        <div class="form-grid">
+          <div class="form-field full-width">
+            <label for="profile-current-password">{{ 'PROFILE.CURRENT_PASSWORD' | translate }}</label>
+            <input id="profile-current-password" class="field-input" type="password" autocomplete="current-password" [ngModel]="currentPassword()" (ngModelChange)="currentPassword.set($event)" [placeholder]="'PROFILE.CURRENT_PASSWORD_PLACEHOLDER' | translate" />
+          </div>
+          <div class="form-field full-width">
+            <label for="profile-new-password">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
+            <input id="profile-new-password" class="field-input" type="password" minlength="8" autocomplete="new-password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" [placeholder]="'PROFILE.NEW_PASSWORD_PLACEHOLDER' | translate" />
+          </div>
+          <div class="form-field full-width">
+            <label for="profile-confirm-password">{{ 'PROFILE.CONFIRM_PASSWORD' | translate }}</label>
+            <input id="profile-confirm-password" class="field-input" type="password" autocomplete="new-password" [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" [placeholder]="'PROFILE.CONFIRM_PLACEHOLDER' | translate" />
+          </div>
         </div>
       </div>
-    </div>
+    }
 
     <app-profile-notifications />
 
-    <app-profile-sessions />
+    @if (!isGuest()) {
+      <app-profile-sessions />
 
-    <app-profile-two-factor />
+      <app-profile-two-factor />
+    }
 
     @if (errorMessage()) {
       <p class="msg msg-error">{{ errorMessage() }}</p>
     }
 
     <div class="form-actions">
-      <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">{{ 'PROFILE.DELETE_ACCOUNT' | translate }}</button>
+      @if (!isGuest()) {
+        <button class="btn-danger-outline" (click)="showDeleteConfirm.set(true)">{{ 'PROFILE.DELETE_ACCOUNT' | translate }}</button>
+      }
       <button class="btn-export" (click)="exportData()">{{ 'PROFILE.EXPORT_DATA' | translate }}</button>
       <button class="btn-save" [disabled]="saving()" (click)="save()">
         {{ saving() ? ('PROFILE.SAVING' | translate) : ('PROFILE.SAVE' | translate) }}

@@ -108,6 +108,10 @@
       </div>
     </header>
 
+    @if (auth.user()?.is_guest) {
+      <div class="guest-banner" role="status">{{ 'TOPBAR.GUEST_BANNER' | translate }}</div>
+    }
+
     <main class="page" id="main-content">
       <router-outlet></router-outlet>
     </main>

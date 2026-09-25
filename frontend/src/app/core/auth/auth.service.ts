@@ -1,6 +1,6 @@
 import { Injectable, signal, inject } from "@angular/core";
 import { Observable, catchError, finalize, map, of, shareReplay, take, tap, throwError } from "rxjs";
-import { AuthApiService } from "./auth-api.service";
+import { AuthApiService, type LoginResponse } from "./auth-api.service";
 
 export type AuthUser = {
     id: number;
@@ -8,6 +8,7 @@ export type AuthUser = {
     first_name: string;
     last_name: string;
     is_staff: boolean;
+    is_guest: boolean;
     totp_enabled: boolean;
     avatar_url: string | null;
 };
@@ -48,12 +49,18 @@ export class AuthService {
 
     login(email: string, password: string, totpCode?: string) {
         return this.api.login({ email, password, totp_code: totpCode }).pipe(
-            tap((res) => {
-                const { access, ...user } = res;
-                this.accessToken = access;
-                this._user.set(user as AuthUser);
-            })
+            tap((res) => this.startSession(res))
         );
+    }
+
+    loginAsGuest() {
+        return this.api.guestLogin().pipe(tap((res) => this.startSession(res)));
+    }
+
+    private startSession(res: LoginResponse): void {
+        const { access, ...user } = res;
+        this.accessToken = access;
+        this._user.set(user);
     }
 
     clearUser(): void {

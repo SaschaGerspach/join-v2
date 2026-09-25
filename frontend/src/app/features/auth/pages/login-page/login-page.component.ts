@@ -68,6 +68,18 @@ export class LoginPageComponent {
     });
   }
 
+  loginAsGuest(): void {
+    this.error.set(null);
+    this.submitting.set(true);
+    this.auth.loginAsGuest().subscribe({
+      next: () => this.router.navigateByUrl('/boards'),
+      error: () => {
+        this.error.set(this.translate.instant('ERROR.GUEST_LOGIN_FAILED'));
+        this.submitting.set(false);
+      },
+    });
+  }
+
   back(): void {
     this.requires2fa.set(false);
     this.totpCode.set('');
