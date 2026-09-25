@@ -614,3 +614,76 @@ class PasswordResetConfirmTests(APITestCase):
     def test_confirm_missing_fields(self):
         response = self.client.post(self.url, {})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class GuestRestrictionTests(APITestCase):
+    def setUp(self):
+        self.guest = User.objects.get(pk=self.client.post("/auth/guest/").data["id"])
+        self.board = self.guest.boards.get(title="Website Relaunch")
+        self.real_user = User.objects.create_user(email="real@example.com", password="securepass123", is_verified=True)
+        self.client.force_authenticate(user=self.guest)
+
+    def test_closed_features_are_forbidden(self):
+        task = self.board.tasks.first()
+        cases = [
+            ("post", "/ai/generate-description/"),
+            ("get", "/webhooks/"),
+            ("get", "/webhooks/events/"),
+            ("post", "/auth/avatar/"),
+            ("post", "/auth/2fa/setup/"),
+            ("post", f"/tasks/{task.pk}/attachments/"),
+        ]
+        for method, url in cases:
+            with self.subTest(url=url):
+                self.assertEqual(getattr(self.client, method)(url).status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_ai_features_are_hidden_from_guests(self):
+        from ai_api.features import AIFeature
+        from ai_api.models import AIFeatureFlag
+
+        AIFeatureFlag.objects.create(key=AIFeature.GENERATE_DESCRIPTION, enabled=True)
+        self.assertEqual(self.client.get("/ai/features/").data["features"], [])
+
+        self.client.force_authenticate(user=self.real_user)
+        self.assertEqual(self.client.get("/ai/features/").data["features"], [AIFeature.GENERATE_DESCRIPTION])
+
+    def test_board_invite_finds_demo_teammates_but_not_real_users(self):
+        url = f"/boards/{self.board.pk}/members/"
+        response = self.client.post(url, {"email": self.real_user.email})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        emma = User.objects.get(email__startswith="emma.wilson.")
+        self.assertFalse(self.board.members.filter(user=emma).exists())
+        response = self.client.post(url, {"email": emma.email})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_team_invite_does_not_find_real_users(self):
+        team_id = self.client.post("/teams/", {"name": "Demo team"}).data["id"]
+        response = self.client.post(f"/teams/{team_id}/members/", {"email": self.real_user.email})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_guest_comment_does_not_email_external_assignees(self):
+        from unittest.mock import patch
+        from tasks_api.models import Task
+
+        task = Task.objects.get(board__created_by=self.guest, title="Competitor analysis")
+        with patch("tasks_api.views._notifications.send_mail_async") as mock_mail:
+            response = self.client.post(f"/tasks/{task.pk}/comments/", {"text": "Looks good"})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        mock_mail.assert_not_called()
+
+    def test_guest_board_notifications_never_reach_real_users(self):
+        from notifications_api.helpers import create_notification
+
+        self.assertIsNone(create_notification(self.real_user, "comment", "Spam", board_id=self.board.pk))
+        self.assertIsNotNone(create_notification(self.guest, "comment", "Hello", board_id=self.board.pk))
+
+    def test_mail_to_guest_addresses_is_dropped(self):
+        from unittest.mock import patch
+        from config.mail import send_mail_async
+
+        with patch("config.mail._send_mail_task.delay") as mock_delay:
+            send_mail_async(subject="s", message="m", from_email="a@b.c", recipient_list=[self.guest.email])
+            mock_delay.assert_not_called()
+            send_mail_async(subject="s", message="m", from_email="a@b.c", recipient_list=[self.guest.email, "real@example.com"])
+        self.assertEqual(mock_delay.call_args.kwargs["recipient_list"], ["real@example.com"])

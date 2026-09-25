@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from auth_api.permissions import GUEST_FORBIDDEN_DETAIL
 from boards_api.permissions import can_access_board, can_edit_board
 from boards_api.ws_events import send_board_event
 from config.serializers import DetailSerializer
@@ -68,6 +69,8 @@ def attachment_list(request, task_pk):
 
     if not can_edit_board(task.board, request.user):
         return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+    if request.user.is_guest:
+        return Response({"detail": GUEST_FORBIDDEN_DETAIL}, status=status.HTTP_403_FORBIDDEN)
 
     file = request.FILES.get("file")
     if not file:

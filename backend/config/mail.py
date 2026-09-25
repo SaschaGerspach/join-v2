@@ -4,6 +4,7 @@ import logging
 from typing import Any
 
 from celery import shared_task
+from django.conf import settings
 from django.core.mail import send_mail, EmailMessage
 
 logger = logging.getLogger(__name__)
@@ -30,4 +31,8 @@ def _send_mail_task(self, headers: dict[str, str] | None = None, **kwargs: Any) 
 
 
 def send_mail_async(headers: dict[str, str] | None = None, **kwargs: Any) -> None:
+    guest_suffix = f"@{settings.GUEST_EMAIL_DOMAIN}"
+    kwargs["recipient_list"] = [r for r in kwargs.get("recipient_list", []) if not r.lower().endswith(guest_suffix)]
+    if not kwargs["recipient_list"]:
+        return
     _send_mail_task.delay(headers=headers, **kwargs)

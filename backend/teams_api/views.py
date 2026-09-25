@@ -131,8 +131,9 @@ def team_members(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     email = serializer.validated_data["email"].strip().lower()
+    invitable = User.objects.filter(is_guest=True) if request.user.is_guest else User.objects.all()
     try:
-        user = User.objects.get(email=email)
+        user = invitable.get(email=email)
     except User.DoesNotExist:
         return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 

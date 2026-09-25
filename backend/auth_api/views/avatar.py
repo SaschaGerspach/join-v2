@@ -4,10 +4,12 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from drf_spectacular.utils import extend_schema
 from PIL import Image
 from rest_framework import status
-from rest_framework.decorators import api_view, parser_classes
+from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from ..permissions import IsNotGuest
 from ..serializers import AvatarSerializer
 
 MAX_SIZE = 2 * 1024 * 1024
@@ -28,6 +30,7 @@ def _resize_avatar(file):
 @extend_schema(request=AvatarSerializer, responses={200: AvatarSerializer})
 @api_view(["POST", "DELETE"])
 @parser_classes([MultiPartParser])
+@permission_classes([IsAuthenticated, IsNotGuest])
 def avatar_upload(request):
     user = request.user
 

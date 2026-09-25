@@ -7,6 +7,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.core.serializers.json import DjangoJSONEncoder
 
+from boards_api.models import Board
 from .models import Notification, NotificationPreference
 
 if TYPE_CHECKING:
@@ -14,6 +15,9 @@ if TYPE_CHECKING:
 
 
 def _is_suppressed(recipient: User, notification_type: str, board_id: int | None) -> bool:
+    # Activity on a guest's demo board must never reach real users.
+    if board_id and not recipient.is_guest and Board.objects.filter(pk=board_id, created_by__is_guest=True).exists():
+        return True
     try:
         prefs = recipient.notification_preferences
     except NotificationPreference.DoesNotExist:

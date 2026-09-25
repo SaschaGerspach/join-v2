@@ -1,8 +1,10 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from auth_api.permissions import IsNotGuest
 from boards_api.permissions import can_edit_board, get_board_or_404
 from config.serializers import DetailSerializer
 from .models import Webhook, ALL_EVENTS
@@ -21,6 +23,7 @@ from .serializers import WebhookSerializer, WebhookUpdateSerializer, WebhookDeli
     responses={201: WebhookSerializer, 400: DetailSerializer},
 )
 @api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated, IsNotGuest])
 def webhook_list(request):
     board_id = request.query_params.get("board")
     if not board_id:
@@ -62,6 +65,7 @@ def webhook_list(request):
     responses={204: None, 404: DetailSerializer},
 )
 @api_view(["PATCH", "DELETE"])
+@permission_classes([IsAuthenticated, IsNotGuest])
 def webhook_detail(request, pk):
     try:
         webhook = Webhook.objects.select_related("board").get(pk=pk)
@@ -89,6 +93,7 @@ def webhook_detail(request, pk):
 
 @extend_schema(responses={200: WebhookDeliverySerializer(many=True)})
 @api_view(["GET"])
+@permission_classes([IsAuthenticated, IsNotGuest])
 def webhook_deliveries(request, pk):
     try:
         webhook = Webhook.objects.select_related("board").get(pk=pk)
@@ -104,5 +109,6 @@ def webhook_deliveries(request, pk):
 
 @extend_schema(responses={200: None})
 @api_view(["GET"])
+@permission_classes([IsAuthenticated, IsNotGuest])
 def webhook_events(request):
     return Response(ALL_EVENTS)

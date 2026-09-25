@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
+from auth_api.permissions import IsNotGuest
 from . import prompts
 from .features import FEATURES, AIFeature
 from .models import AIFeatureFlag
@@ -88,6 +89,8 @@ def admin_feature_detail(request, key):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def enabled_features(request):
+    if request.user.is_guest:
+        return Response({"features": []})
     keys = AIFeatureFlag.objects.filter(enabled=True).values_list("key", flat=True)
     return Response({"features": [key for key in keys if key in FEATURES]})
 
@@ -141,7 +144,7 @@ def _string_list(value):
 
 @extend_schema(request=GenerateDescriptionInput, responses=DescriptionOutput)
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsNotGuest])
 @throttle_classes([AIThrottle])
 def generate_description(request):
     data = _validate(GenerateDescriptionInput, request.data)
@@ -154,7 +157,7 @@ def generate_description(request):
 
 @extend_schema(request=SuggestSubtasksInput, responses=SubtasksOutput)
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsNotGuest])
 @throttle_classes([AIThrottle])
 def suggest_subtasks(request):
     data = _validate(SuggestSubtasksInput, request.data)
@@ -174,7 +177,7 @@ def suggest_subtasks(request):
 
 @extend_schema(request=SummarizeInput, responses=SummaryOutput)
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsNotGuest])
 @throttle_classes([AIThrottle])
 def summarize(request):
     data = _validate(SummarizeInput, request.data)
@@ -187,7 +190,7 @@ def summarize(request):
 
 @extend_schema(request=CategorizeInput, responses=CategorizeOutput)
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsNotGuest])
 @throttle_classes([AIThrottle])
 def categorize(request):
     data = _validate(CategorizeInput, request.data)

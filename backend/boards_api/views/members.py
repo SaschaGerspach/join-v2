@@ -58,8 +58,9 @@ def board_members(request, pk):
     if email == request.user.email:
         return Response({"detail": "You cannot invite yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
+    invitable = User.objects.filter(is_guest=True) if request.user.is_guest else User.objects.all()
     try:
-        invitee = User.objects.get(email=email)
+        invitee = invitable.get(email=email)
     except User.DoesNotExist:
         return Response({"detail": "No user found with that email."}, status=status.HTTP_404_NOT_FOUND)
 

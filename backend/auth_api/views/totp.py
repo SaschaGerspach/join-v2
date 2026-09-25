@@ -5,10 +5,12 @@ import pyotp
 import qrcode
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from audit_api.helpers import log_audit
+from ..permissions import IsNotGuest
 from ..encryption import encrypt_totp_secret
 from ..serializers import TotpSetupSerializer, TotpCodeSerializer, TotpDisableSerializer
 from ._helpers import verify_totp_code
@@ -16,6 +18,7 @@ from ._helpers import verify_totp_code
 
 @extend_schema(responses={200: TotpSetupSerializer})
 @api_view(["POST"])
+@permission_classes([IsAuthenticated, IsNotGuest])
 def totp_setup(request):
     user = request.user
     if user.totp_enabled:
@@ -41,6 +44,7 @@ def totp_setup(request):
 
 @extend_schema(request=TotpCodeSerializer, responses={200: None})
 @api_view(["POST"])
+@permission_classes([IsAuthenticated, IsNotGuest])
 def totp_confirm(request):
     user = request.user
     if user.totp_enabled:
@@ -64,6 +68,7 @@ def totp_confirm(request):
 
 @extend_schema(request=TotpDisableSerializer, responses={200: None})
 @api_view(["POST"])
+@permission_classes([IsAuthenticated, IsNotGuest])
 def totp_disable(request):
     user = request.user
     if not user.totp_enabled:

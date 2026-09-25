@@ -93,7 +93,8 @@ def _notify_comment(comment: Comment, actor: User) -> None:
     recipients.discard(actor.email.lower())
     in_app_recipients.discard(actor.pk)
 
-    if recipients:
+    # Guests could otherwise use contacts with arbitrary addresses to send mail through the app.
+    if recipients and not actor.is_guest:
         _notify(
             subject=f'New comment on "{_sanitize(task.title)}" — Join',
             body=(
@@ -139,7 +140,7 @@ def _notify_assignments(task: Task, old_ids: set[int], new_ids: set[int], actor:
     for contact in Contact.objects.filter(pk__in=added_ids):
         is_self = contact.email and contact.email.lower() == actor.email.lower()
 
-        if contact.email and not is_self:
+        if contact.email and not is_self and not actor.is_guest:
             _notify(
                 subject="You were assigned to a task — Join",
                 body=(
