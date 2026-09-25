@@ -93,6 +93,29 @@ class GuestLoginTests(APITestCase):
         self.assertTrue(guest.email.endswith(f"@{settings.GUEST_EMAIL_DOMAIN}"))
         self.assertTrue(guest.boards.exists())
 
+    def test_guest_gets_populated_demo_workspace(self):
+        from django.utils import timezone
+        from tasks_api.models import Task
+
+        guest = User.objects.get(pk=self.client.post(self.url).data["id"])
+
+        self.assertEqual(guest.boards.count(), 3)
+        teammates = User.objects.filter(board_memberships__board__created_by=guest).distinct()
+        self.assertEqual(teammates.count(), 4)
+        self.assertTrue(all(t.is_guest and not t.has_usable_password() for t in teammates))
+        self.assertTrue(guest.notifications.filter(is_read=False).exists())
+
+        tasks = Task.objects.filter(board__created_by=guest)
+        today = timezone.now().date()
+        self.assertTrue(tasks.filter(due_date__lt=today).exists())
+        self.assertTrue(tasks.filter(due_date__gt=today).exists())
+        self.assertTrue(tasks.filter(subtasks__isnull=False).exists())
+        self.assertTrue(tasks.filter(comments__isnull=False).exists())
+
+        self.client.force_authenticate(user=guest)
+        for board in guest.boards.all():
+            self.assertEqual(self.client.get(f"/boards/{board.pk}/").status_code, status.HTTP_200_OK)
+
     def test_each_guest_login_gets_own_account(self):
         first = self.client.post(self.url)
         second = self.client.post(self.url)

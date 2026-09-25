@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 
 from ..serializers import LoginResponseSerializer
-from ._demo_data import create_demo_data
+from ._guest_demo_data import create_guest_demo_data
 from ._helpers import User, issue_tokens_for, set_refresh_cookie
 
 
@@ -32,7 +32,7 @@ def guest_login(request):
             is_verified=True,
             is_guest=True,
         )
-        create_demo_data(user)
+        create_guest_demo_data(user)
 
     update_last_login(None, user)
     refresh, access = issue_tokens_for(user)
