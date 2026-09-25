@@ -28,3 +28,11 @@ test('invalid credentials show error message', async ({ page }) => {
   await page.getByRole('button', { name: /log\s*in/i }).click();
   await expect(page.locator('.error-message').first()).toBeVisible();
 });
+
+test('guest login opens a populated demo workspace', async ({ page }) => {
+  await page.goto('/login');
+  await page.getByRole('button', { name: 'Try as guest' }).click();
+  await expect(page).toHaveURL(/\/boards$/);
+  await expect(page.getByRole('status').filter({ hasText: 'Demo mode' })).toBeVisible();
+  await expect(page.getByText('Website Relaunch').first()).toBeVisible();
+});
