@@ -67,9 +67,8 @@ def dependency_list(request, task_pk):
     if depends_on_id == task_pk:
         return Response({"detail": "A task cannot depend on itself."}, status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        target = Task.objects.select_related("board").get(pk=depends_on_id, archived_at__isnull=True)
-    except Task.DoesNotExist:
+    target = Task.objects.select_related("board").filter(pk=depends_on_id, archived_at__isnull=True).first()
+    if target is None or not can_access_board(target.board, request.user):
         return Response({"detail": "Target task not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if target.board_id != task.board_id:

@@ -5,6 +5,7 @@ from rest_framework.test import APITestCase
 
 from columns_api.models import Column
 from tasks_api.models import Task
+from teams_api.models import Team, TeamMember
 from .models import Board, BoardFavorite, BoardMember
 
 User = get_user_model()
@@ -95,6 +96,26 @@ class BoardDetailTests(APITestCase):
         response = self.client.patch(self.url(self.board.pk), {"color": "#ff5733"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["color"], "#ff5733")
+
+    def test_patch_team_assigns_own_team(self):
+        team = Team.objects.create(name="Mine", created_by=self.user)
+        response = self.client.patch(self.url(self.board.pk), {"team_id": team.pk}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.board.refresh_from_db()
+        self.assertEqual(self.board.team_id, team.pk)
+
+    def test_patch_foreign_team_looks_like_missing_team(self):
+        foreign = Team.objects.create(name="Foreign", created_by=self.other)
+        foreign_response = self.client.patch(self.url(self.board.pk), {"team_id": foreign.pk}, format="json")
+        missing_response = self.client.patch(self.url(self.board.pk), {"team_id": 99999}, format="json")
+        self.assertEqual(foreign_response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(foreign_response.data, missing_response.data)
+
+    def test_patch_team_as_plain_member_forbidden(self):
+        team = Team.objects.create(name="Shared", created_by=self.other)
+        TeamMember.objects.create(team=team, user=self.user, role=TeamMember.Role.MEMBER)
+        response = self.client.patch(self.url(self.board.pk), {"team_id": team.pk}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class AdminBoardAccessTests(APITestCase):

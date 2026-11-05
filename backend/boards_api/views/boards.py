@@ -169,16 +169,13 @@ def board_detail(request, pk):
             if data["team_id"] is None:
                 board.team = None
             else:
-                from teams_api.models import Team
-                try:
-                    t = Team.objects.get(pk=data["team_id"])
-                    from teams_api.views import _is_team_admin
-                    if _is_team_admin(t, request.user):
-                        board.team = t
-                    else:
-                        return Response({"detail": "Not a member of this team."}, status=status.HTTP_403_FORBIDDEN)
-                except Team.DoesNotExist:
-                    return Response({"detail": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
+                from teams_api.views import _get_team_or_404, _is_team_admin
+                t, err = _get_team_or_404(data["team_id"], request.user)
+                if err:
+                    return err
+                if not _is_team_admin(t, request.user):
+                    return Response({"detail": "Only team admins can add boards to this team."}, status=status.HTTP_403_FORBIDDEN)
+                board.team = t
             changed_fields.append("team")
         if changed_fields:
             board.save(update_fields=changed_fields)

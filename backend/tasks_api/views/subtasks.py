@@ -110,6 +110,9 @@ def subtask_reorder(request, task_pk):
     except Task.DoesNotExist:
         return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    if not can_access_board(task.board, request.user):
+        return Response({"detail": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
+
     if not can_edit_board(task.board, request.user):
         return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 

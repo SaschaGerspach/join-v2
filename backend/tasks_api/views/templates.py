@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from boards_api.permissions import can_edit_board, get_board_or_404
+from boards_api.permissions import can_access_board, can_edit_board, get_board_or_404
 from config.serializers import DetailSerializer
 from ..models import TaskTemplate, Task, Subtask, Label
 from ..serializers import TaskTemplateSerializer, TaskTemplateUpdateSerializer, TaskSerializer
@@ -74,6 +74,9 @@ def template_detail(request, pk):
     except TaskTemplate.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    if not can_access_board(template.board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
     if not can_edit_board(template.board, request.user):
         return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
@@ -104,6 +107,9 @@ def template_create_task(request, pk):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     board = template.board
+    if not can_access_board(board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
     if not can_edit_board(board, request.user):
         return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 

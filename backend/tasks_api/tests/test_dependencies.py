@@ -68,6 +68,14 @@ class TaskDependencyTests(APITestCase):
         response = self.client.post(self.url(self.task1.pk), {"depends_on": other_task.pk}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_target_on_inaccessible_board_looks_like_missing_task(self):
+        foreign_board = Board.objects.create(title="Foreign", created_by=self.other)
+        foreign_task = Task.objects.create(board=foreign_board, title="Secret")
+        foreign_response = self.client.post(self.url(self.task1.pk), {"depends_on": foreign_task.pk}, format="json")
+        missing_response = self.client.post(self.url(self.task1.pk), {"depends_on": 99999}, format="json")
+        self.assertEqual(foreign_response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(foreign_response.data, missing_response.data)
+
     def test_idempotent_add(self):
         self.client.post(self.url(self.task1.pk), {"depends_on": self.task2.pk}, format="json")
         response = self.client.post(self.url(self.task1.pk), {"depends_on": self.task2.pk}, format="json")

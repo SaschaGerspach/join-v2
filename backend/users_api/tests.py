@@ -52,7 +52,13 @@ class UserDetailTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["first_name"], "Updated")
 
-    def test_patch_other_profile_forbidden(self):
+    def test_patch_unrelated_profile_returns_404(self):
+        response = self.client.patch(self.url(self.other.pk), {"first_name": "Hacked"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_patch_co_member_profile_forbidden(self):
+        board = Board.objects.create(title="Shared", created_by=self.user)
+        BoardMember.objects.create(board=board, user=self.other)
         response = self.client.patch(self.url(self.other.pk), {"first_name": "Hacked"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -75,7 +81,14 @@ class UserDetailTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(User.objects.get(pk=self.user.pk).is_active)
 
-    def test_delete_other_account_forbidden(self):
+    def test_delete_unrelated_account_returns_404(self):
+        response = self.client.delete(self.url(self.other.pk))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(User.objects.get(pk=self.other.pk).is_active)
+
+    def test_delete_co_member_account_forbidden(self):
+        board = Board.objects.create(title="Shared", created_by=self.user)
+        BoardMember.objects.create(board=board, user=self.other)
         response = self.client.delete(self.url(self.other.pk))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 

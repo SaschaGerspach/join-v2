@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from boards_api.models import Board
+from boards_api.models import Board, BoardMember
 from ..models import Task, Subtask
 
 User = get_user_model()
@@ -53,3 +53,32 @@ class SubtaskTests(APITestCase):
         response = self.client.delete(self.detail_url(subtask.pk))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Subtask.objects.count(), 0)
+
+
+class SubtaskReorderTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.other = User.objects.create_user(email="b@example.com", password="pass")
+        self.board = Board.objects.create(title="Board", created_by=self.user)
+        self.task = Task.objects.create(board=self.board, title="Task")
+        self.sub1 = Subtask.objects.create(task=self.task, title="Sub 1", order=0)
+        self.sub2 = Subtask.objects.create(task=self.task, title="Sub 2", order=1)
+        self.url = f"/tasks/{self.task.pk}/subtasks/reorder/"
+        self.client.force_authenticate(user=self.user)
+
+    def test_reorder_subtasks(self):
+        response = self.client.post(self.url, {"ids": [self.sub2.pk, self.sub1.pk]}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.sub2.refresh_from_db()
+        self.assertEqual(self.sub2.order, 0)
+
+    def test_reorder_outsider_gets_404(self):
+        self.client.force_authenticate(user=self.other)
+        response = self.client.post(self.url, {"ids": [self.sub2.pk, self.sub1.pk]}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_reorder_viewer_forbidden(self):
+        BoardMember.objects.create(board=self.board, user=self.other, role="viewer")
+        self.client.force_authenticate(user=self.other)
+        response = self.client.post(self.url, {"ids": [self.sub2.pk, self.sub1.pk]}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

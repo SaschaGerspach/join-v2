@@ -94,6 +94,10 @@ def user_detail(request, pk):
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(serialize_user(user))
 
+    # Same 404 as GET for users the actor cannot see, so write requests cannot probe user IDs.
+    if not (_can_manage(request.user, user) or request.user.is_staff or user.pk in set(_co_member_ids(request.user))):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
     if request.method == "PATCH":
         if not _can_manage(request.user, user):
             return Response({"detail": "You can only edit your own profile."}, status=status.HTTP_403_FORBIDDEN)
