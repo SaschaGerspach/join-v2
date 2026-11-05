@@ -36,6 +36,12 @@ Mirrors the CI pipeline (.github/workflows/ci.yml) exactly, so green locally = g
 
 ## Architecture Decisions
 
-- Deliberate decisions are documented as comments at the affected code
-  (e.g. the DOMPurify safeguard in `shared/pipes/markdown.pipe.ts`),
-  not in this file. Read the comment before changing such places.
+- Cross-cutting decisions with alternatives and trade-offs are recorded as
+  ADRs in `docs/adr/` (index in `docs/adr/README.md`). Read the relevant ADR
+  before changing permissions, auth/tokens, WebSockets or automations.
+- Local safeguards are documented as comments at the affected code
+  (e.g. the DOMPurify safeguard in `shared/pipes/markdown.pipe.ts`).
+  Read the comment before changing such places.
+- Do not edit accepted ADRs: if a decision changes, add a new ADR and set
+  the old one to "Superseded by …".
+- Do not copy any of this into this file.
