@@ -145,7 +145,9 @@ def column_reorder(request):
     items = serializer.validated_data
     col_ids = [item["id"] for item in items]
     columns = Column.objects.select_related("board").filter(pk__in=col_ids)
-    col_map = {c.pk: c for c in columns}
+    # Columns on boards the user cannot see count as missing, so the response does not reveal that they exist.
+    accessible_boards = {b for b in {c.board for c in columns} if can_access_board(b, request.user)}
+    col_map = {c.pk: c for c in columns if c.board in accessible_boards}
 
     if len(col_map) != len(col_ids):
         return Response({"detail": "Some columns not found."}, status=status.HTTP_400_BAD_REQUEST)

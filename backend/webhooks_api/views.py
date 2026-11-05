@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from auth_api.permissions import IsNotGuest
-from boards_api.permissions import can_edit_board, get_board_or_404
+from boards_api.permissions import can_access_board, can_edit_board, get_board_or_404
 from config.serializers import DetailSerializer
 from .models import Webhook, ALL_EVENTS
 from .serializers import WebhookSerializer, WebhookUpdateSerializer, WebhookDeliverySerializer
@@ -72,6 +72,9 @@ def webhook_detail(request, pk):
     except Webhook.DoesNotExist:
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    if not can_access_board(webhook.board, request.user):
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
     if not can_edit_board(webhook.board, request.user):
         return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
@@ -98,6 +101,9 @@ def webhook_deliveries(request, pk):
     try:
         webhook = Webhook.objects.select_related("board").get(pk=pk)
     except Webhook.DoesNotExist:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not can_access_board(webhook.board, request.user):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if not can_edit_board(webhook.board, request.user):

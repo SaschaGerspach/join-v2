@@ -126,3 +126,54 @@ class ColumnDetailTests(APITestCase):
         self.client.force_authenticate(user=viewer)
         response = self.client.patch(self.url(self.column.pk), {"title": "Renamed"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ColumnReorderTests(APITestCase):
+    url = "/columns/reorder/"
+
+    def setUp(self):
+        self.user = User.objects.create_user(email="a@example.com", password="pass")
+        self.outsider = User.objects.create_user(email="b@example.com", password="pass")
+        self.board = Board.objects.create(title="Board", created_by=self.user)
+        self.col1 = Column.objects.create(board=self.board, title="Todo", order=0)
+        self.col2 = Column.objects.create(board=self.board, title="Done", order=1)
+        self.client.force_authenticate(user=self.user)
+
+    def test_reorder_columns(self):
+        response = self.client.post(
+            self.url,
+            [{"id": self.col1.pk, "order": 1}, {"id": self.col2.pk, "order": 0}],
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.col1.refresh_from_db()
+        self.assertEqual(self.col1.order, 1)
+
+    def test_reorder_nonexistent_column(self):
+        response = self.client.post(self.url, [{"id": 99999, "order": 0}], format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_outsider_gets_same_response_as_nonexistent(self):
+        self.client.force_authenticate(user=self.outsider)
+        response = self.client.post(self.url, [{"id": self.col1.pk, "order": 1}], format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["detail"], "Some columns not found.")
+
+    def test_reorder_mixed_with_foreign_column_does_not_reveal_it(self):
+        own_board = Board.objects.create(title="Own", created_by=self.outsider)
+        own_col = Column.objects.create(board=own_board, title="Mine", order=0)
+        self.client.force_authenticate(user=self.outsider)
+        response = self.client.post(
+            self.url,
+            [{"id": own_col.pk, "order": 1}, {"id": self.col1.pk, "order": 0}],
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["detail"], "Some columns not found.")
+
+    def test_reorder_viewer_forbidden(self):
+        viewer = User.objects.create_user(email="viewer@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=viewer, role=BoardMember.Role.VIEWER)
+        self.client.force_authenticate(user=viewer)
+        response = self.client.post(self.url, [{"id": self.col1.pk, "order": 1}], format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

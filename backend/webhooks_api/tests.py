@@ -151,9 +151,16 @@ class WebhookDetailTests(APITestCase):
         response = self.client.patch(f"/webhooks/{self.webhook.pk}/", {
             "is_active": False,
         }, format="json")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_outsider_cannot_delete(self):
+        self.client.force_authenticate(user=self.other)
+        response = self.client.delete(f"/webhooks/{self.webhook.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(Webhook.objects.filter(pk=self.webhook.pk).exists())
+
+    def test_viewer_cannot_delete(self):
+        BoardMember.objects.create(board=self.board, user=self.other, role="viewer")
         self.client.force_authenticate(user=self.other)
         response = self.client.delete(f"/webhooks/{self.webhook.pk}/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -192,7 +199,13 @@ class WebhookDeliveriesTests(APITestCase):
         response = self.client.get("/webhooks/99999/deliveries/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_deliveries_outsider_gets_403(self):
+    def test_deliveries_outsider_gets_404(self):
+        self.client.force_authenticate(user=self.other)
+        response = self.client.get(f"/webhooks/{self.webhook.pk}/deliveries/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_deliveries_viewer_gets_403(self):
+        BoardMember.objects.create(board=self.board, user=self.other, role="viewer")
         self.client.force_authenticate(user=self.other)
         response = self.client.get(f"/webhooks/{self.webhook.pk}/deliveries/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

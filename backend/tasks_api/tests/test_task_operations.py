@@ -70,8 +70,19 @@ class TaskReorderTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_reorder_forbidden_for_outsider(self):
+    def test_reorder_outsider_gets_404(self):
         self.client.force_authenticate(user=self.outsider)
+        response = self.client.post(
+            self.url,
+            [{"id": self.task1.pk, "order": 5.0}],
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_reorder_viewer_forbidden(self):
+        viewer = User.objects.create_user(email="viewer@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=viewer, role="viewer")
+        self.client.force_authenticate(user=viewer)
         response = self.client.post(
             self.url,
             [{"id": self.task1.pk, "order": 5.0}],
@@ -197,10 +208,10 @@ class TaskDuplicateTests(APITestCase):
         response = self.client.post(self.url(self.task.pk))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_duplicate_forbidden_for_outsider(self):
+    def test_duplicate_outsider_gets_404(self):
         self.client.force_authenticate(user=self.outsider)
         response = self.client.post(self.url(self.task.pk))
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_duplicate_viewer_forbidden(self):
         viewer = User.objects.create_user(email="viewer@example.com", password="pass")
