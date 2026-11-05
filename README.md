@@ -151,6 +151,10 @@ All board access decisions live in one module — `backend/boards_api/permission
 - **Audit scope, precisely:** opening a foreign board or team detail as superuser writes `superuser_board_access` / `superuser_team_access` to the audit log; other superuser reads (board list, sub-resources) are not individually audited. Independently, every successful write request by a staff user is logged as `admin_action` via middleware — this also covers superuser writes as long as the account has `is_staff` (the `createsuperuser` default).
 - **Django admin** (`/manage/`) is only mounted when `DEBUG` or `DJANGO_ADMIN_ENABLED=true`. A staff user who is additionally granted model permissions there can read data past the API layer, so the flag stays off in production.
 
+## Architecture Decisions
+
+Important design decisions and their trade-offs are recorded as ADRs in [`docs/adr/`](docs/adr/README.md).
+
 ## Tech Stack
 
 | Layer | Technology |
