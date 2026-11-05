@@ -1,5 +1,7 @@
 asgiref==3.11.1
 celery[redis]==5.4.0
+# kombu 5.7 needs redis>=6.4, but celery 5.4 caps redis below 6.
+kombu==5.6.2
 channels==4.3.2
 channels-redis==4.3.0
 daphne==4.2.2
