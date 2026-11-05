@@ -5,7 +5,7 @@ channels-redis==4.3.0
 daphne==4.2.2
 Django==6.0.8
 django-cors-headers==4.9.0
-djangorestframework==3.17.2
+djangorestframework==3.18.2
 drf-spectacular==0.28.0
 djangorestframework-simplejwt==5.5.1
 psycopg2-binary==2.9.10
@@ -19,6 +19,6 @@ tzdata==2025.3
 whitenoise==6.8.2
 django-storages[s3]==1.14.6
 boto3==1.38.6
-Pillow==12.3.0
+Pillow==13.0.0
 coverage==7.9.1
 weasyprint==70.0
