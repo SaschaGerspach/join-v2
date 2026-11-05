@@ -31,15 +31,19 @@ The main risks:
 - **Origin check:** in production the cookie must be `SameSite=None`
   because frontend and API are on different sites. That means a foreign
   page could trigger a refresh. The refresh endpoint therefore rejects
-  requests from origins that are not on the allow list.
+  requests whose `Origin` header is not on the allow list. Requests without
+  an `Origin` header are let through; browsers always send it on
+  cross-site POST requests, so a foreign page cannot skip the check.
 - Logout blacklists the refresh token. Deactivated users cannot refresh.
 - Login and other auth endpoints are rate limited (10 per minute in
   production).
 
 ## Consequences
 
-- XSS cannot steal the refresh token. It can still use the access token
-  while the page is open, but only for a few minutes.
+- XSS cannot steal the refresh token. But while the page is open,
+  injected script can call the refresh endpoint itself (the browser sends
+  the cookie) and get new access tokens. This setup limits what an
+  attacker can take away, not what they can do during the session.
 - After a page reload the access token is gone. The app must call the
   refresh endpoint first. This adds one request at startup.
 - Logout is not instant for access tokens: an access token that was
@@ -61,5 +65,9 @@ The main risks:
 
 ## Open points
 
-Expired entries in the token blacklist are never deleted. simplejwt has a
-`flushexpiredtokens` command that could run as a daily Celery Beat task.
+- Expired entries in the token blacklist are never deleted. simplejwt has a
+  `flushexpiredtokens` command that could run as a daily Celery Beat task.
+- The rate limit identifies clients by `X-Forwarded-For`, but
+  `NUM_PROXIES` is not set. A client can send a fake header and bypass the
+  limit on login and guest login. This is deliberately deferred while the
+  app runs as a demo.

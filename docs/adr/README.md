@@ -14,6 +14,8 @@ made. The `Date` field shows when the record was written. Where possible,
 
 **Rule:** an accepted ADR is not edited later. If a decision changes, a
 new ADR replaces it, and the old one gets the status "Superseded".
+Fixing factual errors or adding missing context is allowed, as long as
+the decision itself does not change.
 
 | ADR | Decision | Status |
 |-----|----------|--------|

@@ -29,6 +29,11 @@ triggered the same rule again.
 
 - No endless loops, without a fixed depth limit and without extra
   infrastructure.
+- The guard key contains the task, so it only stops cycles on the same
+  task. This is enough because no action creates tasks (actions only move,
+  set priority, assign, change labels or notify). An action like "create
+  task" or "duplicate task" would allow endless chains across new tasks,
+  and the guard would need a depth or chain limit.
 - Each rule runs at most once per task in one chain. If someone really
   wants a rule to fire twice in one chain, that is not possible.
 - Automations make the request slower, because they run before the
