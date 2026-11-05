@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from boards_api.models import Board
+from boards_api.models import Board, BoardMember
 from columns_api.models import Column
 from contacts_api.models import Contact
 from tasks_api.models import Label, Task
@@ -489,6 +489,31 @@ class ActionTests(AutomationTestMixin, APITestCase):
         self.assertTrue(self.task.labels.filter(pk=label.pk).exists())
 
     @patch("automations_api.actions.send_board_event")
+    def test_set_label_rejects_label_from_other_board(self, mock_ws):
+        other_board = Board.objects.create(title="Foreign", created_by=self.other)
+        foreign = Label.objects.create(board=other_board, name="Secret", color="#000000")
+        action = RuleAction.objects.create(
+            rule=self.rule, action_type=ActionType.SET_LABEL,
+            config={"label_id": foreign.pk}, order=0,
+        )
+        from .actions import execute_action
+        execute_action(action, self.task, self.user)
+        self.assertFalse(self.task.labels.filter(pk=foreign.pk).exists())
+
+    @patch("automations_api.actions.send_board_event")
+    def test_assign_user_rejects_contact_of_non_member(self, mock_ws):
+        foreign = Contact.objects.create(
+            owner=self.other, first_name="Eve", last_name="X", email="eve@example.com",
+        )
+        action = RuleAction.objects.create(
+            rule=self.rule, action_type=ActionType.ASSIGN_USER,
+            config={"assignee_id": foreign.pk}, order=0,
+        )
+        from .actions import execute_action
+        execute_action(action, self.task, self.user)
+        self.assertFalse(self.task.assignees.filter(pk=foreign.pk).exists())
+
+    @patch("automations_api.actions.send_board_event")
     def test_set_label_missing_config(self, mock_ws):
         action = RuleAction.objects.create(
             rule=self.rule, action_type=ActionType.SET_LABEL,
@@ -537,6 +562,7 @@ class ActionTests(AutomationTestMixin, APITestCase):
     @patch("automations_api.actions.create_notification")
     def test_notify_user(self, mock_notify):
         target = User.objects.create_user(email="target@example.com", password="pass")
+        BoardMember.objects.create(board=self.board, user=target)
         action = RuleAction.objects.create(
             rule=self.rule, action_type=ActionType.NOTIFY_USER,
             config={"user_id": target.pk}, order=0,
@@ -545,6 +571,16 @@ class ActionTests(AutomationTestMixin, APITestCase):
         result = execute_action(action, self.task, self.user)
         self.assertTrue(result)
         mock_notify.assert_called_once()
+
+    @patch("automations_api.actions.create_notification")
+    def test_notify_user_skips_non_member(self, mock_notify):
+        action = RuleAction.objects.create(
+            rule=self.rule, action_type=ActionType.NOTIFY_USER,
+            config={"user_id": self.other.pk}, order=0,
+        )
+        from .actions import execute_action
+        execute_action(action, self.task, self.user)
+        mock_notify.assert_not_called()
 
     @patch("automations_api.actions.create_notification")
     def test_notify_user_missing_config(self, mock_notify):

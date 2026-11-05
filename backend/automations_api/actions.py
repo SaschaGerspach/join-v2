@@ -56,8 +56,9 @@ def _action_set_priority(task: Task, config: dict[str, Any], triggered_by: User)
 
 
 def _action_assign_user(task: Task, config: dict[str, Any], triggered_by: User) -> None:
+    from tasks_api.views.tasks import _validate_assignees
     assignee_id = config.get("assignee_id")
-    if not assignee_id:
+    if not assignee_id or not _validate_assignees([assignee_id], task.board):
         return
     task.assignees.add(assignee_id)
     send_board_event(task.board_id, "task_updated", serialize_task(task))
@@ -67,7 +68,8 @@ def _action_set_label(task: Task, config: dict[str, Any], triggered_by: User) ->
     label_id = config.get("label_id")
     if not label_id:
         return
-    task.labels.add(label_id)
+    from tasks_api.models import Label
+    task.labels.add(Label.objects.get(pk=label_id, board=task.board))
     send_board_event(task.board_id, "task_updated", serialize_task(task))
     from tasks_api.signals import task_label_added
     task_label_added.send(sender=task.__class__, task=task, label_id=label_id)
@@ -107,9 +109,12 @@ def _action_notify_user(task: Task, config: dict[str, Any], triggered_by: User) 
     user_id = config.get("user_id")
     if not user_id:
         return
+    from boards_api.permissions import is_board_member
     try:
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
+        return
+    if not is_board_member(task.board, user):
         return
     create_notification(
         user, "automation",
